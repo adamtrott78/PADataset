@@ -1,0 +1,403 @@
+function eval_ota_quick_v01()
+%EVAL_OTA_QUICK_V01 Quick OTA sanity eval + representative PNGs (PA2/PA3/PA4/PA8).
+% - Uses OTA-sane preprocessing: DC removal + RMS normalize.
+% - Uses per-window noise-floor occupancy (quantile+MAD) for PA3/PA4/PA8.
+% - PA8 repeats: uses K-longest occupancy components + IQ xcorr similarity.
+%
+% Expects files:
+%   WIFI/pilot_out_v01/data_ota/ota_rx_S01_PA2.mat  (Xrx_all, meta_rx)
+%   WIFI/pilot_out_v01/data_ota/ota_rx_S01_PA3.mat
+%   WIFI/pilot_out_v01/data_ota/ota_rx_S01_PA4.mat
+%   WIFI/pilot_out_v01/data_ota/ota_rx_S01_PA8.mat
+%
+% Outputs:
+%   WIFI/pilot_out_v01/evidence_pack_ota_quick/png/OTA_PA2.png ... OTA_PA8.png
+%   WIFI/pilot_out_v01/evidence_pack_ota_quick/ota_quick_summary.mat
+
+    % ---------- locate WIFI root (script lives in WIFI/) ----------
+    this = fileparts(mfilename("fullpath"));
+    wifi_root = this;
+    data_ota = fullfile(wifi_root, "pilot_out_v01", "data_ota");
+    assert(isfolder(data_ota), "Missing data_ota: %s", data_ota);
+
+    out_root = fullfile(wifi_root, "pilot_out_v01", "evidence_pack_ota_quick");
+    out_png  = fullfile(out_root, "png");
+    if exist(out_root,"dir")==0, mkdir(out_root); end
+    if exist(out_png,"dir")~=0, rmdir(out_png,"s"); end
+    mkdir(out_png);
+
+    fprintf("OTA QUICK EVAL | data_ota=%s\n", data_ota);
+
+    % ---------- load cfg (DO NOT pa_validate_cfg on OTA; it asserts 20 MS/s) ----------
+    cfg = pa_load_cfg("starter_ota12.json");
+
+    % detector params from cfg
+    bp = pa_get_nested(cfg,"validation.detectors.burst.params");
+    smooth_s = double(bp.power_smoothing_s);
+    refr_s   = double(bp.refractory_s);
+    k_hi     = double(bp.thresholds.hi_mad_k);
+    k_lo     = double(bp.thresholds.lo_mad_k);
+    close_s  = double(pa_get_nested(cfg,"validation.detectors.burst.mask_close_s"));
+
+    sp = pa_get_nested(cfg,"validation.detectors.stationarity.params");
+    nfft = double(sp.nfft);
+    hop  = double(sp.hop);
+    nb   = double(sp.nbins);
+
+    fp = pa_get_nested(cfg,"validation.detectors.freq.params");
+    pframes = double(fp.persistence_frames);
+    sframes = double(fp.smooth_frames);
+    dbins   = double(fp.min_delta_bins);
+        
+    % ---- OTA knobs from cfg ----
+    ota_pre = pa_get_nested(cfg,"validation.ota.preprocess");
+    ota_occ_cfg = pa_get_nested(cfg,"validation.ota.occupancy");
+    pa8_cfg = pa_get_nested(cfg,"validation.ota.pa8");
+    
+    ota_occ = struct();
+    ota_occ.q_floor        = double(ota_occ_cfg.q_floor);
+    ota_occ.k_mad          = double(ota_occ_cfg.k_mad);
+    ota_occ.close_s_pa3    = double(ota_occ_cfg.close_s_pa3);
+    ota_occ.close_s_pa8    = double(ota_occ_cfg.close_s_pa8);
+    ota_occ.min_comp_s_pa3 = double(ota_occ_cfg.min_comp_s_pa3);
+    ota_occ.min_comp_s_pa8 = double(ota_occ_cfg.min_comp_s_pa8);
+    
+    pa8 = struct();
+    pa8.keep_longest = double(pa8_cfg.keep_longest);
+    pa8.ds           = double(pa8_cfg.ds);
+    pa8.maxlag_s     = double(pa8_cfg.maxlag_s);
+    pa8.cap_len_s    = double(pa8_cfg.cap_len_s);
+    pa8.sim_min      = double(pa8_cfg.sim_min); % (you're not enforcing it yet; OK)
+
+    % speed knob
+    N_eval = 40;
+
+    PAs = ["PA2","PA3","PA4","PA8"];
+    picked = struct();
+
+    Fs_global = [];
+    for pa = PAs
+        f = fullfile(data_ota, sprintf("ota_rx_S01_%s.mat", pa));
+        assert(isfile(f), "Missing %s", f);
+        S = load(f,"Xrx_all","meta_rx");
+        X = S.Xrx_all;
+        M = S.meta_rx;
+        
+        Fs_cfg = double(pa_get_nested(cfg, "rates.fs_hz"));
+        Fs_meta = double(M(1).fs_hz);
+        
+        Fs = Fs_cfg;
+        fprintf("Using Fs=%.3f MS/s (cfg) | meta=%.3f MS/s\n", Fs_cfg/1e6, Fs_meta/1e6);
+
+        N = size(X,2);
+        Ne = min(N_eval, N);
+
+        best_score = -inf;
+        best = struct();
+
+        for i = 1:Ne
+            wid = double(M(i).window_id);
+            x_raw = X(:,i);
+            
+            % raw QC
+            rms_raw = pa_rms(x_raw);
+            pk_raw  = max(abs(x_raw));
+            papr_raw = 20*log10(double(pk_raw) / max(1e-12,double(rms_raw)));
+
+            % OTA-sane preprocess
+            [x, prep] = pa_preprocess_ota_basic(x_raw);
+
+            switch string(pa)
+                case "PA2"
+                    % Burst edges on OTA signal (no snr_quiet assumptions)
+                    e23 = pa_detect_E2E3(x, Fs, smooth_s, refr_s, k_hi, k_lo);
+
+                    % train-span mask from first rise to last fall
+                    W = numel(x);
+                    train = false(W,1);
+                    if ~isempty(e23.rise_idx) && ~isempty(e23.fall_idx)
+                        a = e23.rise_idx(1);
+                        b = e23.fall_idx(end);
+                        a = max(1,min(W,a)); b = max(1,min(W,b));
+                        if b>=a, train(a:b)=true; end
+                    end
+                    train = pa_mask_close(train, max(1, round(close_s*Fs)));
+                    span = mean(train);
+
+                    % Score: prefer 3-8 edges and non-trivial span
+                    c2 = double(e23.E2_count);
+                    c3 = double(e23.E3_count);
+                    score = 30*min(c2,c3) - 10*abs(c2-c3) + 200*span - 3*papr_raw;
+
+                    det = struct("E2",c2,"E3",c3,"span",span,"train_mask",train,"e23",e23);
+
+                case "PA3"
+                    occ = pa_detect_occupancy_ota_v01(x, Fs, smooth_s, ota_occ.close_s_pa3, ota_occ.q_floor, ota_occ.k_mad, ota_occ.min_comp_s_pa3);
+                    
+                    % use train_frac (largest component span) instead of raw duty
+                    occ_frac = occ.train_frac;
+
+                    B = pa_stft_bins32(x, nfft, hop, nb);
+                    [st_shape, st_energy, energy_cv] = stationarity_metrics_local(B);
+
+                    % Score: high stationarity + decent occupancy
+                    score = 200*st_shape + 200*st_energy + 80*occ_frac - 2*numel(occ.starts) - 2*papr_raw;
+
+                    det = struct("occ",occ,"st_shape",st_shape,"st_energy",st_energy,"energy_cv",energy_cv);
+
+                case "PA4"
+                    B = pa_stft_bins32(x, nfft, hop, nb);
+                    fj = pa_detect_freq_jump(B, pframes, sframes, dbins);
+                    rv = pa_detect_freq_revisit(fj.bin_trace);
+
+                    score = 15*double(fj.count) + 60*double(rv.present) - 2*papr_raw;
+
+                    det = struct("fj",fj,"rv",rv);
+                
+                case "PA8"
+                   occ = pa_detect_occupancy_ota_v01(x, Fs, smooth_s, ota_occ.close_s_pa8, ota_occ.q_floor, ota_occ.k_mad, ota_occ.min_comp_s_pa8);
+
+                    intervals = [occ.starts(:) occ.ends(:)];
+                    intervals = keep_longest_intervals_local(intervals, pa8.keep_longest);
+
+                    sim = pa_detect_repeat_similarity_iqxcorr(x, Fs, intervals, pa8.ds, pa8.maxlag_s, pa8.cap_len_s);
+
+                    score = 300*double(sim.score) + 10*min(10, size(intervals,1)) - 0.2*double(numel(occ.starts)) - 2*papr_raw;
+
+                    det = struct("occ",occ,"intervals",intervals,"sim",sim);
+            end
+
+            if score > best_score
+                best_score = score;
+                best = struct( ...
+                    "idx", i, ...
+                    "window_id", wid, ...
+                    "N", N, ...
+                    "score", best_score, ...
+                    "x_raw", x_raw, ...
+                    "x", x, ...
+                    "Fs", Fs, ...
+                    "rms_raw", rms_raw, ...
+                    "papr_raw", papr_raw, ...
+                    "prep", prep, ...
+                    "det", det);
+            end
+        end
+
+        picked.(char(pa)) = best;
+    end
+
+    % ---------- write PNGs + print summary ----------
+    for pa = PAs
+        b = picked.(char(pa));
+        fprintf("\n%s: picked idx=%d/%d | window_id=%d | score=%.3f | rms_raw=%.6g | papr_raw=%.2f dB\n", ...
+            pa, b.idx, b.N, b.window_id, b.score, b.rms_raw, b.papr_raw);
+
+        switch string(pa)
+            case "PA2"
+                fprintf("  edges: start=%d end=%d | span=%.3f\n", b.det.E2, b.det.E3, b.det.span);
+            case "PA3"
+                fprintf("  occ: duty=%.3f comps=%d | stationarity: shape=%.3f energy=%.3f\n", ...
+                    b.det.occ.duty_frac, numel(b.det.occ.starts), b.det.st_shape, b.det.st_energy);
+            case "PA4"
+                fprintf("  freq jumps: %d | revisit=%d\n", b.det.fj.count, b.det.rv.present);
+            case "PA8"
+                fprintf("  repeats: comps=%d | kept=%d | sim=%.3f | used=%d\n", ...
+                    numel(b.det.occ.starts), size(b.det.intervals,1), b.det.sim.score, b.det.sim.used_repeats);
+        end
+
+        Fs_force = double(pa_get_nested(cfg,"rates.fs_hz"));
+        [xd, Fs_d, ok] = load_digital_match(wifi_root, pa, b.window_id, Fs_force);
+        if ok
+            out = fullfile(out_png, sprintf("DIG_vs_OTA_%s.png", pa));
+            plot_pair_dig_vs_ota_local(cfg, pa, xd, Fs_d, b.x, b.Fs, out);
+        else
+            out = fullfile(out_png, sprintf("OTA_%s.png", pa));
+            plot_one_ota_local(cfg, pa, b.x, b.Fs, b.det, out);
+        end
+    end
+
+    save(fullfile(out_root,"ota_quick_summary.mat"), "cfg","picked","ota_occ","pa8","N_eval");
+    fprintf("\nWrote PNGs to: %s\n", out_png);
+    fprintf("Saved: %s\n", fullfile(out_root,"ota_quick_summary.mat"));
+end
+
+% ======================= PLOTTING =======================
+
+function plot_one_ota_local(cfg, pa, x, Fs, det, out_png)
+    x = x(:);
+    W = numel(x);
+    tms = (0:W-1)/Fs*1e3;
+
+    nfft = double(pa_get_nested(cfg,"validation.detectors.stationarity.params.nfft"));
+    hop  = double(pa_get_nested(cfg,"validation.detectors.stationarity.params.hop"));
+    win  = hann(nfft,"periodic");
+
+    % Build a mask for overlay (so waveform panel can highlight "evidence")
+    mask = false(W,1);
+    switch string(pa)
+        case "PA2"
+            if isfield(det,"train_mask"), mask = det.train_mask; end
+        case {"PA3","PA8"}
+            if isfield(det,"occ") && isfield(det.occ,"mask"), mask = det.occ.mask; end
+        otherwise
+            % PA4: no mask by default
+    end
+    mask = logical(mask(:));
+
+    f = figure("Visible","off","Color","w","Position",[100 100 1400 1000]);
+    tiledlayout(3,1,"Padding","compact","TileSpacing","compact");
+
+    % -------- Panel 1: spectrogram --------
+    nexttile;
+    [S,F,T] = spectrogram(x, win, nfft-hop, nfft, Fs, "centered");
+    imagesc(T*1e3, F/1e6, 10*log10(abs(S).^2 + 1e-12));
+    axis xy; xlabel("Time (ms)"); ylabel("Freq (MHz)");
+    title(sprintf("%s (OTA) — spectrogram", pa), "Interpreter","none");
+    colorbar;
+
+    % -------- Panel 2: waveform magnitude (+ mask dots) --------
+    nexttile;
+    % a = abs(x);
+    xi = real(x); xq = imag(x);
+
+    plot(tms, xi, "k"); hold on;
+    plot(tms, xq, "Color",[0.5 0.5 0.5]); grid on;
+    xlabel("Time (ms)"); ylabel("I / Q");
+    title("Waveform (I and Q)");
+    legend("I = real(x)", "Q = imag(x)", "Location", "northeast");
+    if any(mask)
+        hold on;
+        yy = 0.95 * max([abs(xi);  abs(xq)])*0.95;
+        plot(tms(mask), yy*ones(nnz(mask),1), ".", "MarkerSize", 2);
+    end
+
+    % -------- Panel 3: PA-specific trace --------
+    nexttile; hold on; grid on;
+
+    switch string(pa)
+        case "PA2"
+            train = det.train_mask;
+            plot(tms, double(train), "-");
+            ylim([-0.05 1.05]); ylabel("On/Off"); xlabel("Time (ms)");
+            title(sprintf("Burst timeline — starts=%d ends=%d | span=%.2f", det.E2, det.E3, det.span), "Interpreter","none");
+
+        case "PA3"
+            m = det.occ.mask;
+            plot(tms, double(m), "-");
+            ylim([-0.05 1.05]); ylabel("Occupied"); xlabel("Time (ms)");
+            title(sprintf("Occupancy strip — duty=%.2f | components=%d", det.occ.duty_frac, numel(det.occ.starts)), "Interpreter","none");
+
+        case "PA4"
+            fj = det.fj;
+            tt = (0:numel(fj.bin_trace)-1) * (hop/Fs) * 1e3;
+            plot(tt, double(fj.bin_trace), "-");
+            xlabel("Time (ms)"); ylabel("Dominant FFT-bin state");
+            title(sprintf("Hop signature — freq_jump.count=%d | revisit=%d", fj.count, det.rv.present), "Interpreter","none");
+
+        case "PA8"
+            occ = det.occ;
+            train = occ.train_mask;
+            plot(tms, double(train), "-");
+            ylim([-0.05 1.05]); ylabel("Repeat-train span"); xlabel("Time (ms)");
+            title(sprintf("Repeat structure — comps=%d | kept=%d | sim=%.3f", ...
+                numel(occ.starts), size(det.intervals,1), det.sim.score), "Interpreter","none");
+            iv = det.intervals;
+            for r = 1:size(iv,1)
+                xline(tms(iv(r,1)), "k:");
+                xline(tms(iv(r,2)), "k:");
+            end
+    end
+
+    exportgraphics(f, out_png);
+    close(f);
+end
+
+function plot_pair_dig_vs_ota_local(cfg, pa, x_d, Fs_d, x_o, Fs_o, out_png)
+    x_d = x_d(:); x_o = x_o(:);
+
+    nfft = double(pa_get_nested(cfg,"validation.detectors.stationarity.params.nfft"));
+    hop  = double(pa_get_nested(cfg,"validation.detectors.stationarity.params.hop"));
+    win  = hann(nfft,"periodic");
+
+    td = (0:numel(x_d)-1)/Fs_d*1e3;
+    to = (0:numel(x_o)-1)/Fs_o*1e3;
+
+    f = figure("Visible","off","Color","w","Position",[100 100 1700 950]);
+    tiledlayout(2,2,"Padding","compact","TileSpacing","compact");
+
+    % --- Digital spectrogram ---
+    nexttile;
+    [Sd,Fd,Td] = spectrogram(x_d, win, nfft-hop, nfft, Fs_d, "centered");
+    imagesc(Td*1e3, Fd/1e6, 10*log10(abs(Sd).^2 + 1e-12));
+    axis xy; xlabel("Time (ms)"); ylabel("Freq (MHz)");
+    title(pa+" (DIG)"); colorbar;
+
+    % --- OTA spectrogram ---
+    nexttile;
+    [So,Fo,To] = spectrogram(x_o, win, nfft-hop, nfft, Fs_o, "centered");
+    imagesc(To*1e3, Fo/1e6, 10*log10(abs(So).^2 + 1e-12));
+    axis xy; xlabel("Time (ms)"); ylabel("Freq (MHz)");
+    title(pa+" (OTA)"); colorbar;
+
+    % --- Digital waveform (I/Q) ---
+    nexttile;
+    plot(td, real(x_d)); hold on;
+    plot(td, imag(x_d), "--");
+    grid on; xlabel("Time (ms)"); ylabel("I / Q");
+    title("Waveform (DIG)");
+    legend("I = real(x)", "Q = imag(x)", "Location","northeast");
+
+    % --- OTA waveform (I/Q) ---
+    nexttile;
+    plot(to, real(x_o)); hold on;
+    plot(to, imag(x_o), "--");
+    grid on; xlabel("Time (ms)"); ylabel("I / Q");
+    title("Waveform (OTA)");
+    legend("I = real(x)", "Q = imag(x)", "Location","northeast");
+
+    exportgraphics(f, out_png);
+    close(f);
+end
+
+% ======================= HELPERS =======================
+
+function [st_shape, st_energy, energy_cv] = stationarity_metrics_local(B)
+    epsv = 1e-12;
+
+    N = sqrt(sum(B.^2, 1)) + epsv;
+    Bh = B ./ N;
+    c = sum(Bh(:,1:end-1) .* Bh(:,2:end), 1);
+    st_shape = mean(c);
+
+    E = sum(B, 1) + epsv;
+    energy_cv = std(E) / (mean(E) + epsv);
+    st_energy = 1 / (1 + energy_cv);
+end
+
+function intervals2 = keep_longest_intervals_local(intervals, K)
+% Keep K longest intervals (by sample length), preserve time order.
+    intervals2 = intervals;
+    if isempty(intervals2), return; end
+    L = intervals2(:,2) - intervals2(:,1) + 1;
+    [~,ord] = sort(L,"descend");
+    ord = ord(1:min(K,numel(ord)));
+    intervals2 = intervals2(ord,:);
+    intervals2 = sortrows(intervals2, 1);
+end
+
+function [x_dig, Fs_dig, found] = load_digital_match(wifi_root, pa, window_id, Fs_force)
+    f = fullfile(wifi_root, "pilot_out_v01", "data", sprintf("pilot_S01_%s.mat", pa)); % TX source
+    if ~isfile(f)
+        x_dig = []; Fs_dig = []; found = false; return;
+    end
+    S = load(f, "Xsig_all", "meta");
+    ids = arrayfun(@(m) double(m.window_id), S.meta);
+    j = find(ids == double(window_id), 1, "first");
+    if isempty(j)
+        x_dig = []; Fs_dig = []; found = false; return;
+    end
+    x_dig = S.Xsig_all(:,j);
+    Fs_dig = double(Fs_force);   % force plot Fs consistency
+    found = true;
+end
