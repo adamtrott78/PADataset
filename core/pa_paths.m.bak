@@ -1,0 +1,30 @@
+% core/pa_paths.m
+function P = pa_paths()
+    root = pa_root();
+
+    P.root = root;
+
+    P.config = fullfile(root, 'config');
+
+    P.data_root = fullfile(root, 'data');
+    P.data_wifi = fullfile(P.data_root, 'wifi');
+    P.data_wifi_digital = fullfile(P.data_wifi, 'digital');
+    P.data_wifi_pilot = fullfile(P.data_wifi_digital, 'pilot');
+    P.data_wifi_ota = fullfile(P.data_wifi, 'ota');
+    P.data_wifi_spliced = fullfile(P.data_wifi_ota, 'spliced');
+    P.data_wifi_spliced_v03 = fullfile(P.data_wifi_spliced, 'v03');
+    P.data_wifi_spliced_v05 = fullfile(P.data_wifi_spliced, 'v05');
+
+    P.txrx = fullfile(root, 'txrx');
+    P.txrx_tapes = fullfile(P.txrx, 'tapes');
+    P.txrx_tapes_digital = fullfile(P.txrx_tapes, 'digital');
+    P.txrx_tapes_ota = fullfile(P.txrx_tapes, 'ota');
+
+    P.results = fullfile(root, 'results');
+    P.results_wifi = fullfile(P.results, 'wifi');
+    P.results_wifi_digital = fullfile(P.results_wifi, 'digital');
+    P.results_wifi_ota = fullfile(P.results_wifi, 'ota');
+    P.results_rx_resplice_v03 = fullfile(P.results_wifi_ota, 'rx_resplice_tape_v03');
+    P.results_rx_resplice_v05 = fullfile(P.results_wifi_ota, 'rx_resplice_tape_v05');
+    P.results_tape_inspect = fullfile(P.results_wifi_ota, 'tape_inspect');
+end
