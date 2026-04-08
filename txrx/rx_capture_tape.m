@@ -1,4 +1,4 @@
-function rx_capture_tape(protocol, ip, fc_hz, rx_gain_db, rx_ant)
+function rx_capture_tape(protocol, ip, fc_hz, rx_gain_db, rx_ant, tx_spec_file_override, out_file_override)
 %RX_CAPTURE_TAPE Monitor beacon -> detect START_SYNC -> record full tx_tape into RAM.
 %
 % Usage:
@@ -29,8 +29,17 @@ function rx_capture_tape(protocol, ip, fc_hz, rx_gain_db, rx_ant)
     if nargin < 4
         error("Usage: rx_capture_tape(protocol, ip, fc_hz, rx_gain_db, rx_ant)");
     end
+
     if nargin < 5
         rx_ant = [];
+    end
+
+    if nargin < 6
+        tx_spec_file_override = [];
+    end
+    
+    if nargin < 7
+        out_file_override = [];
     end
 
     protocol_s = string(protocol_s);
@@ -40,11 +49,17 @@ function rx_capture_tape(protocol, ip, fc_hz, rx_gain_db, rx_ant)
     P = pa_paths();
     addpath(P.txrx);
 
-    tape_file = fullfile(P.txrx_tapes_digital, char(protocol_s), "tx_tape.mat");
-    S = load(tape_file, "tx_tape", "tx_params", "sync");
-    tx_tape = S.tx_tape;
-    p = S.tx_params;
-    sync = S.sync;
+    if isempty(tx_spec_file_override)
+        spec_file = fullfile(P.txrx_tapes_digital, char(protocol_s), "tx_spec.mat");
+    else
+        spec_file = char(tx_spec_file_override);
+    end
+    
+    S = load(spec_file, "tx_spec");
+    tx_spec = S.tx_spec;
+    p = tx_spec.tx_params;
+    sync = tx_spec.sync;
+    tx_index = tx_spec.tx_index; %#ok<NASGU>
 
     out_root = fullfile(P.txrx_tapes_ota, char(protocol_s));
     if ~exist(out_root,"dir"), mkdir(out_root); end
@@ -75,11 +90,11 @@ function rx_capture_tape(protocol, ip, fc_hz, rx_gain_db, rx_ant)
     overruns = 0;
 
     function pull_frame()
-        [y,len,ov] = rx(); %#ok<ASGLU>
+        [y,len,ov] = rx();
         if ov, overruns = overruns + 1; end
         if len > 0
             y = y(1:len);
-            stash = [stash; y]; %#ok<AGROW>
+            stash = [stash; y];
         end
     end
 
@@ -94,17 +109,25 @@ function rx_capture_tape(protocol, ip, fc_hz, rx_gain_db, rx_ant)
     % ---------- monitor mode ----------
     fprintf("RX MONITOR | protocol=%s | watching beacon/start. Move antennas. TX press SPACE when ready.\n", protocol_s);
 
-    start_thr = 25;
+    start_thr = 10;
     consec_need = 3;
     consec = 0;
 
     t0 = tic;
     while true
         x = readN(p.frameLen);
-        pow = mean(abs(double(x)).^2);
 
-        rb = pa_corr_ratio_v03(x(1:p.Lpre), sync.beacon_preamble);
-        rs = pa_corr_ratio_v03(x(1:p.Lpre), sync.start_preamble);
+        [rb, kb] = preamble_best_ratio_in_frame(x, sync.beacon_preamble);
+        [rs, ks] = preamble_best_ratio_in_frame(x, sync.start_preamble);
+
+        if ~isempty(kb)
+            xb = x(kb : kb + p.Lpre - 1);
+            [snr_b_db, sig_b, noise_b] = estimate_preamble_snr(xb, sync.beacon_preamble);
+        else
+            snr_b_db = NaN;
+            sig_b = NaN;
+            noise_b = NaN;
+        end
 
         if rs > start_thr && rs > rb
             consec = consec + 1;
@@ -113,8 +136,8 @@ function rx_capture_tape(protocol, ip, fc_hz, rx_gain_db, rx_ant)
         end
 
         if toc(t0) > 0.5
-            fprintf("MON | protocol=%s | pow=%.3e | beacon=%.1f | start=%.1f | consec=%d/%d | overruns=%d\n", ...
-                protocol_s, pow, rb, rs, consec, consec_need, overruns);
+            fprintf("MON | protocol=%s | beacon_SNR=%.1f dB | sig=%.3e | noise=%.3e | beacon=%.1f@%d | start=%.1f@%d | consec=%d/%d | overruns=%d\n", ...
+                protocol_s, snr_b_db, sig_b, noise_b, rb, kb, rs, ks, consec, consec_need, overruns);
             t0 = tic;
         end
 
@@ -133,11 +156,14 @@ function rx_capture_tape(protocol, ip, fc_hz, rx_gain_db, rx_ant)
     end
     stash = buf(k0:end); % align stash to start of tx_tape
 
-    fprintf("ALIGN OK | protocol=%s | k0=%d | ratio=%.1f | now capturing %d samples into RAM...\n", ...
-        protocol_s, k0, ratio, numel(tx_tape));
-
+    Ncap = double(p.N_start_frames)*double(p.frameLen) + ...
+       double(height(tx_spec.tx_index))*(double(p.frameLen) + double(p.W) + double(p.guardN)) + ...
+       double(p.N_stop_frames)*double(p.frameLen);
+    
+    fprintf("ALIGN OK | protocol=%s | k0=%d | ratio=%.1f | now capturing %d samples into RAM.\n", ...
+        protocol_s, k0, ratio, Ncap);
+    
     % ---------- capture tape ----------
-    Ncap = numel(tx_tape);
     x_tape = complex(zeros(Ncap,1,"single"), zeros(Ncap,1,"single"));
 
     filled = 0;
@@ -149,8 +175,8 @@ function rx_capture_tape(protocol, ip, fc_hz, rx_gain_db, rx_ant)
         filled = filled + need;
 
         if mod(filled, 50*p.frameLen) == 0 || filled == Ncap
-            fprintf("CAPTURE | protocol=%s | %d/%d samples (%.1f%%) | overruns=%d | elapsed=%.1fs\n", ...
-                protocol_s, filled, Ncap, 100*filled/Ncap, overruns, toc(t1));
+            fprintf("MON | protocol=%s | beacon_SNR=%.1f dB | beacon=%.1f@%d | start=%.1f@%d | start-beacon=%.1f | consec=%d/%d | overruns=%d\n", ...
+                protocol_s, snr_b_db, rb, kb, rs, ks, rs-rb, consec, consec_need, overruns);
         end
     end
 
@@ -167,7 +193,16 @@ function rx_capture_tape(protocol, ip, fc_hz, rx_gain_db, rx_ant)
     rx_cfg.overruns = overruns;
     rx_cfg.capture_time = datetime("now");
 
-    out_file = fullfile(out_root, "ota_tape_S01.mat");
+    if isempty(out_file_override)
+        out_file = fullfile(out_root, "ota_tape_S01.mat");
+    else
+        out_file = char(out_file_override);
+        out_dir = fileparts(out_file);
+        if ~exist(out_dir, 'dir')
+            mkdir(out_dir);
+        end
+    end
+
     save(out_file, "x_tape", "rx_cfg", "-v7.3");
     release(rx);
 
@@ -192,4 +227,45 @@ function [k0, best_ratio] = find_preamble_in_buffer(buf, pre)
     else
         k0 = idx;
     end
+end
+
+function [snr_db, sig_pow, noise_pow] = estimate_preamble_snr(x, pre)
+    x = double(x(:));
+    pre = double(pre(:));
+
+    N = min(numel(x), numel(pre));
+    x = x(1:N);
+    pre = pre(1:N);
+
+    % Least-squares complex gain fit: x ~= alpha * pre
+    den = sum(abs(pre).^2) + eps;
+    alpha = (pre' * x) / den;
+
+    s_hat = alpha * pre;
+    err = x - s_hat;
+
+    sig_pow = mean(abs(s_hat).^2);
+    noise_pow = mean(abs(err).^2) + eps;
+    snr_db = 10 * log10(sig_pow / noise_pow);
+end
+
+function [best_ratio, best_k] = preamble_best_ratio_in_frame(x, pre)
+    x = double(x(:));
+    pre = double(pre(:));
+
+    N = numel(pre);
+    L = numel(x) - N + 1;
+
+    if L < 1
+        best_ratio = 0;
+        best_k = [];
+        return;
+    end
+
+    vals = zeros(L,1);
+    for k = 1:L
+        vals(k) = pa_corr_ratio_v03(x(k:k+N-1), pre);
+    end
+
+    [best_ratio, best_k] = max(vals);
 end
