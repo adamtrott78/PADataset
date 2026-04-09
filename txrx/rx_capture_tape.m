@@ -59,7 +59,7 @@ function rx_capture_tape(protocol, ip, fc_hz, rx_gain_db, rx_ant, tx_spec_file_o
     tx_spec = S.tx_spec;
     p = tx_spec.tx_params;
     sync = tx_spec.sync;
-    tx_index = tx_spec.tx_index; %#ok<NASGU>
+    tx_index = tx_spec.tx_index;
 
     out_root = fullfile(P.txrx_tapes_ota, char(protocol_s));
     if ~exist(out_root,"dir"), mkdir(out_root); end
@@ -109,7 +109,7 @@ function rx_capture_tape(protocol, ip, fc_hz, rx_gain_db, rx_ant, tx_spec_file_o
     % ---------- monitor mode ----------
     fprintf("RX MONITOR | protocol=%s | watching beacon/start. Move antennas. TX press SPACE when ready.\n", protocol_s);
 
-    start_thr = 10;
+    start_thr = 20;
     consec_need = 3;
     consec = 0;
 
@@ -128,8 +128,10 @@ function rx_capture_tape(protocol, ip, fc_hz, rx_gain_db, rx_ant, tx_spec_file_o
             sig_b = NaN;
             noise_b = NaN;
         end
+        
+        start_margin = rs / (rb + eps);
 
-        if rs > start_thr && rs > rb
+        if rs > start_thr && start_margin > 2.0
             consec = consec + 1;
         else
             consec = 0;
@@ -254,7 +256,8 @@ function [best_ratio, best_k] = preamble_best_ratio_in_frame(x, pre)
     pre = double(pre(:));
 
     N = numel(pre);
-    L = numel(x) - N + 1;
+    M = numel(x);
+    L = M - N + 1;
 
     if L < 1
         best_ratio = 0;
@@ -262,10 +265,14 @@ function [best_ratio, best_k] = preamble_best_ratio_in_frame(x, pre)
         return;
     end
 
-    vals = zeros(L,1);
-    for k = 1:L
-        vals(k) = pa_corr_ratio_v03(x(k:k+N-1), pre);
-    end
+    nfft = 2^nextpow2(M + N - 1);
+    C = ifft(fft(x, nfft) .* fft(conj(flipud(pre)), nfft));
 
-    [best_ratio, best_k] = max(vals);
+    % valid start positions only
+    c = abs(C(N : N + M - 1));
+    c = c(1:L);
+
+    [pk, best_k] = max(c);
+    med = median(c) + 1e-12;
+    best_ratio = pk / med;
 end
