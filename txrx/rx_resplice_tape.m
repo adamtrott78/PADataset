@@ -1,9 +1,12 @@
 function rx_resplice_tape(protocol)
-%RX_RESPLICE_TAPE Header-first OTA resplice that tolerates dropped samples.
+%RX_RESPLICE_TAPE Header-first OTA resplice using ONLY the new tx_spec.mat format.
+%
 % Strategy:
-%   1) Recover a monotone chain of CRC-valid headers.
-%   2) Keep payload i only if header(i+1) starts after payload(i) fully ends.
-%   3) If the next valid header starts too early, payload(i) was truncated -> drop it.
+%   1) Load captured OTA tape from txrx/tapes/ota/<protocol>/ota_tape_S01.mat
+%   2) Load TX metadata from txrx/tapes/digital/<protocol>/tx_spec.mat
+%   3) Recover a monotone chain of CRC-valid headers
+%   4) Keep payload i only if header(i+1) starts after payload(i) fully ends
+%   5) Split recovered windows back out by PA and save them
 %
 % Usage:
 %   rx_resplice_tape
@@ -14,6 +17,7 @@ function rx_resplice_tape(protocol)
     if nargin < 1 || isempty(protocol)
         protocol = "wifi";
     end
+
     protocol = string(protocol);
     assert(any(protocol == ["wifi","bluetooth","zigbee"]), ...
         "protocol must be one of: wifi, bluetooth, zigbee");
@@ -21,34 +25,63 @@ function rx_resplice_tape(protocol)
     P = pa_paths();
     addpath(P.txrx);
 
-    ota_file   = fullfile(P.txrx_tapes_ota, char(protocol), "ota_tape_S01.mat");
-    tape_file  = fullfile(P.txrx_tapes_digital, char(protocol), "tx_tape.mat");
+    ota_file   = fullfile(P.txrx_tapes_ota,     char(protocol), "ota_tape_S01.mat");
+    spec_file  = fullfile(P.txrx_tapes_digital, char(protocol), "tx_spec.mat");
     pilot_root = pilot_root_from_protocol(protocol);
     out_data   = spliced_root_from_protocol(protocol);
     out_res    = results_root_from_protocol(protocol);
     png_root   = fullfile(out_res, "png");
 
     if ~exist(out_data,"dir"), mkdir(out_data); end
-    if ~exist(out_res,"dir"), mkdir(out_res); end
+    if ~exist(out_res,"dir"),  mkdir(out_res);  end
+
+    fprintf("RX RESPLICE | protocol=%s\n", protocol);
+    fprintf("OTA FILE    | %s\n", ota_file);
+    fprintf("SPEC FILE   | %s\n", spec_file);
+
+    assert(isfile(ota_file),  "Missing OTA tape file: %s", ota_file);
+    assert(isfile(spec_file), "Missing tx_spec file: %s", spec_file);
 
     T = load(ota_file, "x_tape", "rx_cfg");
+    assert(isfield(T,"x_tape"), "OTA file missing x_tape: %s", ota_file);
+    assert(isfield(T,"rx_cfg"),  "OTA file missing rx_cfg: %s", ota_file);
     x_tape = T.x_tape(:);
     rx_cfg = T.rx_cfg;
 
-    S = load(tape_file, "tx_params", "sync", "tx_index");
-    p = S.tx_params;
-    sync = S.sync;
-    tx_index = S.tx_index;
+    S = load(spec_file, "tx_spec");
+    assert(isfield(S,"tx_spec"), "Spec file missing tx_spec struct: %s", spec_file);
+
+    tx_spec = S.tx_spec;
+    must_have = ["tx_params","sync","tx_index"];
+    for k = 1:numel(must_have)
+        assert(isfield(tx_spec, must_have(k)), ...
+            "Spec file missing tx_spec.%s: %s", must_have(k), spec_file);
+    end
+
+    p = tx_spec.tx_params;
+    sync = tx_spec.sync;
+    tx_index = tx_spec.tx_index;
     tx_lut = make_tx_lut(tx_index);
 
-    fprintf("RESPLICE | protocol=%s | tape=%d | Fs=%.6f MS/s | frameLen=%d | W=%d | guardN=%d | overruns=%d\n", ...
-        protocol, numel(x_tape), rx_cfg.Fs/1e6, p.frameLen, p.W, p.guardN, rx_cfg.overruns);
+    fprintf("SPEC OK     | records=%d | frameLen=%d | W=%d | guardN=%d\n", ...
+        height(tx_index), p.frameLen, p.W, p.guardN);
+
+    fprintf("OTA INFO    | protocol=%s | samples=%d | Fs=%.6f MS/s | overruns=%d\n", ...
+        protocol, numel(x_tape), rx_cfg.Fs/1e6, rx_cfg.overruns);
 
     PAs = ["PA2","PA3","PA4","PA8"];
-    X = struct(); M = struct(); counts = struct();
+
+    % Preallocate per-PA storage from tx_index counts
+    tx_pa = normalize_pa_column(tx_index.pa);
+    X = struct();
+    M = struct();
+    counts = struct();
+
     for pa = PAs
-        X.(char(pa)) = complex(zeros(p.W, 400, "single"), zeros(p.W, 400, "single"));
-        M.(char(pa)) = repmat(empty_meta(), 1, 400);
+        npa = sum(tx_pa == pa);
+        if npa < 1, npa = 1; end
+        X.(char(pa)) = complex(zeros(p.W, npa, "single"), zeros(p.W, npa, "single"));
+        M.(char(pa)) = repmat(empty_meta(), 1, npa);
         counts.(char(pa)) = 0;
     end
 
@@ -65,15 +98,18 @@ function rx_resplice_tape(protocol)
     end
     h0.r = r0;
 
-    fprintf("First hdr | protocol=%s | k=%d | seq=%d | pa=%s | wid=%d | r=%.2f\n", ...
-        protocol, h0.k, h0.seq, h0.pa, h0.wid, h0.r);
+    fprintf("First hdr   | k=%d | seq=%d | pa=%s | wid=%d | r=%.2f\n", ...
+        h0.k, h0.seq, h0.pa, h0.wid, h0.r);
 
     H = repmat(empty_hdr(), 1, tx_lut.N + 64);
     nH = 1;
     H(1) = h0;
 
-    t0 = tic; tPrint = tic;
-    nExact = 0; nBroad = 0; nFail = 0;
+    t0 = tic;
+    tPrint = tic;
+    nExact = 0;
+    nBroad = 0;
+    nFail = 0;
     stop_seen = h0.is_stop;
 
     while ~stop_seen
@@ -81,8 +117,8 @@ function rx_resplice_tape(protocol)
         [nxt, ok, mode] = find_next_valid_header(x_tape, cur, p, sync, tx_lut);
         if ~ok
             nFail = nFail + 1;
-            fprintf("NEXT hdr not found | protocol=%s | after seq=%d | pa=%s | wid=%d | k=%d\n", ...
-                protocol, cur.seq, cur.pa, cur.wid, cur.k);
+            fprintf("NEXT hdr not found | after seq=%d | pa=%s | wid=%d | k=%d\n", ...
+                cur.seq, cur.pa, cur.wid, cur.k);
             break;
         end
 
@@ -93,21 +129,26 @@ function rx_resplice_tape(protocol)
         H(nH) = nxt;
         stop_seen = nxt.is_stop;
 
-        if mode == "exact", nExact = nExact + 1; else, nBroad = nBroad + 1; end
+        if mode == "exact"
+            nExact = nExact + 1;
+        else
+            nBroad = nBroad + 1;
+        end
 
         if toc(tPrint) > 1.0
-            fprintf("HDR prog | protocol=%s | found=%d | last_seq=%d | last_pa=%s | k=%d | exact=%d | broad=%d | elapsed=%.1fs\n", ...
-                protocol, nH, H(nH).seq, H(nH).pa, H(nH).k, nExact, nBroad, toc(t0));
+            fprintf("HDR prog    | found=%d | last_seq=%d | last_pa=%s | k=%d | exact=%d | broad=%d | elapsed=%.1fs\n", ...
+                nH, H(nH).seq, H(nH).pa, H(nH).k, nExact, nBroad, toc(t0));
             tPrint = tic;
         end
     end
 
     H = H(1:nH);
-    fprintf("HDR done | protocol=%s | found=%d | stop_seen=%d | exact=%d | broad=%d | fail=%d | first_seq=%d | last_seq=%d\n", ...
-        protocol, nH, stop_seen, nExact, nBroad, nFail, H(1).seq, H(end).seq);
+    fprintf("HDR done    | found=%d | stop_seen=%d | exact=%d | broad=%d | fail=%d | first_seq=%d | last_seq=%d\n", ...
+        nH, stop_seen, nExact, nBroad, nFail, H(1).seq, H(end).seq);
 
     drop_log = repmat(empty_drop(), 1, max(1, nH));
-    nDrop = 0; nKeep = 0;
+    nDrop = 0;
+    nKeep = 0;
 
     for i = 1:max(0, nH-1)
         cur = H(i);
@@ -131,13 +172,20 @@ function rx_resplice_tape(protocol)
                 "k_next", int64(nxt.k), ...
                 "gap", int64(gap), ...
                 "reason", "truncated_or_unproven");
-            fprintf("DROP | protocol=%s | seq=%d | pa=%s | wid=%d | k=%d | next_k=%d | gap=%d\n", ...
-                protocol, cur.seq, pa, cur.wid, cur.k, nxt.k, gap);
+            fprintf("DROP        | seq=%d | pa=%s | wid=%d | k=%d | next_k=%d | gap=%d\n", ...
+                cur.seq, pa, cur.wid, cur.k, nxt.k, gap);
             continue;
         end
 
         c = counts.(char(pa)) + 1;
         counts.(char(pa)) = c;
+
+        % grow storage if needed
+        if c > size(X.(char(pa)), 2)
+            X.(char(pa))(:, end+256) = complex(single(0), single(0)); %#ok<AGROW>
+            M.(char(pa))(end+256) = empty_meta(); %#ok<AGROW>
+        end
+
         X.(char(pa))(:,c) = x_tape(pay0:pay1);
 
         M.(char(pa))(c) = struct( ...
@@ -172,8 +220,8 @@ function rx_resplice_tape(protocol)
                 "k_next", int64(-1), ...
                 "gap", int64(-1), ...
                 "reason", "unpaired_tail");
-            fprintf("DROP | protocol=%s | seq=%d | pa=%s | wid=%d | k=%d | reason=unpaired_tail\n", ...
-                protocol, tail.seq, tail.pa, tail.wid, tail.k);
+            fprintf("DROP        | seq=%d | pa=%s | wid=%d | k=%d | reason=unpaired_tail\n", ...
+                tail.seq, tail.pa, tail.wid, tail.k);
         end
     end
 
@@ -185,11 +233,13 @@ function rx_resplice_tape(protocol)
         meta_rx = M.(char(pa))(1:c);
         out = fullfile(out_data, sprintf("ota_rx_S01_%s.mat", pa));
         save(out, "Xrx_all", "meta_rx", "rx_cfg", "-v7.3");
-        fprintf("Saved %s | %d windows\n", out, c);
+        fprintf("Saved       | %s | %d windows\n", out, c);
     end
 
     summary = struct();
     summary.protocol = char(protocol);
+    summary.spec_file = spec_file;
+    summary.ota_file = ota_file;
     summary.stop_seen = logical(stop_seen);
     summary.headers_found = H;
     summary.n_headers = int32(nH);
@@ -250,7 +300,7 @@ function [nxt, ok, mode] = find_next_valid_header(x_tape, cur, p, sync, tx_lut)
 
     nxt = empty_hdr(); ok = false; mode = "";
 
-    % Fast exact/local path around expected position; allow left and right drift.
+    % Fast exact/local path around expected position
     smallR = 2048;
     [cand, ok1] = search_exact_range(x_tape, max(double(cur.k)+1, k_exp-smallR), min(kmax, k_exp+smallR), cur, p, tx_lut, k_exp);
     if ok1
@@ -258,7 +308,7 @@ function [nxt, ok, mode] = find_next_valid_header(x_tape, cur, p, sync, tx_lut)
         nxt = cand; ok = true; mode = "exact"; return;
     end
 
-    % Broad relock path for dropped-sample recovery.
+    % Broad relock path for dropped-sample recovery
     leftR = max(400000, 4*p.frameLen);
     rightR = max(4*Lrec, 2800000);
     a = max(double(cur.k)+1, k_exp-leftR);
@@ -470,11 +520,6 @@ function plot_pair_dig_vs_ota(pa, x_d, Fs_d, x_o, Fs_o, out_png)
 end
 
 
-function h = empty_hdr()
-    h = struct("k", int64(0), "pa_id", uint16(0), "pa", "", "wid", uint16(0), "seq", uint16(0), "is_stop", false, "r", NaN);
-end
-
-
 function m = empty_meta()
     m = struct( ...
         "schema_version", "", ...
@@ -491,6 +536,11 @@ function m = empty_meta()
         "k_next", int64(0), ...
         "gap_to_next", int64(0), ...
         "header_r", NaN );
+end
+
+
+function h = empty_hdr()
+    h = struct("k", int64(0), "pa_id", uint16(0), "pa", "", "wid", uint16(0), "seq", uint16(0), "is_stop", false, "r", NaN);
 end
 
 
@@ -548,4 +598,9 @@ function out_root = results_root_from_protocol(protocol)
         otherwise
             error("Unknown protocol %s", protocol);
     end
+end
+
+
+function pa_s = normalize_pa_column(pa_col)
+    pa_s = string(pa_col);
 end
