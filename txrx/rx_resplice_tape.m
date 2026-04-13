@@ -72,7 +72,7 @@ function rx_resplice_tape(protocol)
     PAs = ["PA2","PA3","PA4","PA8"];
 
     % Preallocate per-PA storage from tx_index counts
-    tx_pa = normalize_pa_column(tx_index.pa);
+    tx_pa = string(pa_col);
     X = struct();
     M = struct();
     counts = struct();
@@ -598,9 +598,4 @@ function out_root = results_root_from_protocol(protocol)
         otherwise
             error("Unknown protocol %s", protocol);
     end
-end
-
-
-function pa_s = normalize_pa_column(pa_col)
-    pa_s = string(pa_col);
 end
