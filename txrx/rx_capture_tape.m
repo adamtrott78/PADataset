@@ -134,30 +134,19 @@ function rx_capture_tape(protocol, ip, fc_hz, rx_gain_db, rx_ant, dataset_id_or_
     t0 = tic;
     while true
         x = readN(p.frameLen);
-
-        [rb, kb] = preamble_best_ratio_in_frame(x, sync.beacon_preamble);
-        [rs, ks] = preamble_best_ratio_in_frame(x, sync.start_preamble);
-
-        if ~isempty(kb)
-            xb = x(kb : kb + p.Lpre - 1);
-            [snr_b_db, sig_b, noise_b] = estimate_preamble_snr(xb, sync.beacon_preamble);
-        else
-            snr_b_db = NaN;
-            sig_b = NaN;
-            noise_b = NaN;
-        end
-
-        start_margin = rs / (rb + eps);
-
-        if rs > start_thr && start_margin > 2.0
+        
+        rb = pa_corr_ratio_v03(x(1:p.Lpre), sync.beacon_preamble);
+        rs = pa_corr_ratio_v03(x(1:p.Lpre), sync.start_preamble);
+        
+        if rs > start_thr && rs > rb
             consec = consec + 1;
         else
             consec = 0;
         end
-
-        if toc(t0) > 0.5
-            fprintf("MON | protocol=%s | beacon_SNR=%.1f dB | sig=%.3e | noise=%.3e | beacon=%.1f@%d | start=%.1f@%d | consec=%d/%d | overruns=%d\n", ...
-                protocol_s, snr_b_db, sig_b, noise_b, rb, kb, rs, ks, consec, consec_need, overruns);
+        
+        if toc(t0) > 1.0
+            fprintf("MON | protocol=%s | beacon=%.1f | start=%.1f | consec=%d/%d | overruns=%d\n", ...
+                protocol_s, rb, rs, consec, consec_need, overruns);
             t0 = tic;
         end
 
@@ -182,23 +171,39 @@ function rx_capture_tape(protocol, ip, fc_hz, rx_gain_db, rx_ant, dataset_id_or_
 
     fprintf("ALIGN OK | protocol=%s | k0=%d | ratio=%.1f | now capturing %d samples into RAM.\n", ...
         protocol_s, k0, ratio, Ncap);
-
-    % ---------- capture tape ----------
-    x_tape = complex(zeros(Ncap,1,"single"), zeros(Ncap,1,"single"));
-
-    filled = 0;
-    t1 = tic;
-    while filled < Ncap
-        need = min(p.frameLen, Ncap-filled);
-        xx = readN(need);
-        x_tape(filled+(1:need)) = xx;
-        filled = filled + need;
-
-        if mod(filled, 50*p.frameLen) == 0 || filled == Ncap
-            fprintf("CAPTURE | protocol=%s | %d/%d samples (%.1f%%) | overruns=%d | elapsed=%.1fs\n", ...
-                protocol_s, filled, Ncap, 100*filled/Ncap, overruns, toc(t1));
+        
+        % ---------- capture tape ----------
+        x_tape = complex(zeros(Ncap,1,"single"), zeros(Ncap,1,"single"));
+        
+        filled = 0;
+        t1 = tic;
+        
+        % consume aligned stash once
+        if ~isempty(stash)
+            take = min(numel(stash), Ncap);
+            x_tape(1:take) = stash(1:take);
+            filled = take;
+            stash = complex(zeros(0,1,"single"), zeros(0,1,"single"));
         end
-    end
+        
+        while filled < Ncap
+            [y, len, ov] = rx();
+            if ov
+                overruns = overruns + 1;
+            end
+            if len <= 0
+                continue;
+            end
+        
+            take = min(len, Ncap - filled);
+            x_tape(filled + (1:take)) = y(1:take);
+            filled = filled + take;
+        
+            if mod(filled, 100000000) == 0 || filled == Ncap
+                fprintf("CAPTURE | protocol=%s | %d/%d samples (%.1f%%) | overruns=%d | elapsed=%.1fs\n", ...
+                    protocol_s, filled, Ncap, 100*filled/Ncap, overruns, toc(t1));
+            end
+        end
 
     rx_cfg = struct();
     rx_cfg.protocol = char(protocol_s);

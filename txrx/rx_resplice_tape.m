@@ -1,15 +1,25 @@
-function rx_resplice_tape(protocol)
-%RX_RESPLICE_TAPE Header-first OTA resplice that tolerates dropped samples.
-% Strategy:
-%   1) Recover a monotone chain of CRC-valid headers.
-%   2) Keep payload i only if header(i+1) starts after payload(i) fully ends.
-%   3) If the next valid header starts too early, payload(i) was truncated -> drop it.
+function rx_resplice_tape(protocol, dataset_id_or_ota_file, shard_id_or_tx_spec_file, make_png)
+%RX_RESPLICE_TAPE Header-first OTA resplice for one recorded shard.
 %
 % Usage:
 %   rx_resplice_tape
 %   rx_resplice_tape("wifi")
-%   rx_resplice_tape("bluetooth")
-%   rx_resplice_tape("zigbee")
+%   rx_resplice_tape("wifi", "high_run01", 1)
+%   rx_resplice_tape("bluetooth", "high_run01", 2)
+%   rx_resplice_tape("zigbee", "high_run01", 1)
+%
+% New direct shard usage:
+%   rx_resplice_tape(protocol, dataset_id, shard_id)
+% where dataset_id may be either:
+%   "high_run01"           -> expands to "<protocol>_high_run01"
+%   "wifi_high_run01"      -> used as-is
+%
+% Backward-compatible override usage:
+%   rx_resplice_tape(protocol, ota_file_override, tx_spec_file_override)
+%
+% Optional:
+%   rx_resplice_tape(..., make_png)
+%   make_png defaults to false
 
     if nargin < 1 || isempty(protocol)
         protocol = "wifi";
@@ -18,43 +28,66 @@ function rx_resplice_tape(protocol)
     assert(any(protocol == ["wifi","bluetooth","zigbee"]), ...
         "protocol must be one of: wifi, bluetooth, zigbee");
 
-    P = pa_paths();
-    addpath(P.txrx);
+    if nargin < 2
+        dataset_id_or_ota_file = [];
+    end
+    if nargin < 3
+        shard_id_or_tx_spec_file = [];
+    end
+    if nargin < 4 || isempty(make_png)
+        make_png = false;
+    end
 
-    ota_file   = fullfile(P.txrx_tapes_ota, char(protocol), "ota_tape_S01_v033.mat");
-    tape_file  = fullfile(P.txrx_tapes_digital, char(protocol), "tx_tape_shard_001.mat");
-    pilot_root = pilot_root_from_protocol(protocol);
-    out_data   = spliced_root_from_protocol(protocol);
-    out_res    = results_root_from_protocol(protocol);
-    png_root   = fullfile(out_res, "png");
+    R = pa_protocol_roots(protocol);
+    addpath(R.txrx);
 
-    if ~exist(out_data,"dir"), mkdir(out_data); end
-    if ~exist(out_res,"dir"), mkdir(out_res); end
+    [ota_file, spec_file, dataset_full, shard_num, out_data, out_res] = ...
+        resolve_resplice_files(protocol, dataset_id_or_ota_file, shard_id_or_tx_spec_file);
+
+    png_root = fullfile(out_res, "png");
+
+    if ~exist(out_data, "dir"), mkdir(out_data); end
+    if ~exist(out_res, "dir"), mkdir(out_res); end
+    if make_png && ~exist(png_root, "dir"), mkdir(png_root); end
 
     T = load(ota_file, "x_tape", "rx_cfg");
     x_tape = T.x_tape(:);
     rx_cfg = T.rx_cfg;
 
-    S = load(tape_file, "tx_params", "sync", "tx_index");
-    p = S.tx_params;
-    sync = S.sync;
-    tx_index = S.tx_index;
+    S = load(spec_file, "tx_spec");
+    tx_spec = S.tx_spec;
+    p = tx_spec.tx_params;
+    sync = tx_spec.sync;
+    tx_index = tx_spec.tx_index;
+
     seq_max = height(tx_index);
     wid_max = max(double(tx_index.window_id));
 
-    fprintf("RESPLICE | protocol=%s | tape=%d | Fs=%.6f MS/s | frameLen=%d | W=%d | guardN=%d | overruns=%d\n", ...
-        protocol, numel(x_tape), rx_cfg.Fs/1e6, p.frameLen, p.W, p.guardN, rx_cfg.overruns);
+    if strlength(dataset_full) > 0
+        fprintf("RESPLICE | protocol=%s | dataset=%s | shard=%03d\n", ...
+            protocol, dataset_full, shard_num);
+    end
+    fprintf("RESPLICE | ota=%s\n", ota_file);
+    fprintf("RESPLICE | spec=%s\n", spec_file);
+    fprintf("RESPLICE | tape=%d | Fs=%.6f MS/s | frameLen=%d | W=%d | guardN=%d | overruns=%d\n", ...
+        numel(x_tape), rx_cfg.Fs/1e6, p.frameLen, p.W, p.guardN, rx_cfg.overruns);
 
+    pilot_root = pilot_root_from_protocol(protocol);
+    
     PAs = ["PA2","PA3","PA4","PA8"];
     X = struct(); M = struct(); counts = struct();
+    
+    pa_col = string(tx_index.pa);
+    
     for pa = PAs
-        X.(char(pa)) = complex(zeros(p.W, 400, "single"), zeros(p.W, 400, "single"));
-        M.(char(pa)) = repmat(empty_meta(), 1, 400);
+        n_alloc = sum(pa_col == pa);
+        X.(char(pa)) = complex(zeros(p.W, n_alloc, "single"), zeros(p.W, n_alloc, "single"));
+        M.(char(pa)) = repmat(empty_meta(), 1, n_alloc);
         counts.(char(pa)) = 0;
     end
-
+    
     need_gap = p.frameLen + p.W;
-
+    
     [h_seed, ok0] = find_seed_header_direct(x_tape, p, sync, seq_max, wid_max, 20);
     if ~ok0
         error("Seed lock failed: no trustworthy data header found.");
@@ -95,7 +128,11 @@ function rx_resplice_tape(protocol)
                 protocol, nxt.seq, nxt.pa, nxt.wid, nxt.k, mode);
         end
 
-        if mode == "exact", nExact = nExact + 1; else, nBroad = nBroad + 1; end
+        if startsWith(mode, "fast")
+            nExact = nExact + 1;
+        else
+            nBroad = nBroad + 1;
+        end
 
         if toc(tPrint) > 1.0
             fprintf("HDR prog | protocol=%s | found=%d | last_seq=%d | last_pa=%s | k=%d | exact=%d | broad=%d | elapsed=%.1fs\n", ...
@@ -185,7 +222,7 @@ function rx_resplice_tape(protocol)
         c = counts.(char(pa));
         Xrx_all = X.(char(pa))(:,1:c);
         meta_rx = M.(char(pa))(1:c);
-        out = fullfile(out_data, sprintf("ota_rx_S01_%s.mat", pa));
+        out = fullfile(out_data, sprintf("ota_rx_%s.mat", pa));
         save(out, "Xrx_all", "meta_rx", "rx_cfg", "-v7.3");
         fprintf("Saved %s | %d windows\n", out, c);
     end
@@ -203,24 +240,29 @@ function rx_resplice_tape(protocol)
 
     save(fullfile(out_res, "resplice_summary.mat"), "summary", "drop_log", "-v7.3");
 
-    if exist(png_root,"dir"), rmdir(png_root,"s"); end
-    mkdir(png_root);
-
-    for pa = PAs
-        c = counts.(char(pa));
-        K = min(10, c);
-        for i = 1:K
-            wid = double(M.(char(pa))(i).window_id);
-            x_o = X.(char(pa))(:,i);
-            [x_d, Fs_d, ok] = load_digital_by_window_id(pilot_root, pa, wid);
-            if ~ok, continue; end
-            outpng = fullfile(png_root, sprintf("DIG_vs_OTA_%s_%s_w%04d.png", protocol, pa, wid));
-            plot_pair_dig_vs_ota(pa, x_d, Fs_d, x_o, rx_cfg.Fs, outpng);
+    if make_png
+        if exist(png_root,"dir"), rmdir(png_root,"s"); end
+        mkdir(png_root);
+    
+        for pa = PAs
+            c = counts.(char(pa));
+            K = min(10, c);
+            for i = 1:K
+                wid = double(M.(char(pa))(i).window_id);
+                x_o = X.(char(pa))(:,i);
+                [x_d, Fs_d, ok] = load_digital_by_window_id(pilot_root, pa, wid);
+                if ~ok, continue; end
+                outpng = fullfile(png_root, sprintf("DIG_vs_OTA_%s_%s_w%04d.png", protocol, pa, wid));
+                plot_pair_dig_vs_ota(pa, x_d, Fs_d, x_o, rx_cfg.Fs, outpng);
+            end
         end
+    
+        fprintf("RESPLICE DONE | protocol=%s | kept=%d | dropped=%d | stop_seen=%d | PNGs=%s\n", ...
+            protocol, nKeep, nDrop, stop_seen, png_root);
+    else
+        fprintf("RESPLICE DONE | protocol=%s | kept=%d | dropped=%d | stop_seen=%d | PNGs=disabled\n", ...
+            protocol, nKeep, nDrop, stop_seen);
     end
-
-    fprintf("RESPLICE DONE | protocol=%s | kept=%d | dropped=%d | stop_seen=%d | PNGs=%s\n", ...
-        protocol, nKeep, nDrop, stop_seen, png_root);
 end
 
 function [h_seed, ok] = find_seed_header_direct(x_tape, p, sync, seq_max, wid_max, n_seed)
@@ -1120,6 +1162,101 @@ function d = empty_drop()
         "k_next", int64(0), ...
         "gap", int64(0), ...
         "reason", "" );
+end
+
+function [ota_file, spec_file, dataset_full, shard_num, out_data, out_res] = ...
+    resolve_resplice_files(protocol_s, dataset_id_or_ota_file, shard_id_or_tx_spec_file)
+
+    dataset_full = "";
+    shard_num = [];
+
+    % old default protocol-only mode
+    if isempty(dataset_id_or_ota_file)
+        R = pa_protocol_roots(protocol_s);
+        ota_file = fullfile(R.txrx_tapes_ota, "ota_tape_S01.mat");
+        spec_file = fullfile(R.txrx_tapes_digital, "tx_spec.mat");
+        out_data = spliced_root_from_protocol(protocol_s);
+        out_res  = results_root_from_protocol(protocol_s);
+        return;
+    end
+
+    arg2 = string(dataset_id_or_ota_file);
+
+    if strlength(arg2) == 0
+        R = pa_protocol_roots(protocol_s);
+        ota_file = fullfile(R.txrx_tapes_ota, "ota_tape_S01.mat");
+        spec_file = fullfile(R.txrx_tapes_digital, "tx_spec.mat");
+        out_data = spliced_root_from_protocol(protocol_s);
+        out_res  = results_root_from_protocol(protocol_s);
+        return;
+    end
+
+    % override mode: rx_resplice_tape(protocol, ota_file_override, tx_spec_file_override)
+    if endsWith(lower(arg2), ".mat")
+        ota_file = char(arg2);
+
+        if isempty(shard_id_or_tx_spec_file)
+            error("Override usage requires tx_spec_file_override as the 3rd argument.");
+        end
+
+        spec_file = char(string(shard_id_or_tx_spec_file));
+
+        if ~isfile(ota_file)
+            error("OTA tape file not found: %s", ota_file);
+        end
+        if ~isfile(spec_file)
+            error("TX spec file not found: %s", spec_file);
+        end
+
+        out_data = spliced_root_from_protocol(protocol_s);
+        out_res  = results_root_from_protocol(protocol_s);
+        return;
+    end
+
+    % direct shard mode
+    if isempty(shard_id_or_tx_spec_file) || ~(isnumeric(shard_id_or_tx_spec_file) || islogical(shard_id_or_tx_spec_file))
+        error([ ...
+            "For direct shard usage, call rx_resplice_tape(protocol, dataset_id, shard_id). " ...
+            "For override usage, call rx_resplice_tape(protocol, ota_file_override, tx_spec_file_override)."]);
+    end
+
+    shard_num = validate_shard_id(shard_id_or_tx_spec_file);
+    dataset_full = normalize_dataset_id(protocol_s, arg2);
+
+    R = pa_protocol_roots(protocol_s);
+    ota_file = fullfile(R.txrx_tapes_ota, char(dataset_full), sprintf("ota_tape_shard_%03d.mat", shard_num));
+    spec_file = fullfile(R.txrx_tapes_digital, char(dataset_full), sprintf("tx_spec_shard_%03d.mat", shard_num));
+
+    if ~isfile(ota_file)
+        error("OTA tape file not found: %s", ota_file);
+    end
+    if ~isfile(spec_file)
+        error("TX spec file not found: %s", spec_file);
+    end
+
+    out_data = fullfile(spliced_root_from_protocol(protocol_s), char(dataset_full), sprintf("shard_%03d", shard_num));
+    out_res  = fullfile(results_root_from_protocol(protocol_s), char(dataset_full), sprintf("shard_%03d", shard_num));
+end
+
+function dataset_full = normalize_dataset_id(protocol_s, dataset_id)
+    dataset_id = string(dataset_id);
+    prefix = protocol_s + "_";
+    if startsWith(dataset_id, prefix)
+        dataset_full = dataset_id;
+    else
+        dataset_full = prefix + dataset_id;
+    end
+end
+
+function shard_num = validate_shard_id(shard_id)
+    if ~(isnumeric(shard_id) || islogical(shard_id)) || numel(shard_id) ~= 1 || ~isfinite(double(shard_id))
+        error("shard_id must be a finite scalar integer.");
+    end
+    shard_num = double(shard_id);
+    if abs(shard_num - round(shard_num)) > 0 || shard_num < 1
+        error("shard_id must be a positive integer.");
+    end
+    shard_num = round(shard_num);
 end
 
 function data_root = pilot_root_from_protocol(protocol)
