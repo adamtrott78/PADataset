@@ -1,12 +1,9 @@
 function rx_resplice_tape(protocol)
-%RX_RESPLICE_TAPE Header-first OTA resplice using ONLY the new tx_spec.mat format.
-%
+%RX_RESPLICE_TAPE Header-first OTA resplice that tolerates dropped samples.
 % Strategy:
-%   1) Load captured OTA tape from txrx/tapes/ota/<protocol>/ota_tape_S01.mat
-%   2) Load TX metadata from txrx/tapes/digital/<protocol>/tx_spec.mat
-%   3) Recover a monotone chain of CRC-valid headers
-%   4) Keep payload i only if header(i+1) starts after payload(i) fully ends
-%   5) Split recovered windows back out by PA and save them
+%   1) Recover a monotone chain of CRC-valid headers.
+%   2) Keep payload i only if header(i+1) starts after payload(i) fully ends.
+%   3) If the next valid header starts too early, payload(i) was truncated -> drop it.
 %
 % Usage:
 %   rx_resplice_tape
@@ -17,7 +14,6 @@ function rx_resplice_tape(protocol)
     if nargin < 1 || isempty(protocol)
         protocol = "wifi";
     end
-
     protocol = string(protocol);
     assert(any(protocol == ["wifi","bluetooth","zigbee"]), ...
         "protocol must be one of: wifi, bluetooth, zigbee");
@@ -25,130 +21,95 @@ function rx_resplice_tape(protocol)
     P = pa_paths();
     addpath(P.txrx);
 
-    ota_file   = fullfile(P.txrx_tapes_ota,     char(protocol), "ota_tape_S01.mat");
-    spec_file  = fullfile(P.txrx_tapes_digital, char(protocol), "tx_spec.mat");
+    ota_file   = fullfile(P.txrx_tapes_ota, char(protocol), "ota_tape_S01_v033.mat");
+    tape_file  = fullfile(P.txrx_tapes_digital, char(protocol), "tx_tape_shard_001.mat");
     pilot_root = pilot_root_from_protocol(protocol);
     out_data   = spliced_root_from_protocol(protocol);
     out_res    = results_root_from_protocol(protocol);
     png_root   = fullfile(out_res, "png");
 
     if ~exist(out_data,"dir"), mkdir(out_data); end
-    if ~exist(out_res,"dir"),  mkdir(out_res);  end
-
-    fprintf("RX RESPLICE | protocol=%s\n", protocol);
-    fprintf("OTA FILE    | %s\n", ota_file);
-    fprintf("SPEC FILE   | %s\n", spec_file);
-
-    assert(isfile(ota_file),  "Missing OTA tape file: %s", ota_file);
-    assert(isfile(spec_file), "Missing tx_spec file: %s", spec_file);
+    if ~exist(out_res,"dir"), mkdir(out_res); end
 
     T = load(ota_file, "x_tape", "rx_cfg");
-    assert(isfield(T,"x_tape"), "OTA file missing x_tape: %s", ota_file);
-    assert(isfield(T,"rx_cfg"),  "OTA file missing rx_cfg: %s", ota_file);
     x_tape = T.x_tape(:);
     rx_cfg = T.rx_cfg;
 
-    S = load(spec_file, "tx_spec");
-    assert(isfield(S,"tx_spec"), "Spec file missing tx_spec struct: %s", spec_file);
+    S = load(tape_file, "tx_params", "sync", "tx_index");
+    p = S.tx_params;
+    sync = S.sync;
+    tx_index = S.tx_index;
+    seq_max = height(tx_index);
+    wid_max = max(double(tx_index.window_id));
 
-    tx_spec = S.tx_spec;
-    must_have = ["tx_params","sync","tx_index"];
-    for k = 1:numel(must_have)
-        assert(isfield(tx_spec, must_have(k)), ...
-            "Spec file missing tx_spec.%s: %s", must_have(k), spec_file);
-    end
-
-    p = tx_spec.tx_params;
-    sync = tx_spec.sync;
-    tx_index = tx_spec.tx_index;
-    tx_lut = make_tx_lut(tx_index);
-
-    fprintf("SPEC OK     | records=%d | frameLen=%d | W=%d | guardN=%d\n", ...
-        height(tx_index), p.frameLen, p.W, p.guardN);
-
-    fprintf("OTA INFO    | protocol=%s | samples=%d | Fs=%.6f MS/s | overruns=%d\n", ...
-        protocol, numel(x_tape), rx_cfg.Fs/1e6, rx_cfg.overruns);
+    fprintf("RESPLICE | protocol=%s | tape=%d | Fs=%.6f MS/s | frameLen=%d | W=%d | guardN=%d | overruns=%d\n", ...
+        protocol, numel(x_tape), rx_cfg.Fs/1e6, p.frameLen, p.W, p.guardN, rx_cfg.overruns);
 
     PAs = ["PA2","PA3","PA4","PA8"];
-
-    % Preallocate per-PA storage from tx_index counts
-    tx_pa = string(pa_col);
-    X = struct();
-    M = struct();
-    counts = struct();
-
+    X = struct(); M = struct(); counts = struct();
     for pa = PAs
-        npa = sum(tx_pa == pa);
-        if npa < 1, npa = 1; end
-        X.(char(pa)) = complex(zeros(p.W, npa, "single"), zeros(p.W, npa, "single"));
-        M.(char(pa)) = repmat(empty_meta(), 1, npa);
+        X.(char(pa)) = complex(zeros(p.W, 400, "single"), zeros(p.W, 400, "single"));
+        M.(char(pa)) = repmat(empty_meta(), 1, 400);
         counts.(char(pa)) = 0;
     end
 
     need_gap = p.frameLen + p.W;
 
-    [k0, ok0, r0] = find_first_record(x_tape, p, sync, tx_lut, 8);
+    [h_seed, ok0] = find_seed_header_direct(x_tape, p, sync, seq_max, wid_max, 20);
     if ~ok0
-        error("Start lock failed: no valid first data header found.");
+        error("Seed lock failed: no trustworthy data header found.");
     end
-
-    [h0, okh0] = raw_decode_valid_header_at_k(x_tape, k0, p, tx_lut, uint16(0));
-    if ~okh0
-        error("Internal error: first record decode failed at k0.");
-    end
-    h0.r = r0;
-
-    fprintf("First hdr   | k=%d | seq=%d | pa=%s | wid=%d | r=%.2f\n", ...
-        h0.k, h0.seq, h0.pa, h0.wid, h0.r);
-
-    H = repmat(empty_hdr(), 1, tx_lut.N + 64);
-    nH = 1;
-    H(1) = h0;
-
+    
+    fprintf("Seed hdr | protocol=%s | k=%d | seq=%d | pa=%s | wid=%d | r=%.2f\n", ...
+        protocol, h_seed.k, h_seed.seq, h_seed.pa, h_seed.wid, h_seed.r);
+    
+    [H, nH, stop_seen] = bootstrap_header_chain(x_tape, h_seed, p, seq_max, wid_max);
+    
     t0 = tic;
     tPrint = tic;
     nExact = 0;
     nBroad = 0;
     nFail = 0;
-    stop_seen = h0.is_stop;
-
+    
     while ~stop_seen
         cur = H(nH);
-        [nxt, ok, mode] = find_next_valid_header(x_tape, cur, p, sync, tx_lut);
+        [nxt, ok, mode] = find_next_valid_header_slipfirst(x_tape, cur, p, seq_max, wid_max);
         if ~ok
             nFail = nFail + 1;
-            fprintf("NEXT hdr not found | after seq=%d | pa=%s | wid=%d | k=%d\n", ...
-                cur.seq, cur.pa, cur.wid, cur.k);
+            fprintf("NEXT hdr not found | protocol=%s | after seq=%d | pa=%s | wid=%d | k=%d\n", ...
+                protocol, cur.seq, cur.pa, cur.wid, cur.k);
             break;
         end
 
         if nH == numel(H)
-            H = [H repmat(empty_hdr(), 1, 512)]; %#ok<AGROW>
+            H = [H repmat(empty_hdr(), 1, 512)];
         end
         nH = nH + 1;
         H(nH) = nxt;
-        stop_seen = nxt.is_stop;
+        stop_seen = nxt.is_stop; 
 
-        if mode == "exact"
-            nExact = nExact + 1;
+        if nxt.is_stop
+            fprintf("HDR FOUND | protocol=%s | STOP | k=%d\n", protocol, nxt.k);
         else
-            nBroad = nBroad + 1;
+            fprintf("HDR FOUND | protocol=%s | seq=%d | pa=%s | wid=%d | k=%d | mode=%s\n", ...
+                protocol, nxt.seq, nxt.pa, nxt.wid, nxt.k, mode);
         end
 
+        if mode == "exact", nExact = nExact + 1; else, nBroad = nBroad + 1; end
+
         if toc(tPrint) > 1.0
-            fprintf("HDR prog    | found=%d | last_seq=%d | last_pa=%s | k=%d | exact=%d | broad=%d | elapsed=%.1fs\n", ...
-                nH, H(nH).seq, H(nH).pa, H(nH).k, nExact, nBroad, toc(t0));
+            fprintf("HDR prog | protocol=%s | found=%d | last_seq=%d | last_pa=%s | k=%d | exact=%d | broad=%d | elapsed=%.1fs\n", ...
+                protocol, nH, H(nH).seq, H(nH).pa, H(nH).k, nExact, nBroad, toc(t0));
             tPrint = tic;
         end
     end
 
     H = H(1:nH);
-    fprintf("HDR done    | found=%d | stop_seen=%d | exact=%d | broad=%d | fail=%d | first_seq=%d | last_seq=%d\n", ...
-        nH, stop_seen, nExact, nBroad, nFail, H(1).seq, H(end).seq);
+    fprintf("HDR done | protocol=%s | found=%d | stop_seen=%d | exact=%d | broad=%d | fail=%d | first_seq=%d | last_seq=%d\n", ...
+        protocol, nH, stop_seen, nExact, nBroad, nFail, H(1).seq, H(end).seq);
 
     drop_log = repmat(empty_drop(), 1, max(1, nH));
-    nDrop = 0;
-    nKeep = 0;
+    nDrop = 0; nKeep = 0;
 
     for i = 1:max(0, nH-1)
         cur = H(i);
@@ -172,20 +133,13 @@ function rx_resplice_tape(protocol)
                 "k_next", int64(nxt.k), ...
                 "gap", int64(gap), ...
                 "reason", "truncated_or_unproven");
-            fprintf("DROP        | seq=%d | pa=%s | wid=%d | k=%d | next_k=%d | gap=%d\n", ...
-                cur.seq, pa, cur.wid, cur.k, nxt.k, gap);
+            fprintf("DROP | protocol=%s | seq=%d | pa=%s | wid=%d | k=%d | next_k=%d | gap=%d\n", ...
+                protocol, cur.seq, pa, cur.wid, cur.k, nxt.k, gap);
             continue;
         end
 
         c = counts.(char(pa)) + 1;
         counts.(char(pa)) = c;
-
-        % grow storage if needed
-        if c > size(X.(char(pa)), 2)
-            X.(char(pa))(:, end+256) = complex(single(0), single(0)); %#ok<AGROW>
-            M.(char(pa))(end+256) = empty_meta(); %#ok<AGROW>
-        end
-
         X.(char(pa))(:,c) = x_tape(pay0:pay1);
 
         M.(char(pa))(c) = struct( ...
@@ -220,8 +174,8 @@ function rx_resplice_tape(protocol)
                 "k_next", int64(-1), ...
                 "gap", int64(-1), ...
                 "reason", "unpaired_tail");
-            fprintf("DROP        | seq=%d | pa=%s | wid=%d | k=%d | reason=unpaired_tail\n", ...
-                tail.seq, tail.pa, tail.wid, tail.k);
+            fprintf("DROP | protocol=%s | seq=%d | pa=%s | wid=%d | k=%d | reason=unpaired_tail\n", ...
+                protocol, tail.seq, tail.pa, tail.wid, tail.k);
         end
     end
 
@@ -233,13 +187,11 @@ function rx_resplice_tape(protocol)
         meta_rx = M.(char(pa))(1:c);
         out = fullfile(out_data, sprintf("ota_rx_S01_%s.mat", pa));
         save(out, "Xrx_all", "meta_rx", "rx_cfg", "-v7.3");
-        fprintf("Saved       | %s | %d windows\n", out, c);
+        fprintf("Saved %s | %d windows\n", out, c);
     end
 
     summary = struct();
     summary.protocol = char(protocol);
-    summary.spec_file = spec_file;
-    summary.ota_file = ota_file;
     summary.stop_seen = logical(stop_seen);
     summary.headers_found = H;
     summary.n_headers = int32(nH);
@@ -271,122 +223,783 @@ function rx_resplice_tape(protocol)
         protocol, nKeep, nDrop, stop_seen, png_root);
 end
 
+function [h_seed, ok] = find_seed_header_direct(x_tape, p, sync, seq_max, wid_max, n_seed)
+    h_seed = empty_hdr();
+    ok = false;
 
-function [k0, ok, best_r] = find_first_record(x_tape, p, sync, tx_lut, r_thr)
-    ok = false; k0 = 1; best_r = 0;
-    offs = unique([1, 1+round(p.frameLen/4), 1+round(p.frameLen/2), 1+round(3*p.frameLen/4)]);
+    if nargin < 6 || isempty(n_seed)
+        n_seed = 20;
+    end
+
+    Lrec = double(p.frameLen) + double(p.W) + double(p.guardN);
+    k_expected_first = double(p.N_start_frames) * double(p.frameLen) + 1;
     kmax = numel(x_tape) - (p.frameLen + p.W) + 1;
 
-    for o = offs
-        for k = o:p.frameLen:kmax
-            r = preamble_score_at_k(x_tape, k, p, sync);
-            if r < r_thr, continue; end
-            [hdr, okh] = raw_decode_valid_header_at_k(x_tape, k, p, tx_lut, uint16(0));
-            if ~okh || hdr.is_stop, continue; end
-            hdr.r = r; %#ok<NASGU>
-            k0 = k;
-            best_r = r;
+    searchR = 12000;
+    best_key = [inf, -inf];  % [seq, r]
+    t_all = tic;
+
+    fprintf('SEED SEEK | n_seed=%d | k_expected_first=%d | Lrec=%d\n', ...
+        n_seed, k_expected_first, Lrec);
+
+    for j = 0:(n_seed-1)
+        kc = k_expected_first + j * Lrec;
+        lo = max(1, kc - searchR);
+        hi = min(kmax, kc + searchR);
+
+        fprintf('  seed=%d/%d | expected_k=%d | search=[%d,%d]\n', ...
+            j+1, n_seed, kc, lo, hi);
+
+        for k = lo:hi
+            [hdr, okh] = raw_decode_crc_plausible_header_at_k( ...
+                x_tape, k, p, uint16(0), uint16(seq_max), uint16(wid_max));
+
+            if ~okh || hdr.is_stop
+                continue;
+            end
+
+            rr = preamble_score_at_k(x_tape, k, p, sync);
+            key = [double(hdr.seq), -rr];
+
+            fprintf('    seed cand | k=%d | seq=%d | pa=%s | wid=%d | r=%.2f\n', ...
+                k, hdr.seq, hdr.pa, hdr.wid, rr);
+
+            if ~ok || lexicographically_better(key, best_key)
+                hdr.r = rr;
+                h_seed = hdr;
+                best_key = key;
+                ok = true;
+            end
+        end
+    end
+
+    if ok
+        fprintf('SEED SEEK SUCCESS | seq=%d | k=%d | r=%.2f | elapsed=%.1fs\n', ...
+            h_seed.seq, h_seed.k, h_seed.r, toc(t_all));
+    else
+        fprintf('SEED SEEK FAILED | elapsed=%.1fs\n', toc(t_all));
+    end
+end
+
+function [H, nH, stop_seen] = bootstrap_header_chain(x_tape, h_seed, p, seq_max, wid_max)
+    Hf = repmat(empty_hdr(), 1, seq_max + 64);
+    nf = 1;
+    Hf(1) = h_seed;
+    stop_seen = h_seed.is_stop;
+
+    % ---------- forward ----------
+    cur = h_seed;
+    while ~stop_seen
+        [nxt, ok, mode] = find_next_valid_header_slipfirst(x_tape, cur, p, seq_max, wid_max);
+        if ~ok
+            fprintf('FWD BREAK | after seq=%d | k=%d\n', cur.seq, cur.k);
+            break;
+        end
+
+        nf = nf + 1;
+        Hf(nf) = nxt;
+        cur = nxt;
+        stop_seen = nxt.is_stop;
+
+        if nxt.is_stop
+            fprintf('FWD HDR | STOP | k=%d | mode=%s\n', nxt.k, mode);
+        else
+            fprintf('FWD HDR | seq=%d | pa=%s | wid=%d | k=%d | mode=%s\n', ...
+                nxt.seq, nxt.pa, nxt.wid, nxt.k, mode);
+        end
+    end
+
+    % ---------- backward ----------
+    Hb = repmat(empty_hdr(), 1, max(1, double(h_seed.seq)));
+    nb = 0;
+    cur = h_seed;
+
+    while double(cur.seq) > 1
+        [prv, ok, mode] = find_prev_valid_header_slipfirst(x_tape, cur, p, seq_max, wid_max);
+        if ~ok
+            fprintf('BWD BREAK | before seq=%d | k=%d\n', cur.seq, cur.k);
+            break;
+        end
+
+        nb = nb + 1;
+        Hb(nb) = prv;
+        cur = prv;
+
+        fprintf('BWD HDR | seq=%d | pa=%s | wid=%d | k=%d | mode=%s\n', ...
+            prv.seq, prv.pa, prv.wid, prv.k, mode);
+    end
+
+    H = [fliplr(Hb(1:nb)) Hf(1:nf)];
+    nH = numel(H);
+end
+
+function [prv, ok, mode] = find_prev_valid_header_slipfirst(x_tape, cur, p, seq_max, wid_max)
+    prv = empty_hdr();
+    ok = false;
+    mode = "";
+
+    Lrec = double(p.frameLen) + double(p.W) + double(p.guardN);
+    seq_target = uint16(double(cur.seq) - 1);
+
+    if double(seq_target) < 1
+        return;
+    end
+
+    k_nom = double(cur.k) - Lrec;
+
+    % 1) exact nominal
+    [cand, okc] = search_exact_range_for_seq( ...
+        x_tape, round(k_nom-2), round(k_nom+2), p, seq_target, seq_max, wid_max);
+    if okc
+        prv = cand;
+        ok = true;
+        mode = "fast_nominal_back";
+        return;
+    end
+
+    % 2) positive frame-slip hypotheses when walking backward
+    slipFrames = 1:12;
+    localR = 1800;
+
+    for sf = slipFrames
+        center = k_nom + double(sf) * double(p.frameLen);
+
+        [cand, okc] = search_exact_range_for_seq( ...
+            x_tape, round(center-localR), round(center+localR), p, seq_target, seq_max, wid_max);
+        if okc
+            prv = cand;
             ok = true;
+            mode = sprintf("back_slip_%d", sf);
+            return;
+        end
+    end
+
+    % 3) limited local scan only
+    scan_lo = max(1, round(k_nom - 2 * double(p.frameLen)));
+    scan_hi = min(double(cur.k)-1, round(k_nom + 12 * double(p.frameLen)));
+
+    fprintf('BWD SCAN | before seq=%d | scan=[%d,%d]\n', cur.seq, scan_lo, scan_hi);
+
+    for k = scan_lo:scan_hi
+        [hdr, okh] = raw_decode_crc_plausible_header_at_k( ...
+            x_tape, k, p, uint16(double(seq_target)-1), uint16(seq_max), uint16(wid_max));
+
+        if ~okh || hdr.is_stop
+            continue;
+        end
+
+        if double(hdr.seq) ~= double(seq_target)
+            continue;
+        end
+
+        prv = hdr;
+        ok = true;
+        mode = "scan_back";
+        return;
+    end
+end
+
+function [k_last, n_found, ok] = find_last_start_frame_anchor(x_tape, p, sync)
+    k_last = int64(0);
+    n_found = 0;
+    ok = false;
+
+    kmax = numel(x_tape) - numel(sync.start_preamble) + 1;
+    seed_hi = min(kmax, 2 * double(p.frameLen));
+
+    fprintf('START SEEK BEGIN | seed_search=[1,%d] | frameLen=%d\n', ...
+        seed_hi, p.frameLen);
+
+    [seed_k, seed_r] = collect_start_seed_candidates( ...
+        x_tape, 1, seed_hi, sync.start_preamble, 12);
+
+    if isempty(seed_k)
+        fprintf('START SEEK FAILED | no plausible start seeds found\n');
+        return;
+    end
+
+    best_len = -inf;
+    best_score = -inf;
+    best_last = 0;
+    best_first = 0;
+
+    for i = 1:numel(seed_k)
+        fprintf('START SEED TEST | %d/%d | seed_k=%d | seed_r=%.2f\n', ...
+            i, numel(seed_k), seed_k(i), seed_r(i));
+
+        [last_k_i, len_i, score_i] = grow_start_chain( ...
+            x_tape, seed_k(i), p, sync.start_preamble, 12);
+
+        fprintf('START SEED RESULT | seed_k=%d | chain_len=%d | last_k=%d | score=%.2f\n', ...
+            seed_k(i), len_i, last_k_i, score_i);
+
+        if len_i > best_len || (len_i == best_len && score_i > best_score)
+            best_len = len_i;
+            best_score = score_i;
+            best_last = last_k_i;
+            best_first = seed_k(i);
+        end
+    end
+
+    if best_len < 2
+        fprintf('START ANCHOR FAILED | best chain too short | len=%d\n', best_len);
+        return;
+    end
+
+    k_last = int64(best_last);
+    n_found = best_len;
+    ok = true;
+
+    fprintf('START ANCHOR CHOSEN | first_k=%d | last_k=%d | n_found=%d | score=%.2f\n', ...
+        best_first, best_last, n_found, best_score);
+end
+
+function [seed_k, seed_r] = collect_start_seed_candidates(x_tape, lo, hi, pre, r_thr)
+    seed_k = [];
+    seed_r = [];
+
+    pre = double(pre(:));
+    N = numel(pre);
+    kmax = numel(x_tape) - N + 1;
+
+    lo = max(1, round(lo));
+    hi = min(kmax, round(hi));
+    if hi < lo
+        return;
+    end
+
+    coarse_step = 250;
+    ks = lo:coarse_step:hi;
+    if ks(end) ~= hi
+        ks(end+1) = hi;
+    end
+
+    r = -inf(size(ks));
+    for i = 1:numel(ks)
+        k = ks(i);
+        r(i) = pa_corr_ratio_v03(x_tape(k:k+N-1), pre);
+    end
+
+    pick = find(r >= r_thr);
+    if isempty(pick)
+        [~, ord] = sort(r, 'descend');
+        pick = ord(1:min(12, numel(ord)));
+    else
+        [~, ord] = sort(r(pick), 'descend');
+        pick = pick(ord(1:min(12, numel(ord))));
+    end
+
+    cand_k = zeros(numel(pick), 1);
+    cand_r = zeros(numel(pick), 1);
+    n = 0;
+
+    for ii = 1:numel(pick)
+        center = ks(pick(ii));
+        [k_ref, ok_ref, r_ref] = search_preamble_near(x_tape, center, 1200, pre, r_thr);
+        if ~ok_ref
+            continue;
+        end
+        n = n + 1;
+        cand_k(n) = double(k_ref);
+        cand_r(n) = r_ref;
+    end
+
+    cand_k = cand_k(1:n);
+    cand_r = cand_r(1:n);
+
+    if isempty(cand_k)
+        return;
+    end
+
+    % dedupe nearby candidates; keep the strongest one in each cluster
+    [cand_k, ord] = sort(cand_k);
+    cand_r = cand_r(ord);
+
+    keep_k = [];
+    keep_r = [];
+
+    cluster_k = cand_k(1);
+    cluster_r = cand_r(1);
+
+    for i = 2:numel(cand_k)
+        if abs(cand_k(i) - cluster_k(end)) <= 1500
+            if cand_r(i) > cluster_r
+                cluster_k = cand_k(i);
+                cluster_r = cand_r(i);
+            end
+        else
+            keep_k(end+1,1) = cluster_k; %#ok<AGROW>
+            keep_r(end+1,1) = cluster_r; %#ok<AGROW>
+            cluster_k = cand_k(i);
+            cluster_r = cand_r(i);
+        end
+    end
+
+    keep_k(end+1,1) = cluster_k;
+    keep_r(end+1,1) = cluster_r;
+
+    seed_k = keep_k;
+    seed_r = keep_r;
+
+    fprintf('START SEEDS |');
+    for i = 1:numel(seed_k)
+        fprintf(' (%d, %.2f)', seed_k(i), seed_r(i));
+    end
+    fprintf('\n');
+end
+
+function [last_k, len, score] = grow_start_chain(x_tape, seed_k, p, pre, r_thr)
+    cur_k = double(seed_k);
+    last_k = cur_k;
+    len = 1;
+    score = 0;
+
+    localR = 2500;
+    max_gap_frames = 4;
+    max_chain = double(p.N_start_frames) + 8;
+
+    while len < max_chain
+        found = false;
+        best_k = 0;
+        best_r = -inf;
+        best_gap = inf;
+        best_err = inf;
+
+        for gap = 1:max_gap_frames
+            kc = cur_k + gap * double(p.frameLen);
+            [k_next, ok_next, r_next] = search_preamble_near(x_tape, kc, localR, pre, r_thr);
+            if ~ok_next
+                continue;
+            end
+
+            err = abs(double(k_next) - kc);
+
+            if ~found || gap < best_gap || ...
+               (gap == best_gap && r_next > best_r) || ...
+               (gap == best_gap && abs(r_next - best_r) < 1e-9 && err < best_err)
+                found = true;
+                best_k = double(k_next);
+                best_r = r_next;
+                best_gap = gap;
+                best_err = err;
+            end
+        end
+
+        if ~found
+            break;
+        end
+
+        fprintf('START CHAIN | n=%d -> %d | k=%d | gap_frames=%d | r=%.2f\n', ...
+            len, len+1, best_k, best_gap, best_r);
+
+        cur_k = best_k;
+        last_k = cur_k;
+        len = len + 1;
+
+        % prefer longer chains, penalize skipped missing frames a bit
+        score = score + best_r - 200 * (best_gap - 1);
+    end
+end
+
+function [h_best, ok] = find_first_data_header_from_anchor(x_tape, k_start_last, p, sync, seq_max, wid_max, max_seq_probe)
+    h_best = empty_hdr();
+    ok = false;
+
+    Lrec = double(p.frameLen) + double(p.W) + double(p.guardN);
+
+    % After the last start frame, the first PH frame begins one frame later.
+    k_base = double(k_start_last) + double(p.frameLen);
+
+    % Early tape may already be compressed by dropped 100k chunks.
+    % Search seq 1..max_seq_probe with discrete negative frame-slip hypotheses.
+    slipFrames = 0:-1:-40;
+    localR = 1800;
+
+    fprintf('FIRST DATA SEEK | base_k=%d | seq_probe=1:%d\n', k_base, max_seq_probe);
+
+    for seqj = 1:max_seq_probe
+        k_nom = k_base + (seqj - 1) * Lrec;
+
+        found_any = false;
+        best_key = [inf, inf];
+        best_hdr = empty_hdr();
+
+        fprintf('  seq=%d | nominal_k=%d\n', seqj, k_nom);
+
+        for sf = slipFrames
+            center = k_nom + double(sf) * double(p.frameLen);
+            lo = round(center - localR);
+            hi = round(center + localR);
+
+            [cand, okc] = search_exact_range_for_seq(x_tape, lo, hi, p, uint16(seqj), seq_max, wid_max);
+            if ~okc
+                continue;
+            end
+
+            cand.r = preamble_score_at_k(x_tape, cand.k, p, sync);
+            key = [abs(sf), abs(double(cand.k) - center)];
+
+            fprintf('    FIRST DATA CAND | seq=%d | k=%d | slip=%d | r=%.2f\n', ...
+                cand.seq, cand.k, sf, cand.r);
+
+            if ~found_any || lexicographically_better(key, best_key)
+                best_hdr = cand;
+                best_key = key;
+                found_any = true;
+            end
+        end
+
+        if found_any
+            h_best = best_hdr;
+            ok = true;
+            fprintf('FIRST DATA SUCCESS | seq=%d | k=%d | r=%.2f\n', ...
+                h_best.seq, h_best.k, h_best.r);
             return;
         end
     end
 end
 
 
-function [nxt, ok, mode] = find_next_valid_header(x_tape, cur, p, sync, tx_lut)
-    Lrec = p.frameLen + p.W + p.guardN;
+function [nxt, ok, mode] = find_next_valid_header_slipfirst(x_tape, cur, p, seq_max, wid_max)
+    nxt = empty_hdr();
+    ok = false;
+    mode = "";
+
+    Lrec = double(p.frameLen) + double(p.W) + double(p.guardN);
     kmax = numel(x_tape) - (p.frameLen + p.W) + 1;
-    k_exp = double(cur.k) + Lrec;
 
-    nxt = empty_hdr(); ok = false; mode = "";
+    seq_target = uint16(double(cur.seq) + 1);
+    k_nom = double(cur.k) + Lrec;
 
-    % Fast exact/local path around expected position
-    smallR = 2048;
-    [cand, ok1] = search_exact_range(x_tape, max(double(cur.k)+1, k_exp-smallR), min(kmax, k_exp+smallR), cur, p, tx_lut, k_exp);
-    if ok1
-        cand.r = preamble_score_at_k(x_tape, cand.k, p, sync);
-        nxt = cand; ok = true; mode = "exact"; return;
+    % 1) exact nominal
+    [cand, okc] = search_exact_range_for_seq(x_tape, round(k_nom-2), round(k_nom+2), p, seq_target, seq_max, wid_max);
+    if okc
+        nxt = cand;
+        ok = true;
+        mode = "fast_nominal";
+        return;
     end
 
-    % Broad relock path for dropped-sample recovery
-    leftR = max(400000, 4*p.frameLen);
-    rightR = max(4*Lrec, 2800000);
-    a = max(double(cur.k)+1, k_exp-leftR);
-    b = min(kmax, k_exp+rightR);
-    if b < a, return; end
-
-    stride = 5000;
-    ks = a:stride:b;
-    r = zeros(size(ks));
-    for i = 1:numel(ks), r(i) = preamble_score_at_k(x_tape, ks(i), p, sync); end
-
-    r_thr = 6;
-    pick = find(r >= r_thr);
-    if isempty(pick)
-        [~,ord] = sort(r, "descend");
-        pick = ord(1:min(24, numel(ord)));
-    else
-        [~,ord] = sort(r(pick), "descend");
-        pick = pick(ord(1:min(24, numel(ord))));
+    % 2) exact nominal stop
+    [stop_hdr, ok_stop] = search_stop_range(x_tape, round(k_nom-32), round(k_nom+32), p, cur.seq, seq_max, wid_max);
+    if ok_stop
+        nxt = stop_hdr;
+        ok = true;
+        mode = "fast_stop";
+        fprintf('STOP FOUND | after seq=%d | stop_k=%d\n', cur.seq, nxt.k);
+        return;
     end
 
-    coarse = ks(pick);
-    [~,ord2] = sort(abs(coarse - k_exp), "ascend");
-    coarse = coarse(ord2);
+    % 3) discrete negative frame-slip hypotheses
+    slipFrames = -1:-1:-12;
+    localR = 1800;
 
-    refineR = 3500;
-    ranges = [max(double(cur.k)+1, coarse(:)-refineR), min(kmax, coarse(:)+refineR)];
-    ranges = merge_ranges(ranges);
+    for sf = slipFrames
+        center = k_nom + double(sf) * double(p.frameLen);
 
-    best = empty_hdr(); okBest = false;
-    for i = 1:size(ranges,1)
-        [cand, okc] = search_exact_range(x_tape, ranges(i,1), ranges(i,2), cur, p, tx_lut, k_exp);
-        if okc && (~okBest || cand_better(cand, best, cur, k_exp))
-            best = cand;
-            okBest = true;
+        [cand, okc] = search_exact_range_for_seq( ...
+            x_tape, round(center-localR), round(center+localR), p, seq_target, seq_max, wid_max);
+        if okc
+            nxt = cand;
+            ok = true;
+            mode = sprintf("slip_%d", sf);
+            return;
+        end
+
+        [stop_hdr, ok_stop] = search_stop_range( ...
+            x_tape, round(center-localR), round(center+localR), p, cur.seq, seq_max, wid_max);
+        if ok_stop
+            nxt = stop_hdr;
+            ok = true;
+            mode = sprintf("stop_slip_%d", sf);
+            fprintf('STOP FOUND | after seq=%d | stop_k=%d\n', cur.seq, nxt.k);
+            return;
         end
     end
 
-    if okBest
-        best.r = preamble_score_at_k(x_tape, best.k, p, sync);
-        nxt = best;
+    % 4) last resort: limited brute-force scan, not whole remaining tape
+    scan_lo = max(double(cur.k)+1, double(cur.k) + double(p.frameLen));
+    scan_hi = min(kmax, round(k_nom + 2 * double(p.frameLen)));
+
+    fprintf('SCAN | after seq=%d | scan=[%d,%d]\n', cur.seq, scan_lo, scan_hi);
+
+    for k = scan_lo:scan_hi
+        if mod(k - scan_lo, 100000) == 0
+            fprintf('SCAN PROG | after seq=%d | checked up to k=%d\n', cur.seq, k);
+        end
+
+        [hdr, okh] = raw_decode_crc_plausible_header_at_k(x_tape, k, p, cur.seq, uint16(seq_max), uint16(wid_max));
+        if ~okh
+            continue;
+        end
+
+        nxt = hdr;
         ok = true;
-        mode = "broad";
+
+        if hdr.is_stop
+            mode = "stop_recover";
+            fprintf('STOP FOUND | after seq=%d | stop_k=%d\n', cur.seq, hdr.k);
+            return;
+        end
+
+        mode = "scan_recover";
+        return;
     end
 end
 
+function [k_best, ok, best_r] = search_preamble_near(x_tape, kc, radius, pre, r_thr)
+    k_best = int64(0);
+    ok = false;
+    best_r = -inf;
 
-function [best, ok] = search_exact_range(x_tape, lo, hi, cur, p, tx_lut, k_exp)
-    best = empty_hdr(); ok = false;
+    pre = double(pre(:));
+    N = numel(pre);
+    kmax = numel(x_tape) - N + 1;
+
+    lo = max(1, round(double(kc) - double(radius)));
+    hi = min(kmax, round(double(kc) + double(radius)));
+    if hi < lo
+        fprintf('PREAMBLE SEEK INVALID | kc=%d | radius=%d | search=[%d,%d]\n', ...
+            round(double(kc)), round(double(radius)), lo, hi);
+        return;
+    end
+
+    % ---------- tuning knobs ----------
+    coarse_step   = 50;     % coarse grid spacing
+    refine_radius = 250;    % +/- refine around top coarse peaks
+    topN          = 6;      % refine the top-N coarse candidates
+    plateau_frac  = 0.985;  % choose earliest k in the near-peak plateau
+    % ----------------------------------
+
+    fprintf('PREAMBLE SEEK | kc=%d | radius=%d | search=[%d,%d] | N=%d | thr=%.2f\n', ...
+        round(double(kc)), round(double(radius)), lo, hi, N, r_thr);
+
+    % ---------- coarse pass ----------
+    ks = lo:coarse_step:hi;
+    if ks(end) ~= hi
+        ks(end+1) = hi;
+    end
+
+    r_coarse = -inf(size(ks));
+    t0 = tic;
+    tPrint = tic;
+
+    for i = 1:numel(ks)
+        k = ks(i);
+        r_coarse(i) = pa_corr_ratio_v03(x_tape(k:k+N-1), pre);
+
+        if toc(tPrint) > 1.0 || i == numel(ks)
+            [pk, ipk] = max(r_coarse(1:i));
+            fprintf('  COARSE PROG | checked=%d/%d | k=%d | best_r=%.2f @ %d | elapsed=%.1fs\n', ...
+                i, numel(ks), k, pk, ks(ipk), toc(t0));
+            tPrint = tic;
+        end
+    end
+
+    [~, ord] = sort(r_coarse, 'descend');
+    ord = ord(1:min(topN, numel(ord)));
+    centers = ks(ord);
+
+    fprintf('  COARSE DONE | best coarse centers =');
+    fprintf(' %d', centers);
+    fprintf('\n');
+
+    % ---------- build merged refine ranges ----------
+    ranges = zeros(numel(centers), 2);
+    for i = 1:numel(centers)
+        ranges(i,1) = max(lo, centers(i) - refine_radius);
+        ranges(i,2) = min(hi, centers(i) + refine_radius);
+    end
+
+    ranges = sortrows(ranges, 1);
+    merged = ranges(1,:);
+    for i = 2:size(ranges,1)
+        if ranges(i,1) <= merged(end,2) + 1
+            merged(end,2) = max(merged(end,2), ranges(i,2));
+        else
+            merged = [merged; ranges(i,:)]; %#ok<AGROW>
+        end
+    end
+
+    fprintf('  REFINE RANGES:\n');
+    for i = 1:size(merged,1)
+        fprintf('    range %d/%d = [%d,%d]\n', i, size(merged,1), merged(i,1), merged(i,2));
+    end
+
+    % ---------- refine pass ----------
+    t_ref = tic;
+    tPrint = tic;
+    n_total = sum(merged(:,2) - merged(:,1) + 1);
+    n_done = 0;
+
+    K_ref = zeros(n_total,1);
+    R_ref = -inf(n_total,1);
+    ptr = 0;
+
+    for i = 1:size(merged,1)
+        rlo = merged(i,1);
+        rhi = merged(i,2);
+
+        for k = rlo:rhi
+            r = pa_corr_ratio_v03(x_tape(k:k+N-1), pre);
+
+            ptr = ptr + 1;
+            K_ref(ptr) = k;
+            R_ref(ptr) = r;
+
+            if r > best_r
+                best_r = r;
+            end
+
+            n_done = n_done + 1;
+            if toc(tPrint) > 1.0 || n_done == n_total
+                [pk, ipk] = max(R_ref(1:ptr));
+                fprintf('  REFINE PROG | checked=%d/%d | k=%d | best_r=%.2f @ %d | elapsed=%.1fs\n', ...
+                    n_done, n_total, k, pk, K_ref(ipk), toc(t_ref));
+                tPrint = tic;
+            end
+        end
+    end
+
+    K_ref = K_ref(1:ptr);
+    R_ref = R_ref(1:ptr);
+
+    [peak_r, ipeak] = max(R_ref);
+    k_peak = K_ref(ipeak);
+
+    ok = peak_r >= r_thr;
+    if ~ok
+        best_r = peak_r;
+        k_best = int64(k_peak);
+        fprintf('PREAMBLE DONE | ok=0 | peak_r=%.2f | k_peak=%d | thr=%.2f | total_elapsed=%.1fs\n', ...
+            peak_r, k_peak, r_thr, toc(t0));
+        return;
+    end
+
+    % ---------- boundary selection ----------
+    % Choose the earliest sample in the contiguous near-peak plateau
+    % containing the peak. This is much closer to the actual frame start
+    % than the raw argmax.
+    plateau_thr = max(r_thr, plateau_frac * peak_r);
+    mask = (R_ref >= plateau_thr);
+
+    left = ipeak;
+    while left > 1 && mask(left-1) && (K_ref(left) - K_ref(left-1) == 1)
+        left = left - 1;
+    end
+
+    right = ipeak;
+    while right < numel(K_ref) && mask(right+1) && (K_ref(right+1) - K_ref(right) == 1)
+        right = right + 1;
+    end
+
+    k_boundary = K_ref(left);
+
+    k_best = int64(k_boundary);
+    best_r = peak_r;
+
+    fprintf('PREAMBLE DONE | ok=1 | peak_r=%.2f | k_peak=%d | plateau_thr=%.2f | boundary_k=%d | run=[%d,%d] | total_elapsed=%.1fs\n', ...
+        peak_r, k_peak, plateau_thr, k_boundary, K_ref(left), K_ref(right), toc(t0));
+end
+
+function tf = lexicographically_better(a, b)
+    tf = false;
+    for i = 1:numel(a)
+        if a(i) < b(i)
+            tf = true;
+            return;
+        end
+        if a(i) > b(i)
+            return;
+        end
+    end
+end
+
+function [best, ok] = search_exact_range_for_seq(x_tape, lo, hi, p, seq_target, seq_max, wid_max)
+    best = empty_hdr();
+    ok = false;
+
     kmax = numel(x_tape) - (p.frameLen + p.W) + 1;
-    lo = max(lo, double(cur.k)+1);
+    lo = max(1, lo);
     hi = min(hi, kmax);
-    if hi < lo, return; end
+    if hi < lo
+        return;
+    end
+
+    kc = round((lo + hi) / 2);
+    best_dist = inf;
 
     for k = lo:hi
-        [cand, okc] = raw_decode_valid_header_at_k(x_tape, k, p, tx_lut, uint16(cur.seq));
-        if ~okc, continue; end
-        if ~ok || cand_better(cand, best, cur, k_exp)
-            best = cand;
+        [hdr, okh] = raw_decode_crc_plausible_header_at_k( ...
+            x_tape, k, p, uint16(seq_target - 1), uint16(seq_max), uint16(wid_max));
+
+        if ~okh
+            continue;
+        end
+
+        if hdr.is_stop
+            continue;
+        end
+
+        if double(hdr.seq) ~= double(seq_target)
+            continue;
+        end
+
+        dist = abs(double(k) - kc);
+        if ~ok || dist < best_dist
+            best = hdr;
             ok = true;
+            best_dist = dist;
         end
     end
 end
 
+function [best, ok] = search_stop_range(x_tape, lo, hi, p, seq_floor, seq_max, wid_max)
+    best = empty_hdr();
+    ok = false;
 
-function [hdr, ok] = raw_decode_valid_header_at_k(x_tape, k, p, tx_lut, seq_floor)
-    hdr = empty_hdr(); ok = false;
+    kmax = numel(x_tape) - (p.frameLen + p.W) + 1;
+    lo = max(1, lo);
+    hi = min(hi, kmax);
+    if hi < lo
+        return;
+    end
+
+    for k = lo:hi
+        [hdr, okh] = raw_decode_crc_plausible_header_at_k( ...
+            x_tape, k, p, uint16(seq_floor), uint16(seq_max), uint16(wid_max));
+
+        if ~okh
+            continue;
+        end
+
+        if hdr.is_stop
+            best = hdr;
+            ok = true;
+            return;
+        end
+    end
+end
+
+function [hdr, ok] = raw_decode_crc_plausible_header_at_k(x_tape, k, p, seq_floor, seq_max, wid_max)
+    hdr = empty_hdr();
+    ok = false;
+
     k = round(double(k));
     kmax = numel(x_tape) - (p.frameLen + p.W) + 1;
-    if k < 1 || k > kmax, return; end
+    if k < 1 || k > kmax
+        return;
+    end
 
     hdr_samp = x_tape(k + p.Lpre + (1:p.Lhdr));
     [pa_id, wid, seq, crc_ok] = pa_dbpsk_header_decode_v03(hdr_samp, p.spsHdr);
-    if ~crc_ok, return; end
+    if ~crc_ok
+        return;
+    end
 
     pa_id = uint16(pa_id);
-    wid = uint16(wid);
-    seq = uint16(seq);
+    wid   = uint16(wid);
+    seq   = uint16(seq);
 
     is_stop = (double(pa_id) == 15) && (double(wid) == 65535) && (double(seq) == 65535);
     if is_stop
@@ -396,72 +1009,31 @@ function [hdr, ok] = raw_decode_valid_header_at_k(x_tape, k, p, tx_lut, seq_floo
     end
 
     pa = id_to_pa(pa_id);
-    if pa == "", return; end
-    if seq <= seq_floor, return; end
+    if pa == ""
+        return;
+    end
 
-    s = double(seq);
-    if s < 1 || s > tx_lut.N, return; end
-    if tx_lut.pa_id(s) ~= pa_id || tx_lut.wid(s) ~= wid, return; end
+    if seq <= seq_floor
+        return;
+    end
+
+    if double(seq) > double(seq_max)
+        return;
+    end
+
+    if double(wid) < 1 || double(wid) > double(wid_max)
+        return;
+    end
 
     hdr = struct("k", int64(k), "pa_id", pa_id, "pa", pa, "wid", wid, "seq", seq, "is_stop", false, "r", NaN);
     ok = true;
 end
-
-
-function tf = cand_better(a, b, cur, k_exp)
-    ka = cand_key(a, cur, k_exp);
-    kb = cand_key(b, cur, k_exp);
-    tf = false;
-    for i = 1:numel(ka)
-        if ka(i) < kb(i), tf = true; return; end
-        if ka(i) > kb(i), return; end
-    end
-end
-
-
-function key = cand_key(cand, cur, k_exp)
-    seq_target = double(cur.seq) + 1;
-    if cand.is_stop
-        grp = 2; seqk = 0;
-    elseif double(cand.seq) == seq_target
-        grp = 1; seqk = 0;
-    else
-        grp = 3; seqk = double(cand.seq);
-    end
-    dist = abs(double(cand.k) - double(k_exp));
-    key = [grp, seqk, dist];
-end
-
 
 function r = preamble_score_at_k(x_tape, k, p, sync)
     k = round(double(k));
     if k < 1 || (k + p.Lpre - 1) > numel(x_tape), r = 0; return; end
     r = pa_corr_ratio_v03(x_tape(k:k+p.Lpre-1), sync.win_preamble);
 end
-
-
-function ranges = merge_ranges(ranges)
-    if isempty(ranges), ranges = zeros(0,2); return; end
-    ranges = sortrows(ranges, 1);
-    out = ranges(1,:);
-    for i = 2:size(ranges,1)
-        if ranges(i,1) <= out(end,2) + 1
-            out(end,2) = max(out(end,2), ranges(i,2));
-        else
-            out = [out; ranges(i,:)]; %#ok<AGROW>
-        end
-    end
-    ranges = out;
-end
-
-
-function lut = make_tx_lut(tx_index)
-    lut = struct();
-    lut.N = height(tx_index);
-    lut.pa_id = uint16(tx_index.pa_id(:));
-    lut.wid = uint16(tx_index.window_id(:));
-end
-
 
 function pa = id_to_pa(pa_id)
     switch double(pa_id)
@@ -472,7 +1044,6 @@ function pa = id_to_pa(pa_id)
         otherwise, pa = "";
     end
 end
-
 
 function [x_d, Fs_d, ok] = load_digital_by_window_id(data_root, pa, wid)
     f = fullfile(data_root, sprintf("pilot_S01_%s.mat", pa));
@@ -485,7 +1056,6 @@ function [x_d, Fs_d, ok] = load_digital_by_window_id(data_root, pa, wid)
     Fs_d = double(S.meta(j).fs_hz);
     ok = true;
 end
-
 
 function plot_pair_dig_vs_ota(pa, x_d, Fs_d, x_o, Fs_o, out_png)
     nfft = 1024; hop = 256; win = hann(nfft,"periodic");
@@ -519,6 +1089,9 @@ function plot_pair_dig_vs_ota(pa, x_d, Fs_d, x_o, Fs_o, out_png)
     close(f);
 end
 
+function h = empty_hdr()
+    h = struct("k", int64(0), "pa_id", uint16(0), "pa", "", "wid", uint16(0), "seq", uint16(0), "is_stop", false, "r", NaN);
+end
 
 function m = empty_meta()
     m = struct( ...
@@ -538,12 +1111,6 @@ function m = empty_meta()
         "header_r", NaN );
 end
 
-
-function h = empty_hdr()
-    h = struct("k", int64(0), "pa_id", uint16(0), "pa", "", "wid", uint16(0), "seq", uint16(0), "is_stop", false, "r", NaN);
-end
-
-
 function d = empty_drop()
     d = struct( ...
         "seq", uint16(0), ...
@@ -554,7 +1121,6 @@ function d = empty_drop()
         "gap", int64(0), ...
         "reason", "" );
 end
-
 
 function data_root = pilot_root_from_protocol(protocol)
     root = pa_root();
@@ -570,12 +1136,11 @@ function data_root = pilot_root_from_protocol(protocol)
     end
 end
 
-
 function out_root = spliced_root_from_protocol(protocol)
     root = pa_root();
     switch string(protocol)
         case "wifi"
-            out_root = fullfile(root, "data", "wifi", "ota", "spliced", "v05");
+            out_root = fullfile(root, "data", "wifi", "ota", "spliced", "v06");
         case "bluetooth"
             out_root = fullfile(root, "data", "bluetooth", "ota", "spliced", "v05");
         case "zigbee"
@@ -584,7 +1149,6 @@ function out_root = spliced_root_from_protocol(protocol)
             error("Unknown protocol %s", protocol);
     end
 end
-
 
 function out_root = results_root_from_protocol(protocol)
     root = pa_root();

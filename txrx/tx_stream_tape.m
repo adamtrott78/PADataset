@@ -1,19 +1,24 @@
-function tx_stream_tape(protocol, ip, fc_hz, gain_db, tx_ant)
-%TX_STREAM_TAPE Beacon mode -> SPACE -> stream protocol-specific tx_tape.
+function tx_stream_tape(protocol, ip, fc_hz, gain_db, tx_ant, dataset_id_or_tape_file, shard_id)
+%TX_STREAM_TAPE Beacon mode -> SPACE -> stream one protocol tx tape or shard.
 %
 % Usage:
-%   build_tx_tape("wifi")
 %   tx_stream_tape("wifi", "192.168.10.2", 2.437e9, 20, "TX/RX")
+%   tx_stream_tape("wifi", "192.168.10.2", 2.437e9, 20, "TX/RX", "high_run01", 1)
+%   tx_stream_tape("bluetooth", "192.168.10.2", 2.437e9, 20, "TX/RX", "high_run01", 1)
+%   tx_stream_tape("zigbee", "192.168.10.2", 2.437e9, 20, "TX/RX", "high_run01", 1)
 %
-%   build_tx_tape("bluetooth")
-%   tx_stream_tape("bluetooth", "192.168.10.2", 2.437e9, 20, "TX/RX")
-%
-%   build_tx_tape("zigbee")
-%   tx_stream_tape("zigbee", "192.168.10.2", 2.437e9, 20, "TX/RX")
+% New direct shard usage:
+%   tx_stream_tape(protocol, ip, fc_hz, gain_db, tx_ant, dataset_id, shard_id)
+% where dataset_id may be either:
+%   "high_run01"          -> expands to "<protocol>_high_run01"
+%   "wifi_high_run01"     -> used as-is
 %
 % Backward-compatible old usage:
 %   tx_stream_tape("192.168.10.2", 2.437e9, 20, "TX/RX")
 % which defaults protocol="wifi".
+%
+% Backward-compatible override usage:
+%   tx_stream_tape(protocol, ip, fc_hz, gain_db, tx_ant, tape_file_override)
 
     % --------- backward-compatible argument handling ---------
     if nargin >= 1 && ~isempty(protocol)
@@ -29,23 +34,35 @@ function tx_stream_tape(protocol, ip, fc_hz, gain_db, tx_ant)
         fc_hz   = ip;
         ip      = protocol;
         protocol_s = "wifi";
+        dataset_id_or_tape_file = [];
+        shard_id = [];
     end
 
     if nargin < 4
-        error("Usage: tx_stream_tape(protocol, ip, fc_hz, gain_db, tx_ant)");
+        error("Usage: tx_stream_tape(protocol, ip, fc_hz, gain_db, tx_ant, dataset_id, shard_id)");
     end
+
     if nargin < 5
         tx_ant = [];
+    end
+
+    if nargin < 6
+        dataset_id_or_tape_file = [];
+    end
+
+    if nargin < 7
+        shard_id = [];
     end
 
     protocol_s = string(protocol_s);
     assert(any(protocol_s == ["wifi","bluetooth","zigbee"]), ...
         "protocol must be one of: wifi, bluetooth, zigbee");
 
-    P = pa_paths();
-    addpath(P.txrx);
+    R = pa_protocol_roots(protocol_s);
+    addpath(R.txrx);
 
-    tape_file = fullfile(P.txrx_tapes_digital, char(protocol_s), "tx_tape.mat");
+    [tape_file, dataset_full, shard_num] = resolve_tx_tape_file(protocol_s, R, dataset_id_or_tape_file, shard_id);
+
     S = load(tape_file, "tx_tape", "tx_params", "sync");
 
     tx_tape = S.tx_tape;
@@ -59,6 +76,12 @@ function tx_stream_tape(protocol, ip, fc_hz, gain_db, tx_ant)
     interp = round(mcr / 12e6); % user-friendly default, but print actual
     Fs = mcr / interp;
 
+    if ~isempty(dataset_full)
+        fprintf("TX | protocol=%s | dataset=%s | shard=%03d | file=%s\n", ...
+            protocol_s, dataset_full, shard_num, tape_file);
+    else
+        fprintf("TX | protocol=%s | file=%s\n", protocol_s, tape_file);
+    end
     fprintf("TX | protocol=%s | IP=%s | Fc=%.6f GHz | Gain=%.1f dB | MCR=%.0f | interp=%d | Fs=%.6f MS/s\n", ...
         protocol_s, ip, fc_hz/1e9, gain_db, mcr, interp, Fs/1e6);
 
@@ -145,8 +168,8 @@ function tx_stream_tape(protocol, ip, fc_hz, gain_db, tx_ant)
         fprintf("TX DONE | protocol=%s | underruns=%d\n", protocol_s, underruns);
 
     catch ME
-        try, release(tx); end %#ok<TRYNC>
-        try, close(fig); end %#ok<TRYNC>
+        try, release(tx); end
+        try, close(fig); end
         rethrow(ME);
     end
 
@@ -154,4 +177,61 @@ function tx_stream_tape(protocol, ip, fc_hz, gain_db, tx_ant)
         if strcmp(ev.Key,"space"), st.go = true; end
         if strcmp(ev.Key,"q"),     st.quit = true; end
     end
+end
+
+
+function [tape_file, dataset_full, shard_num] = resolve_tx_tape_file(protocol_s, R, dataset_id_or_tape_file, shard_id)
+    dataset_full = "";
+    shard_num = [];
+
+    if isempty(dataset_id_or_tape_file)
+        tape_file = fullfile(R.txrx_tapes_digital, "tx_tape.mat");
+        return;
+    end
+
+    arg6 = string(dataset_id_or_tape_file);
+    if strlength(arg6) == 0
+        tape_file = fullfile(R.txrx_tapes_digital, "tx_tape.mat");
+        return;
+    end
+
+    if endsWith(lower(arg6), ".mat")
+        tape_file = char(arg6);
+        return;
+    end
+
+    if isempty(shard_id)
+        error("When dataset_id is provided, shard_id is also required.");
+    end
+
+    shard_num = validate_shard_id(shard_id);
+    dataset_full = normalize_dataset_id(protocol_s, arg6);
+    tape_file = fullfile(R.txrx_tapes_digital, char(dataset_full), sprintf("tx_tape_shard_%03d.mat", shard_num));
+
+    if ~isfile(tape_file)
+        error("TX tape file not found: %s", tape_file);
+    end
+end
+
+
+function dataset_full = normalize_dataset_id(protocol_s, dataset_id)
+    dataset_id = string(dataset_id);
+    prefix = protocol_s + "_";
+    if startsWith(dataset_id, prefix)
+        dataset_full = dataset_id;
+    else
+        dataset_full = prefix + dataset_id;
+    end
+end
+
+
+function shard_num = validate_shard_id(shard_id)
+    if ~(isnumeric(shard_id) || islogical(shard_id)) || numel(shard_id) ~= 1 || ~isfinite(double(shard_id))
+        error("shard_id must be a finite scalar integer.");
+    end
+    shard_num = double(shard_id);
+    if abs(shard_num - round(shard_num)) > 0 || shard_num < 1
+        error("shard_id must be a positive integer.");
+    end
+    shard_num = round(shard_num);
 end
