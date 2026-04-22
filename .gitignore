@@ -1,5 +1,6 @@
 *.mat
 !**/tx_spec_shard_*.mat
+*.png
 *.zip
 *.pt
 *.pth
