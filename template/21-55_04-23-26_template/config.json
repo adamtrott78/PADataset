@@ -1,0 +1,15 @@
+{
+  "run_name": "template",
+  "task": "pa",
+  "split_mode": "closed",
+  "cache_len": 16384,
+  "batch_size": 16,
+  "lr": 0.0005,
+  "weight_decay": 0.0,
+  "lambda_center": 0.1,
+  "epochs": 40,
+  "early_stopping_patience": 8,
+  "seed": 1,
+  "save_root": "template",
+  "root": "/home/atrott/Adam/varMax/PADataset/data"
+}

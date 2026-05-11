@@ -1,0 +1,11 @@
+STAGE DATASET MANIFEST
+protocol            : bluetooth
+snr_regime          : high
+dataset_id          : bluetooth_pa1_run01
+stage_root          : /home/atrott/adamArchives/Adam/varMax/PADataset
+n_per_pa            : 10000
+n_shards            : 5
+windows_per_segment : 100
+seed_session_id     : 1
+seed_tape_id        : 1
+generated_at        : 08-May-2026 05:35:02

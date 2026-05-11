@@ -1,0 +1,117 @@
+# ============================================================
+# PADataset gitignore
+# Track source/scripts/configs/notebooks.
+# Ignore generated data, OTA captures, caches, results, logs, and large outputs.
+# ============================================================
+
+# ---------- OS / editor ----------
+.DS_Store
+Thumbs.db
+*.swp
+*.swo
+*~
+.vscode/
+.idea/
+.ipynb_checkpoints/
+**/.ipynb_checkpoints/
+
+# ---------- Python ----------
+__pycache__/
+**/__pycache__/
+*.py[cod]
+*.pyo
+.pytest_cache/
+.mypy_cache/
+.venv/
+venv/
+env/
+*.egg-info/
+
+# ---------- MATLAB temp ----------
+*.asv
+*.m~
+*.autosave
+*.slxc
+*.mex*
+
+# ---------- Logs / generated tables ----------
+*.log
+*.csv
+
+# ---------- Generated images / plots ----------
+*.png
+
+# ---------- Archives ----------
+*.zip
+*.tar
+*.tar.gz
+*.tgz
+*.7z
+*.rar
+
+# ---------- ML/cache/binary artifacts ----------
+*.pt
+*.pth
+*.ckpt
+*.npy
+*.npz
+*.pkl
+*.pickle
+*.h5
+*.hdf5
+
+# ---------- MATLAB data ----------
+*.mat
+
+# Keep TX spec metadata files.
+!**/tx_spec_shard_*.mat
+
+# ---------- Root generated data/results/caches ----------
+/data/
+/results/
+/results*/
+/results_pa_*/
+/_feature*/
+/_feature_*/
+/_feature_cache*/
+/_feature_cache_*/
+/_feature_cache_len*/
+/_feature_cache_nvme/
+/cache/
+/tmp/
+/temp/
+/archive/
+
+# ---------- TXRX generated outputs ----------
+/txrx/seek_outputs/
+/txrx/seek_outputs_pretty/
+/txrx/tapes/ota/
+
+# Ignore actual digital tape payloads, but allow tx_spec_shard_*.mat metadata.
+/txrx/tapes/digital/**/*.mat
+!/txrx/tapes/digital/**/tx_spec_shard_*.mat
+
+# ---------- Keep placeholders ----------
+!.gitkeep
+
+# ---------- Symlink/file-style generated roots ----------
+/data
+/results
+/results*
+/results_pa_*
+/_feature*
+/_feature_cache*
+/_feature_cache_len*
+/_feature_cache_nvme
+/archive
+/cache
+/tmp
+/temp
+
+# ---------- Symlink/file-style TXRX generated outputs ----------
+/txrx/tapes/ota
+/txrx/seek_outputs
+/txrx/seek_outputs_pretty
+
+# Ignore symlink to external digital tape storage.
+/txrx/tapes/digital

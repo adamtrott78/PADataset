@@ -1,0 +1,462 @@
+{
+  "schema_version": "pa_rf_iq_v0.2_starter_4pa_fixed20ms_20Msps",
+  "project": {
+    "name": "PA RF/IQ Generator + Validator (Starter 4 PAs)",
+    "principle": "Periodization-driven design: fixed 20ms windows that contain sufficient cycles of burst cadence, hop/dwell revisits, repeats, or stationarity evidence.",
+    "band_policy": {
+      "band": "2.4GHz",
+      "fixed_center_per_session": true,
+      "center_freq_hz_default": 2437000000.0
+    }
+  },
+  "rates": {
+    "fs_hz": 20000000.0
+  },
+  "tx_domain": {
+    "fs_hz": 12500000.0,
+    "window_n": 400000,
+    "window_length_s": 0.032
+  },
+  "windowing": {
+    "window_length_s": 0.02,
+    "alignment_jitter_policy": {
+      "enabled": true,
+      "max_jitter_s": 0.005
+    },
+    "stride_policy": {
+      "primary_stride": "W",
+      "fallback_stride": "W/2",
+      "insufficient_rule": {
+        "definition": "Let N_base = floor((L - 2J - W)/S) + 1 be the number of base windows for a stride S. If N_base < windows_needed_for_segment, set S=floor(W/2) and recompute N_base. If still insufficient, increase segment length (only S=W or S=W/2 allowed in v0.1)."
+      }
+    },
+    "padding_policy": {
+      "enabled": true,
+      "evidence_span_frac_min": 0.75,
+      "types": [
+        {
+          "name": "quiet",
+          "probability": 0.6,
+          "snr_db": [35, 50],
+          "applies_where": "entire_window"
+        },
+        {
+          "name": "benign_background",
+          "probability": 0.4,
+          "snr_db": [15, 30],
+          "applies_where": "non_evidence_only"
+        }
+      ]
+    }
+  },
+  "signal_pipeline": {
+    "normalize_signal_rms": 1.0,
+    "renormalize_after_noise": false,
+    "impairments": {
+      "awgn": { "enabled": true },
+      "cfo_hz": { "enabled": true, "range_hz": [-2000, 2000] },
+      "multipath_fading": { "enabled": false },
+      "iq_imbalance": { "enabled": false },
+      "phase_noise": { "enabled": false }
+    },
+    "peak_reject": {
+      "enabled": true,
+      "peak_threshold": 10.0,
+      "log_papr": true
+    }
+  },
+  "io": {
+    "output_root": "./out_starter_v01",
+    "format": {
+      "iq_dtype": "complex_single",
+      "container": "mat"
+    },
+    "chunking": {
+      "windows_per_chunk": 256,
+      "max_chunk_gb": 1.8,
+      "mat_version_policy": {
+        "prefer_v7_under_2gb": true,
+        "use_v7_3_if_exceeds_limit": true
+      },
+      "compression": "off"
+    },
+    "rejects": {
+      "write_separately": true,
+      "include_full_iq": true
+    }
+  },
+  "dataset_plan": {
+    "sessions": {
+      "count": 4,
+      "each_session_has_pas": ["PA2", "PA3", "PA4", "PA8"],
+      "environment_id_template": "offline_clean_sess%02d"
+    },
+    "splits": {
+      "mode": "fixed_by_session",
+      "train_sessions": [1, 2],
+      "val_sessions": [3],
+      "test_sessions": [4]
+    },
+    "targets": {
+      "windows_per_pa_valid": 10000
+    }
+  },
+  "generator": {
+    "seeds": {
+      "master_seed": 12345,
+      "seed_derivation": "sha256_tuple_first64",
+      "tuple_fields": ["master_seed", "schema_version", "session_id", "tape_id", "segment_id", "window_id"],
+      "substreams": {
+        "payload": "payload",
+        "scrambler": "scrambler",
+        "operator": "operator",
+        "jitter": "jitter",
+        "noise": "noise"
+      }
+    },
+    "structure": {
+      "master_tape_mode": "virtual_segments_streaming",
+      "segment_min_seconds": 1.0,
+      "segment_max_seconds": 30.0
+    },
+    "regeneration": {
+      "max_attempts_per_valid_window": 10,
+      "on_failure": "log_reject_and_continue"
+    },
+    "logging": {
+      "write_meta_sidecar": false,
+      "store_validation_results": "vr_full",
+      "meta_fields_required": [
+        "schema_version",
+        "session_id",
+        "tape_id",
+        "segment_id",
+        "window_id",
+        "pa_type",
+        "fs_hz",
+        "wlan_cfg_snapshot",
+        "seeds",
+        "operator_params",
+        "validation_results"
+      ],
+      "meta_fields_added": [
+        "tape_start_time_utc",
+        "window_start_sample",
+        "window_length_s",
+        "generator_commit",
+        "generator_version",
+        "matlab_version",
+        "toolbox_versions",
+        "mode",
+        "environment_id",
+        "emitter_profile_id",
+        "sdr_device",
+        "center_freq_hz",
+        "rx_gain_db",
+        "tx_gain_db",
+        "uhd_overflow_count",
+        "uhd_underrun_count",
+        "capture_chunk_id",
+        "capture_file_id",
+        "hardware_chain_id"
+      ]
+    }
+  },
+  "wlan_base_waveform": {
+    "format": "NonHT",
+    "channel_bandwidth": "CBW20",
+    "mcs": 4,
+    "psdu_length_bytes": 1500,
+    "num_tx_antennas": 1,
+    "oversampling_factor": 1.0,
+    "payload_source": "random_bits",
+    "payload_seed_policy": { "mode": "per_window" },
+    "scrambler_policy": { "mode": "per_packet_vector" },
+    "burst_gen_default": { "num_packets": 10, "idle_time_s": 0.00005 }
+  },
+  "bluetooth_base_waveform": {
+    "format": "BLE",
+    "mode": "LE2M",
+    "channel_index": 37,
+    "channel_index_grid": [0, 9, 18, 27, 36],
+    "offset_grid_hz": [-4000000, -2000000, 0, 2000000, 4000000],
+    "samples_per_symbol": 10,
+    "access_address": "8E89BED6",
+    "whiten_status": "On",
+    "modulation_index": 0.5,
+    "pulse_length": 1,
+    "pdu_type": "Advertising indication",
+    "advertiser_address": "1234567890AB",
+    "advertising_data": "020106"
+  },
+  "zigbee_base_waveform": {
+    "format": "OQPSK",
+    "band_mhz": 2450,
+    "samples_per_chip": 20,
+    "psdu_length_bytes": 127,
+    "offset_grid_hz": [-4000000, -2000000, 0, 2000000, 4000000]
+  },
+  "operators": {
+    "burst_scheduling": {
+      "mode": "packet_factory_plus_manual_concat"
+    },
+    "freq_translation": {
+      "method": "phase_freq_offset",
+      "max_abs_offset_hz": 8000000.0,
+      "phase_continuity": true
+    },
+    "hop_step_schedule": {
+        "hop_cycles": [6, 10],
+        "dwell_s": [0.001, 0.0025],
+        "hop_set_size": [3, 4],
+        "require_revisit": true,
+        "offset_grid_hz": { 
+            "min_hz": -8000000, 
+            "max_hz": 8000000, 
+            "step_hz": 2000000 
+        },
+        "rate_conversion": { 
+            "enable": true, 
+            "os_factor": 2, 
+            "lpf_cutoff_hz": 9500000, 
+            "fir_numtaps": 160, 
+            "kaiser_beta": 7.0 
+        }
+    }
+  },
+  "validation": {
+  "drop_reject": {
+    "reject_on_discontinuity_detected": true,
+    "discontinuity_rule": {
+      "enabled": true,
+      "r_threshold": 20.0
+    }
+  },
+  "detectors": {
+    "burst": {
+      "edges": { "enabled": true },
+      "params": {
+        "power_smoothing_s": 0.0001,
+        "refractory_s": 0.0002,
+        "thresholds": {
+          "hi_mad_k": 6.0,
+          "lo_mad_k": 3.0,
+          "occ_sigma_k": 5.0
+        }
+      },
+      "mask_close_s": 0.0002
+    },
+    "freq": {
+      "jump": { "enabled": true },
+      "params": {
+        "window": "hann",
+        "nfft": 4096,
+        "hop": 2048,
+        "nbins": 32,
+        "persistence_frames": 2,
+        "smooth_frames": 3,
+        "min_delta_bins": 2
+      }
+    },
+    "stationarity": {
+      "enabled": true,
+      "outputs": ["shape", "energy", "energy_cv"],
+      "params": {
+        "window": "hann",
+        "nfft": 4096,
+        "hop": 2048,
+        "nbins": 32
+      }
+    },
+    "repeat": {
+      "similarity": { "enabled": true },
+      "params": {
+        "window": "hann",
+        "nfft": 4096,
+        "hop": 2048,
+        "nbins": 32,
+        "reduce": "min_pairwise",
+        "alignment": "schedule_indices_v0_1"
+      }
+    }
+  },
+  "thresholds": {
+    "burst": {
+      "min_count": 3
+    },
+    "freq": {
+      "jump_min_count": 3
+    },
+    "stationarity": {
+      "shape_high": 0.8,
+      "shape_low": 0.4,
+      "energy_high": 0.8,
+      "energy_low": 0.4
+    },
+    "repeat": {
+      "similarity_min": 0.85
+    }
+  }
+},
+  "usrp_ota": {
+    "enabled": false,
+    "device": "USRP_N210",
+    "uhd_streaming": {
+      "rx_overflow_monitoring_required": true,
+      "tx_underrun_monitoring_required": true
+    },
+    "session_policy": {
+      "manual_gain_only": true,
+      "fixed_center_freq_per_session": true
+    },
+    "defaults": {
+      "tx_gain_db": 0,
+      "rx_gain_db": 0,
+      "center_freq_hz": 2437000000.0
+    }
+  },
+  "pas": {
+    "PA1": {
+      "name": "Survey / Probing Scan",
+      "params": {
+        "dwell_s": [0.0010, 0.0020],
+        "scan_set_size": [12, 24],
+        "offset_grid_hz": { "min_hz": -8000000, "max_hz": 8000000, "step_hz": 500000 }
+      },
+      "accept": {
+        "evidence_span_frac_min": 0.75
+      }
+    },
+    "PA2": {
+      "name": "Burst Timing Acquisition",
+      "required_operators": ["burst_scheduling"],
+      "params": {
+        "burst_count": [4, 8],
+        "burst_on_s": [0.0005, 0.0018],
+        "ibi_mean_s": [0.002, 0.0045],
+        "ibi_jitter_frac": [0.1, 0.25],
+        "burst_definition": "energy_on_segment"
+      },
+      "accept": {
+        "evidence_span_frac_min": 0.72,
+        "burst_start_min": 3,
+        "burst_end_min": 3,
+        "burst_len_max_s": 0.0029,
+        "ibi_max_s": 0.0065,
+        "freq_jump_max": 0,
+        "reject_if_stationary_high": true
+      },
+      "log": ["burst_times", "gap_times"]
+    },
+    "PA3": {
+      "name": "Steady-State Waveform Characterization",
+      "required_operators": ["burst_scheduling"],
+      "params": {
+        "min_steady_occupancy_frac": 0.8,
+        "max_edge_events": 1,
+        "construction": "near_continuous_occupancy"
+      },
+      "accept": {
+        "evidence_span_frac_min": 0.75,
+        "stationarity_min": 0.8,
+        "edge_max": 1,
+        "reject_if_freq_jumps": true
+      },
+      "log": ["stationarity_score", "edge_counts"]
+    },
+    "PA4": {
+      "name": "Frequency Agility Characterization",
+      "required_operators": ["hop_step_schedule", "freq_translation"],
+      "internal_osf": 4,
+      "lpf_pass_hz": 9500000.0,
+      "lpf_stop_hz": 10000000.0,
+      "lpf_atten_db": 80,
+      "params": {
+        "hop_cycles": [6, 10],
+        "dwell_s": [0.001, 0.0025],
+        "hop_set_size": [3, 4],
+        "require_revisit": true
+      },
+      "accept": {
+        "evidence_span_frac_min": 0.75,
+        "freq_jump_min_count": 3,
+        "require_revisit": true
+      },
+      "log": ["hop_schedule", "offsets_hz"]
+    },
+    "PA5": {
+      "name": "Margin / Quality Regime Manipulation",
+      "params": {
+        "regime_count": [2, 4],
+        "regime_dwell_s": [0.003, 0.010],
+        "regime_gains_db": [-12, -6, -3, 0]
+      },
+      "accept": {
+        "evidence_span_frac_min": 0.75
+      }
+    },
+    "PA6": {
+      "name": "Burst Timing + Intra-burst Drift (Tracking Loop Stress)",
+      "params": {
+        "burst_on_s": [0.0005, 0.0018],
+        "ibi_mean_s": [0.0020, 0.0045],
+        "ibi_jitter_frac": [0.10, 0.25],
+
+        "f0_hz": [-2000, 2000],
+        "drift_total_hz": [5000, 30000],
+        "amp_jitter_db": [-0.5, 0.5]
+      },
+      "accept": {
+        "evidence_span_frac_min": 0.75
+      }
+    },
+    "PA7": {
+      "name": "Fingerprint Acquisition / Transient Elicitation",
+      "params": {
+        "probe_len_s": [0.0003, 0.0010],
+        "gap_s": [0.0005, 0.0015],
+        "amp_jitter_db": [-0.5, 0.5],
+        "transient": {
+          "rise_s": [0.00002, 0.00012],
+          "fall_s": [0.00002, 0.00012],
+          "overshoot_db": [0.0, 1.5],
+          "ring_amp": [0.00, 0.15],
+          "ring_freq_hz": [20000, 200000],
+          "ring_tau_s": [0.00005, 0.00040]
+        }
+      },
+      "accept": {
+        "evidence_span_frac_min": 0.75
+      }
+    },
+    "PA8": {
+      "name": "Replay / Repeat Template Mining",
+      "required_operators": ["burst_scheduling"],
+      "params": {
+        "repeat_count": [4, 5],
+        "template_len_s": [0.003, 0.006],
+        "repeat_spacing_s": [0.0065, 0.0095],
+        "template_source": "cropped_iq_within_burst",
+        "repeat_mode": ["exact"],
+        "recorded_noise": {
+        "enable": false,
+        "snr_db": [20, 35]
+        },
+        "near_exact": {
+          "awgn_snr_db": [30, 50],
+          "amp_scale_db": [-1, 1],
+          "phase_rot_deg": [-15, 15],
+          "cfo_hz": [-200, 200],
+          "time_shift_enabled": false
+        }
+      },
+      "accept": {
+        "evidence_span_frac_min": 0.75,
+        "repeat_min": 3,
+        "repeat_similarity_min": 0.93,
+        "reject_if_repeat_missing": true
+      },
+      "log": ["repeat_schedule", "similarity_scores"]
+    }
+  }
+}
