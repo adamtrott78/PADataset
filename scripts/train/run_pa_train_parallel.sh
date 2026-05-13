@@ -5,7 +5,7 @@ REPO="${REPO:-$HOME/adamArchives/Adam/varMax/PADataset}"
 PY="${PY:-$(command -v python)}"
 MANIFEST="${1:-manifests/train_manifest.tsv}"
 JOBS="${JOBS:-2}"
-LOGROOT="${LOGROOT:-results/train_workers}"
+LOGROOT="${LOGROOT:-_runtime/train_workers}"
 TS="$(date +%Y%m%d_%H%M%S)"
 
 cd "$REPO"
