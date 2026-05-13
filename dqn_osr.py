@@ -1,6 +1,10 @@
 import copy
+import json
+import os
+import time
 import random
 from collections import deque
+from pathlib import Path
 from typing import Any, Dict, Optional, Tuple
 
 import numpy as np
@@ -9,6 +13,28 @@ import torch.nn as nn
 import torch.optim as optim
 
 from osr_core import BaseOSRMethod, BackbonePayload, SplitOutputs
+
+
+
+def _write_dqn_progress(**payload) -> None:
+    path = os.environ.get("PADATASET_OSR_PROGRESS_JSON")
+    if not path:
+        return
+    try:
+        p = Path(path)
+        current = {}
+        if p.is_file():
+            try:
+                current = json.loads(p.read_text())
+            except Exception:
+                current = {}
+        current.update(payload)
+        current.setdefault("time", time.strftime("%Y-%m-%dT%H:%M:%S%z"))
+        tmp = p.with_suffix(".json.tmp")
+        tmp.write_text(json.dumps(current, indent=2))
+        tmp.replace(p)
+    except Exception:
+        pass
 
 
 # ============================================================
@@ -363,6 +389,17 @@ class DQNOSR(BaseOSRMethod):
 
         history = []
 
+        _write_dqn_progress(
+            phase="dqn_training_start",
+            pct=20.0,
+            dqn_episode=0,
+            dqn_episodes=int(self.episodes),
+            dqn_n_states_total=int(len(states)),
+            dqn_n_train_states=int(len(train_states)),
+            dqn_n_anchor_high=int(high_mask.sum()),
+            dqn_n_anchor_low=int(low_mask.sum()),
+        )
+
         for episode in range(self.episodes):
             order = np.random.permutation(len(train_states))
             episode_rewards = []
@@ -402,10 +439,25 @@ class DQNOSR(BaseOSRMethod):
 
             agent.decay_epsilon()
 
+            avg_reward = float(np.mean(episode_rewards)) if episode_rewards else None
+            avg_loss = float(np.mean(losses)) if losses else None
+            dqn_pct = 20.0 + 65.0 * float(episode + 1) / float(max(self.episodes, 1))
+            _write_dqn_progress(
+                phase="dqn_training",
+                pct=dqn_pct,
+                dqn_episode=int(episode + 1),
+                dqn_episodes=int(self.episodes),
+                dqn_avg_reward=avg_reward,
+                dqn_avg_loss=avg_loss,
+                dqn_epsilon=float(agent.epsilon),
+                dqn_centroid_known_count=int(n_known),
+                dqn_centroid_unknown_count=int(n_unknown),
+            )
+
             history.append({
                 "episode": episode + 1,
-                "avg_reward": float(np.mean(episode_rewards)) if episode_rewards else None,
-                "avg_loss": float(np.mean(losses)) if losses else None,
+                "avg_reward": avg_reward,
+                "avg_loss": avg_loss,
                 "epsilon": float(agent.epsilon),
                 "centroid_known": c_known.copy(),
                 "centroid_unknown": c_unknown.copy(),
@@ -413,6 +465,16 @@ class DQNOSR(BaseOSRMethod):
                 "n_anchor_high": int(high_mask.sum()),
                 "n_anchor_low": int(low_mask.sum()),
             })
+
+        _write_dqn_progress(
+            phase="dqn_fit_done",
+            pct=85.0,
+            dqn_episode=int(self.episodes),
+            dqn_episodes=int(self.episodes),
+            dqn_final_epsilon=float(agent.epsilon),
+            dqn_centroid_known_count=int(n_known),
+            dqn_centroid_unknown_count=int(n_unknown),
+        )
 
         self.agent = agent
         self.centroid_known_ = c_known

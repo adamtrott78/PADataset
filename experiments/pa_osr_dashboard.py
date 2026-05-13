@@ -97,7 +97,7 @@ def render_once(manifest: Path):
     rows = read_manifest(manifest)
     now = time.strftime("%Y-%m-%d %H:%M:%S")
 
-    print(f"PADataset VarMax OSR dashboard | {now}")
+    print(f"PADataset OSR/DQN dashboard | {now}")
     print(f"MANIFEST={manifest.resolve()}")
     print()
     print(gpu_line())
@@ -149,6 +149,24 @@ def render_once(manifest: Path):
                 extra += f" | sweep {sc}/{st}"
             if spec:
                 extra += f" | spec {spec}"
+
+            de = prog.get("dqn_episode")
+            des = prog.get("dqn_episodes")
+            if de is not None and des is not None:
+                extra += f" | dqn_ep {de}/{des}"
+
+            rew = prog.get("dqn_avg_reward")
+            eps = prog.get("dqn_epsilon")
+            if rew is not None:
+                try:
+                    extra += f" | reward {float(rew):.4f}"
+                except Exception:
+                    extra += f" | reward {rew}"
+            if eps is not None:
+                try:
+                    extra += f" | eps {float(eps):.4f}"
+                except Exception:
+                    extra += f" | eps {eps}"
 
         print(f"[{render_bar(pct)}] {float(pct):6.2f}% | phase {phase} | rows {rows_done} | elapsed {elapsed}{extra}")
 
