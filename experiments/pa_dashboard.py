@@ -223,7 +223,48 @@ def metric_line(progress, summary, complete):
     return " | ".join(parts)
 
 
-def render_once(repo: Path, manifest: Path):
+def compact_run_line(i, total, run, status, progress, summary, complete, arts):
+    pct = 0.0
+    step = "?"
+    steps = "?"
+    loss = "?"
+    speed = "?"
+    phase = "?"
+
+    if progress:
+        pct = float(progress.get("pct", 0.0) or 0.0)
+        step = progress.get("step", "?")
+        steps = progress.get("steps", "?")
+        phase = progress.get("phase", "?")
+        loss = fmt_float(progress.get("loss_so_far", progress.get("train_loss")), 4)
+        sps = progress.get("steps_per_sec")
+        speed = "?" if sps is None else f"{float(sps):.1f}"
+
+    val = "?"
+    proxy = "?"
+    test = "?"
+    if summary:
+        val = fmt_float(summary.get("best_val_macro_f1"), 3)
+        proxy = fmt_float(summary.get("test_dqn_proxy_expanded5"), 3)
+        test = fmt_float(summary.get("test_known_macro_f1"), 3)
+
+    elapsed = "?"
+    if complete:
+        elapsed = fmt_time(complete.get("elapsed_sec"))
+
+    rn = run["run_name"]
+    if len(rn) > 42:
+        rn = rn[:39] + "..."
+
+    return (
+        f"{i:02d}/{total:02d} {status[:4]:<4} g{run['gpu']} "
+        f"{run['paper_set']:<8} {run['family']:<22.22} unk={run['unknown']:<3} "
+        f"{pct:5.1f}% {step:>5}/{steps:<5} loss={loss:<7} "
+        f"valF1={val:<5} testF1={test:<5} p5={proxy:<5} "
+        f"{arts} {elapsed:>7} {rn}"
+    )
+
+def render_once(repo: Path, manifest: Path, view: str = "full", active_only: bool = False, max_rows: int | None = None):
     rows = read_manifest(manifest)
     active_text = active_process_text()
 
@@ -235,6 +276,8 @@ def render_once(repo: Path, manifest: Path):
     print()
     print(gpu_line())
     print()
+
+    rendered = []
 
     for i, row in enumerate(rows, 1):
         run = resolve_run(row, repo)
@@ -255,22 +298,40 @@ def render_once(repo: Path, manifest: Path):
         else:
             pending += 1
 
-        print("=" * 80)
-        print(
-            f"RUN {i}/{total} | {st} | gpu={run['gpu']} seed={run['seed']} "
-            f"| {run['paper_set']} unk={run['unknown']} | arts={arts}"
-        )
-        print(run["run_name"])
-        print(tqdm_line(progress, summary))
-        err = load_json(run_dir / "train_error.json")
-        if err:
-            msg = str(err.get("error", "?")).replace("\n", " ")
-            if len(msg) > 180:
-                msg = msg[:177] + "..."
-            print(f"error {msg}")
-        else:
-            print(metric_line(progress, summary, complete))
-        print()
+        if active_only and st not in {"RUNNING", "STARTED", "FINALIZING", "WRAPPING", "ERROR", "INCOMPLETE"}:
+            continue
+
+        rendered.append((i, run, run_dir, progress, summary, complete, st, arts))
+
+    if view == "compact":
+        print("idx  stat gpu paper    family                 unk   pct    step/steps loss     valF1 testF1 p5    arts elapsed run")
+        print("-" * 150)
+        rows_to_show = rendered if max_rows is None else rendered[:max_rows]
+        for i, run, run_dir, progress, summary, complete, st, arts in rows_to_show:
+            print(compact_run_line(i, total, run, st, progress, summary, complete, arts))
+        if max_rows is not None and len(rendered) > max_rows:
+            print(f"... hidden {len(rendered) - max_rows} rows due to --max-rows={max_rows}")
+    else:
+        rows_to_show = rendered if max_rows is None else rendered[:max_rows]
+        for i, run, run_dir, progress, summary, complete, st, arts in rows_to_show:
+            print("=" * 80)
+            print(
+                f"RUN {i}/{total} | {st} | gpu={run['gpu']} seed={run['seed']} "
+                f"| {run['paper_set']} unk={run['unknown']} | arts={arts}"
+            )
+            print(run["run_name"])
+            print(tqdm_line(progress, summary))
+            err = load_json(run_dir / "train_error.json")
+            if err:
+                msg = str(err.get("error", "?")).replace("\n", " ")
+                if len(msg) > 180:
+                    msg = msg[:177] + "..."
+                print(f"error {msg}")
+            else:
+                print(metric_line(progress, summary, complete))
+            print()
+        if max_rows is not None and len(rendered) > max_rows:
+            print(f"... hidden {len(rendered) - max_rows} rows due to --max-rows={max_rows}")
 
     print("=" * 80)
     print(f"summary: total={total} done={done} running={running} errors={errors} pending={pending}")
@@ -289,6 +350,9 @@ def main():
     ap.add_argument("manifest", nargs="?", default="manifests/smoke_train_manifest.tsv")
     ap.add_argument("--repo", default=os.environ.get("REPO", str(Path.cwd())))
     ap.add_argument("--refresh", type=float, default=float(os.environ.get("REFRESH", 2)))
+    ap.add_argument("--view", choices=["full", "compact"], default=os.environ.get("VIEW", "full"))
+    ap.add_argument("--active-only", action="store_true", default=os.environ.get("ACTIVE_ONLY", "0") == "1")
+    ap.add_argument("--max-rows", type=int, default=None)
     ap.add_argument("--once", action="store_true")
     args = ap.parse_args()
 
@@ -297,7 +361,7 @@ def main():
 
     while True:
         clear()
-        render_once(repo, manifest)
+        render_once(repo, manifest, view=args.view, active_only=args.active_only, max_rows=args.max_rows)
         print(f"Refresh: {args.refresh:g}s | Ctrl+C exits dashboard only")
         if args.once:
             break
