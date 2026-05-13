@@ -137,3 +137,6 @@ _feature_cache_nvme/
 *.log
 __pycache__/
 .ipynb_checkpoints/
+/local_artifacts/
+/PADataset_cleanup_audit_*.tgz
+/make_cleanup_audit_*.sh
