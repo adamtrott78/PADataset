@@ -1,0 +1,350 @@
+[
+  {
+    "rank": 1,
+    "p1": 0.9758816957473755,
+    "pred_name": "PA8",
+    "proto_name": "wifi",
+    "pa_name": "PA2",
+    "shard_id": 19,
+    "source_id": "19",
+    "window_id": 9284,
+    "record_id": 284,
+    "local_idx": 283,
+    "dataset_index": "76228",
+    "cache_path": "/home/atrott/adamArchives/Adam/varMax/PADataset/_feature_cache_nvme/len16384/norm/ota__ota_core_high_run01__high_run01/wifi__ota__ota_core_high_run01__ota_core_high_run01__high_run01__ota_core_high_run01__shard_019__PA2.h5",
+    "source_path": "/home/atrott/adamArchives/Adam/varMax/PADataset/data/wifi/ota/ota_core_high_run01/ota_core_high_run01__shard_019__PA2.mat",
+    "source_meta": {
+      "proto": 0,
+      "record_id": 284,
+      "shard_id": 19,
+      "source_id": 19,
+      "window_id": 9284,
+      "y": 1
+    },
+    "window_shape": [
+      400000,
+      2
+    ],
+    "n_iq": 400000,
+    "spectrogram_png": "docs/experiments/run_diagnostics/highconf_pa2_as_pa8_bank_spectrograms/rank_001_shard_019_idx_283_win_09284_p1_0.97588.png"
+  },
+  {
+    "rank": 2,
+    "p1": 0.9758344888687134,
+    "pred_name": "PA8",
+    "proto_name": "wifi",
+    "pa_name": "PA2",
+    "shard_id": 15,
+    "source_id": "15",
+    "window_id": 7008,
+    "record_id": 8,
+    "local_idx": 7,
+    "dataset_index": "67952",
+    "cache_path": "/home/atrott/adamArchives/Adam/varMax/PADataset/_feature_cache_nvme/len16384/norm/ota__ota_core_high_run01__high_run01/wifi__ota__ota_core_high_run01__ota_core_high_run01__high_run01__ota_core_high_run01__shard_015__PA2.h5",
+    "source_path": "/home/atrott/adamArchives/Adam/varMax/PADataset/data/wifi/ota/ota_core_high_run01/ota_core_high_run01__shard_015__PA2.mat",
+    "source_meta": {
+      "proto": 0,
+      "record_id": 8,
+      "shard_id": 15,
+      "source_id": 15,
+      "window_id": 7008,
+      "y": 1
+    },
+    "window_shape": [
+      400000,
+      2
+    ],
+    "n_iq": 400000,
+    "spectrogram_png": "docs/experiments/run_diagnostics/highconf_pa2_as_pa8_bank_spectrograms/rank_002_shard_015_idx_007_win_07008_p1_0.97583.png"
+  },
+  {
+    "rank": 3,
+    "p1": 0.9745878577232361,
+    "pred_name": "PA8",
+    "proto_name": "wifi",
+    "pa_name": "PA2",
+    "shard_id": 1,
+    "source_id": "1",
+    "window_id": 77,
+    "record_id": 77,
+    "local_idx": 76,
+    "dataset_index": "40076",
+    "cache_path": "/home/atrott/adamArchives/Adam/varMax/PADataset/_feature_cache_nvme/len16384/norm/ota__ota_core_high_run01__high_run01/wifi__ota__ota_core_high_run01__ota_core_high_run01__high_run01__ota_core_high_run01__shard_001__PA2.h5",
+    "source_path": "/home/atrott/adamArchives/Adam/varMax/PADataset/data/wifi/ota/ota_core_high_run01/ota_core_high_run01__shard_001__PA2.mat",
+    "source_meta": {
+      "proto": 0,
+      "record_id": 77,
+      "shard_id": 1,
+      "source_id": 1,
+      "window_id": 77,
+      "y": 1
+    },
+    "window_shape": [
+      400000,
+      2
+    ],
+    "n_iq": 400000,
+    "spectrogram_png": "docs/experiments/run_diagnostics/highconf_pa2_as_pa8_bank_spectrograms/rank_003_shard_001_idx_076_win_00077_p1_0.97459.png"
+  },
+  {
+    "rank": 4,
+    "p1": 0.9744046926498413,
+    "pred_name": "PA8",
+    "proto_name": "wifi",
+    "pa_name": "PA2",
+    "shard_id": 5,
+    "source_id": "5",
+    "window_id": 2177,
+    "record_id": 177,
+    "local_idx": 176,
+    "dataset_index": "48122",
+    "cache_path": "/home/atrott/adamArchives/Adam/varMax/PADataset/_feature_cache_nvme/len16384/norm/ota__ota_core_high_run01__high_run01/wifi__ota__ota_core_high_run01__ota_core_high_run01__high_run01__ota_core_high_run01__shard_005__PA2.h5",
+    "source_path": "/home/atrott/adamArchives/Adam/varMax/PADataset/data/wifi/ota/ota_core_high_run01/ota_core_high_run01__shard_005__PA2.mat",
+    "source_meta": {
+      "proto": 0,
+      "record_id": 177,
+      "shard_id": 5,
+      "source_id": 5,
+      "window_id": 2177,
+      "y": 1
+    },
+    "window_shape": [
+      400000,
+      2
+    ],
+    "n_iq": 400000,
+    "spectrogram_png": "docs/experiments/run_diagnostics/highconf_pa2_as_pa8_bank_spectrograms/rank_004_shard_005_idx_176_win_02177_p1_0.97440.png"
+  },
+  {
+    "rank": 5,
+    "p1": 0.9741369485855103,
+    "pred_name": "PA8",
+    "proto_name": "wifi",
+    "pa_name": "PA2",
+    "shard_id": 7,
+    "source_id": "7",
+    "window_id": 3027,
+    "record_id": 27,
+    "local_idx": 26,
+    "dataset_index": "51972",
+    "cache_path": "/home/atrott/adamArchives/Adam/varMax/PADataset/_feature_cache_nvme/len16384/norm/ota__ota_core_high_run01__high_run01/wifi__ota__ota_core_high_run01__ota_core_high_run01__high_run01__ota_core_high_run01__shard_007__PA2.h5",
+    "source_path": "/home/atrott/adamArchives/Adam/varMax/PADataset/data/wifi/ota/ota_core_high_run01/ota_core_high_run01__shard_007__PA2.mat",
+    "source_meta": {
+      "proto": 0,
+      "record_id": 27,
+      "shard_id": 7,
+      "source_id": 7,
+      "window_id": 3027,
+      "y": 1
+    },
+    "window_shape": [
+      400000,
+      2
+    ],
+    "n_iq": 400000,
+    "spectrogram_png": "docs/experiments/run_diagnostics/highconf_pa2_as_pa8_bank_spectrograms/rank_005_shard_007_idx_026_win_03027_p1_0.97414.png"
+  },
+  {
+    "rank": 6,
+    "p1": 0.9741125106811523,
+    "pred_name": "PA8",
+    "proto_name": "wifi",
+    "pa_name": "PA2",
+    "shard_id": 17,
+    "source_id": "17",
+    "window_id": 8221,
+    "record_id": 221,
+    "local_idx": 220,
+    "dataset_index": "72165",
+    "cache_path": "/home/atrott/adamArchives/Adam/varMax/PADataset/_feature_cache_nvme/len16384/norm/ota__ota_core_high_run01__high_run01/wifi__ota__ota_core_high_run01__ota_core_high_run01__high_run01__ota_core_high_run01__shard_017__PA2.h5",
+    "source_path": "/home/atrott/adamArchives/Adam/varMax/PADataset/data/wifi/ota/ota_core_high_run01/ota_core_high_run01__shard_017__PA2.mat",
+    "source_meta": {
+      "proto": 0,
+      "record_id": 221,
+      "shard_id": 17,
+      "source_id": 17,
+      "window_id": 8221,
+      "y": 1
+    },
+    "window_shape": [
+      400000,
+      2
+    ],
+    "n_iq": 400000,
+    "spectrogram_png": "docs/experiments/run_diagnostics/highconf_pa2_as_pa8_bank_spectrograms/rank_006_shard_017_idx_220_win_08221_p1_0.97411.png"
+  },
+  {
+    "rank": 7,
+    "p1": 0.9740869402885437,
+    "pred_name": "PA8",
+    "proto_name": "wifi",
+    "pa_name": "PA2",
+    "shard_id": 12,
+    "source_id": "12",
+    "window_id": 5755,
+    "record_id": 255,
+    "local_idx": 254,
+    "dataset_index": "62199",
+    "cache_path": "/home/atrott/adamArchives/Adam/varMax/PADataset/_feature_cache_nvme/len16384/norm/ota__ota_core_high_run01__high_run01/wifi__ota__ota_core_high_run01__ota_core_high_run01__high_run01__ota_core_high_run01__shard_012__PA2.h5",
+    "source_path": "/home/atrott/adamArchives/Adam/varMax/PADataset/data/wifi/ota/ota_core_high_run01/ota_core_high_run01__shard_012__PA2.mat",
+    "source_meta": {
+      "proto": 0,
+      "record_id": 255,
+      "shard_id": 12,
+      "source_id": 12,
+      "window_id": 5755,
+      "y": 1
+    },
+    "window_shape": [
+      400000,
+      2
+    ],
+    "n_iq": 400000,
+    "spectrogram_png": "docs/experiments/run_diagnostics/highconf_pa2_as_pa8_bank_spectrograms/rank_007_shard_012_idx_254_win_05755_p1_0.97409.png"
+  },
+  {
+    "rank": 8,
+    "p1": 0.9740661382675171,
+    "pred_name": "PA8",
+    "proto_name": "wifi",
+    "pa_name": "PA2",
+    "shard_id": 16,
+    "source_id": "16",
+    "window_id": 7864,
+    "record_id": 364,
+    "local_idx": 363,
+    "dataset_index": "70308",
+    "cache_path": "/home/atrott/adamArchives/Adam/varMax/PADataset/_feature_cache_nvme/len16384/norm/ota__ota_core_high_run01__high_run01/wifi__ota__ota_core_high_run01__ota_core_high_run01__high_run01__ota_core_high_run01__shard_016__PA2.h5",
+    "source_path": "/home/atrott/adamArchives/Adam/varMax/PADataset/data/wifi/ota/ota_core_high_run01/ota_core_high_run01__shard_016__PA2.mat",
+    "source_meta": {
+      "proto": 0,
+      "record_id": 364,
+      "shard_id": 16,
+      "source_id": 16,
+      "window_id": 7864,
+      "y": 1
+    },
+    "window_shape": [
+      400000,
+      2
+    ],
+    "n_iq": 400000,
+    "spectrogram_png": "docs/experiments/run_diagnostics/highconf_pa2_as_pa8_bank_spectrograms/rank_008_shard_016_idx_363_win_07864_p1_0.97407.png"
+  },
+  {
+    "rank": 9,
+    "p1": 0.9740043878555298,
+    "pred_name": "PA8",
+    "proto_name": "wifi",
+    "pa_name": "PA2",
+    "shard_id": 17,
+    "source_id": "17",
+    "window_id": 8198,
+    "record_id": 198,
+    "local_idx": 197,
+    "dataset_index": "72142",
+    "cache_path": "/home/atrott/adamArchives/Adam/varMax/PADataset/_feature_cache_nvme/len16384/norm/ota__ota_core_high_run01__high_run01/wifi__ota__ota_core_high_run01__ota_core_high_run01__high_run01__ota_core_high_run01__shard_017__PA2.h5",
+    "source_path": "/home/atrott/adamArchives/Adam/varMax/PADataset/data/wifi/ota/ota_core_high_run01/ota_core_high_run01__shard_017__PA2.mat",
+    "source_meta": {
+      "proto": 0,
+      "record_id": 198,
+      "shard_id": 17,
+      "source_id": 17,
+      "window_id": 8198,
+      "y": 1
+    },
+    "window_shape": [
+      400000,
+      2
+    ],
+    "n_iq": 400000,
+    "spectrogram_png": "docs/experiments/run_diagnostics/highconf_pa2_as_pa8_bank_spectrograms/rank_009_shard_017_idx_197_win_08198_p1_0.97400.png"
+  },
+  {
+    "rank": 10,
+    "p1": 0.9738504886627197,
+    "pred_name": "PA8",
+    "proto_name": "wifi",
+    "pa_name": "PA2",
+    "shard_id": 18,
+    "source_id": "18",
+    "window_id": 8798,
+    "record_id": 298,
+    "local_idx": 297,
+    "dataset_index": "74242",
+    "cache_path": "/home/atrott/adamArchives/Adam/varMax/PADataset/_feature_cache_nvme/len16384/norm/ota__ota_core_high_run01__high_run01/wifi__ota__ota_core_high_run01__ota_core_high_run01__high_run01__ota_core_high_run01__shard_018__PA2.h5",
+    "source_path": "/home/atrott/adamArchives/Adam/varMax/PADataset/data/wifi/ota/ota_core_high_run01/ota_core_high_run01__shard_018__PA2.mat",
+    "source_meta": {
+      "proto": 0,
+      "record_id": 298,
+      "shard_id": 18,
+      "source_id": 18,
+      "window_id": 8798,
+      "y": 1
+    },
+    "window_shape": [
+      400000,
+      2
+    ],
+    "n_iq": 400000,
+    "spectrogram_png": "docs/experiments/run_diagnostics/highconf_pa2_as_pa8_bank_spectrograms/rank_010_shard_018_idx_297_win_08798_p1_0.97385.png"
+  },
+  {
+    "rank": 11,
+    "p1": 0.9738380908966064,
+    "pred_name": "PA8",
+    "proto_name": "wifi",
+    "pa_name": "PA2",
+    "shard_id": 1,
+    "source_id": "1",
+    "window_id": 242,
+    "record_id": 242,
+    "local_idx": 241,
+    "dataset_index": "40241",
+    "cache_path": "/home/atrott/adamArchives/Adam/varMax/PADataset/_feature_cache_nvme/len16384/norm/ota__ota_core_high_run01__high_run01/wifi__ota__ota_core_high_run01__ota_core_high_run01__high_run01__ota_core_high_run01__shard_001__PA2.h5",
+    "source_path": "/home/atrott/adamArchives/Adam/varMax/PADataset/data/wifi/ota/ota_core_high_run01/ota_core_high_run01__shard_001__PA2.mat",
+    "source_meta": {
+      "proto": 0,
+      "record_id": 242,
+      "shard_id": 1,
+      "source_id": 1,
+      "window_id": 242,
+      "y": 1
+    },
+    "window_shape": [
+      400000,
+      2
+    ],
+    "n_iq": 400000,
+    "spectrogram_png": "docs/experiments/run_diagnostics/highconf_pa2_as_pa8_bank_spectrograms/rank_011_shard_001_idx_241_win_00242_p1_0.97384.png"
+  },
+  {
+    "rank": 12,
+    "p1": 0.9735930562019348,
+    "pred_name": "PA8",
+    "proto_name": "wifi",
+    "pa_name": "PA2",
+    "shard_id": 3,
+    "source_id": "3",
+    "window_id": 1059,
+    "record_id": 58,
+    "local_idx": 57,
+    "dataset_index": "44023",
+    "cache_path": "/home/atrott/adamArchives/Adam/varMax/PADataset/_feature_cache_nvme/len16384/norm/ota__ota_core_high_run01__high_run01/wifi__ota__ota_core_high_run01__ota_core_high_run01__high_run01__ota_core_high_run01__shard_003__PA2.h5",
+    "source_path": "/home/atrott/adamArchives/Adam/varMax/PADataset/data/wifi/ota/ota_core_high_run01/ota_core_high_run01__shard_003__PA2.mat",
+    "source_meta": {
+      "proto": 0,
+      "record_id": 58,
+      "shard_id": 3,
+      "source_id": 3,
+      "window_id": 1059,
+      "y": 1
+    },
+    "window_shape": [
+      400000,
+      2
+    ],
+    "n_iq": 400000,
+    "spectrogram_png": "docs/experiments/run_diagnostics/highconf_pa2_as_pa8_bank_spectrograms/rank_012_shard_003_idx_057_win_01059_p1_0.97359.png"
+  }
+]
