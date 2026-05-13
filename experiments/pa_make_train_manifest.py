@@ -17,11 +17,24 @@ from experiments.pa_constants import (
     base_training_config,
     split_csv,
 )
+from experiments.pa_experiment_catalog import (
+    FAMILY_CONFIGS,
+    RUN_GROUPS,
+    catalog_training_config_overrides,
+    get_run_group,
+    grid_name_to_family_names,
+    list_run_groups,
+)
+
+
+def parse_int_csv(s: str) -> list[int]:
+    return [int(x) for x in split_csv(s)]
 
 
 def main() -> None:
     ap = argparse.ArgumentParser()
     ap.add_argument("--out", default="manifests/train_manifest.tsv")
+    ap.add_argument("--run-group", choices=list_run_groups(), default=None)
     ap.add_argument("--grid", choices=sorted(FAMILY_GRIDS), default="baseline")
     ap.add_argument("--paper-sets", default="OG,DISTINCT,MASTER")
     ap.add_argument("--unknowns", default=None, help="Optional comma list; defaults to each PA in paper set.")
@@ -36,6 +49,25 @@ def main() -> None:
     ap.add_argument("--protocols", default="all", help="'all' or comma list such as wifi,bluetooth,zigbee")
     args = ap.parse_args()
 
+    if args.run_group is not None:
+        group = get_run_group(args.run_group)
+        if group.get("status") == "no_rerun":
+            raise ValueError(
+                f"run_group={args.run_group} is metadata-only and should not generate training runs."
+            )
+
+        args.paper_sets = ",".join(group["paper_sets"])
+        args.save_root = group["output_root"]
+        args.seeds = ",".join(str(x) for x in group.get("seeds", [0]))
+
+        run_group_name = args.run_group
+        source_profile_name = group["source_profile"]
+        family_names = list(group["families"])
+    else:
+        run_group_name = f"grid_{args.grid}"
+        source_profile_name = "ota_core_high_run01"
+        family_names = grid_name_to_family_names(args.grid)
+
     out = Path(args.out)
     out.parent.mkdir(parents=True, exist_ok=True)
 
@@ -43,7 +75,7 @@ def main() -> None:
     cfg_dir.mkdir(parents=True, exist_ok=True)
 
     paper_sets = split_csv(args.paper_sets)
-    seeds = [int(x) for x in split_csv(args.seeds)]
+    seeds = parse_int_csv(args.seeds)
     gpus = split_csv(args.gpus)
     if not gpus:
         raise ValueError("At least one GPU id must be provided.")
@@ -61,7 +93,18 @@ def main() -> None:
         pas = PAPER_SETS[paper_set]
         unknowns = split_csv(args.unknowns) if args.unknowns else list(pas)
 
-        for family in FAMILY_GRIDS[args.grid]:
+        for family_name in family_names:
+            if family_name == "top_selected":
+                raise ValueError(
+                    "family_name=top_selected must be resolved after primary results exist."
+                )
+            if family_name not in FAMILY_CONFIGS:
+                raise ValueError(
+                    f"Unknown family_name={family_name}; valid={sorted(FAMILY_CONFIGS)}"
+                )
+
+            family = FAMILY_CONFIGS[family_name]
+
             for unknown_pa in unknowns:
                 if unknown_pa not in pas:
                     print(f"SKIP unknown {unknown_pa} not in {paper_set} PAs {pas}")
@@ -96,6 +139,14 @@ def main() -> None:
                         patience_override=args.patience,
                         num_workers=args.num_workers,
                     )
+
+                    cfg.update(
+                        catalog_training_config_overrides(
+                            source_profile_name=source_profile_name,
+                            family_name=family_name,
+                        )
+                    )
+                    cfg["run_group"] = run_group_name
 
                     cfg_path = cfg_dir / f"{run_name}.json"
                     cfg_path.write_text(json.dumps(cfg, indent=2))
