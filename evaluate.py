@@ -92,9 +92,19 @@ def _compute_safe_classification_metrics(
 
     if class_names is None:
         out_class_names = [str(i) for i in range(cm.shape[0])]
+    elif len(class_names) != cm.shape[0]:
+        # Open-PA runs can have a known-class confusion matrix whose dimension is
+        # smaller than the original PA universe. Never let plotting/reporting crash
+        # the run finalization just because label display names are stale or full-set.
+        print(
+            "EVAL_WARN | confusion_matrix_label_mismatch "
+            f"| cm_shape={cm.shape} | n_class_names={len(class_names)} "
+            "| using_numeric_display_labels",
+            flush=True,
+        )
+        out_class_names = [str(i) for i in range(cm.shape[0])]
     else:
-        # valid_labels are remapped known-class labels, so provided class_names are correct
-        out_class_names = class_names
+        out_class_names = list(class_names)
 
     return {
         "acc": acc,
