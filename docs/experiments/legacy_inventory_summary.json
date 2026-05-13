@@ -1,0 +1,23 @@
+{
+  "n_run_dirs": 203,
+  "n_run_dirs_with_config": 200,
+  "n_run_dirs_with_summary": 187,
+  "n_generated_tables": 16,
+  "n_checkpoints": 617,
+  "checkpoint_scan_enabled": true,
+  "result_roots": [
+    "results_pa_baseline",
+    "results_pa_cache_sweep",
+    "results_pa_confmanifold_coarse",
+    "results_pa_confmanifold_refined",
+    "results_pa_finalist",
+    "results_pa_followup",
+    "results_pa_osr_bank",
+    "results_pa_ota_btzb",
+    "results_pa_smoke"
+  ],
+  "table_roots": [
+    "local_artifacts/generated_tables",
+    "."
+  ]
+}
