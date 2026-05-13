@@ -245,7 +245,8 @@ def _make_setup_from_config(cfg: Dict[str, Any], return_metadata: bool = False) 
         normalize=cfg.get("normalize", True),
         cache_len=cfg.get("cache_len", 8192),
         cache_root=cfg.get("cache_root", None),
-        force_rebuild_cache=False,
+        force_rebuild_cache=cfg.get("force_rebuild_cache", False),
+        skip_cache_build=cfg.get("skip_cache_build", False),
 
         train_frac=cfg.get("train_frac", 0.70),
         val_frac=cfg.get("val_frac", 0.15),
@@ -262,6 +263,10 @@ def _make_setup_from_config(cfg: Dict[str, Any], return_metadata: bool = False) 
         dataset_tag=cfg.get("dataset_tag", None),
         noise_tag=cfg.get("noise_tag", None),
         cache_namespace=cfg.get("cache_namespace", None),
+
+        open_val_frac=cfg.get("open_val_frac", None),
+        build_balanced_val_open=cfg.get("build_balanced_val_open", True),
+        manifold_balance_seed=cfg.get("manifold_balance_seed", None),
     )
 
 

@@ -471,6 +471,14 @@ def build_osr_eval_bundle(
 
     setup = _get_setup_from_handle(handle, data_root=data_root)
 
+    print(
+        "OSR_STAGE | stage=setup "
+        f"| skip_cache_build={getattr(setup, 'skip_cache_build', None)} "
+        f"| cache_root={getattr(setup, 'cache_root', None)} "
+        f"| open_val_frac={getattr(setup, 'open_val_frac', None)} "
+        f"| build_balanced_val_open={getattr(setup, 'build_balanced_val_open', None)}",
+        flush=True,
+    )
     print("OSR_STAGE | stage=build_data_from_setup_start", flush=True)
     data = build_data_from_setup(
         setup,
