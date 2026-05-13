@@ -17,6 +17,7 @@ sys.path.insert(0, str(REPO_ROOT))
 
 from evaluate import evaluate_multiple_osr_methods_on_run, choose_osr_calibration_splits
 from varmax_osr import VarMaxOSR, DEFAULT_PAIR_MAP
+from dqn_osr import DQNOSR
 
 
 def grid_values(kind: str) -> Dict[str, Any]:
@@ -94,6 +95,65 @@ def make_method_specs(modes: list[str], sweep_grid: str):
     return specs
 
 
+
+def make_dqn_calibration_builder(mode: str):
+    mode = str(mode).strip().lower()
+
+    def builder(payload, extras):
+        # Paper-style DQN-IDS fitting:
+        # use validation-known + validation-open as one mixed confidence stream.
+        # The DQN itself uses centroid-guided rewards from [P1, P1-P2, entropy],
+        # not a VarMax threshold sweep.
+        known_cal, open_cal = choose_osr_calibration_splits(
+            payload,
+            extras,
+            prefer_balanced=False,
+        )
+        return {
+            "calibration_mode": mode,
+            "calibration_known": known_cal,
+            "calibration_open": open_cal,
+        }
+
+    return builder
+
+
+def make_dqn_method_specs(modes: list[str]):
+    specs = []
+    for mode in modes:
+        mode = mode.strip().strip("'\"").lower()
+        if not mode:
+            continue
+
+        if mode not in {"paper", "paper_mixed", "cicids", "cicids_mixed"}:
+            raise ValueError(
+                f"Unsupported DQN mode {mode!r}. Use one of: paper,paper_mixed,cicids,cicids_mixed"
+            )
+
+        specs.append({
+            "name": f"dqn_{mode}_softmax3",
+            "factory": lambda: DQNOSR(
+                state_mode="softmax3",
+                gamma=0.95,
+                epsilon=1.0,
+                epsilon_min=0.05,
+                epsilon_decay=0.99,
+                learning_rate=1e-3,
+                memory_size=2000,
+                batch_size=32,
+                episodes=30,
+                anchor_fraction=0.05,
+                train_subsample_size=1250,
+                centroid_update_threshold=0.75,
+                seed=42,
+                device="cpu",
+            ),
+            "calibration_builder": make_dqn_calibration_builder(mode),
+        })
+
+    return specs
+
+
 def compact_method_row(row: Dict[str, Any], result: Dict[str, Any], run_meta: Dict[str, Any]) -> Dict[str, Any]:
     out = dict(run_meta)
     out.update(row)
@@ -108,6 +168,18 @@ def compact_method_row(row: Dict[str, Any], result: Dict[str, Any], run_meta: Di
     out["sweep_candidates"] = len(params.get("best_sweep_result", {}) or {}) if False else len(result.get("params", {}).get("top_feasible_results", []) or []) + len(result.get("params", {}).get("top_fallback_results", []) or [])
     out["top_feasible_count_saved"] = len(params.get("top_feasible_results", []) or [])
     out["top_fallback_count_saved"] = len(params.get("top_fallback_results", []) or [])
+
+    if params.get("method_name") == "dqn_osr":
+        fit_summary = params.get("last_fit_summary") or {}
+        out["dqn_state_mode"] = params.get("state_mode")
+        out["dqn_episodes"] = params.get("episodes")
+        out["dqn_anchor_fraction"] = params.get("anchor_fraction")
+        out["dqn_train_subsample_size"] = params.get("train_subsample_size")
+        out["dqn_centroid_update_threshold"] = params.get("centroid_update_threshold")
+        out["dqn_final_epsilon"] = fit_summary.get("final_epsilon")
+        out["dqn_n_states_total"] = fit_summary.get("n_states_total")
+        out["dqn_n_anchor_high"] = fit_summary.get("n_anchor_high")
+        out["dqn_n_anchor_low"] = fit_summary.get("n_anchor_low")
 
     if best:
         out["best_regime"] = best.get("regime")
@@ -131,6 +203,7 @@ def main() -> None:
     ap.add_argument("--checkpoint", default="best_model")
     ap.add_argument("--out-dir", default=None)
     ap.add_argument("--modes", default="oracle,surrogate_all")
+    ap.add_argument("--method-family", choices=["varmax", "dqn", "both"], default="varmax")
     ap.add_argument("--sweep-grid", choices=["smoke", "full"], default="smoke")
     ap.add_argument("--batch-size", type=int, default=64)
     ap.add_argument("--num-workers", type=int, default=0)
@@ -172,7 +245,15 @@ def main() -> None:
 
     try:
         modes = [x.strip().strip("'\"") for x in args.modes.split(",") if x.strip().strip("'\"")]
-        specs = make_method_specs(modes=modes, sweep_grid=args.sweep_grid)
+        if args.method_family == "varmax":
+            specs = make_method_specs(modes=modes, sweep_grid=args.sweep_grid)
+        elif args.method_family == "dqn":
+            specs = make_dqn_method_specs(modes=modes)
+        elif args.method_family == "both":
+            specs = make_method_specs(modes=["oracle", "surrogate_all"], sweep_grid=args.sweep_grid)
+            specs.extend(make_dqn_method_specs(modes=["paper"]))
+        else:
+            raise ValueError(f"Unsupported method family: {args.method_family}")
 
         write_progress(phase="building_payload", pct=10.0)
 
@@ -198,6 +279,7 @@ def main() -> None:
             "run_dir": str(run_dir),
             "checkpoint": args.checkpoint,
             "sweep_grid": args.sweep_grid,
+            "method_family": args.method_family,
             "paper_set": handle.config.get("paper_set"),
             "family_tag": handle.config.get("family_tag"),
             "unknown_pas": json.dumps(handle.config.get("unknown_pas", [])),
