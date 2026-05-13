@@ -790,9 +790,22 @@ def make_pa_open_set_splits(
     if open_val_frac < 0 or open_val_frac >= 1.0:
         raise ValueError("open_val_frac must satisfy 0 <= open_val_frac < 1")
 
-    known_pa_idx = [i for i in range(len(PA_NAMES)) if i not in unknown_pa_idx]
+    # Only use PA classes that are actually present after dataset-level filters
+    # such as setup.pas/protocols/source filters. Otherwise catalog paper sets
+    # that intentionally exclude a PA can create output classes with zero support.
+    present_pa_idx = sorted({int(rec["pa"]) for rec in dataset.index})
+    known_pa_idx = [i for i in present_pa_idx if i not in unknown_pa_idx]
+
+    missing_unknown = [i for i in unknown_pa_idx if i not in present_pa_idx]
+    if missing_unknown:
+        raise ValueError(
+            "Unknown PA(s) are not present after dataset filters: "
+            f"{[PA_NAMES[i] for i in missing_unknown]} | "
+            f"present={[PA_NAMES[i] for i in present_pa_idx]}"
+        )
+
     if len(known_pa_idx) == 0:
-        raise ValueError("All PAs withheld; no known classes remain.")
+        raise ValueError("All present PAs withheld; no known classes remain.")
 
     rng = np.random.default_rng(seed)
 
