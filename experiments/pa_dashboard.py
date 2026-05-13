@@ -305,18 +305,30 @@ def compact_run_line(i, total, run, status, progress, summary, complete, arts):
         elapsed = fmt_time(complete.get("elapsed_sec"))
 
     rn = run["run_name"]
-    if len(rn) > 38:
-        rn = rn[:35] + "..."
+    if len(rn) > 34:
+        rn = rn[:31] + "..."
 
     ep_txt = f"{epoch}/{epochs}"
+    step_txt = f"{step}/{steps}"
 
     return (
-        f"{i:02d}/{total:02d} {status[:4]:<4} g{run['gpu']} "
-        f"{run['paper_set']:<8} {run['family']:<22.22} unk={run['unknown']:<3} "
-        f"ep={ep_txt:<7} run={run_pct:5.1f}% ep={ep_pct:5.1f}% "
-        f"{step:>5}/{steps:<5} loss={loss:<7} "
-        f"valF1={val:<5} testF1={test:<5} p5={proxy:<5} "
-        f"{arts} {elapsed:>7} {rn}"
+        f"{i:02d}/{total:02d} "
+        f"{status[:4]:<4} "
+        f"{('g' + str(run['gpu'])):<3} "
+        f"{str(run['paper_set']):<8.8} "
+        f"{str(run['family']):<22.22} "
+        f"{str(run['unknown']):<4.4} "
+        f"{ep_txt:<7.7} "
+        f"{run_pct:6.1f} "
+        f"{ep_pct:6.1f} "
+        f"{step_txt:>11.11} "
+        f"{loss:>7.7} "
+        f"{val:>5.5} "
+        f"{test:>6.6} "
+        f"{proxy:>6.6} "
+        f"{arts:<7.7} "
+        f"{elapsed:>7.7} "
+        f"{rn}"
     )
 
 def render_once(repo: Path, manifest: Path, view: str = "full", active_only: bool = False, max_rows: int | None = None):
@@ -361,8 +373,26 @@ def render_once(repo: Path, manifest: Path, view: str = "full", active_only: boo
         rendered.append((i, run, run_dir, progress, summary, complete, st, arts))
 
     if view == "compact":
-        print("idx  stat gpu paper    family                 unk  epoch   run%    ep%     step/steps loss     valF1 testF1 p5    arts elapsed run")
-        print("-" * 170)
+        print(
+            f"{'idx':<5} "
+            f"{'stat':<4} "
+            f"{'gpu':<3} "
+            f"{'paper':<8} "
+            f"{'family':<22} "
+            f"{'unk':<4} "
+            f"{'epoch':<7} "
+            f"{'run%':>6} "
+            f"{'ep%':>6} "
+            f"{'step/steps':>11} "
+            f"{'loss':>7} "
+            f"{'val':>5} "
+            f"{'test':>6} "
+            f"{'p5':>6} "
+            f"{'arts':<7} "
+            f"{'elapsed':>7} "
+            f"run"
+        )
+        print("-" * 150)
         rows_to_show = rendered if max_rows is None else rendered[:max_rows]
         for i, run, run_dir, progress, summary, complete, st, arts in rows_to_show:
             print(compact_run_line(i, total, run, st, progress, summary, complete, arts))
