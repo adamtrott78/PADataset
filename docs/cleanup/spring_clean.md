@@ -1,4 +1,4 @@
-# Spring clean v01
+# Spring clean
 
 This cleanup pass preserves core dataset generation and CNN/OSR library code while moving notebook-era interfaces and local artifacts out of the active repo root.
 
