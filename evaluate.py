@@ -244,6 +244,62 @@ def evaluate_classifier(
     return out
 
 
+def compute_dqn_anchor_metrics(
+    known_cf: Dict[str, np.ndarray],
+    open_cf: Dict[str, np.ndarray],
+    known_macro_f1: float,
+    anchor_fraction: float = 0.05,
+) -> Dict[str, float]:
+    """
+    Shreyash/DQN-specific backbone selection metric.
+
+    Desired confidence geometry:
+      top 5% by P1    -> known-heavy anchor
+      bottom 5% by P1 -> unknown/open-heavy anchor
+
+    This is not a VarMax threshold sweep. It is a backbone-selection diagnostic
+    for whether the CNN has shaped the softmax manifold in a DQN-friendly way.
+    """
+    known_p1 = np.asarray(known_cf["p_max"], dtype=np.float64)
+    open_p1 = np.asarray(open_cf["p_max"], dtype=np.float64)
+
+    p1 = np.concatenate([known_p1, open_p1])
+    is_open = np.concatenate([
+        np.zeros(len(known_p1), dtype=bool),
+        np.ones(len(open_p1), dtype=bool),
+    ])
+
+    n = len(p1)
+    k = max(1, int(float(anchor_fraction) * n))
+
+    order = np.argsort(p1)
+    low_idx = order[:k]
+    high_idx = order[-k:]
+
+    low_open_frac = float(is_open[low_idx].mean())
+    high_open_frac = float(is_open[high_idx].mean())
+    high_known_frac = float(1.0 - high_open_frac)
+    low_known_frac = float(1.0 - low_open_frac)
+
+    # Geometric mean punishes any single failure mode hard.
+    dqn_anchor_score = float(
+        max(known_macro_f1, 0.0)
+        * max(high_known_frac, 0.0)
+        * max(low_open_frac, 0.0)
+    ) ** (1.0 / 3.0)
+
+    return {
+        "dqn_anchor_fraction": float(anchor_fraction),
+        "dqn_anchor_k": int(k),
+        "dqn_anchor_high_known_frac": high_known_frac,
+        "dqn_anchor_high_open_frac": high_open_frac,
+        "dqn_anchor_low_open_frac": low_open_frac,
+        "dqn_anchor_low_known_frac": low_known_frac,
+        "dqn_anchor_score": dqn_anchor_score,
+    }
+
+
+
 def _known_higher_auroc(known_values: np.ndarray, open_values: np.ndarray) -> tuple[float, str]:
     y = np.concatenate([
         np.ones(len(known_values), dtype=int),
@@ -309,6 +365,13 @@ def evaluate_open_confidence(
     dqn_proxy_softmax3 = float(np.sqrt(max(known_macro_f1, 0.0) * max(softmax3_mean_auroc, 0.0)))
     dqn_proxy_expanded5 = float(np.sqrt(max(known_macro_f1, 0.0) * max(expanded5_mean_auroc, 0.0)))
 
+    dqn_anchor_stats = compute_dqn_anchor_metrics(
+        known_cf=known_cf,
+        open_cf=open_cf,
+        known_macro_f1=known_macro_f1,
+        anchor_fraction=0.05,
+    )
+
     if save_dir is not None:
         os.makedirs(save_dir, exist_ok=True)
         _save_overlay_hist(
@@ -355,6 +418,8 @@ def evaluate_open_confidence(
         "expanded5_mean_auroc": expanded5_mean_auroc,
         "dqn_proxy_softmax3": dqn_proxy_softmax3,
         "dqn_proxy_expanded5": dqn_proxy_expanded5,
+
+        **dqn_anchor_stats,
 
         "known_pmax_mean": float(np.mean(known_cf["p_max"])),
         "open_pmax_mean": float(np.mean(open_cf["p_max"])),

@@ -482,6 +482,9 @@ def train_classifier(
         "val_weighted_f1": [],
         "val_dqn_proxy_softmax3": [],
         "val_dqn_proxy_expanded5": [],
+        "val_dqn_anchor_score": [],
+        "val_dqn_anchor_high_known_frac": [],
+        "val_dqn_anchor_low_open_frac": [],
         "lr": [],
     }
 
@@ -649,9 +652,15 @@ def train_classifier(
         if open_conf_stats is not None:
             history["val_dqn_proxy_softmax3"].append(open_conf_stats["dqn_proxy_softmax3"])
             history["val_dqn_proxy_expanded5"].append(open_conf_stats["dqn_proxy_expanded5"])
+            history["val_dqn_anchor_score"].append(open_conf_stats["dqn_anchor_score"])
+            history["val_dqn_anchor_high_known_frac"].append(open_conf_stats["dqn_anchor_high_known_frac"])
+            history["val_dqn_anchor_low_open_frac"].append(open_conf_stats["dqn_anchor_low_open_frac"])
         else:
             history["val_dqn_proxy_softmax3"].append(None)
             history["val_dqn_proxy_expanded5"].append(None)
+            history["val_dqn_anchor_score"].append(None)
+            history["val_dqn_anchor_high_known_frac"].append(None)
+            history["val_dqn_anchor_low_open_frac"].append(None)
 
         log_msg = (
             f"Epoch {epoch:03d} | "
@@ -665,6 +674,9 @@ def train_classifier(
             log_msg += (
                 f" | val_dqn_proxy_softmax3={open_conf_stats['dqn_proxy_softmax3']:.4f}"
                 f" | val_dqn_proxy_expanded5={open_conf_stats['dqn_proxy_expanded5']:.4f}"
+                f" | val_dqn_anchor_score={open_conf_stats['dqn_anchor_score']:.4f}"
+                f" | anchor_hi_known={open_conf_stats['dqn_anchor_high_known_frac']:.4f}"
+                f" | anchor_lo_open={open_conf_stats['dqn_anchor_low_open_frac']:.4f}"
             )
         print(log_msg, flush=True)
 
