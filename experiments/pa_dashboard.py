@@ -261,21 +261,36 @@ def metric_line(progress, summary, complete):
 
 
 def compact_run_line(i, total, run, status, progress, summary, complete, arts):
-    pct = 0.0
+    epoch = "?"
+    epochs = "?"
+    ep_pct = 0.0
+    run_pct = 0.0
     step = "?"
     steps = "?"
     loss = "?"
-    speed = "?"
-    phase = "?"
 
     if progress:
-        pct = float(progress.get("pct", 0.0) or 0.0)
-        step = progress.get("step", "?")
-        steps = progress.get("steps", "?")
-        phase = progress.get("phase", "?")
+        epoch_i = int(progress.get("epoch", 0) or 0)
+        epochs_i = int(progress.get("epochs", 0) or 0)
+        step_i = int(progress.get("step", 0) or 0)
+        steps_i = int(progress.get("steps", 0) or 0)
+
+        epoch = epoch_i if epoch_i > 0 else "?"
+        epochs = epochs_i if epochs_i > 0 else "?"
+        step = step_i
+        steps = steps_i
+        ep_pct = float(progress.get("pct", 0.0) or 0.0)
+
+        if epoch_i > 0 and epochs_i > 0 and steps_i > 0:
+            run_pct = 100.0 * ((epoch_i - 1) + (step_i / max(steps_i, 1))) / epochs_i
+        elif summary is not None or complete is not None:
+            run_pct = 100.0
+
         loss = fmt_float(progress.get("loss_so_far", progress.get("train_loss")), 4)
-        sps = progress.get("steps_per_sec")
-        speed = "?" if sps is None else f"{float(sps):.1f}"
+
+    elif summary is not None or complete is not None:
+        ep_pct = 100.0
+        run_pct = 100.0
 
     val = "?"
     proxy = "?"
@@ -290,13 +305,16 @@ def compact_run_line(i, total, run, status, progress, summary, complete, arts):
         elapsed = fmt_time(complete.get("elapsed_sec"))
 
     rn = run["run_name"]
-    if len(rn) > 42:
-        rn = rn[:39] + "..."
+    if len(rn) > 38:
+        rn = rn[:35] + "..."
+
+    ep_txt = f"{epoch}/{epochs}"
 
     return (
         f"{i:02d}/{total:02d} {status[:4]:<4} g{run['gpu']} "
         f"{run['paper_set']:<8} {run['family']:<22.22} unk={run['unknown']:<3} "
-        f"{pct:5.1f}% {step:>5}/{steps:<5} loss={loss:<7} "
+        f"ep={ep_txt:<7} run={run_pct:5.1f}% ep={ep_pct:5.1f}% "
+        f"{step:>5}/{steps:<5} loss={loss:<7} "
         f"valF1={val:<5} testF1={test:<5} p5={proxy:<5} "
         f"{arts} {elapsed:>7} {rn}"
     )
@@ -343,8 +361,8 @@ def render_once(repo: Path, manifest: Path, view: str = "full", active_only: boo
         rendered.append((i, run, run_dir, progress, summary, complete, st, arts))
 
     if view == "compact":
-        print("idx  stat gpu paper    family                 unk   pct    step/steps loss     valF1 testF1 p5    arts elapsed run")
-        print("-" * 150)
+        print("idx  stat gpu paper    family                 unk  epoch   run%    ep%     step/steps loss     valF1 testF1 p5    arts elapsed run")
+        print("-" * 170)
         rows_to_show = rendered if max_rows is None else rendered[:max_rows]
         for i, run, run_dir, progress, summary, complete, st, arts in rows_to_show:
             print(compact_run_line(i, total, run, st, progress, summary, complete, arts))
