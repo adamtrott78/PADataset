@@ -117,6 +117,41 @@ def resolve_run(row, repo: Path):
     }
 
 
+
+def stale_reason_for(run):
+    """Return reason if existing run_dir artifacts do not match manifest cfg."""
+    run_dir = run["run_dir"]
+    cfg = run.get("cfg") or {}
+    existing_cfg = load_json(run_dir / "config.json")
+
+    if not existing_cfg:
+        return None
+
+    checks = [
+        ("epochs", cfg.get("epochs"), existing_cfg.get("epochs")),
+        ("run_name", cfg.get("run_name"), existing_cfg.get("run_name")),
+        ("family_tag", cfg.get("family_tag"), existing_cfg.get("family_tag")),
+        ("paper_set", cfg.get("paper_set"), existing_cfg.get("paper_set")),
+        ("unknown_pas", cfg.get("unknown_pas"), existing_cfg.get("unknown_pas")),
+        ("pas", cfg.get("pas"), existing_cfg.get("pas")),
+        ("cache_len", cfg.get("cache_len"), existing_cfg.get("cache_len")),
+        ("source_type", cfg.get("source_type"), existing_cfg.get("source_type")),
+        ("source_name", cfg.get("source_name"), existing_cfg.get("source_name")),
+        ("dataset_tag", cfg.get("dataset_tag"), existing_cfg.get("dataset_tag")),
+        ("noise_tag", cfg.get("noise_tag"), existing_cfg.get("noise_tag")),
+    ]
+
+    bad = []
+    for key, expected, actual in checks:
+        if expected != actual:
+            bad.append(f"{key}:manifest={expected!r},run={actual!r}")
+
+    if bad:
+        return "; ".join(bad[:3])
+
+    return None
+
+
 def artifact_flags(run_dir: Path):
     out = []
     for flag, name in ARTIFACTS:
@@ -128,6 +163,8 @@ def status_for(run, active_text: str):
     run_dir = run["run_dir"]
     cfg_path = str(run["cfg_path"])
 
+    if stale_reason_for(run):
+        return "STALE"
     if (run_dir / "train_error.json").exists():
         return "ERROR"
     if (run_dir / "train_complete.json").exists():
@@ -269,7 +306,7 @@ def render_once(repo: Path, manifest: Path, view: str = "full", active_only: boo
     active_text = active_process_text()
 
     total = len(rows)
-    done = running = errors = pending = 0
+    done = running = errors = pending = stale = 0
 
     print(f"PADataset train/eval dashboard | {time.strftime('%Y-%m-%d %H:%M:%S')}")
     print(f"MANIFEST={manifest}")
@@ -295,6 +332,8 @@ def render_once(repo: Path, manifest: Path, view: str = "full", active_only: boo
             running += 1
         elif st == "ERROR":
             errors += 1
+        elif st == "STALE":
+            stale += 1
         else:
             pending += 1
 
@@ -321,8 +360,14 @@ def render_once(repo: Path, manifest: Path, view: str = "full", active_only: boo
             )
             print(run["run_name"])
             print(tqdm_line(progress, summary))
+            stale_reason = stale_reason_for(run)
             err = load_json(run_dir / "train_error.json")
-            if err:
+            if stale_reason:
+                msg = stale_reason.replace("\n", " ")
+                if len(msg) > 180:
+                    msg = msg[:177] + "..."
+                print(f"stale {msg}")
+            elif err:
                 msg = str(err.get("error", "?")).replace("\n", " ")
                 if len(msg) > 180:
                     msg = msg[:177] + "..."
@@ -334,7 +379,7 @@ def render_once(repo: Path, manifest: Path, view: str = "full", active_only: boo
             print(f"... hidden {len(rendered) - max_rows} rows due to --max-rows={max_rows}")
 
     print("=" * 80)
-    print(f"summary: total={total} done={done} running={running} errors={errors} pending={pending}")
+    print(f"summary: total={total} done={done} running={running} errors={errors} stale={stale} pending={pending}")
     print("artifact flags: C=config B=best F=final H=history S=summary T=train_complete E=train_error")
 
     if total and done == total:
