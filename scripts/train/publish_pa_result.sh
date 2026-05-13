@@ -22,6 +22,20 @@ if [[ ! -f "$SRC" ]]; then
   exit 1
 fi
 
+
+# Refuse to publish empty/headerless result files.
+if [[ ! -s "$SRC" ]]; then
+  echo "ERROR: source CSV is empty: $SRC"
+  exit 1
+fi
+
+LINE_COUNT="$(wc -l < "$SRC" | tr -d ' ')"
+if [[ "$LINE_COUNT" -lt 2 ]]; then
+  echo "ERROR: source CSV has no data rows: $SRC"
+  echo "line_count=$LINE_COUNT"
+  exit 1
+fi
+
 cp "$SRC" "$DEST"
 
 echo "Published:"
