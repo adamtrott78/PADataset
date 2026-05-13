@@ -38,6 +38,7 @@ def main() -> None:
     ap.add_argument("--grid", choices=sorted(FAMILY_GRIDS), default="baseline")
     ap.add_argument("--paper-sets", default="OG,DISTINCT,MASTER")
     ap.add_argument("--unknowns", default=None, help="Optional comma list; defaults to each PA in paper set.")
+    ap.add_argument("--families", default=None, help="Optional comma list overriding run-group/grid families.")
     ap.add_argument("--seeds", default="0")
     ap.add_argument("--gpus", default="0,1")
     ap.add_argument("--cache-root", default=str(DEFAULT_CACHE_ROOT))
@@ -67,6 +68,9 @@ def main() -> None:
         run_group_name = f"grid_{args.grid}"
         source_profile_name = "ota_core_high_run01"
         family_names = grid_name_to_family_names(args.grid)
+
+    if args.families:
+        family_names = split_csv(args.families)
 
     out = Path(args.out)
     out.parent.mkdir(parents=True, exist_ok=True)

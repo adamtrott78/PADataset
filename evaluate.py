@@ -383,6 +383,7 @@ def _make_setup_from_run_config(config: Dict[str, Any], data_root: Optional[str]
         cache_len=config.get("cache_len", 8192),
         cache_root=config.get("cache_root", None),
         force_rebuild_cache=config.get("force_rebuild_cache", False),
+        skip_cache_build=config.get("skip_cache_build", False),
 
         train_frac=config.get("train_frac", 0.70),
         val_frac=config.get("val_frac", 0.15),
@@ -470,12 +471,15 @@ def build_osr_eval_bundle(
 
     setup = _get_setup_from_handle(handle, data_root=data_root)
 
+    print("OSR_STAGE | stage=build_data_from_setup_start", flush=True)
     data = build_data_from_setup(
         setup,
         batch_size=batch_size,
         num_workers=num_workers,
         pin_memory=pin_memory,
     )
+
+    print("OSR_STAGE | stage=build_data_from_setup_done", flush=True)
 
     if setup.split_mode != "open_pa":
         raise ValueError("build_osr_eval_bundle currently expects an open_pa backbone run")
@@ -496,10 +500,11 @@ def build_osr_eval_bundle(
             "dataset_tag": handle.config.get("dataset_tag"),
             "noise_tag": handle.config.get("noise_tag"),
         },
-        val_known=collect_split_outputs_from_loader(handle, data["val_loader"], "val_known"),
-        test_known=collect_split_outputs_from_loader(handle, data["test_known_loader"], "test_known"),
-        test_open=collect_split_outputs_from_loader(handle, data["test_open_loader"], "test_open"),
+        val_known=(print("OSR_STAGE | stage=collect_val_known_start", flush=True) or collect_split_outputs_from_loader(handle, data["val_loader"], "val_known")),
+        test_known=(print("OSR_STAGE | stage=collect_test_known_start", flush=True) or collect_split_outputs_from_loader(handle, data["test_known_loader"], "test_known")),
+        test_open=(print("OSR_STAGE | stage=collect_test_open_start", flush=True) or collect_split_outputs_from_loader(handle, data["test_open_loader"], "test_open")),
     )
+    print("OSR_STAGE | stage=collect_core_splits_done", flush=True)
 
     extras = {
         "val_open": collect_split_outputs_from_loader(

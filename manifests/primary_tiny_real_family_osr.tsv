@@ -1,0 +1,2 @@
+run_name	run_dir	checkpoint	gpu	modes	sweep_grid	out_dir
+og_ref_ent005_lr2e4_unkPA2_c16384_seed0	results_pa_ota_primary/og_ref_ent005_lr2e4_unkPA2_c16384_seed0	best_model	1	oracle,surrogate_all	smoke	results_pa_osr_eval/og_ref_ent005_lr2e4_unkPA2_c16384_seed0__best_model__smoke
