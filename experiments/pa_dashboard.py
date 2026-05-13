@@ -17,6 +17,7 @@ ARTIFACTS = [
     ("H", "history.json"),
     ("S", "summary.json"),
     ("T", "train_complete.json"),
+    ("E", "train_error.json"),
 ]
 
 
@@ -261,12 +262,19 @@ def render_once(repo: Path, manifest: Path):
         )
         print(run["run_name"])
         print(tqdm_line(progress, summary))
-        print(metric_line(progress, summary, complete))
+        err = load_json(run_dir / "train_error.json")
+        if err:
+            msg = str(err.get("error", "?")).replace("\n", " ")
+            if len(msg) > 180:
+                msg = msg[:177] + "..."
+            print(f"error {msg}")
+        else:
+            print(metric_line(progress, summary, complete))
         print()
 
     print("=" * 80)
     print(f"summary: total={total} done={done} running={running} errors={errors} pending={pending}")
-    print("artifact flags: C=config B=best F=final H=history S=summary T=train_complete")
+    print("artifact flags: C=config B=best F=final H=history S=summary T=train_complete E=train_error")
 
     if total and done == total:
         print()
