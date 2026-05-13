@@ -137,6 +137,10 @@ def main() -> None:
     ap.add_argument("--data-root", default=None)
     args = ap.parse_args()
 
+    # GNU parallel may shell-quote replacement fields containing commas,
+    # producing values like "'oracle,surrogate_all'".
+    args.modes = str(args.modes).strip().strip("'\"")
+
     t0 = time.time()
     run_dir = Path(args.run_dir)
     run_name = run_dir.name
@@ -162,7 +166,7 @@ def main() -> None:
     write_progress(phase="start", pct=0.0)
 
     try:
-        modes = [x.strip() for x in args.modes.split(",") if x.strip()]
+        modes = [x.strip().strip("'\"") for x in args.modes.split(",") if x.strip().strip("'\"")]
         specs = make_method_specs(modes=modes, sweep_grid=args.sweep_grid)
 
         write_progress(phase="building_payload", pct=10.0)
