@@ -3,6 +3,7 @@ from __future__ import annotations
 
 import argparse
 import json
+import os
 import sys
 import time
 import traceback
@@ -163,6 +164,10 @@ def main() -> None:
         f"OSR START | run_name={run_name} | checkpoint={args.checkpoint} | modes={args.modes} | grid={args.sweep_grid}",
         flush=True,
     )
+
+    # Let lower-level OSR methods update this same progress file during long sweeps.
+    os.environ["PADATASET_OSR_PROGRESS_JSON"] = str(progress_path)
+
     write_progress(phase="start", pct=0.0)
 
     try:

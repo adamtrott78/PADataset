@@ -1,4 +1,8 @@
 import copy
+import json
+import os
+import time
+from pathlib import Path
 from typing import Any, Dict, Optional, Sequence, Tuple, List
 
 import numpy as np
@@ -73,6 +77,27 @@ def _band_distance(x: np.ndarray, bounds: np.ndarray) -> np.ndarray:
 def _safe_percentile(values: np.ndarray, lo_hi: Tuple[float, float]) -> Tuple[float, float]:
     lo_p, hi_p = lo_hi
     return float(np.percentile(values, lo_p)), float(np.percentile(values, hi_p))
+
+def _write_osr_progress_from_varmax(**payload) -> None:
+    path = os.environ.get("PADATASET_OSR_PROGRESS_JSON")
+    if not path:
+        return
+    try:
+        p = Path(path)
+        existing = {}
+        if p.is_file():
+            try:
+                existing = json.loads(p.read_text())
+            except Exception:
+                existing = {}
+        existing.update(payload)
+        existing.setdefault("time", time.strftime("%Y-%m-%dT%H:%M:%S%z"))
+        tmp = p.with_suffix(".json.tmp")
+        tmp.write_text(json.dumps(existing, indent=2))
+        tmp.replace(p)
+    except Exception:
+        pass
+
 
 
 def _subset_split(split: SplitOutputs, mask: np.ndarray, split_name: Optional[str] = None) -> SplitOutputs:
@@ -608,6 +633,25 @@ class VarMaxOSR(BaseOSRMethod):
         )
         self.calibration_specs_ = copy.deepcopy(calibration_specs)
 
+        n_top2 = len(list(top2_grid))
+        n_var = sum(1 for lo in var_lo_grid for hi in var_hi_grid if float(lo) < float(hi))
+        if self.use_energy:
+            n_energy = sum(1 for lo in energy_lo_grid for hi in energy_hi_grid if float(lo) < float(hi))
+        else:
+            n_energy = 1
+        total_candidates = max(1, len(calibration_specs) * n_top2 * n_var * n_energy)
+        candidate_i = 0
+        last_progress_write = 0.0
+
+        _write_osr_progress_from_varmax(
+            phase="threshold_sweep",
+            pct=20.0,
+            sweep_candidate=0,
+            sweep_candidates=total_candidates,
+            calibration_specs=len(calibration_specs),
+            calibration_mode=calibration_mode,
+        )
+
         base_known = calibration_known or payload.val_known
         if base_known is None:
             raise ValueError("Need a known split to compute baseline metrics")
@@ -658,6 +702,26 @@ class VarMaxOSR(BaseOSRMethod):
                             continue
 
                         for energy_lo, energy_hi in energy_pairs:
+                            candidate_i += 1
+                            now = time.time()
+                            if candidate_i == 1 or candidate_i == total_candidates or (now - last_progress_write) >= 2.0:
+                                last_progress_write = now
+                                pct = 20.0 + 65.0 * (float(candidate_i) / float(total_candidates))
+                                _write_osr_progress_from_varmax(
+                                    phase="threshold_sweep",
+                                    pct=pct,
+                                    sweep_candidate=candidate_i,
+                                    sweep_candidates=total_candidates,
+                                    calibration_mode=calibration_mode,
+                                    spec_name=spec.get("spec_name"),
+                                    top2_threshold=float(top2_thr),
+                                    var_percentiles=[float(var_lo), float(var_hi)],
+                                    energy_percentiles=(
+                                        [float(energy_lo), float(energy_hi)]
+                                        if self.use_energy else None
+                                    ),
+                                )
+
                             thresholds = self._make_thresholds_from_percentiles(
                                 known_split=fit_known,
                                 top2_threshold=float(top2_thr),
@@ -713,6 +777,14 @@ class VarMaxOSR(BaseOSRMethod):
                                 "thresholds": thresholds,
                             }
                             sweep_rows.append(row)
+
+        _write_osr_progress_from_varmax(
+            phase="selecting_threshold",
+            pct=87.0,
+            sweep_candidate=candidate_i,
+            sweep_candidates=total_candidates,
+            calibration_mode=calibration_mode,
+        )
 
         self.sweep_history_ = sweep_rows
 

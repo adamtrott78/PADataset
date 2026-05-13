@@ -140,7 +140,17 @@ def render_once(manifest: Path):
         print(f"RUN {i}/{len(rows)} | {status} | gpu={gpu} | ckpt={checkpoint} | grid={grid} | arts={arts}")
         print(run_name)
         print(f"modes: {modes}")
-        print(f"[{render_bar(pct)}] {float(pct):6.2f}% | phase {phase} | rows {rows_done} | elapsed {elapsed}")
+        extra = ""
+        if prog:
+            sc = prog.get("sweep_candidate")
+            st = prog.get("sweep_candidates")
+            spec = prog.get("spec_name")
+            if sc is not None and st is not None:
+                extra += f" | sweep {sc}/{st}"
+            if spec:
+                extra += f" | spec {spec}"
+
+        print(f"[{render_bar(pct)}] {float(pct):6.2f}% | phase {phase} | rows {rows_done} | elapsed {elapsed}{extra}")
 
         if err:
             print(f"error: {short(err.get('error', '?'), 180)}")
