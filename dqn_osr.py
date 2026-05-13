@@ -189,8 +189,11 @@ class DQNAgent:
         loss.backward()
         self.optimizer.step()
 
-        self.epsilon = max(self.epsilon_min, self.epsilon * self.epsilon_decay)
         return float(loss.item())
+
+    def decay_epsilon(self) -> None:
+        # Notebook-faithful behavior: decay once per episode, not once per replay minibatch.
+        self.epsilon = max(self.epsilon_min, self.epsilon * self.epsilon_decay)
 
 
 # ============================================================
@@ -397,6 +400,8 @@ class DQNOSR(BaseOSRMethod):
                 if loss is not None:
                     losses.append(float(loss))
 
+            agent.decay_epsilon()
+
             history.append({
                 "episode": episode + 1,
                 "avg_reward": float(np.mean(episode_rewards)) if episode_rewards else None,
@@ -436,13 +441,25 @@ class DQNOSR(BaseOSRMethod):
     def fit(self, payload: BackbonePayload, calibration: Dict[str, Any] | None = None) -> None:
         calibration = calibration or {}
 
-        known_split = calibration.get("calibration_known", payload.val_known)
-        open_split = calibration.get("calibration_open", payload.test_open)
+        # Paper-style DQN-IDS fitting uses a mixed confidence-state stream.
+        # Do not silently fall back to payload.test_open; that would risk fitting on test data.
+        calibration_stream = calibration.get("calibration_stream", None)
+        if calibration_stream is not None:
+            states = compute_dqn_state_from_split(
+                calibration_stream,
+                state_mode=self.state_mode,
+                energy_temperature=self.energy_temperature,
+            )
+            self._fit_from_states(states)
+            return
+
+        known_split = calibration.get("calibration_known", None)
+        open_split = calibration.get("calibration_open", None)
 
         if known_split is None:
-            raise ValueError("DQNOSR.fit() requires calibration_known or payload.val_known")
+            raise ValueError("DQNOSR.fit() requires explicit calibration_known")
         if open_split is None:
-            raise ValueError("DQNOSR.fit() requires calibration_open or payload.test_open")
+            raise ValueError("DQNOSR.fit() requires explicit calibration_open")
 
         states = self._combine_calibration_states(known_split, open_split)
         self._fit_from_states(states)
