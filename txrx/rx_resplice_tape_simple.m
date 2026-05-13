@@ -46,6 +46,7 @@ function rx_resplice_tape_simple(protocol, dataset_id, shard_id, varargin)
     addParameter(ip, 'hard_reacquire_span_samp', 700000, @(x) isnumeric(x) && isscalar(x) && x > 0);
     addParameter(ip, 'hard_scan_enable', true, @(x) islogical(x) || isnumeric(x));
     addParameter(ip, 'hard_scan_span', 700000, @(x) isnumeric(x) && isscalar(x) && x > 0);
+    addParameter(ip, 'hard_scan_max_blocks', Inf, @(x) isnumeric(x) && isscalar(x) && (x > 0 || isinf(x)));
     parse(ip, varargin{:});
 
     seed_k = round(double(ip.Results.seed_k));
@@ -63,6 +64,7 @@ function rx_resplice_tape_simple(protocol, dataset_id, shard_id, varargin)
     hard_reacquire_span_samp = round(double(ip.Results.hard_reacquire_span_samp));
     hard_scan_enable = logical(ip.Results.hard_scan_enable);
     hard_scan_span   = round(double(ip.Results.hard_scan_span));
+    hard_scan_max_blocks = double(ip.Results.hard_scan_max_blocks);
     
     protocol = string(protocol);
     assert(any(protocol == ["wifi","bluetooth","zigbee"]), ...
@@ -184,18 +186,17 @@ function rx_resplice_tape_simple(protocol, dataset_id, shard_id, varargin)
         end
     end
     
-    % ---- hard bootstrap fallback (700k) ----
+    % ---- hard bootstrap fallback: scan repeated 700k blocks until first valid header ----
     if ~ok0 && hard_scan_enable
-        kmax = numel(x_tape) - (p.frameLen + p.W) + 1;
-        hi_hard = min(kmax, hard_scan_span);
-        fprintf("BOOTSTRAP HARD | seed miss | scanning [1, %d] (early-exit)\n", hi_hard);
-    
-        [h_cur, ok0] = search_first_header_in_range_simple( ...
-            x_tape, 1, hi_hard, p, tx_lut, uint16(0));
+        [h_cur, ok0, lo_hard, hi_hard, blk_hard] = search_first_header_blocks_simple( ...
+            x_tape, 1, p, tx_lut, uint16(0), hard_scan_span, hard_scan_max_blocks);
     
         if ok0
-            fprintf("BOOTSTRAP HARD HIT | k=%d | seq=%d | pa=%s | wid=%d\n", ...
-                h_cur.k, h_cur.seq, h_cur.pa, h_cur.wid);
+            fprintf("BOOTSTRAP HARD HIT | block=%d | scan=[%d,%d] | k=%d | seq=%d | pa=%s | wid=%d\n", ...
+                blk_hard, lo_hard, hi_hard, h_cur.k, h_cur.seq, h_cur.pa, h_cur.wid);
+        else
+            fprintf("BOOTSTRAP HARD MISS | scanned through block=%d | last_scan=[%d,%d]\n", ...
+                blk_hard, lo_hard, hi_hard);
         end
     end
     
@@ -251,38 +252,26 @@ function rx_resplice_tape_simple(protocol, dataset_id, shard_id, varargin)
             end
 
             % ------------------------------------------------------------
-            % HARD RE-ACQUIRE: scan forward ~1 record span to recover from a missing header
-            % Early-exit on first valid header decode.
+            % HARD RE-ACQUIRE: scan repeated 700k blocks until the next valid header.
+            % Use this when one or more headers/preambles were destroyed by drops.
             % ------------------------------------------------------------
-            if ~ok && hard_scan_enable
-                [nxt_h, ok_h, lo_h, hi_h] = hard_reacquire_next_header_simple( ...
-                    x_tape, expected_k, cur, p, tx_lut, slip_frames, search_radius, hard_scan_span);
-            
-                if ok_h
-                    fprintf("HARD REACQUIRE HIT | scan=[%d,%d] | seq=%d | pa=%s | wid=%d | k=%d\n", ...
-                        lo_h, hi_h, nxt_h.seq, nxt_h.pa, nxt_h.wid, nxt_h.k);
-                    nxt = nxt_h;
-                    ok = true;
-                else
-                    fprintf("HARD REACQUIRE MISS | scan=[%d,%d]\n", lo_h, hi_h);
+            if ~ok && (hard_scan_enable || hard_reacquire_enable)
+                scan_span = hard_scan_span;
+                if ~hard_scan_enable && hard_reacquire_enable
+                    scan_span = hard_reacquire_span_samp;
                 end
-            end
-
-            % ------------------------------------------------------------
-            % HARD RE-ACQUIRE: brute-force scan one record span (~700k)
-            % Use this when we suspect a header/preamble was destroyed by a drop.
-            % ------------------------------------------------------------
-            if ~ok && hard_reacquire_enable
-                [nxt_hard, ok_hard, lo_hard, hi_hard] = hard_reacquire_next_header_simple( ...
-                    x_tape, expected_k, cur, p, tx_lut, slip_frames, search_radius, hard_reacquire_span_samp);
+            
+                [nxt_hard, ok_hard, lo_hard, hi_hard, blk_hard] = hard_reacquire_next_header_blocks_simple( ...
+                    x_tape, expected_k, cur, p, tx_lut, slip_frames, search_radius, scan_span, hard_scan_max_blocks);
             
                 if ok_hard
-                    fprintf("HARD REACQUIRE HIT | search=[%d,%d] | seq=%d | pa=%s | wid=%d | k=%d\n", ...
-                        lo_hard, hi_hard, nxt_hard.seq, nxt_hard.pa, nxt_hard.wid, nxt_hard.k);
+                    fprintf("HARD REACQUIRE HIT | block=%d | scan=[%d,%d] | seq=%d | pa=%s | wid=%d | k=%d\n", ...
+                        blk_hard, lo_hard, hi_hard, nxt_hard.seq, nxt_hard.pa, nxt_hard.wid, nxt_hard.k);
                     nxt = nxt_hard;
                     ok = true;
                 else
-                    fprintf("HARD REACQUIRE MISS | search=[%d,%d]\n", lo_hard, hi_hard);
+                    fprintf("HARD REACQUIRE MISS | scanned through block=%d | last_scan=[%d,%d]\n", ...
+                        blk_hard, lo_hard, hi_hard);
                 end
             end
 
@@ -939,6 +928,92 @@ function [nxt, ok, skip_used, expected_k_skip] = try_auto_skip_header_simple( ..
         end
     end
 end
+
+
+function [hdr, ok, lo_hit, hi_hit, block_idx] = search_first_header_blocks_simple( ...
+    x_tape, start_k, p, tx_lut, seq_floor, span_samp, max_blocks)
+% Scan repeated contiguous blocks [start,start+span-1], then the next block, etc.
+% Early-exit on the first valid header.
+
+    hdr = empty_hdr_simple();
+    ok = false;
+
+    kmax = numel(x_tape) - (p.frameLen + p.W) + 1;
+    span_samp = max(1, round(double(span_samp)));
+
+    lo = max(1, round(double(start_k)));
+    lo_hit = lo;
+    hi_hit = min(kmax, lo + span_samp - 1);
+    block_idx = 0;
+
+    while lo <= kmax && block_idx < max_blocks
+        block_idx = block_idx + 1;
+        hi = min(kmax, lo + span_samp - 1);
+
+        fprintf("BOOTSTRAP HARD BLOCK | block=%d | scanning [%d,%d]\n", block_idx, lo, hi);
+
+        [cand, okc] = search_first_header_in_range_simple( ...
+            x_tape, lo, hi, p, tx_lut, seq_floor);
+
+        lo_hit = lo;
+        hi_hit = hi;
+
+        if okc
+            hdr = cand;
+            ok = true;
+            return;
+        end
+
+        lo = hi + 1;
+    end
+end
+
+
+function [nxt, ok, lo_hit, hi_hit, block_idx] = hard_reacquire_next_header_blocks_simple( ...
+    x_tape, expected_k, cur, p, tx_lut, slip_frames, search_radius, span_samp, max_blocks)
+% Scan repeated contiguous blocks starting near expected_k.
+% Early-exit on the first valid header with seq > cur.seq.
+
+    nxt = empty_hdr_simple();
+    ok = false;
+
+    kmax = numel(x_tape) - (p.frameLen + p.W) + 1;
+    span_samp = max(1, round(double(span_samp)));
+
+    max_slip = max(abs(double(slip_frames))) * double(p.frameLen);
+
+    % Start at the same conservative lower edge used by the previous hard reacquire,
+    % then scan forward in contiguous span_samp blocks.
+    lo = max(1, round(double(expected_k) - max_slip - double(search_radius)));
+    lo_hit = lo;
+    hi_hit = min(kmax, lo + span_samp - 1);
+    block_idx = 0;
+
+    seq_floor = uint16(cur.seq);
+
+    while lo <= kmax && block_idx < max_blocks
+        block_idx = block_idx + 1;
+        hi = min(kmax, lo + span_samp - 1);
+
+        fprintf("HARD REACQUIRE BLOCK | block=%d | scanning [%d,%d]\n", block_idx, lo, hi);
+
+        for k = lo:hi
+            [cand, okc] = raw_decode_valid_header_at_k_simple(x_tape, k, p, tx_lut, seq_floor);
+            if okc
+                nxt = cand;
+                ok = true;
+                lo_hit = lo;
+                hi_hit = hi;
+                return;
+            end
+        end
+
+        lo_hit = lo;
+        hi_hit = hi;
+        lo = hi + 1;
+    end
+end
+
 
 function [nxt, ok, lo, hi] = hard_reacquire_next_header_simple( ...
     x_tape, expected_k, cur, p, tx_lut, slip_frames, search_radius, span_samp)

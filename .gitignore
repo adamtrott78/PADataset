@@ -115,3 +115,25 @@ env/
 
 # Ignore symlink to external digital tape storage.
 /txrx/tapes/digital
+
+# Local handoff/debug artifacts
+PADataset_training_handoff_*/
+*.bak_*
+*.tar.gz
+*.tgz
+*.zip
+
+# Generated data/cache/log outputs
+data/
+results/
+_feature_cache_nvme/
+*.mat
+*.h5
+*.hdf5
+*.npy
+*.npz
+*.pt
+*.pth
+*.log
+__pycache__/
+.ipynb_checkpoints/

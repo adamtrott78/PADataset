@@ -1,14 +1,16 @@
-# --- 0) run the orchestrator as a user service that survives SSH disconnect ---
-cd ~/adamArchives/Adam/varMax/PADataset
-mkdir -p results/buh_logs results/resplice_workers results/bank_workers results/cache_workers
-chmod +x ./buh_orchestrate.sh
+systemctl --user stop buh_orchestrate_20260511_012345.service
 
-# run as systemd transient *service*
-systemd-run --user --unit=buh_orch --collect --property=WorkingDirectory="$PWD" \
-  bash -lc './buh_orchestrate.sh'
+# --- 0) START ---
+UNIT="buh_orch_$(date +%Y%m%d_%H%M%S)"
+systemd-run --user --unit="$UNIT" --collect --property=WorkingDirectory="$PWD" bash -lc './buh_orchestrate.sh'
+journalctl --user -u "$UNIT".service -f
+
 
 # --- 1) system logs (everything) ---
+systemd-run --user --unit=buh_orch --collect --property=WorkingDirectory="$PWD" \
+  bash -lc './buh_orchestrate.sh'
 journalctl --user -u buh_orch.service -f
+
 
 # --- 2) full orchestrator log + important-only view ---
 LOG=$(ls -t results/buh_logs/orch_*.log | head -n 1)
@@ -16,11 +18,12 @@ tail -f "$LOG"
 
 # important-only stream (filters out “NEXT SEARCH / trying center” spam)
 tail -f "$LOG" | grep --line-buffered -E \
-'^(===|--- CAPTURE|CAPTURE PASS|CAPTURE FAIL|TXRX GATE|TXRX DONE|RESP SIMPLE DONE|HDR DONE|BANK (DISCOVER|TARGET|ASSEMBLE|WRITE|DONE)|Cache build complete|Cache files present|ERROR|!!!)'
+'^(===|--- CAPTURE|CAPTURE PASS|CAPTURE FAIL|TXRX GATE|TXRX DONE|TXRX SAVE|RESP SIMPLE DONE|HDR DONE|BANK (DISCOVER|TARGET|ASSEMBLE|WRITE|DONE)|Cache build complete|Cache files present|ERROR|!!!)'
 
-# --- 3) resplice UI (your existing log-based TUI) ---
-# (run this while resplice is in progress)
-python ./tui_resplice_watch.py
+# --- 3) resplice UI (your existing log-based UI) ---
+watch -n 2 "ps -eo pid,%cpu,%mem,rss,vsz,etime,cmd --sort=-rss \
+  | grep -E \"MATLAB.*resplice_worker\\('\" \
+  | head -n 30"
 
 # --- 4) live memory/cpu for MATLAB workers ---
 watch -n 2 "ps -C MATLAB -o pid,%cpu,%mem,rss,vsz,etime,cmd --sort=-rss | head -n 25"
