@@ -47,6 +47,7 @@ class DataSetup:
     cache_len: Optional[int] = 8192
     cache_root: Optional[str] = None
     force_rebuild_cache: bool = False
+    skip_cache_build: bool = False
 
     train_frac: float = 0.70
     val_frac: float = 0.15
@@ -944,7 +945,14 @@ def build_data_from_setup(
     num_workers: int = 0,
     pin_memory: bool = True,
 ) -> Dict[str, Any]:
-    build_feature_cache(setup)
+    if getattr(setup, "skip_cache_build", False):
+        print(
+            f"DATA_STAGE | cache_only=true | cache_root={setup.cache_root}",
+            flush=True,
+        )
+    else:
+        build_feature_cache(setup)
+
     ds = CachedFeatureDataset(setup)
 
     out: Dict[str, Any] = {"dataset": ds, "setup": setup}

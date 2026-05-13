@@ -1,6 +1,6 @@
 {
   "run_schema_version": "final_parallel_experiment_system",
-  "run_name": "distinct_smoke_ent005_lr2e4_unkPA1_c16384_seed0",
+  "run_name": "distinct_smoke_ent005_lr2e4_unkPA1_c16384_seed1",
   "paper_set": "DISTINCT",
   "family_tag": "smoke_ent005_lr2e4",
   "protocol_tag": "all",
@@ -24,14 +24,14 @@
   "batch_size": 2,
   "num_workers": 0,
   "pin_memory": true,
-  "seed": 0,
+  "seed": 1,
   "source_type": "ota",
   "source_name": "ota_core_high_run01",
   "dataset_tag": "ota_core_high_run01",
   "noise_tag": "high_run01",
   "open_val_frac": 0.15,
   "build_balanced_val_open": true,
-  "manifold_balance_seed": 0,
+  "manifold_balance_seed": 1,
   "require_true_val_open": true,
   "allow_val_open_fallback": false,
   "confidence_temperature": 1.0,
@@ -54,6 +54,6 @@
   "early_stopping_patience": null,
   "save_root": "results_pa_smoke",
   "use_timestamped_run_dir": false,
-  "overwrite_existing_run": true,
+  "overwrite_existing_run": false,
   "progress_interval": 250
 }

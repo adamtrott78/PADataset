@@ -132,6 +132,7 @@ def base_training_config(
         "cache_len": 16384,
         "cache_root": str(cache_root),
         "force_rebuild_cache": False,
+        "skip_cache_build": True,
 
         "batch_size": batch_size,
         "num_workers": num_workers,

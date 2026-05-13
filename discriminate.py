@@ -4,6 +4,7 @@ import copy
 import gc
 import json
 import os
+import time
 from datetime import datetime
 from typing import Any, Dict, Optional
 
@@ -395,6 +396,21 @@ def train_classifier(
         with open(os.path.join(save_dir, "config.json"), "w") as f:
             json.dump(config_dict, f, indent=2)
 
+    progress_interval = 25
+    if config_dict is not None:
+        progress_interval = int(config_dict.get("progress_interval", progress_interval))
+    progress_interval = max(1, progress_interval)
+
+    progress_path = os.path.join(save_dir, "train_progress.json")
+
+    def write_progress(**payload):
+        payload.setdefault("run_name", run_name)
+        payload.setdefault("time", time.strftime("%Y-%m-%dT%H:%M:%S%z"))
+        tmp_path = progress_path + ".tmp"
+        with open(tmp_path, "w") as f:
+            json.dump(payload, f, indent=2)
+        os.replace(tmp_path, progress_path)
+
     model.to(device)
 
     class_weights = None
@@ -475,7 +491,24 @@ def train_classifier(
     last_val_stats = None
     last_open_conf_stats = None
 
+    total_train_batches = len(train_loader)
+
     for epoch in range(1, epochs + 1):
+        epoch_t0 = time.time()
+        print(
+            f"TRAIN_EPOCH_START | run_name={run_name} | epoch={epoch} | epochs={epochs} | steps={total_train_batches}",
+            flush=True,
+        )
+        write_progress(
+            phase="train_epoch",
+            epoch=epoch,
+            epochs=epochs,
+            step=0,
+            steps=total_train_batches,
+            pct=0.0,
+            running_samples=0,
+        )
+
         model.train()
         running_loss = 0.0
         running_ce = 0.0
@@ -490,7 +523,7 @@ def train_classifier(
             mininterval=2.0,
         )
 
-        for batch in pbar:
+        for batch_idx, batch in enumerate(pbar, start=1):
             x, y = batch[:2]
             x = x.to(device, non_blocking=True)
             y = y.to(device, non_blocking=True)
@@ -521,10 +554,51 @@ def train_classifier(
             running_center += center.item() * bs
             running_samples += bs
 
+            if (
+                batch_idx == 1
+                or batch_idx % progress_interval == 0
+                or batch_idx == total_train_batches
+            ):
+                loss_so_far = running_loss / max(running_samples, 1)
+                pct = 100.0 * batch_idx / max(total_train_batches, 1)
+                elapsed = time.time() - epoch_t0
+                steps_per_sec = batch_idx / max(elapsed, 1e-9)
+                print(
+                    f"TRAIN_STEP | run_name={run_name} | epoch={epoch} | epochs={epochs} "
+                    f"| step={batch_idx} | steps={total_train_batches} | pct={pct:.2f} "
+                    f"| loss_so_far={loss_so_far:.5f} | steps_per_sec={steps_per_sec:.3f}",
+                    flush=True,
+                )
+                write_progress(
+                    phase="train_step",
+                    epoch=epoch,
+                    epochs=epochs,
+                    step=batch_idx,
+                    steps=total_train_batches,
+                    pct=pct,
+                    running_samples=int(running_samples),
+                    loss_so_far=float(loss_so_far),
+                    steps_per_sec=float(steps_per_sec),
+                )
+
         train_loss = running_loss / max(running_samples, 1)
         train_ce = running_ce / max(running_samples, 1)
         train_ent = running_ent / max(running_samples, 1)
         train_center = running_center / max(running_samples, 1)
+
+        print(
+            f"TRAIN_EPOCH_TRAIN_DONE | run_name={run_name} | epoch={epoch} | train_loss={train_loss:.5f}",
+            flush=True,
+        )
+        write_progress(
+            phase="validation",
+            epoch=epoch,
+            epochs=epochs,
+            step=total_train_batches,
+            steps=total_train_batches,
+            pct=100.0,
+            train_loss=float(train_loss),
+        )
 
         val_stats = evaluate_classifier(
             model,
@@ -592,7 +666,26 @@ def train_classifier(
                 f" | val_dqn_proxy_softmax3={open_conf_stats['dqn_proxy_softmax3']:.4f}"
                 f" | val_dqn_proxy_expanded5={open_conf_stats['dqn_proxy_expanded5']:.4f}"
             )
-        print(log_msg)
+        print(log_msg, flush=True)
+
+        print(
+            f"TRAIN_EPOCH_DONE | run_name={run_name} | epoch={epoch} | epochs={epochs} "
+            f"| train_loss={train_loss:.5f} | val_loss={val_stats['loss']:.5f} "
+            f"| val_acc={val_stats['acc']:.5f} | val_macro_f1={val_stats['macro_f1']:.5f}",
+            flush=True,
+        )
+        write_progress(
+            phase="epoch_done",
+            epoch=epoch,
+            epochs=epochs,
+            step=total_train_batches,
+            steps=total_train_batches,
+            pct=100.0,
+            train_loss=float(train_loss),
+            val_loss=float(val_stats["loss"]),
+            val_acc=float(val_stats["acc"]),
+            val_macro_f1=float(val_stats["macro_f1"]),
+        )
 
         if early_stopping_mode == "known_only":
             current_metric = _select_known_only_metric(val_stats, model_selection_metric)
@@ -636,6 +729,8 @@ def train_classifier(
 # experiment runners
 # -----------------------------
 def run_experiment(cfg: Dict[str, Any], data_root: str) -> Dict[str, Any]:
+    print(f"RUN_STAGE | run_name={cfg.get('run_name', '<unset>')} | stage=enter_run_experiment", flush=True)
+    run_name = cfg.get("run_name", "run")
     gc.collect()
     if torch.cuda.is_available():
         torch.cuda.empty_cache()
@@ -643,6 +738,7 @@ def run_experiment(cfg: Dict[str, Any], data_root: str) -> Dict[str, Any]:
     cfg = copy.deepcopy(cfg)
     cfg["root"] = data_root
 
+    print(f"RUN_STAGE | run_name={run_name} | stage=before_datasetup", flush=True)
     setup = DataSetup(
         root=data_root,
         task=cfg.get("task", "pa"),
@@ -653,6 +749,7 @@ def run_experiment(cfg: Dict[str, Any], data_root: str) -> Dict[str, Any]:
         cache_len=cfg.get("cache_len", 8192),
         cache_root=cfg.get("cache_root", None),
         force_rebuild_cache=cfg.get("force_rebuild_cache", False),
+        skip_cache_build=cfg.get("skip_cache_build", False),
 
         train_frac=cfg.get("train_frac", 0.70),
         val_frac=cfg.get("val_frac", 0.15),
@@ -679,6 +776,7 @@ def run_experiment(cfg: Dict[str, Any], data_root: str) -> Dict[str, Any]:
     num_workers = cfg.get("num_workers", 0)
     pin_memory = cfg.get("pin_memory", True)
 
+    print(f"RUN_STAGE | run_name={run_name} | stage=build_data_start", flush=True)
     data = build_data_from_setup(
         setup,
         batch_size=batch_size,
@@ -686,6 +784,7 @@ def run_experiment(cfg: Dict[str, Any], data_root: str) -> Dict[str, Any]:
         pin_memory=pin_memory,
     )
 
+    print(f"RUN_STAGE | run_name={run_name} | stage=build_data_done", flush=True)
     train_loader = data["train_loader"]
     val_loader = data["val_loader"]
     meta = data["meta"]
@@ -727,6 +826,7 @@ def run_experiment(cfg: Dict[str, Any], data_root: str) -> Dict[str, Any]:
 
     run_name = cfg.get("run_name", None)
 
+    print(f"RUN_STAGE | run_name={run_name} | stage=train_classifier_start", flush=True)
     save_dir, history = train_classifier(
         model=model,
         train_loader=train_loader,
@@ -760,6 +860,8 @@ def run_experiment(cfg: Dict[str, Any], data_root: str) -> Dict[str, Any]:
         open_conf_selection_metric=cfg.get("open_conf_selection_metric", "dqn_proxy_expanded5"),
         confidence_temperature=cfg.get("confidence_temperature", 1.0),
     )
+
+    print(f"RUN_STAGE | run_name={run_name} | stage=post_train_eval_start", flush=True)
 
     ckpt = torch.load(
         os.path.join(save_dir, "best_model.pt"),
@@ -957,6 +1059,8 @@ def run_experiment(cfg: Dict[str, Any], data_root: str) -> Dict[str, Any]:
             "available_checkpoints": available_checkpoints,
         }
 
+    print(f"RUN_STAGE | run_name={run_name} | stage=train_classifier_done", flush=True)
+
     # Preserve paper/system-level identity fields for manifest-driven final experiments.
     for _k in [
         "paper_set",
@@ -977,6 +1081,7 @@ def run_experiment(cfg: Dict[str, Any], data_root: str) -> Dict[str, Any]:
     summary.setdefault("pas", None if setup.pas is None else list(setup.pas))
     summary.setdefault("protocols", None if setup.protocols is None else list(setup.protocols))
 
+    print(f"RUN_STAGE | run_name={run_name} | stage=summary_write", flush=True)
     save_experiment_summary(summary, save_dir)
 
     try:

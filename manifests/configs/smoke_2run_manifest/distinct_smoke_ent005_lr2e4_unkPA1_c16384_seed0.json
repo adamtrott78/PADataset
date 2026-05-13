@@ -54,6 +54,6 @@
   "early_stopping_patience": null,
   "save_root": "results_pa_smoke",
   "use_timestamped_run_dir": false,
-  "overwrite_existing_run": true,
+  "overwrite_existing_run": false,
   "progress_interval": 250
 }

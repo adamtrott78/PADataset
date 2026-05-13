@@ -54,16 +54,18 @@ parallel --line-buffer --colsep '\t' \
   export OPENBLAS_NUM_THREADS=1
   export NUMEXPR_NUM_THREADS=1
   export VECLIB_MAXIMUM_THREADS=1
+  export PYTHONUNBUFFERED=1
+  export TQDM_MININTERVAL=2
 
-  exec 9>"/tmp/padataset_gpu_${gpu}.lock"
+  exec 9>"/tmp/padataset_gpu_$gpu.lock"
   flock -n 9 || {
-    echo "TRAIN ERROR | run_name=${run_name} | gpu=${gpu} | error=gpu_lock_busy"
+    echo "TRAIN ERROR | run_name=$run_name | gpu=$gpu | error=gpu_lock_busy"
     exit 99
   }
 
   "$PY" "$REPO/experiments/pa_train_one.py" \
     --cfg "$REPO/$cfg_path" \
-    2>&1 | tee "$REPO/$LOGROOT/${run_name}_${TS}.log"
+    2>&1 | tee "$REPO/$LOGROOT/"$run_name"_"$TS".log"
 ' :::: "$MANIFEST" \
   2>&1 | tee "$LOG"
 

@@ -74,8 +74,21 @@ def main() -> None:
 
     t0 = time.time()
 
+    print(
+        f"TRAIN_STAGE | run_name={run_name} | stage=before_run_experiment | data_root={args.data_root}",
+        flush=True,
+    )
+
     try:
+        print(
+            f"TRAIN_STAGE | run_name={run_name} | stage=calling_run_experiment",
+            flush=True,
+        )
         summary = run_experiment(cfg, data_root=args.data_root)
+        print(
+            f"TRAIN_STAGE | run_name={run_name} | stage=returned_run_experiment",
+            flush=True,
+        )
         save_dir = Path(summary["save_dir"])
         verify_complete(save_dir)
 
@@ -95,6 +108,22 @@ def main() -> None:
         )
 
     except Exception as e:
+        err_record = {
+            "run_name": run_name,
+            "cfg_path": str(cfg_path),
+            "gpu": gpu,
+            "error": repr(e),
+            "elapsed_sec": time.time() - t0,
+        }
+
+        err_dir = expected_run_dir(cfg)
+        if err_dir is not None:
+            try:
+                err_dir.mkdir(parents=True, exist_ok=True)
+                (err_dir / "train_error.json").write_text(json.dumps(err_record, indent=2))
+            except Exception:
+                pass
+
         print(
             f"TRAIN ERROR | run_name={run_name} | gpu={gpu} | error={repr(e)}",
             flush=True,
