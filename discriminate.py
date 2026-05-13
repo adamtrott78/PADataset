@@ -371,8 +371,24 @@ def train_classifier(
     confidence_temperature: float = 1.0,
 ):
     timestamp = datetime.now().strftime("%H-%M_%m-%d-%y")
-    run_dir_name = f"{timestamp}_{run_name}" if run_name else timestamp
+
+    use_timestamped_run_dir = True
+    overwrite_existing_run = False
+    if config_dict is not None:
+        use_timestamped_run_dir = bool(config_dict.get("use_timestamped_run_dir", True))
+        overwrite_existing_run = bool(config_dict.get("overwrite_existing_run", False))
+
+    if run_name:
+        run_dir_name = f"{timestamp}_{run_name}" if use_timestamped_run_dir else str(run_name)
+    else:
+        run_dir_name = timestamp
+
     save_dir = os.path.join(save_root, run_dir_name)
+    if os.path.isdir(save_dir) and os.listdir(save_dir) and not overwrite_existing_run:
+        raise FileExistsError(
+            f"Refusing to overwrite existing non-empty run directory: {save_dir}. "
+            "Set overwrite_existing_run=True or choose a new run_name."
+        )
     os.makedirs(save_dir, exist_ok=True)
 
     if config_dict is not None:
@@ -940,6 +956,26 @@ def run_experiment(cfg: Dict[str, Any], data_root: str) -> Dict[str, Any]:
 
             "available_checkpoints": available_checkpoints,
         }
+
+    # Preserve paper/system-level identity fields for manifest-driven final experiments.
+    for _k in [
+        "paper_set",
+        "protocol_tag",
+        "family_tag",
+        "pas",
+        "protocols",
+        "cache_root",
+        "run_schema_version",
+        "use_timestamped_run_dir",
+        "notes",
+    ]:
+        if _k in cfg:
+            summary[_k] = cfg.get(_k)
+
+    summary.setdefault("run_schema_version", "final_parallel_experiment_system")
+    summary.setdefault("cache_root", setup.cache_root)
+    summary.setdefault("pas", None if setup.pas is None else list(setup.pas))
+    summary.setdefault("protocols", None if setup.protocols is None else list(setup.protocols))
 
     save_experiment_summary(summary, save_dir)
 
