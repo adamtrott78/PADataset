@@ -278,7 +278,7 @@ class TrainingStateCallback(tf.keras.callbacks.Callback):
     def on_epoch_end(self, epoch, logs=None):
         logs = logs or {}
         payload = {
-            "epoch": int(epoch + 1),
+            "epoch": epoch_num,
             "time": time.strftime("%Y-%m-%dT%H:%M:%S%z"),
             "logs": {k: float(v) for k, v in logs.items() if isinstance(v, (int, float, np.floating))},
             "latest_model_path": str(self.out_dir / "latest_model.keras"),
@@ -318,6 +318,7 @@ class EpochOSRMetricsCallback(tf.keras.callbacks.Callback):
         out_dir,
         batch_size=512,
         limit_n=None,
+        every_n=5,
     ):
         super().__init__()
         self.val_known_ds = val_known_ds
@@ -326,6 +327,7 @@ class EpochOSRMetricsCallback(tf.keras.callbacks.Callback):
         self.out_dir = Path(out_dir)
         self.batch_size = int(batch_size)
         self.limit_n = limit_n
+        self.every_n = max(1, int(every_n))
         self.csv_path = self.out_dir / "epoch_osr_metrics.csv"
         self.jsonl_path = self.out_dir / "epoch_osr_metrics.jsonl"
 
@@ -346,6 +348,17 @@ class EpochOSRMetricsCallback(tf.keras.callbacks.Callback):
 
     def on_epoch_end(self, epoch, logs=None):
         logs = logs or {}
+        epoch_num = int(epoch + 1)
+
+        # Always evaluate epoch 1, then every N epochs.
+        if epoch_num != 1 and epoch_num % self.every_n != 0:
+            print(
+                "EPOCH_OSR_METRICS_SKIP"
+                f" | epoch={epoch_num}"
+                f" | next_eval_epoch={((epoch_num // self.every_n) + 1) * self.every_n}",
+                flush=True,
+            )
+            return
 
         known_probs, known_y = predict_probs(
             self.model,
@@ -374,7 +387,7 @@ class EpochOSRMetricsCallback(tf.keras.callbacks.Callback):
         )
 
         row = {
-            "epoch": int(epoch + 1),
+            "epoch": epoch_num,
             "epoch_val_known_macro_f1": known_macro_f1,
             "epoch_val_known_acc": known_acc,
             "epoch_anchor_high_known_frac": anchors["anchor_high_known_frac"],
@@ -399,7 +412,7 @@ class EpochOSRMetricsCallback(tf.keras.callbacks.Callback):
 
         print(
             "EPOCH_OSR_METRICS"
-            f" | epoch={epoch + 1}"
+            f" | epoch={epoch_num}"
             f" | known_macro_f1={known_macro_f1:.4f}"
             f" | known_acc={known_acc:.4f}"
             f" | anchor_hi_known={anchors['anchor_high_known_frac']:.4f}"
@@ -426,6 +439,12 @@ def main():
         type=int,
         default=None,
         help="Optional cap for per-epoch OSR metric evaluation. Default uses full val_known and val_open.",
+    )
+    ap.add_argument(
+        "--epoch-metric-every",
+        type=int,
+        default=5,
+        help="Evaluate known-F1 and DQN anchor metrics every N epochs. Epoch 1 is always evaluated.",
     )
     args = ap.parse_args()
 
@@ -530,6 +549,7 @@ def main():
             out_dir=out_dir,
             batch_size=args.predict_batch_size,
             limit_n=args.epoch_metric_n,
+            every_n=args.epoch_metric_every,
         ),
         TrainingStateCallback(out_dir=out_dir),
         BackupAndRestore(backup_dir=str(out_dir / "keras_backup")),
