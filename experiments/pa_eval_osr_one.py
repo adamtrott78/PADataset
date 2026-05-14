@@ -125,25 +125,31 @@ def make_dqn_method_specs(modes: list[str]):
         if not mode:
             continue
 
-        valid_modes = {
-            "paper",
-            "paper_mixed",
-            "cicids",
-            "cicids_mixed",
-            "banded_guard",
-            "paper_banded_guard",
-            "banded_guard_softmax3",
+        plain_modes = {"paper", "paper_mixed", "cicids", "cicids_mixed"}
+
+        guard_configs = {
+            # default alias preserves original committed behavior
+            "banded_guard": ("dqn_banded_guard_2of3_softmax3", "two_of_three"),
+            "paper_banded_guard": ("dqn_banded_guard_2of3_softmax3", "two_of_three"),
+            "banded_guard_softmax3": ("dqn_banded_guard_2of3_softmax3", "two_of_three"),
+            "banded_guard_2of3": ("dqn_banded_guard_2of3_softmax3", "two_of_three"),
+            "banded_guard_all": ("dqn_banded_guard_all_softmax3", "all"),
+            "banded_guard_var_energy": ("dqn_banded_guard_var_energy_softmax3", "var_energy"),
+            "banded_guard_any": ("dqn_banded_guard_any_softmax3", "any"),
         }
+
+        valid_modes = plain_modes | set(guard_configs)
         if mode not in valid_modes:
             raise ValueError(
                 f"Unsupported DQN mode {mode!r}. Use one of: "
-                "paper,paper_mixed,cicids,cicids_mixed,banded_guard,paper_banded_guard"
+                + ",".join(sorted(valid_modes))
             )
 
-        if mode in {"banded_guard", "paper_banded_guard", "banded_guard_softmax3"}:
+        if mode in guard_configs:
+            spec_name, accept_mode = guard_configs[mode]
             specs.append({
-                "name": "dqn_banded_guard_softmax3",
-                "factory": lambda: BandedGuardDQNOSR(
+                "name": spec_name,
+                "factory": lambda accept_mode=accept_mode: BandedGuardDQNOSR(
                     state_mode="softmax3",
                     gamma=0.95,
                     epsilon=1.0,
@@ -160,7 +166,7 @@ def make_dqn_method_specs(modes: list[str]):
                     device="cpu",
                     band_percentiles=(5.0, 95.0),
                     top2_band_percentiles=(5.0, 95.0),
-                    band_accept_mode="two_of_three",
+                    band_accept_mode=accept_mode,
                     band_weight=1.0,
                     min_samples_per_class=5,
                     fit_bands_on="predicted_class",
@@ -218,6 +224,12 @@ def compact_method_row(row: Dict[str, Any], result: Dict[str, Any], run_meta: Di
         out["dqn_n_states_total"] = fit_summary.get("n_states_total")
         out["dqn_n_anchor_high"] = fit_summary.get("n_anchor_high")
         out["dqn_n_anchor_low"] = fit_summary.get("n_anchor_low")
+        if params.get("method_name") == "dqn_banded_guard_osr":
+            out["band_accept_mode"] = params.get("band_accept_mode")
+            out["band_percentiles"] = json.dumps(params.get("band_percentiles"))
+            out["top2_band_percentiles"] = json.dumps(params.get("top2_band_percentiles"))
+            out["band_weight"] = params.get("band_weight")
+            out["fit_bands_on"] = params.get("fit_bands_on")
 
     if best:
         out["best_regime"] = best.get("regime")
