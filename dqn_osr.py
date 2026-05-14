@@ -599,3 +599,309 @@ class DQNOSR(BaseOSRMethod):
             "last_fit_summary": copy.deepcopy(self.last_fit_summary_),
             "train_history": copy.deepcopy(self.train_history_),
         }
+
+
+# ============================================================
+# DQN + predicted-class band guard
+# ============================================================
+
+def _dqn_guard_safe_percentile(values: np.ndarray, percentiles: Tuple[float, float]) -> Tuple[float, float]:
+    lo, hi = percentiles
+    return float(np.percentile(values, lo)), float(np.percentile(values, hi))
+
+
+def _dqn_guard_band_distance(values: np.ndarray, bounds: np.ndarray) -> np.ndarray:
+    lo = bounds[:, 0]
+    hi = bounds[:, 1]
+    below = np.clip(lo - values, 0.0, None)
+    above = np.clip(values - hi, 0.0, None)
+    raw = below + above
+    width = np.maximum(hi - lo, 1e-8)
+    return raw / width
+
+
+class BandedGuardDQNOSR(BaseOSRMethod):
+    """
+    DQN with predicted-class conditional band veto.
+
+    DQN remains the policy:
+      0 = unknown
+      1 = known
+
+    But DQN-known decisions must pass known-only predicted-class
+    top2/variance/energy bands.
+    """
+
+    method_name = "dqn_banded_guard_osr"
+
+    def __init__(
+        self,
+        state_mode: str = "softmax3",
+        gamma: float = 0.95,
+        epsilon: float = 1.0,
+        epsilon_min: float = 0.05,
+        epsilon_decay: float = 0.99,
+        learning_rate: float = 1e-3,
+        memory_size: int = 2000,
+        batch_size: int = 32,
+        episodes: int = 30,
+        anchor_fraction: float = 0.05,
+        train_subsample_size: int = 1250,
+        centroid_update_threshold: float = 0.75,
+        energy_temperature: float = 1.0,
+        seed: int = 42,
+        device: str = "cpu",
+        band_percentiles: Tuple[float, float] = (5.0, 95.0),
+        top2_band_percentiles: Tuple[float, float] = (5.0, 95.0),
+        band_accept_mode: str = "two_of_three",
+        band_weight: float = 1.0,
+        min_samples_per_class: int = 5,
+        fit_bands_on: str = "predicted_class",
+    ):
+        self.dqn = DQNOSR(
+            state_mode=state_mode,
+            gamma=gamma,
+            epsilon=epsilon,
+            epsilon_min=epsilon_min,
+            epsilon_decay=epsilon_decay,
+            learning_rate=learning_rate,
+            memory_size=memory_size,
+            batch_size=batch_size,
+            episodes=episodes,
+            anchor_fraction=anchor_fraction,
+            train_subsample_size=train_subsample_size,
+            centroid_update_threshold=centroid_update_threshold,
+            energy_temperature=energy_temperature,
+            seed=seed,
+            device=device,
+        )
+
+        self.state_mode = state_mode
+        self.energy_temperature = float(energy_temperature)
+        self.band_percentiles = tuple(band_percentiles)
+        self.top2_band_percentiles = tuple(top2_band_percentiles)
+        self.band_accept_mode = str(band_accept_mode)
+        self.band_weight = float(band_weight)
+        self.min_samples_per_class = int(min_samples_per_class)
+        self.fit_bands_on = str(fit_bands_on)
+
+        self.num_classes_: Optional[int] = None
+        self.class_names_: Optional[list[str]] = None
+        self.band_thresholds_: Optional[Dict[str, Dict[int, Tuple[float, float]]]] = None
+        self.fitted_ = False
+        self.band_fit_summary_: Dict[str, Any] = {}
+
+    def _compute_band_scores(self, split: SplitOutputs) -> Dict[str, np.ndarray]:
+        return {
+            "top2": compute_top2_gap_from_probs(split.probs),
+            "var": compute_logit_variance(split.logits),
+            "energy": compute_energy_from_logits(split.logits, temperature=self.energy_temperature),
+        }
+
+    def _labels_for_band_fit(self, split: SplitOutputs) -> np.ndarray:
+        if self.fit_bands_on == "predicted_class":
+            return split.closed_pred.astype(int)
+        if self.fit_bands_on == "true_class":
+            return split.y_true.astype(int)
+        raise ValueError(f"Unsupported fit_bands_on={self.fit_bands_on!r}")
+
+    def _fit_one_metric_band(
+        self,
+        values: np.ndarray,
+        labels_for_bands: np.ndarray,
+        fallback_labels: np.ndarray,
+        percentiles: Tuple[float, float],
+    ) -> Dict[int, Tuple[float, float]]:
+        assert self.num_classes_ is not None
+        out: Dict[int, Tuple[float, float]] = {}
+
+        for cls in range(self.num_classes_):
+            vals = values[labels_for_bands == cls]
+            if vals.size < self.min_samples_per_class:
+                vals = values[fallback_labels == cls]
+            if vals.size < self.min_samples_per_class:
+                vals = values
+
+            out[int(cls)] = _dqn_guard_safe_percentile(vals, percentiles)
+
+        return out
+
+    def _fit_band_guard(self, known_split: SplitOutputs) -> None:
+        assert self.num_classes_ is not None
+
+        scores = self._compute_band_scores(known_split)
+        labels_for_bands = self._labels_for_band_fit(known_split)
+        fallback_labels = known_split.y_true.astype(int)
+
+        self.band_thresholds_ = {
+            "top2": self._fit_one_metric_band(
+                values=scores["top2"],
+                labels_for_bands=labels_for_bands,
+                fallback_labels=fallback_labels,
+                percentiles=self.top2_band_percentiles,
+            ),
+            "var": self._fit_one_metric_band(
+                values=scores["var"],
+                labels_for_bands=labels_for_bands,
+                fallback_labels=fallback_labels,
+                percentiles=self.band_percentiles,
+            ),
+            "energy": self._fit_one_metric_band(
+                values=scores["energy"],
+                labels_for_bands=labels_for_bands,
+                fallback_labels=fallback_labels,
+                percentiles=self.band_percentiles,
+            ),
+        }
+
+        self.band_fit_summary_ = {
+            "fit_bands_on": self.fit_bands_on,
+            "band_percentiles": list(self.band_percentiles),
+            "top2_band_percentiles": list(self.top2_band_percentiles),
+            "band_accept_mode": self.band_accept_mode,
+            "min_samples_per_class": self.min_samples_per_class,
+            "thresholds": copy.deepcopy(self.band_thresholds_),
+        }
+
+    def _band_predict(self, split: SplitOutputs) -> Dict[str, np.ndarray]:
+        if self.band_thresholds_ is None:
+            raise RuntimeError("BandedGuardDQNOSR band guard is not fitted")
+
+        scores = self._compute_band_scores(split)
+        pred = split.closed_pred.astype(int)
+
+        inside_flags = {}
+        distances = {}
+
+        for metric_name in ["top2", "var", "energy"]:
+            metric_thresholds = self.band_thresholds_[metric_name]
+            bounds = np.array([metric_thresholds[int(c)] for c in pred], dtype=float)
+            vals = scores[metric_name]
+
+            inside = (vals >= bounds[:, 0]) & (vals <= bounds[:, 1])
+            dist = _dqn_guard_band_distance(vals, bounds)
+
+            inside_flags[metric_name] = inside
+            distances[metric_name] = dist
+
+        inside_stack = np.stack(
+            [inside_flags["top2"], inside_flags["var"], inside_flags["energy"]],
+            axis=1,
+        )
+        pass_count = inside_stack.sum(axis=1)
+
+        if self.band_accept_mode == "all":
+            band_known = pass_count == 3
+        elif self.band_accept_mode == "two_of_three":
+            band_known = pass_count >= 2
+        elif self.band_accept_mode == "any":
+            band_known = pass_count >= 1
+        elif self.band_accept_mode == "var_energy":
+            band_known = inside_flags["var"] & inside_flags["energy"]
+        else:
+            raise ValueError(f"Unsupported band_accept_mode={self.band_accept_mode!r}")
+
+        dist_stack = np.stack(
+            [distances["top2"], distances["var"], distances["energy"]],
+            axis=1,
+        )
+        band_unknown_score = dist_stack.mean(axis=1).astype(np.float32)
+
+        return {
+            "band_known": band_known.astype(bool),
+            "band_unknown_score": band_unknown_score,
+            "band_top2_inside": inside_flags["top2"].astype(bool),
+            "band_var_inside": inside_flags["var"].astype(bool),
+            "band_energy_inside": inside_flags["energy"].astype(bool),
+            "band_top2_distance": distances["top2"].astype(np.float32),
+            "band_var_distance": distances["var"].astype(np.float32),
+            "band_energy_distance": distances["energy"].astype(np.float32),
+            "band_pass_count": pass_count.astype(np.int64),
+        }
+
+    def fit(self, payload: BackbonePayload, calibration: Dict[str, Any] | None = None) -> None:
+        calibration = calibration or {}
+
+        self.num_classes_ = int(payload.meta["num_classes"])
+        self.class_names_ = list(payload.meta["class_names"])
+
+        known_split = calibration.get("calibration_known", None)
+        if known_split is None:
+            known_split = payload.val_known
+        if known_split is None:
+            raise ValueError("BandedGuardDQNOSR requires calibration_known or payload.val_known")
+
+        # Fit faithful DQN with the supplied known+open calibration.
+        self.dqn.fit(payload, calibration=calibration)
+
+        # Fit guard bands using known calibration only.
+        self._fit_band_guard(known_split)
+
+        self.fitted_ = True
+
+    def score(self, split: SplitOutputs) -> np.ndarray:
+        if not self.fitted_:
+            raise RuntimeError("BandedGuardDQNOSR must be fitted before score()")
+
+        dqn_score = self.dqn.score(split)
+        band = self._band_predict(split)
+        return (dqn_score + self.band_weight * band["band_unknown_score"]).astype(np.float32)
+
+    def predict(self, split: SplitOutputs, unknown_label: int) -> Dict[str, np.ndarray]:
+        if not self.fitted_:
+            raise RuntimeError("BandedGuardDQNOSR must be fitted before predict()")
+
+        dqn_pred = self.dqn.predict(split, unknown_label=unknown_label)
+        band = self._band_predict(split)
+
+        dqn_unknown = dqn_pred["is_unknown"].astype(bool)
+        dqn_known = ~dqn_unknown
+
+        # DQN-known decisions must pass the predicted-class band guard.
+        final_known = dqn_known & band["band_known"]
+        is_unknown = ~final_known
+
+        closed_pred = split.closed_pred.astype(int).copy()
+        final_pred = closed_pred.copy()
+        final_pred[is_unknown] = int(unknown_label)
+
+        unknown_score = (
+            dqn_pred["unknown_score"].astype(np.float32)
+            + self.band_weight * band["band_unknown_score"].astype(np.float32)
+        )
+
+        out = dict(dqn_pred)
+        out.update(band)
+        out.update({
+            "unknown_score": unknown_score.astype(np.float32),
+            "is_unknown": is_unknown.astype(bool),
+            "closed_pred": closed_pred,
+            "final_pred": final_pred,
+            "dqn_is_unknown": dqn_unknown.astype(bool),
+            "dqn_predicted_actions": dqn_pred["predicted_actions"],
+        })
+        return out
+
+    def get_params(self) -> Dict[str, Any]:
+        dqn_params = self.dqn.get_params()
+        return {
+            "method_name": self.method_name,
+            "state_mode": self.state_mode,
+            "band_percentiles": list(self.band_percentiles),
+            "top2_band_percentiles": list(self.top2_band_percentiles),
+            "band_accept_mode": self.band_accept_mode,
+            "band_weight": self.band_weight,
+            "min_samples_per_class": self.min_samples_per_class,
+            "fit_bands_on": self.fit_bands_on,
+            "fitted": self.fitted_,
+            "band_fit_summary": copy.deepcopy(self.band_fit_summary_),
+            "dqn_params": dqn_params,
+
+            # Flatten common DQN fields for existing reducers.
+            "episodes": dqn_params.get("episodes"),
+            "anchor_fraction": dqn_params.get("anchor_fraction"),
+            "train_subsample_size": dqn_params.get("train_subsample_size"),
+            "centroid_update_threshold": dqn_params.get("centroid_update_threshold"),
+            "last_fit_summary": dqn_params.get("last_fit_summary"),
+            "train_history": dqn_params.get("train_history"),
+        }

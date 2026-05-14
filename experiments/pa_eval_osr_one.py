@@ -17,7 +17,7 @@ sys.path.insert(0, str(REPO_ROOT))
 
 from evaluate import evaluate_multiple_osr_methods_on_run, choose_osr_calibration_splits
 from varmax_osr import VarMaxOSR, DEFAULT_PAIR_MAP
-from dqn_osr import DQNOSR
+from dqn_osr import DQNOSR, BandedGuardDQNOSR
 
 
 def grid_values(kind: str) -> Dict[str, Any]:
@@ -125,31 +125,69 @@ def make_dqn_method_specs(modes: list[str]):
         if not mode:
             continue
 
-        if mode not in {"paper", "paper_mixed", "cicids", "cicids_mixed"}:
+        valid_modes = {
+            "paper",
+            "paper_mixed",
+            "cicids",
+            "cicids_mixed",
+            "banded_guard",
+            "paper_banded_guard",
+            "banded_guard_softmax3",
+        }
+        if mode not in valid_modes:
             raise ValueError(
-                f"Unsupported DQN mode {mode!r}. Use one of: paper,paper_mixed,cicids,cicids_mixed"
+                f"Unsupported DQN mode {mode!r}. Use one of: "
+                "paper,paper_mixed,cicids,cicids_mixed,banded_guard,paper_banded_guard"
             )
 
-        specs.append({
-            "name": f"dqn_{mode}_softmax3",
-            "factory": lambda: DQNOSR(
-                state_mode="softmax3",
-                gamma=0.95,
-                epsilon=1.0,
-                epsilon_min=0.05,
-                epsilon_decay=0.99,
-                learning_rate=1e-3,
-                memory_size=2000,
-                batch_size=32,
-                episodes=30,
-                anchor_fraction=0.05,
-                train_subsample_size=1250,
-                centroid_update_threshold=0.75,
-                seed=42,
-                device="cpu",
-            ),
-            "calibration_builder": make_dqn_calibration_builder(mode),
-        })
+        if mode in {"banded_guard", "paper_banded_guard", "banded_guard_softmax3"}:
+            specs.append({
+                "name": "dqn_banded_guard_softmax3",
+                "factory": lambda: BandedGuardDQNOSR(
+                    state_mode="softmax3",
+                    gamma=0.95,
+                    epsilon=1.0,
+                    epsilon_min=0.05,
+                    epsilon_decay=0.99,
+                    learning_rate=1e-3,
+                    memory_size=2000,
+                    batch_size=32,
+                    episodes=30,
+                    anchor_fraction=0.05,
+                    train_subsample_size=1250,
+                    centroid_update_threshold=0.75,
+                    seed=42,
+                    device="cpu",
+                    band_percentiles=(5.0, 95.0),
+                    top2_band_percentiles=(5.0, 95.0),
+                    band_accept_mode="two_of_three",
+                    band_weight=1.0,
+                    min_samples_per_class=5,
+                    fit_bands_on="predicted_class",
+                ),
+                "calibration_builder": make_dqn_calibration_builder(mode),
+            })
+        else:
+            specs.append({
+                "name": f"dqn_{mode}_softmax3",
+                "factory": lambda: DQNOSR(
+                    state_mode="softmax3",
+                    gamma=0.95,
+                    epsilon=1.0,
+                    epsilon_min=0.05,
+                    epsilon_decay=0.99,
+                    learning_rate=1e-3,
+                    memory_size=2000,
+                    batch_size=32,
+                    episodes=30,
+                    anchor_fraction=0.05,
+                    train_subsample_size=1250,
+                    centroid_update_threshold=0.75,
+                    seed=42,
+                    device="cpu",
+                ),
+                "calibration_builder": make_dqn_calibration_builder(mode),
+            })
 
     return specs
 
@@ -169,7 +207,7 @@ def compact_method_row(row: Dict[str, Any], result: Dict[str, Any], run_meta: Di
     out["top_feasible_count_saved"] = len(params.get("top_feasible_results", []) or [])
     out["top_fallback_count_saved"] = len(params.get("top_fallback_results", []) or [])
 
-    if params.get("method_name") == "dqn_osr":
+    if params.get("method_name") in {"dqn_osr", "dqn_banded_guard_osr"}:
         fit_summary = params.get("last_fit_summary") or {}
         out["dqn_state_mode"] = params.get("state_mode")
         out["dqn_episodes"] = params.get("episodes")
