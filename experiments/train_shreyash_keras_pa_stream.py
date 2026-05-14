@@ -21,7 +21,7 @@ from tensorflow.keras.layers import (
 )
 from tensorflow.keras.optimizers import Adam
 from tensorflow.keras.regularizers import l2
-from tensorflow.keras.callbacks import EarlyStopping, ReduceLROnPlateau, CSVLogger, ModelCheckpoint
+from tensorflow.keras.callbacks import EarlyStopping, ReduceLROnPlateau, CSVLogger, ModelCheckpoint, BackupAndRestore
 from sklearn.utils.class_weight import compute_class_weight
 from sklearn.metrics import accuracy_score, f1_score
 
@@ -111,7 +111,8 @@ def to_numpy_x_y(item):
 
 
 class TorchDatasetSequence(tf.keras.utils.Sequence):
-    def __init__(self, dataset, batch_size, num_classes, shuffle=False, seed=0, limit_n=None, return_y=True):
+    def __init__(self, dataset, batch_size, num_classes, shuffle=False, seed=0, limit_n=None, return_y=True, **kwargs):
+        super().__init__(**kwargs)
         self.dataset = dataset
         self.batch_size = int(batch_size)
         self.num_classes = int(num_classes)
@@ -214,6 +215,86 @@ def anchor_metrics(known_probs, open_probs, anchor_fraction=0.05):
         "known_p1_mean": float(known_p1.mean()),
         "open_p1_mean": float(open_p1.mean()),
     }
+
+
+
+
+def read_last_completed_epoch(out_dir: Path) -> int:
+    """
+    Return number of completed epochs.
+
+    Keras `initial_epoch` expects the count of already-completed epochs,
+    so if latest_epoch.json says epoch=7, resume should use initial_epoch=7.
+    """
+    out_dir = Path(out_dir)
+    state_path = out_dir / "latest_epoch.json"
+    if state_path.exists():
+        try:
+            state = json.loads(state_path.read_text())
+            return int(state.get("epoch", 0))
+        except Exception:
+            pass
+
+    hist_path = out_dir / "keras_history.csv"
+    if hist_path.exists():
+        try:
+            with hist_path.open(newline="") as f:
+                rows = list(csv.DictReader(f))
+            return len(rows)
+        except Exception:
+            pass
+
+    return 0
+
+
+def read_best_val_loss(out_dir: Path):
+    out_dir = Path(out_dir)
+    hist_path = out_dir / "keras_history.csv"
+    if not hist_path.exists():
+        return None
+
+    vals = []
+    try:
+        with hist_path.open(newline="") as f:
+            for row in csv.DictReader(f):
+                v = row.get("val_loss")
+                if v not in [None, ""]:
+                    vals.append(float(v))
+    except Exception:
+        return None
+
+    return min(vals) if vals else None
+
+
+class TrainingStateCallback(tf.keras.callbacks.Callback):
+    """
+    Writes lightweight state every epoch so interrupted jobs can resume.
+    """
+    def __init__(self, out_dir):
+        super().__init__()
+        self.out_dir = Path(out_dir)
+        self.state_path = self.out_dir / "latest_epoch.json"
+
+    def on_epoch_end(self, epoch, logs=None):
+        logs = logs or {}
+        payload = {
+            "epoch": int(epoch + 1),
+            "time": time.strftime("%Y-%m-%dT%H:%M:%S%z"),
+            "logs": {k: float(v) for k, v in logs.items() if isinstance(v, (int, float, np.floating))},
+            "latest_model_path": str(self.out_dir / "latest_model.keras"),
+            "best_model_path": str(self.out_dir / "best_model.keras"),
+        }
+        tmp = self.state_path.with_suffix(".json.tmp")
+        tmp.write_text(json.dumps(payload, indent=2))
+        tmp.replace(self.state_path)
+
+        print(
+            "TRAIN_STATE"
+            f" | epoch={payload['epoch']}"
+            f" | latest={payload['latest_model_path']}"
+            f" | best={payload['best_model_path']}",
+            flush=True,
+        )
 
 
 
@@ -339,6 +420,7 @@ def main():
     ap.add_argument("--batch-size", type=int, default=500)
     ap.add_argument("--predict-batch-size", type=int, default=512)
     ap.add_argument("--smoke-n", type=int, default=None)
+    ap.add_argument("--resume", action="store_true", help="Resume from latest_model.keras if present, else best_model.keras.")
     ap.add_argument(
         "--epoch-metric-n",
         type=int,
@@ -401,14 +483,71 @@ def main():
 
     # Infer input shape from first sample.
     x0, _ = to_numpy_x_y(train_ds[0])
-    model = make_model(input_shape=x0.shape, num_classes=num_classes)
+
+    latest_model_path = out_dir / "latest_model.keras"
+    best_model_path = out_dir / "best_model.keras"
+    initial_epoch = 0
+
+    if args.resume and latest_model_path.exists():
+        print(f"RESUME_LOAD | source=latest | path={latest_model_path}", flush=True)
+        model = tf.keras.models.load_model(
+            latest_model_path,
+            custom_objects={"custom_loss_with_entropy": custom_loss_with_entropy},
+        )
+        initial_epoch = read_last_completed_epoch(out_dir)
+    elif args.resume and best_model_path.exists():
+        print(f"RESUME_LOAD | source=best | path={best_model_path}", flush=True)
+        model = tf.keras.models.load_model(
+            best_model_path,
+            custom_objects={"custom_loss_with_entropy": custom_loss_with_entropy},
+        )
+        initial_epoch = read_last_completed_epoch(out_dir)
+    else:
+        model = make_model(input_shape=x0.shape, num_classes=num_classes)
+
+    print(
+        "RESUME_INFO",
+        {
+            "resume": bool(args.resume),
+            "initial_epoch": int(initial_epoch),
+            "target_epochs": int(args.epochs),
+            "latest_model_exists": latest_model_path.exists(),
+            "best_model_exists": best_model_path.exists(),
+        },
+        flush=True,
+    )
+
     model.summary(print_fn=lambda x: print(x, flush=True))
 
+    prev_best_val_loss = read_best_val_loss(out_dir)
+    epoch_metric_open_ds = val_open_ds if val_open_ds is not None else test_open_ds
+
     callbacks = [
+        EpochOSRMetricsCallback(
+            val_known_ds=val_ds,
+            val_open_ds=epoch_metric_open_ds,
+            num_classes=num_classes,
+            out_dir=out_dir,
+            batch_size=args.predict_batch_size,
+            limit_n=args.epoch_metric_n,
+        ),
+        TrainingStateCallback(out_dir=out_dir),
+        BackupAndRestore(backup_dir=str(out_dir / "keras_backup")),
         EarlyStopping(monitor="val_loss", patience=10, restore_best_weights=True),
         ReduceLROnPlateau(monitor="val_loss", factor=0.5, patience=5, min_lr=1e-7),
-        CSVLogger(str(out_dir / "keras_history.csv")),
-        ModelCheckpoint(str(out_dir / "best_model.keras"), monitor="val_loss", save_best_only=True),
+        CSVLogger(str(out_dir / "keras_history.csv"), append=bool(initial_epoch > 0)),
+        ModelCheckpoint(
+            str(latest_model_path),
+            monitor="val_loss",
+            save_best_only=False,
+        ),
+        ModelCheckpoint(
+            str(best_model_path),
+            monitor="val_loss",
+            save_best_only=True,
+            mode="min",
+            initial_value_threshold=prev_best_val_loss,
+        ),
     ]
 
     print("TRAIN_INFO", {
@@ -427,6 +566,7 @@ def main():
     history = model.fit(
         train_seq,
         epochs=args.epochs,
+        initial_epoch=initial_epoch,
         validation_data=val_seq,
         class_weight=class_weights,
         callbacks=callbacks,
