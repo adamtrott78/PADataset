@@ -176,6 +176,8 @@ def main():
     ap.add_argument("--mode", default="var_energy")
     ap.add_argument("--decision-mode", choices=["hard", "score_threshold"], default="hard",
                     help="hard uses DQNGuard's built-in final decision; score_threshold sweeps unknown_score on calibration.")
+    ap.add_argument("--max-known-reject-cal", type=float, default=0.25,
+                    help="Known-only threshold budget. Cutoff is selected from known calibration scores only.")
     ap.add_argument("--known-cap", type=int, default=625)
     ap.add_argument("--open-cap", type=int, default=625)
     ap.add_argument("--device", default="cuda")
