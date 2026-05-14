@@ -278,7 +278,7 @@ class TrainingStateCallback(tf.keras.callbacks.Callback):
     def on_epoch_end(self, epoch, logs=None):
         logs = logs or {}
         payload = {
-            "epoch": epoch_num,
+            "epoch": int(epoch + 1),
             "time": time.strftime("%Y-%m-%dT%H:%M:%S%z"),
             "logs": {k: float(v) for k, v in logs.items() if isinstance(v, (int, float, np.floating))},
             "latest_model_path": str(self.out_dir / "latest_model.keras"),
