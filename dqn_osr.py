@@ -525,6 +525,10 @@ class DQNOSR(BaseOSRMethod):
 
         states = self._combine_calibration_states(known_split, open_split)
         self._fit_from_states(states)
+        self.last_fit_summary_.update({
+            "n_known_calibration": int(len(known_split.y_true)),
+            "n_open_calibration": int(len(open_split.y_true)),
+        })
 
     def score(self, split: SplitOutputs) -> np.ndarray:
         if not self.fitted_ or self.agent is None:

@@ -11,6 +11,7 @@ from pathlib import Path
 from typing import Any, Dict
 
 import pandas as pd
+import numpy as np
 
 REPO_ROOT = Path(__file__).resolve().parents[1]
 sys.path.insert(0, str(REPO_ROOT))
@@ -96,19 +97,87 @@ def make_method_specs(modes: list[str], sweep_grid: str):
 
 
 
+def _cap_split_outputs(split, cap: int, seed: int, stratify: bool, suffix: str):
+    if split is None:
+        return None
+
+    n = int(len(split.y_true))
+    cap = int(cap)
+    if cap <= 0 or n <= cap:
+        return split
+
+    rng = np.random.default_rng(int(seed))
+    y = np.asarray(split.y_true)
+
+    if stratify:
+        classes = sorted([int(c) for c in np.unique(y) if int(c) >= 0])
+        if len(classes) > 1:
+            base = cap // len(classes)
+            rem = cap % len(classes)
+            chosen = []
+            for j, cls in enumerate(classes):
+                cls_idx = np.where(y == cls)[0]
+                take = min(len(cls_idx), base + (1 if j < rem else 0))
+                chosen.append(rng.choice(cls_idx, size=take, replace=False))
+            idx = np.concatenate(chosen)
+            if len(idx) < cap:
+                remaining = np.setdiff1d(np.arange(n), idx, assume_unique=False)
+                extra = rng.choice(remaining, size=cap - len(idx), replace=False)
+                idx = np.concatenate([idx, extra])
+            rng.shuffle(idx)
+        else:
+            idx = rng.choice(n, size=cap, replace=False)
+    else:
+        idx = rng.choice(n, size=cap, replace=False)
+
+    idx = np.asarray(idx, dtype=int)
+
+    meta = None
+    if getattr(split, "sample_meta", None) is not None:
+        meta = [split.sample_meta[int(i)] for i in idx]
+
+    return split.__class__(
+        split_name=f"{split.split_name}_{suffix}",
+        y_true=split.y_true[idx],
+        logits=split.logits[idx],
+        features=split.features[idx],
+        closed_pred=split.closed_pred[idx],
+        probs=split.probs[idx],
+        sample_meta=meta,
+    )
+
+
 def make_dqn_calibration_builder(mode: str):
     mode = str(mode).strip().lower()
 
     def builder(payload, extras):
         # Paper-style DQN-IDS fitting:
         # use validation-known + validation-open as one mixed confidence stream.
-        # The DQN itself uses centroid-guided rewards from [P1, P1-P2, entropy],
-        # not a VarMax threshold sweep.
         known_cal, open_cal = choose_osr_calibration_splits(
             payload,
             extras,
             prefer_balanced=False,
         )
+
+        # Shreyash paper-faithful scale:
+        # validation stream = 625 known + 625 unknown = 1250 total.
+        if "cap625" in mode:
+            seed = int(payload.meta.get("seed", 0) or 0)
+            known_cal = _cap_split_outputs(
+                known_cal,
+                cap=625,
+                seed=seed + 101,
+                stratify=True,
+                suffix="cap625_known",
+            )
+            open_cal = _cap_split_outputs(
+                open_cal,
+                cap=625,
+                seed=seed + 202,
+                stratify=False,
+                suffix="cap625_open",
+            )
+
         return {
             "calibration_mode": mode,
             "calibration_known": known_cal,
@@ -128,7 +197,6 @@ def make_dqn_method_specs(modes: list[str]):
         plain_modes = {"paper", "paper_mixed", "cicids", "cicids_mixed"}
 
         guard_configs = {
-            # default alias preserves original committed behavior
             "banded_guard": ("dqn_banded_guard_2of3_softmax3", "two_of_three"),
             "paper_banded_guard": ("dqn_banded_guard_2of3_softmax3", "two_of_three"),
             "banded_guard_softmax3": ("dqn_banded_guard_2of3_softmax3", "two_of_three"),
@@ -136,6 +204,12 @@ def make_dqn_method_specs(modes: list[str]):
             "banded_guard_all": ("dqn_banded_guard_all_softmax3", "all"),
             "banded_guard_var_energy": ("dqn_banded_guard_var_energy_softmax3", "var_energy"),
             "banded_guard_any": ("dqn_banded_guard_any_softmax3", "any"),
+
+            # Paper-scale DQN validation cap: 625 known + 625 open.
+            "banded_guard_2of3_cap625": ("dqn_banded_guard_2of3_cap625_softmax3", "two_of_three"),
+            "banded_guard_all_cap625": ("dqn_banded_guard_all_cap625_softmax3", "all"),
+            "banded_guard_var_energy_cap625": ("dqn_banded_guard_var_energy_cap625_softmax3", "var_energy"),
+            "banded_guard_any_cap625": ("dqn_banded_guard_any_cap625_softmax3", "any"),
         }
 
         valid_modes = plain_modes | set(guard_configs)
@@ -224,6 +298,14 @@ def compact_method_row(row: Dict[str, Any], result: Dict[str, Any], run_meta: Di
         out["dqn_n_states_total"] = fit_summary.get("n_states_total")
         out["dqn_n_anchor_high"] = fit_summary.get("n_anchor_high")
         out["dqn_n_anchor_low"] = fit_summary.get("n_anchor_low")
+        out["dqn_n_known_calibration"] = fit_summary.get("n_known_calibration")
+        out["dqn_n_open_calibration"] = fit_summary.get("n_open_calibration")
+        if params.get("method_name") == "dqn_banded_guard_osr":
+            out["band_accept_mode"] = params.get("band_accept_mode")
+            out["band_percentiles"] = json.dumps(params.get("band_percentiles"))
+            out["top2_band_percentiles"] = json.dumps(params.get("top2_band_percentiles"))
+            out["band_weight"] = params.get("band_weight")
+            out["fit_bands_on"] = params.get("fit_bands_on")
         if params.get("method_name") == "dqn_banded_guard_osr":
             out["band_accept_mode"] = params.get("band_accept_mode")
             out["band_percentiles"] = json.dumps(params.get("band_percentiles"))
