@@ -3,6 +3,7 @@ from __future__ import annotations
 
 from pathlib import Path
 import argparse
+import csv
 import json
 import os
 import sys
@@ -215,6 +216,120 @@ def anchor_metrics(known_probs, open_probs, anchor_fraction=0.05):
     }
 
 
+
+class EpochOSRMetricsCallback(tf.keras.callbacks.Callback):
+    """
+    Logs DQN-relevant backbone geometry after each epoch.
+
+    Metrics:
+      - epoch_val_known_macro_f1
+      - epoch_anchor_high_known_frac
+      - epoch_anchor_low_open_frac
+
+    These are the core pass/fail signals for whether the CNN backbone is
+    producing a confidence manifold that Shreyash-style DQN can use.
+    """
+    def __init__(
+        self,
+        val_known_ds,
+        val_open_ds,
+        num_classes,
+        out_dir,
+        batch_size=512,
+        limit_n=None,
+    ):
+        super().__init__()
+        self.val_known_ds = val_known_ds
+        self.val_open_ds = val_open_ds
+        self.num_classes = int(num_classes)
+        self.out_dir = Path(out_dir)
+        self.batch_size = int(batch_size)
+        self.limit_n = limit_n
+        self.csv_path = self.out_dir / "epoch_osr_metrics.csv"
+        self.jsonl_path = self.out_dir / "epoch_osr_metrics.jsonl"
+
+        if not self.csv_path.exists():
+            with self.csv_path.open("w", newline="") as f:
+                w = csv.DictWriter(f, fieldnames=[
+                    "epoch",
+                    "epoch_val_known_macro_f1",
+                    "epoch_val_known_acc",
+                    "epoch_anchor_high_known_frac",
+                    "epoch_anchor_low_open_frac",
+                    "epoch_anchor_high_open_frac",
+                    "epoch_known_p1_mean",
+                    "epoch_open_p1_mean",
+                    "epoch_anchor_k",
+                ])
+                w.writeheader()
+
+    def on_epoch_end(self, epoch, logs=None):
+        logs = logs or {}
+
+        known_probs, known_y = predict_probs(
+            self.model,
+            self.val_known_ds,
+            self.batch_size,
+            self.num_classes,
+            limit_n=self.limit_n,
+        )
+        open_probs, open_y = predict_probs(
+            self.model,
+            self.val_open_ds,
+            self.batch_size,
+            self.num_classes,
+            limit_n=self.limit_n,
+        )
+
+        known_pred = known_probs.argmax(axis=1)
+        known_macro_f1 = float(f1_score(known_y, known_pred, average="macro"))
+        known_acc = float(accuracy_score(known_y, known_pred))
+
+        n_anchor = min(len(known_probs), len(open_probs))
+        anchors = anchor_metrics(
+            known_probs[:n_anchor],
+            open_probs[:n_anchor],
+            anchor_fraction=0.05,
+        )
+
+        row = {
+            "epoch": int(epoch + 1),
+            "epoch_val_known_macro_f1": known_macro_f1,
+            "epoch_val_known_acc": known_acc,
+            "epoch_anchor_high_known_frac": anchors["anchor_high_known_frac"],
+            "epoch_anchor_low_open_frac": anchors["anchor_low_open_frac"],
+            "epoch_anchor_high_open_frac": anchors["anchor_high_open_frac"],
+            "epoch_known_p1_mean": anchors["known_p1_mean"],
+            "epoch_open_p1_mean": anchors["open_p1_mean"],
+            "epoch_anchor_k": anchors["anchor_k"],
+        }
+
+        with self.csv_path.open("a", newline="") as f:
+            w = csv.DictWriter(f, fieldnames=list(row.keys()))
+            w.writerow(row)
+
+        with self.jsonl_path.open("a") as f:
+            f.write(json.dumps(row) + "\n")
+
+        # Also attach to Keras logs so CSVLogger can capture them too.
+        logs["epoch_val_known_macro_f1"] = known_macro_f1
+        logs["epoch_anchor_high_known_frac"] = anchors["anchor_high_known_frac"]
+        logs["epoch_anchor_low_open_frac"] = anchors["anchor_low_open_frac"]
+
+        print(
+            "EPOCH_OSR_METRICS"
+            f" | epoch={epoch + 1}"
+            f" | known_macro_f1={known_macro_f1:.4f}"
+            f" | known_acc={known_acc:.4f}"
+            f" | anchor_hi_known={anchors['anchor_high_known_frac']:.4f}"
+            f" | anchor_lo_open={anchors['anchor_low_open_frac']:.4f}"
+            f" | known_p1_mean={anchors['known_p1_mean']:.4f}"
+            f" | open_p1_mean={anchors['open_p1_mean']:.4f}",
+            flush=True,
+        )
+
+
+
 def main():
     ap = argparse.ArgumentParser()
     ap.add_argument("--cfg", required=True)
@@ -224,6 +339,12 @@ def main():
     ap.add_argument("--batch-size", type=int, default=500)
     ap.add_argument("--predict-batch-size", type=int, default=512)
     ap.add_argument("--smoke-n", type=int, default=None)
+    ap.add_argument(
+        "--epoch-metric-n",
+        type=int,
+        default=None,
+        help="Optional cap for per-epoch OSR metric evaluation. Default uses full val_known and val_open.",
+    )
     args = ap.parse_args()
 
     configure_tf()
