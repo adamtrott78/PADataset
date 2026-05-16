@@ -4,6 +4,17 @@ set -euo pipefail
 export CUDA_VISIBLE_DEVICES=0
 export TF_FORCE_GPU_ALLOW_GROWTH=true
 export TF_CPP_MIN_LOG_LEVEL=2
+export LD_LIBRARY_PATH="$(python - <<'PYLIB'
+import pathlib, sysconfig
+purelib = pathlib.Path(sysconfig.get_paths()["purelib"])
+nvidia = purelib / "nvidia"
+dirs = []
+if nvidia.exists():
+    for d in sorted(nvidia.glob("*/lib")):
+        dirs.append(str(d))
+print(":".join(dirs))
+PYLIB
+):${LD_LIBRARY_PATH:-}"
 
 MANIFEST="${1:-manifests/shreyash_keras_og_gpu0.tsv}"
 mkdir -p results_pa_shreyash_keras/_logs
