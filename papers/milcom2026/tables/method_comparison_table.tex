@@ -1,0 +1,13 @@
+\begin{table}
+\caption{OG method comparison across held-out preliminary-action folds.}
+\label{tab:method_comparison}
+\begin{tabular}{lrrrr}
+\toprule
+Method & Folds & Known reject rate & Unknown F1 & OSR macro F1 & Unknown AUROC \\
+\midrule
+DQNGuard, Scan-surrogate, known-only & 4 & 0.050 & 0.865 & 0.881 & 0.891 \\
+Shreyash CNN + DQNGuard & 4 & 0.063 & 0.701 & 0.764 & 0.829 \\
+VarMax, surrogate-all & 4 & 0.128 & 0.745 & 0.778 & 0.951 \\
+\bottomrule
+\end{tabular}
+\end{table}
