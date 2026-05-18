@@ -1,0 +1,20 @@
+<!doctype html>
+<html>
+<head>
+  <meta charset="utf-8">
+  <title>MILCOM 2026 LaTeX Preview</title>
+  <style>
+    html, body { margin: 0; height: 100%; overflow: hidden; font-family: sans-serif; }
+    iframe { width: 100%; height: 100%; border: none; }
+  </style>
+</head>
+<body>
+  <iframe id="pdf" src="build/main.pdf"></iframe>
+  <script>
+    setInterval(() => {
+      const pdf = document.getElementById("pdf");
+      pdf.src = "build/main.pdf?reload=" + Date.now();
+    }, 3000);
+  </script>
+</body>
+</html>
