@@ -9,7 +9,7 @@ all:
 
 watch:
 	mkdir -p $(OUT)
-	latexmk -pdf -pvc -interaction=nonstopmode -file-line-error -synctex=1 -outdir=$(OUT) $(MAIN).tex
+	latexmk -pdf -pvc -view=none -view=none -view=none -interaction=nonstopmode -file-line-error -synctex=1 -outdir=$(OUT) $(MAIN).tex
 
 clean:
 	latexmk -C -outdir=$(OUT) $(MAIN).tex || true

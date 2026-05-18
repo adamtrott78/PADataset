@@ -2,19 +2,58 @@
 <html>
 <head>
   <meta charset="utf-8">
-  <title>MILCOM 2026 LaTeX Preview</title>
+  <title>LaTeX Paper Preview</title>
   <style>
-    html, body { margin: 0; height: 100%; overflow: hidden; font-family: sans-serif; }
-    iframe { width: 100%; height: 100%; border: none; }
+    html, body {
+      margin: 0;
+      height: 100%;
+      overflow: hidden;
+      font-family: sans-serif;
+      background: #222;
+    }
+    iframe {
+      width: 100%;
+      height: 100%;
+      border: none;
+      background: #222;
+    }
   </style>
 </head>
 <body>
   <iframe id="pdf" src="build/main.pdf"></iframe>
+
   <script>
-    setInterval(() => {
-      const pdf = document.getElementById("pdf");
-      pdf.src = "build/main.pdf?reload=" + Date.now();
-    }, 3000);
+    const pdfPath = "build/main.pdf";
+    const iframe = document.getElementById("pdf");
+    let lastSignature = null;
+
+    async function checkForUpdate() {
+      try {
+        const response = await fetch(pdfPath, {
+          method: "HEAD",
+          cache: "no-store"
+        });
+
+        const modified = response.headers.get("last-modified") || "";
+        const length = response.headers.get("content-length") || "";
+        const signature = modified + "|" + length;
+
+        if (lastSignature === null) {
+          lastSignature = signature;
+          return;
+        }
+
+        if (signature !== lastSignature) {
+          lastSignature = signature;
+          iframe.src = pdfPath + "?reload=" + Date.now();
+        }
+      } catch (err) {
+        console.log("PDF update check failed:", err);
+      }
+    }
+
+    setInterval(checkForUpdate, 2000);
+    checkForUpdate();
   </script>
 </body>
 </html>
