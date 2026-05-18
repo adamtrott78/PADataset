@@ -8,3 +8,13 @@ The OTA recordings used two Ettus USRP N210 radios. One radio used an SBX daught
 Paper-facing setup sentence:
 
 The OTA capture setup used two Ettus USRP N210 radios, equipped with SBX/CBX daughterboards and VERT2450 omnidirectional antennas, connected through a Netgear 1 GbE switch to a Lambda Vector Pro workstation. The radios were separated by approximately 11 inches, with TX/RX gains fixed at 30/10 dB.
+
+---
+
+# OTA network hardware correction
+
+The Ethernet switch used for the OTA capture setup was a NETGEAR ProSAFE GS108 Gigabit switch.
+
+Updated paper-facing setup sentence:
+
+The OTA capture setup used two Ettus USRP N210 radios, equipped with SBX/CBX daughterboards and VERT2450 omnidirectional antennas, connected through a NETGEAR ProSAFE GS108 Gigabit switch to a Lambda Vector Pro workstation. The radios were separated by approximately 11 inches, with TX/RX gains fixed at 30/10 dB.
