@@ -1,0 +1,211 @@
+\documentclass[tikz,border=2pt]{standalone}
+
+\usepackage{amsmath}
+\usepackage{helvet}
+\renewcommand{\familydefault}{\sfdefault}
+
+\usetikzlibrary{arrows.meta,positioning,fit,calc,backgrounds}
+
+\begin{document}
+
+\begin{tikzpicture}[
+  x=1mm,
+  y=1mm,
+  font=\sffamily,
+  >=Stealth,
+  panel/.style={
+    draw=#1,
+    fill=#2,
+    rounded corners=2.2mm,
+    line width=0.55pt,
+    inner sep=0pt
+  },
+  block/.style={
+    draw=slate,
+    fill=whitebox,
+    rounded corners=1.4mm,
+    line width=0.45pt,
+    align=center,
+    inner sep=2.2pt,
+    minimum height=8mm
+  },
+  metric/.style={
+    draw=slate,
+    fill=whitebox,
+    rounded corners=1.4mm,
+    line width=0.45pt,
+    align=center,
+    inner sep=2pt,
+    minimum width=23mm,
+    minimum height=10.4mm,
+    font=\sffamily\bfseries\scriptsize
+  },
+  stage/.style={
+    draw=guardstroke,
+    fill=stagefill,
+    rounded corners=1.4mm,
+    line width=0.55pt,
+    align=center,
+    inner sep=2.2pt,
+    minimum height=15mm
+  },
+  arr/.style={
+    -{Stealth[length=1.35mm,width=1.0mm]},
+    draw=slate,
+    line width=0.42pt,
+    shorten >=0pt,
+    shorten <=0pt
+  },
+  thinarr/.style={
+    -{Stealth[length=1.10mm,width=0.82mm]},
+    draw=slate,
+    line width=0.34pt,
+    shorten >=0pt,
+    shorten <=0pt
+  },
+  knownarr/.style={
+    -{Stealth[length=1.25mm,width=0.95mm]},
+    draw=knownstroke,
+    line width=0.42pt,
+    shorten >=0pt,
+    shorten <=0pt
+  },
+  unkarr/.style={
+    -{Stealth[length=1.25mm,width=0.95mm]},
+    draw=unkstroke,
+    line width=0.42pt,
+    shorten >=0pt,
+    shorten <=0pt
+  }
+]
+
+% Colors
+\definecolor{slate}{HTML}{46515E}
+\definecolor{inputfill}{HTML}{F3F4F6}
+\definecolor{encoderfill}{HTML}{E6EBF3}
+\definecolor{guardfill}{HTML}{B9D2E7}
+\definecolor{outputfill}{HTML}{F1F0EB}
+\definecolor{whitebox}{HTML}{FBFCFE}
+\definecolor{fusionfill}{HTML}{EEF3F8}
+\definecolor{modelfill}{HTML}{EAF2FB}
+\definecolor{stagefill}{HTML}{DDECFF}
+\definecolor{guardstroke}{HTML}{2F638F}
+\definecolor{knownfill}{HTML}{DCEFD7}
+\definecolor{knownstroke}{HTML}{3F7A46}
+\definecolor{unkfill}{HTML}{F9DEDA}
+\definecolor{unkstroke}{HTML}{B23A3A}
+\definecolor{attackfill}{HTML}{EEE2F4}
+\definecolor{attackstroke}{HTML}{7A5C84}
+\definecolor{llmfill}{HTML}{EEEEEE}
+\definecolor{qrcwosfill}{HTML}{DCEFE5}
+\definecolor{qrcwosstroke}{HTML}{5A7868}
+
+% Panel coordinates. Target final standalone size: about 7.1in x 2.1in.
+\coordinate (p1sw) at (0,0);
+\coordinate (p1ne) at (28,58);
+\coordinate (p2sw) at (30,0);
+\coordinate (p2ne) at (102,58);
+\coordinate (p3sw) at (104,0);
+\coordinate (p3ne) at (151,58);
+\coordinate (p4sw) at (153,0);
+\coordinate (p4ne) at (209,58);
+
+% Panels
+\node[panel={slate}{inputfill}, minimum width=28mm, minimum height=58mm, anchor=south west] (inputpanel) at (p1sw) {};
+\node[panel={slate}{encoderfill}, minimum width=72mm, minimum height=58mm, anchor=south west] (encpanel) at (p2sw) {};
+\node[panel={slate}{guardfill}, minimum width=47mm, minimum height=58mm, anchor=south west] (guardpanel) at (p3sw) {};
+\node[panel={black!30}{outputfill}, minimum width=56mm, minimum height=58mm, anchor=south west] (outpanel) at (p4sw) {};
+
+% Panel titles
+\node[font=\sffamily\bfseries\scriptsize] at (14,54.6) {RF Signal Input};
+\node[font=\sffamily\bfseries\scriptsize] at (66,54.6) {Multi-Domain PA Encoder};
+\node[font=\sffamily\bfseries\scriptsize] at (127.5,54.7) {DQNGuard};
+\node[font=\sffamily\scriptsize] at (127.5,51.8) {budgeted open-set decision layer};
+\node[font=\sffamily\bfseries\scriptsize, align=center] at (181,54.7) {Evidence Outputs\\[-1pt] and Consumers};
+
+% RF input
+\node[block, minimum width=20mm, minimum height=8.2mm] (rf) at (14,28) {\textbf{RF Window}\\[-1pt] {\scriptsize complex IQ}};
+
+% Transform blocks
+\node[block, minimum width=11mm, minimum height=5.8mm, font=\sffamily\bfseries\scriptsize] (iq) at (37,41.5) {IQ};
+\node[block, minimum width=11mm, minimum height=5.8mm, font=\sffamily\bfseries\scriptsize] (fft) at (37,33.2) {FFT};
+\node[block, minimum width=11mm, minimum height=5.8mm, font=\sffamily\bfseries\scriptsize] (dct) at (37,24.9) {DCT};
+\node[block, minimum width=11mm, minimum height=5.8mm, font=\sffamily\bfseries\scriptsize] (polar) at (37,16.6) {Polar};
+
+% Fusion/model
+\node[block, fill=fusionfill, minimum width=14.5mm, minimum height=10.5mm] (fusion) at (54.7,28) {\textbf{\scriptsize Concat + AvgPool}\\[-1pt] $\boldsymbol{N=8192}$};
+\node[block, fill=modelfill, minimum width=13.5mm, minimum height=10.5mm] (cnn) at (73.5,28) {\textbf{PA CNN}\\[-1pt] {\scriptsize encoder + head}};
+
+% Metrics
+\node[metric] (yhat) at (91,42.0) {predicted PA\\[-1pt] $\boldsymbol{\hat{y}}$};
+\node[metric] (zlog) at (91,32.6) {logits\\[-1pt] $\boldsymbol{z}$};
+\node[metric] (psoft) at (91,23.2) {softmax\\[-1pt] $\boldsymbol{p}$};
+\node[metric] (hfeat) at (91,13.8) {feature\\[-1pt] $\boldsymbol{h}$};
+
+% DQNGuard stages
+\node[stage, minimum width=41mm] (cal) at (127.5,42.0) {\textbf{Predicted-class calibration}\\[-1pt] {\scriptsize select bands for $\boldsymbol{\hat{y}}$}};
+\node[stage, minimum width=41mm] (evid) at (127.5,28.0) {\textbf{Guard evidence}\\[-1pt] $\boldsymbol{P_1,\;P_1-P_2,\;H}$\\[-1pt] $\boldsymbol{V,\;E,\;r(x)}$};
+\node[stage, minimum width=41mm] (thresh) at (127.5,14.0) {\textbf{Known-budget threshold}\\[-1pt] $\boldsymbol{r(x)\ge \tau_\beta}$\\[-1pt] $\boldsymbol{\beta=0.05}$};
+
+% Stage numbers
+\node[font=\sffamily\bfseries\scriptsize] at ($(cal.west)+(2.4,0)$) {1};
+\node[font=\sffamily\bfseries\scriptsize] at ($(evid.west)+(2.4,0)$) {2};
+\node[font=\sffamily\bfseries\scriptsize] at ($(thresh.west)+(2.4,0)$) {3};
+
+% Output boxes
+\node[block, fill=knownfill, draw=knownstroke, minimum width=23mm, minimum height=9.8mm] (known) at (165.5,39.5)
+{\textbf{Known PA evidence}\\[-1pt] {\scriptsize Scan / Burst /}\\[-1pt] {\scriptsize Sustain / Hop / Replay}};
+
+\node[block, fill=unkfill, draw=unkstroke, minimum width=23mm, minimum height=9.8mm] (unknown) at (165.5,17.5)
+{\textbf{Unknown behavior pool}\\[-1pt] {\scriptsize candidate novel}\\[-1pt] {\scriptsize signal behavior}};
+
+\node[block, fill=attackfill, draw=attackstroke, minimum width=22mm, minimum height=8.5mm] (attack) at (193,41.8)
+{\textbf{ATT\&CK/EW}\\[-1pt] {\scriptsize precursor hypotheses}};
+
+\node[block, fill=llmfill, draw=black!55, minimum width=22mm, minimum height=8.5mm] (llm) at (193,27.8)
+{\textbf{LLM-assisted}\\[-1pt] {\scriptsize label-making}};
+
+\node[block, fill=qrcwosfill, draw=qrcwosstroke, minimum width=22mm, minimum height=8.5mm] (qrcwos) at (193,13.8)
+{\textbf{QR-CWoS}\\[-1pt] {\scriptsize response planning}};
+
+% Arrows: RF -> transforms
+\draw[thinarr] (rf.east) -- (iq.west);
+\draw[thinarr] (rf.east) -- (fft.west);
+\draw[thinarr] (rf.east) -- (dct.west);
+\draw[thinarr] (rf.east) -- (polar.west);
+
+% Transforms -> fusion
+\draw[thinarr] (iq.east) -- (fusion.west);
+\draw[thinarr] (fft.east) -- (fusion.west);
+\draw[thinarr] (dct.east) -- (fusion.west);
+\draw[thinarr] (polar.east) -- (fusion.west);
+
+% Fusion -> CNN -> metrics
+\draw[arr] (fusion.east) -- (cnn.west);
+\draw[thinarr] (cnn.east) -- (yhat.west);
+\draw[thinarr] (cnn.east) -- (zlog.west);
+\draw[thinarr] (cnn.east) -- (psoft.west);
+\draw[thinarr] (cnn.east) -- (hfeat.west);
+
+% Metrics -> DQNGuard stage-specific targets
+\draw[arr] (yhat.east) -- (cal.west);
+\draw[thinarr] (zlog.east) -- ($(evid.west)+(0,2.4)$);
+\draw[thinarr] (psoft.east) -- (evid.west);
+\draw[thinarr] (hfeat.east) -- ($(evid.west)+(0,-2.4)$);
+
+% DQNGuard internal cascade
+\draw[thinarr, draw=guardstroke] (cal.south) -- (evid.north);
+\draw[thinarr, draw=guardstroke] (evid.south) -- (thresh.north);
+
+% Decision outputs
+\draw[knownarr] (guardpanel.east |- cal.east) -- (known.west);
+\draw[unkarr] (guardpanel.east |- thresh.east) -- (unknown.west);
+
+% Consumers
+\draw[knownarr] (known.east) -- (attack.west);
+\draw[unkarr] (unknown.east) -- (llm.west);
+\draw[unkarr] (unknown.east) -- (qrcwos.west);
+
+\end{tikzpicture}
+
+\end{document}
