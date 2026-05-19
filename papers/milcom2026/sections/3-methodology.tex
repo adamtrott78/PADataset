@@ -1,4 +1,12 @@
-This section defines the RF preliminary-action recognition problem and the open-set decision layers evaluated in Section~\ref{sec:experiments}. The paper focuses on the sensing and novelty-detection layer of a larger cyber/electromagnetic framework: detected preliminary actions provide evidence for downstream ATT\&CK/EW technique prediction and response planning, but this work does not claim to solve the full response-policy problem.
+This section defines the RF preliminary-action recognition problem and the open-set decision layers evaluated in Section~\ref{sec:experiments}. Figure~\ref{fig:dqnguard_pipeline} summarizes the resulting evidence flow from OTA RF windows through the multi-domain preliminary-action encoder, DQNGuard decision layer, and downstream OSR outputs. The paper focuses on the sensing and novelty-detection layer of a larger cyber/electromagnetic framework: detected preliminary actions provide evidence for downstream ATT\&CK/EW technique prediction and response planning, but this work does not claim to solve the full response-policy problem.
+
+\begin{figure*}[t]
+    \centering
+    \includegraphics[width=\textwidth]{figures/hero_figure/hero_dqnguard_pipeline_s22_tikz.pdf}
+    \caption{DQNGuard RF open-set recognition pipeline. OTA RF windows are transformed into multi-domain representations, fused and processed by a preliminary-action CNN, and passed to DQNGuard as predicted-class, confidence, and feature evidence. DQNGuard applies predicted-class calibration, guard evidence scoring, and known-budget thresholding to route samples to known preliminary-action evidence or the unknown pool for downstream analysis.}
+    \label{fig:dqnguard_pipeline}
+\end{figure*}
+
 
 \subsection{Preliminary Actions as Technique Precursors}
 \label{subsec:pa_precursors}
