@@ -140,3 +140,11 @@ __pycache__/
 /local_artifacts/
 /PADataset_cleanup_audit_*.tgz
 /make_cleanup_audit_*.sh
+
+# Allow MILCOM reference layout screenshots
+!papers/
+!papers/milcom2026/
+!papers/milcom2026/reference_notes/
+!papers/milcom2026/reference_notes/layout_screenshots/
+!papers/milcom2026/reference_notes/layout_screenshots/**/
+!papers/milcom2026/reference_notes/layout_screenshots/**/*.png
