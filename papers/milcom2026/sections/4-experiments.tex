@@ -1,36 +1,52 @@
+\section{Experimental Design}
+\label{sec:experiments}
 
-
-We design the experimental protocol around three properties the methodology of Section~\ref{sec:methodology} is meant to deliver: (i)~accurate classification of known preliminary actions (PAs), (ii)~reliable identification of \emph{unseen} PAs as \texttt{unknown} rather than as the nearest known class, and (iii)~response selection that converts those verdicts into measurable QR-CWoS. Each of these properties is evaluated in isolation and in combination, so that we can attribute end-to-end window quality to specific components of the pipeline.
+We design the experimental protocol to evaluate open-set recognition (OSR) for RF preliminary-action detection. The core task is to train a closed-set backbone on a subset of known preliminary actions and then determine whether DQNGuard can preserve known-class accuracy while rejecting withheld preliminary actions as \texttt{unknown}. We separate the evaluation into fixed-surrogate, target--surrogate, and target-open calibration regimes so that improvements can be attributed to either the OSR decision rule or to the calibration information made available.
 
 \subsection{Research Questions}
 \label{subsec:rqs}
 
 The experiments are organized around four questions:
 \begin{itemize}
-    \item \textbf{RQ1.} Does the varMax open-set rule of Section~\ref{subsec:varmax} improve detection of unseen PAs relative to closed-set softmax and to alternative open-set baselines, on RF I/Q data captured over the air?
-    \item \textbf{RQ2.} Does the DQN response policy of Section~\ref{subsec:dqn} produce longer and more reliable QR-CWoS windows than rule-based or threshold-based response policies operating on the same classifier output?
-    \item \textbf{RQ3.} How does end-to-end QR-CWoS quality degrade as the prevalence of unseen tactics in the test stream increases, and is degradation graceful (a slow decline in window duration with novelty flags raised) or catastrophic (silent misclassification with no window opened)?
-    \item \textbf{RQ4.} How sensitive are the open-set verdict and the resulting window duration to the varMax threshold $\tau$ and to the weighting of the duration, resource, and miss terms in the DQN reward?
+    \item \textbf{RQ1.} Under a fixed Scan-surrogate calibration condition, does DQNGuard improve open-set preliminary-action detection relative to VarMax?
+    \item \textbf{RQ2.} How sensitive is DQNGuard to the choice of surrogate-open class in the Target--Surrogate Matrix?
+    \item \textbf{RQ3.} Does target-open calibration with a small number of held-out target-open examples explain failures of surrogate-open calibration?
+    \item \textbf{RQ4.} Can surrogate quality be predicted from calibration recall, confidence geometry, feature geometry, or closed-set route-alignment diagnostics?
 \end{itemize}
 
-\subsection{Dataset}
+\subsection{OTA Dataset and Capture Setup}
 \label{subsec:dataset}
 
-We use the PA dataset constructed by the OTA pipeline of~\cite{trott2026model}. The dataset is built in two stages. \TODO{This is outdated. New data is being prepared.}
+The OTA corpus spans WiFi, Bluetooth, and Zigbee emissions and five preliminary-action classes: Scan, Burst, Sustain, Hop, and Replay. The legacy repository identifiers for these classes are retained in code and result files for traceability, but the paper refers to the classes by behavior name.
 
-\paragraph{Digital pilot stage.} Each of the four trained PA classes (PA2 Burst, PA3 Sustain, PA4 Hop, PA8 Replay) is first generated synthetically with controlled parameters (burst lengths, dwell times, hop sets, replay-segment durations) and validated by the digital validators developed in MS1--MS2 of the parent project. The digital stage establishes that the classifier and event-detection front end can recover each PA's defining behavior under ideal channel conditions, and provides the parameter sweeps from which OTA emission settings are drawn.
+For each protocol/action pair, the generation target is 10,000 windows. Burst, Sustain, Hop, and Replay were generated together per protocol and split across 20 shards; each shard therefore contains 2,000 windows, or 500 windows per class. Scan was generated separately under the same seed schedule and capture setup and split across 5 shards of 2,000 windows. Each spliced OTA window contains 400,000 complex I/Q samples. At the recorded OTA sample rate of 12.5 MS/s, each window spans 32 ms.
 
-\paragraph{Over-the-air stage.} Validated digital pilots are transmitted through a software-defined radio testbed and recaptured at a separate SDR receiver, with TX/RX synchronization and on-site validation as described in Trott's MS3 protocol~\cite{trott2026model}. OTA recordings are segmented into fixed-length analysis windows of \TODO{report window length in ms and sample rate}, yielding the $x \in \mathbb{R}^{C \times T \times F}$ tensors of Section~\ref{subsec:preprocessing}. Only OTA windows that pass the synchronization and payload-integrity validators are retained; the rejection rate is reported in the results.
+The OTA capture setup used two Ettus USRP N210 radios equipped with SBX/CBX daughterboards and VERT2450 omnidirectional antennas. The radios were separated by approximately 11 inches and connected through a NETGEAR ProSAFE GS108 Gigabit switch to a Lambda Vector Pro workstation. The captures used a 2.437 GHz center frequency with TX/RX gains fixed at 30/10 dB.
 
-\paragraph{Train/validation/test split.} OTA samples are partitioned into a training set (\TODO{X\%}), a validation set (\TODO{Y\%}) used for varMax threshold calibration and DQN early stopping, and a held-out test set (\TODO{Z\%}). To prevent leakage from temporally adjacent windows, splitting is performed at the recording-session level rather than at the window level: all windows from a given OTA capture session belong to the same split.
+\subsection{Backbone Training and Splits}
+\label{subsec:backbone_training}
 
-\paragraph{Unseen-tactic protocol.} For each experimental run we designate one of the four PA classes as the \emph{held-out unseen tactic}. The held-out class contributes \emph{no} samples to training or validation; its OTA windows appear only in the test set, where the pipeline must label them \texttt{unknown}. We rotate the held-out class across runs (PA2-out, PA3-out, PA4-out, PA8-out) so that no single class drives the reported numbers, and we report per-class as well as aggregate results. Where applicable we also evaluate a \emph{multi-unseen} variant in which two PAs are held out simultaneously, to stress-test the open-set boundary.
+For each fold, the closed-set backbone is trained only on the classes designated as known for that fold. The withheld target class is excluded from closed-set training and is used only for open-set evaluation or, in the target-open calibration regime, for OSR calibration. The backbone outputs logits, softmax probabilities, predicted known labels, and intermediate features; these outputs are then consumed by VarMax, DQN-IDS-style heads, or DQNGuard.
 
-\subsection{Implementation}
-\label{subsec:impl}
+The evaluated runs use the OTA feature cache with cache length 16,384, source type \texttt{ota}, protocol tag \texttt{all}, dataset tag \texttt{ota\_core\_high\_run01}, learning rate $2\times 10^{-4}$, entropy loss weight 0.05, and seed 0. Known samples are partitioned using the open-PA split mode into 70\% training, 15\% validation, and 15\% testing. Where calibration caps are used, the OSR calibration set contains 625 known samples and 625 open samples. The main DQNGuard operating point uses a 5\% known-rejection budget.
 
-\paragraph{Hardware.} OTA captures are produced on the SDR testbed with separate TX and RX radios and the synchronization and recording refinements from MS3. \TODO{report the specific SDR model, sample rate, RF center frequency, antenna configuration, and TX/RX distance, and any deliberate channel impairments}.
+\subsection{Open-Set Calibration Regimes}
+\label{subsec:calibration_regimes}
 
-\paragraph{Software.} The signal-processing front end (windowing, STFT, event detection, validator) is implemented following the pipeline of~\cite{trott2026model}\TODO{confirm?}.  The varMax decision rule is applied as a post-hoc transformation of the classifier's logit vector and is not part of the trained graph, allowing direct comparison against the same backbone with closed-set softmax decoding. Source code and the OTA dataset will be released through the project's collaborative repository.
+We evaluate three calibration regimes.
 
-\paragraph{Classifier backbone.} We retain the backbone architecture validated on the pilot OTA dataset and replace only the decision layer, isolating the contribution of the open-set rule. Training uses cross-entropy on the four trained PA classes only; \TODO{Confirm?} \texttt{unknown} is never a training target. Hyperparameters (optimizer, learning rate, batch size, epochs) are selected on the validation split
+\paragraph{Regime A: Scan-surrogate method ablation.}
+The first regime fixes the surrogate-open calibration class to Scan and evaluates the four remaining actions, Burst, Sustain, Hop, and Replay, as target unknowns. This regime isolates the OSR decision mechanism: VarMax and DQNGuard receive the same fixed surrogate-open information, so differences in performance are attributable to the decision rule rather than to a different surrogate choice.
+
+\paragraph{Regime B: Target--Surrogate Matrix.}
+The second regime evaluates a full Target--Surrogate Matrix. In each cell, one class is withheld as the target unknown, one different class is used as the surrogate-open calibration class, and the remaining three classes form the known set. With five preliminary-action classes, this produces 20 ordered target/surrogate cells. This matrix measures how strongly DQNGuard depends on surrogate choice and whether some surrogate actions transfer better across target unknowns than others.
+
+\paragraph{Regime C: target-open calibration.}
+The third regime evaluates target-open calibration. In this condition, a small labeled subset of the held-out target-open class is available for OSR calibration, but the closed-set backbone is still trained only on known classes. We use the term target-open calibration rather than oracle calibration because the setting is not a deployment assumption; it is an upper-bound diagnostic that tests whether failures under surrogate-open calibration are explained by the absence of target-open examples.
+
+\subsection{Metrics}
+\label{subsec:metrics}
+
+We report known rejection rate, unknown precision, unknown recall, unknown F1, OSR macro F1, OSR accuracy, and unknown AUROC. The known rejection rate is the fraction of known test samples rejected as \texttt{unknown}. Unknown F1 measures binary detection of the held-out target-open class. OSR macro F1 averages performance across the known classes and the unknown class, penalizing methods that improve novelty detection by sacrificing known-class recognition.
+
+For DQNGuard, the main operating threshold is selected from known calibration scores only. With a 5\% known-rejection budget, the threshold is set at the 95th percentile of known calibration unknown scores. Open calibration samples may be used to fit or diagnose the guard, but in the known-budgeted setting they do not determine the final threshold.
