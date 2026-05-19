@@ -151,3 +151,7 @@ __pycache__/
 
 # Keep rendered reference screenshots local only
 papers/milcom2026/reference_notes/layout_screenshots/**/*.png
+
+# Comparative-analysis generated upload bundles and caches
+papers/milcom2026/composition/aspects/*/upload_batches/
+papers/milcom2026/composition/.cache/
