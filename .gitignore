@@ -148,3 +148,6 @@ __pycache__/
 !papers/milcom2026/reference_notes/layout_screenshots/
 !papers/milcom2026/reference_notes/layout_screenshots/**/
 !papers/milcom2026/reference_notes/layout_screenshots/**/*.png
+
+# Keep rendered reference screenshots local only
+papers/milcom2026/reference_notes/layout_screenshots/**/*.png
