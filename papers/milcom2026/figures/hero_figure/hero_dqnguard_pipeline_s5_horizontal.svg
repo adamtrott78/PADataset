@@ -1,0 +1,190 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="7.1in" height="2.13in" viewBox="0 0 2130 640" role="img" aria-label="DQNGuard RF open-set recognition pipeline">
+<rect x="0" y="0" width="2130" height="640" fill="#ffffff"/>
+<style>
+  text { font-family: "TeX Gyre Heros", "Nimbus Sans", "DejaVu Sans", Helvetica, Arial, sans-serif; fill: #18212b; }
+  .paneltitle { font-size: 25px; font-weight: 700; letter-spacing: 0.1px; }
+  .subtitle { font-size: 17px; fill: #344054; }
+  .label { font-size: 21px; font-weight: 500; }
+  .detail { font-size: 17px; fill: #2f3742; }
+  .small { font-size: 15px; fill: #384252; }
+  .tiny { font-size: 13.5px; fill: #384252; }
+  .num { font-size: 22px; font-weight: 700; }
+  .math { font-family: "Latin Modern Math", "STIX Two Math", "Times New Roman", Times, serif; font-size: 16px; font-style: italic; fill: #18212b; }
+  .mathtiny { font-family: "Latin Modern Math", "STIX Two Math", "Times New Roman", Times, serif; font-size: 13.5px; font-style: italic; fill: #18212b; }
+</style>
+<rect x="24" y="32" width="270" height="540" rx="15" ry="15" fill="#f3f4f6" stroke="#46515e" stroke-width="2.5"/>
+<rect x="315" y="32" width="720" height="540" rx="15" ry="15" fill="#e6ebf3" stroke="#46515e" stroke-width="2.5"/>
+<rect x="1058" y="32" width="470" height="540" rx="15" ry="15" fill="#b9d2e7" stroke="#46515e" stroke-width="2.7"/>
+<rect x="1550" y="32" width="555" height="540" rx="15" ry="15" fill="#f1f0eb" stroke="#b9b7ae" stroke-width="1.8"/>
+<text x="159.0" y="70" text-anchor="middle" class="paneltitle">RF Signal Input</text>
+<text x="675.0" y="70" text-anchor="middle" class="paneltitle">Multi-Domain PA Encoder</text>
+<text x="1293.0" y="68" text-anchor="middle" class="paneltitle">DQNGuard</text>
+<text x="1293.0" y="96" text-anchor="middle" class="subtitle">budgeted open-set decision layer</text>
+<text x="1827.5" y="66" text-anchor="middle" class="paneltitle">
+  <tspan x="1827.5" dy="0">Evidence Outputs</tspan>
+  <tspan x="1827.5" dy="28">and Consumers</tspan>
+</text>
+<rect x="58" y="270" width="200" height="82" rx="9" ry="9" fill="#fbfcfe" stroke="#46515e" stroke-width="1.8"/>
+<text x="158.0" y="301.16" text-anchor="middle" class="label">
+  <tspan x="158.0" dy="0">RF Window</tspan>
+</text>
+<text x="158.0" y="322.48" text-anchor="middle" class="small">
+  <tspan x="158.0" dy="0">complex IQ</tspan>
+</text>
+<rect x="335" y="137" width="110" height="50" rx="8" ry="8" fill="#fbfcfe" stroke="#46515e" stroke-width="1.7"/>
+<text x="390.0" y="166.0" text-anchor="middle" class="label">IQ</text>
+<polyline points="258,311.0 328,162.0" fill="none" stroke="#46515e" stroke-width="1.65" stroke-linecap="round" stroke-linejoin="round"/>
+<polygon points="328,162.0 322.76521664015866,166.72228156461776 327.7070290199878,169.04393838735623" fill="#46515e" stroke="#46515e" stroke-width="0"/>
+<rect x="335" y="215" width="110" height="50" rx="8" ry="8" fill="#fbfcfe" stroke="#46515e" stroke-width="1.7"/>
+<text x="390.0" y="244.0" text-anchor="middle" class="label">FFT</text>
+<polyline points="258,311.0 328,240.0" fill="none" stroke="#46515e" stroke-width="1.65" stroke-linecap="round" stroke-linejoin="round"/>
+<polygon points="328,240.0 321.49247439976745,242.71201227178597 325.3805612240298,246.54533730979114" fill="#46515e" stroke="#46515e" stroke-width="0"/>
+<rect x="335" y="293" width="110" height="50" rx="8" ry="8" fill="#fbfcfe" stroke="#46515e" stroke-width="1.7"/>
+<text x="390.0" y="322.0" text-anchor="middle" class="label">DCT</text>
+<polyline points="258,311.0 328,318.0" fill="none" stroke="#46515e" stroke-width="1.65" stroke-linecap="round" stroke-linejoin="round"/>
+<polygon points="328,318.0 321.8039034165624,314.6367742970902 321.26061311070777,320.06967735563677" fill="#46515e" stroke="#46515e" stroke-width="0"/>
+<rect x="335" y="371" width="110" height="50" rx="8" ry="8" fill="#fbfcfe" stroke="#46515e" stroke-width="1.7"/>
+<text x="390.0" y="400.0" text-anchor="middle" class="label">Polar</text>
+<polyline points="258,311.0 328,396.0" fill="none" stroke="#46515e" stroke-width="1.65" stroke-linecap="round" stroke-linejoin="round"/>
+<polygon points="328,396.0 325.9752723996374,389.24697266817833 321.7605333131683,392.7179342688" fill="#46515e" stroke="#46515e" stroke-width="0"/>
+<rect x="490" y="247" width="145" height="104" rx="9" ry="9" fill="#eef3f8" stroke="#46515e" stroke-width="1.8"/>
+<text x="562.5" y="286.52" text-anchor="middle" class="small">
+  <tspan x="562.5" dy="0">Concat + AvgPool</tspan>
+</text>
+<text x="562.5" y="313.56" text-anchor="middle" class="mathtiny">
+  <tspan x="562.5" dy="0" class="mathtiny">N = 8192</tspan>
+</text>
+<rect x="675" y="247" width="128" height="104" rx="9" ry="9" fill="#eaf2fb" stroke="#46515e" stroke-width="1.8"/>
+<text x="739.0" y="286.52" text-anchor="middle" class="label">
+  <tspan x="739.0" dy="0">PA CNN</tspan>
+</text>
+<text x="739.0" y="313.56" text-anchor="middle" class="small">
+  <tspan x="739.0" dy="0">encoder + head</tspan>
+</text>
+<polyline points="445,162.0 483,299.0" fill="none" stroke="#46515e" stroke-width="1.65" stroke-linecap="round" stroke-linejoin="round"/>
+<polygon points="483,299.0 483.893351823102,292.0068016959219 478.6319942078215,293.46615636293404" fill="#46515e" stroke="#46515e" stroke-width="0"/>
+<polyline points="445,240.0 483,299.0" fill="none" stroke="#46515e" stroke-width="1.65" stroke-linecap="round" stroke-linejoin="round"/>
+<polygon points="483,299.0 481.77554819890776,292.05711747277815 477.18524326228675,295.0135850590765" fill="#46515e" stroke="#46515e" stroke-width="0"/>
+<polyline points="445,318.0 483,299.0" fill="none" stroke="#46515e" stroke-width="1.65" stroke-linecap="round" stroke-linejoin="round"/>
+<polygon points="483,299.0 475.96533014278566,299.4651021393199 478.40711637421543,304.34867460217947" fill="#46515e" stroke="#46515e" stroke-width="0"/>
+<polyline points="445,396.0 483,299.0" fill="none" stroke="#46515e" stroke-width="1.65" stroke-linecap="round" stroke-linejoin="round"/>
+<polygon points="483,299.0 478.08714591389554,304.0563588409691 483.1709578384039,306.04795526500334" fill="#46515e" stroke="#46515e" stroke-width="0"/>
+<polyline points="635,299.0 668,299.0" fill="none" stroke="#46515e" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/>
+<polygon points="668,299.0 661.0,296.06 661.0,301.94" fill="#46515e" stroke="#46515e" stroke-width="0"/>
+<rect x="850" y="137" width="140" height="51" rx="8" ry="8" fill="#fbfcfe" stroke="#46515e" stroke-width="1.7"/>
+<text x="920.0" y="156.38" text-anchor="middle" class="tiny">
+  <tspan x="920.0" dy="0">predicted PA</tspan>
+</text>
+<text x="920.0" y="169.64" text-anchor="middle" class="mathtiny">
+  <tspan x="920.0" dy="0" class="mathtiny">ŷ</tspan>
+</text>
+<polyline points="803,299.0 843,162.5" fill="none" stroke="#46515e" stroke-width="1.55" stroke-linecap="round" stroke-linejoin="round"/>
+<polygon points="843,162.5 838.757554015611,167.71751550736005 843.7553846595033,169.18208126381197" fill="#46515e" stroke="#46515e" stroke-width="0"/>
+<rect x="850" y="215" width="140" height="51" rx="8" ry="8" fill="#fbfcfe" stroke="#46515e" stroke-width="1.7"/>
+<text x="920.0" y="234.38" text-anchor="middle" class="tiny">
+  <tspan x="920.0" dy="0">logits</tspan>
+</text>
+<text x="920.0" y="247.64" text-anchor="middle" class="mathtiny">
+  <tspan x="920.0" dy="0" class="mathtiny">z</tspan>
+</text>
+<polyline points="803,299.0 843,240.5" fill="none" stroke="#46515e" stroke-width="1.55" stroke-linecap="round" stroke-linejoin="round"/>
+<polygon points="843,240.5 837.3509774004232,244.14819951064507 841.6500786942626,247.08775595087704" fill="#46515e" stroke="#46515e" stroke-width="0"/>
+<rect x="850" y="293" width="140" height="51" rx="8" ry="8" fill="#fbfcfe" stroke="#46515e" stroke-width="1.7"/>
+<text x="920.0" y="312.38" text-anchor="middle" class="tiny">
+  <tspan x="920.0" dy="0">softmax</tspan>
+</text>
+<text x="920.0" y="325.64" text-anchor="middle" class="mathtiny">
+  <tspan x="920.0" dy="0" class="mathtiny">p</tspan>
+</text>
+<polyline points="803,299.0 843,318.5" fill="none" stroke="#46515e" stroke-width="1.55" stroke-linecap="round" stroke-linejoin="round"/>
+<polygon points="843,318.5 838.5680449438202,313.4424719101123 836.2858876404495,318.1238202247191" fill="#46515e" stroke="#46515e" stroke-width="0"/>
+<rect x="850" y="371" width="140" height="51" rx="8" ry="8" fill="#fbfcfe" stroke="#46515e" stroke-width="1.7"/>
+<text x="920.0" y="390.38" text-anchor="middle" class="tiny">
+  <tspan x="920.0" dy="0">feature</tspan>
+</text>
+<text x="920.0" y="403.64" text-anchor="middle" class="mathtiny">
+  <tspan x="920.0" dy="0" class="mathtiny">h</tspan>
+</text>
+<polyline points="803,299.0 843,396.5" fill="none" stroke="#46515e" stroke-width="1.55" stroke-linecap="round" stroke-linejoin="round"/>
+<polygon points="843,396.5 843.0558896734588,389.77558981438517 838.237611508963,391.75231931776796" fill="#46515e" stroke="#46515e" stroke-width="0"/>
+<rect x="1082" y="124" width="422" height="101" rx="10" ry="10" fill="#ddecff" stroke="#2f638f" stroke-width="2.0"/>
+<text x="1110" y="169" text-anchor="middle" class="num">1</text>
+<text x="1311.0" y="158" text-anchor="middle" class="label">Predicted-class calibration</text>
+<text x="1311.0" y="188" text-anchor="middle" class="small">
+  <tspan x="1311.0" dy="0">select bands for</tspan>
+  <tspan x="1311.0" dy="16" class="mathtiny">ŷ</tspan>
+</text>
+<rect x="1082" y="265" width="422" height="101" rx="10" ry="10" fill="#ddecff" stroke="#2f638f" stroke-width="2.0"/>
+<text x="1110" y="310" text-anchor="middle" class="num">2</text>
+<text x="1311.0" y="299" text-anchor="middle" class="label">Guard evidence</text>
+<text x="1311.0" y="329" text-anchor="middle" class="small">
+  <tspan x="1311.0" dy="0" class="mathtiny">P₁, P₁ − P₂, H</tspan>
+  <tspan x="1311.0" dy="16" class="mathtiny">V, E, r(x)</tspan>
+</text>
+<rect x="1082" y="406" width="422" height="101" rx="10" ry="10" fill="#ddecff" stroke="#2f638f" stroke-width="2.0"/>
+<text x="1110" y="451" text-anchor="middle" class="num">3</text>
+<text x="1311.0" y="440" text-anchor="middle" class="label">Known-budget threshold</text>
+<text x="1311.0" y="470" text-anchor="middle" class="small">
+  <tspan x="1311.0" dy="0" class="mathtiny">r(x) ≥ τβ</tspan>
+  <tspan x="1311.0" dy="16" class="mathtiny">β = 0.05</tspan>
+</text>
+<polyline points="1293.0,230 1293.0,258" fill="none" stroke="#2f638f" stroke-width="1.4" stroke-linecap="round" stroke-linejoin="round"/>
+<polygon points="1293.0,258 1295.604,251.8 1290.396,251.8" fill="#2f638f" stroke="#2f638f" stroke-width="0"/>
+<polyline points="1293.0,371 1293.0,399" fill="none" stroke="#2f638f" stroke-width="1.4" stroke-linecap="round" stroke-linejoin="round"/>
+<polygon points="1293.0,399 1295.604,392.8 1290.396,392.8" fill="#2f638f" stroke="#2f638f" stroke-width="0"/>
+<polyline points="990,162.5 1075,174.5" fill="none" stroke="#46515e" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/>
+<polygon points="1075,174.5 1068.4797154781693,170.6103355216193 1067.6577486450021,176.43260058988724" fill="#46515e" stroke="#46515e" stroke-width="0"/>
+<polyline points="990,240.5 1075,296" fill="none" stroke="#46515e" stroke-width="1.65" stroke-linecap="round" stroke-linejoin="round"/>
+<polygon points="1075,296 1071.0499839445563,290.1604560827289 1068.0649012973724,294.73220428111875" fill="#46515e" stroke="#46515e" stroke-width="0"/>
+<polyline points="990,318.5 1075,315.5" fill="none" stroke="#46515e" stroke-width="1.65" stroke-linecap="round" stroke-linejoin="round"/>
+<polygon points="1075,315.5 1068.4077516795735,313.000967770949 1068.600337649519,318.45757025273014" fill="#46515e" stroke="#46515e" stroke-width="0"/>
+<polyline points="990,396.5 1075,335" fill="none" stroke="#46515e" stroke-width="1.65" stroke-linecap="round" stroke-linejoin="round"/>
+<polygon points="1075,335 1068.1335656097212,336.59843009355944 1071.3341430761275,341.02199244550303" fill="#46515e" stroke="#46515e" stroke-width="0"/>
+<rect x="1578" y="148" width="228" height="96" rx="10" ry="10" fill="#dcefd7" stroke="#3f7a46" stroke-width="1.9"/>
+<text x="1692.0" y="184.48000000000002" text-anchor="middle" class="detail">
+  <tspan x="1692.0" dy="0">Known PA evidence</tspan>
+</text>
+<text x="1692.0" y="209.44" text-anchor="middle" class="tiny">
+  <tspan x="1692.0" dy="0">Scan / Burst /</tspan>
+  <tspan x="1692.0" dy="17">Sustain / Hop / Replay</tspan>
+</text>
+<rect x="1578" y="376" width="228" height="96" rx="10" ry="10" fill="#f9deda" stroke="#b23a3a" stroke-width="1.9"/>
+<text x="1692.0" y="412.48" text-anchor="middle" class="detail">
+  <tspan x="1692.0" dy="0">Unknown behavior pool</tspan>
+</text>
+<text x="1692.0" y="437.44" text-anchor="middle" class="tiny">
+  <tspan x="1692.0" dy="0">candidate novel</tspan>
+  <tspan x="1692.0" dy="17">signal behavior</tspan>
+</text>
+<rect x="1842" y="132" width="220" height="82" rx="9" ry="9" fill="#eee2f4" stroke="#7a5c84" stroke-width="1.8"/>
+<text x="1952.0" y="163.16" text-anchor="middle" class="detail">
+  <tspan x="1952.0" dy="0">ATT&amp;CK/EW</tspan>
+</text>
+<text x="1952.0" y="184.48000000000002" text-anchor="middle" class="tiny">
+  <tspan x="1952.0" dy="0">precursor hypotheses</tspan>
+</text>
+<rect x="1842" y="279" width="220" height="82" rx="9" ry="9" fill="#eeeeee" stroke="#707070" stroke-width="1.8"/>
+<text x="1952.0" y="310.16" text-anchor="middle" class="detail">
+  <tspan x="1952.0" dy="0">LLM-assisted</tspan>
+</text>
+<text x="1952.0" y="331.48" text-anchor="middle" class="tiny">
+  <tspan x="1952.0" dy="0">label-making</tspan>
+</text>
+<rect x="1842" y="426" width="220" height="82" rx="9" ry="9" fill="#dcefe5" stroke="#5a7868" stroke-width="1.8"/>
+<text x="1952.0" y="457.16" text-anchor="middle" class="detail">
+  <tspan x="1952.0" dy="0">QR-CWoS</tspan>
+</text>
+<text x="1952.0" y="478.48" text-anchor="middle" class="tiny">
+  <tspan x="1952.0" dy="0">response planning</tspan>
+</text>
+<polyline points="1528,245 1571,196.0" fill="none" stroke="#3f7a46" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round"/>
+<polygon points="1571,196.0 1563.6854549013626,199.55948451324065 1568.4206967425064,203.7149008228157" fill="#3f7a46" stroke="#3f7a46" stroke-width="0"/>
+<polyline points="1528,421 1571,424.0" fill="none" stroke="#b23a3a" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round"/>
+<polygon points="1571,424.0 1563.737421271703,420.3356514609981 1563.2989522157538,426.62037459626634" fill="#b23a3a" stroke="#b23a3a" stroke-width="0"/>
+<polyline points="1806,196.0 1835,173.0" fill="none" stroke="#3f7a46" stroke-width="1.65" stroke-linecap="round" stroke-linejoin="round"/>
+<polygon points="1835,173.0 1828.2108575248824,174.90011695759887 1831.6036726469536,179.1780142854277" fill="#3f7a46" stroke="#3f7a46" stroke-width="0"/>
+<polyline points="1806,424.0 1835,320.0" fill="none" stroke="#b23a3a" stroke-width="1.65" stroke-linecap="round" stroke-linejoin="round"/>
+<polygon points="1835,320.0 1830.6244275718545,325.5278626905933 1835.8837837540614,326.9944139337086" fill="#b23a3a" stroke="#b23a3a" stroke-width="0"/>
+<polyline points="1806,424.0 1835,467.0" fill="none" stroke="#b23a3a" stroke-width="1.65" stroke-linecap="round" stroke-linejoin="round"/>
+<polygon points="1835,467.0 1833.6289460678884,460.08457440823474 1829.1022122445004,463.1374879170314" fill="#b23a3a" stroke="#b23a3a" stroke-width="0"/>
+</svg>
