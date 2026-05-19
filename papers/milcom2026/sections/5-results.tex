@@ -1,5 +1,11 @@
 The results are organized around three questions: whether the proposed DQNGuard layer preserves known-class recognition while detecting unknown preliminary actions, how surrogate-open calibration transfers across target unknown classes, and how much performance changes under more permissive calibration assumptions.
 
+\subsection{Main Open-Set Performance}
+
+Table~\ref{tab:main_osr_results} compares the main OSR decision layers under the fixed PA1-surrogate known-budget calibration setting. DQNGuard achieves the highest unknown F1 and OSR macro F1 while maintaining a low known-rejection rate, indicating that the proposed decision layer improves unknown preliminary-action detection without obtaining the gain by simply rejecting known samples.
+
+\input{tables/main_results/main_osr_results_table}
+
 \subsection{Target--Surrogate Transfer}
 
 Figure~\ref{fig:target_surrogate_matrix} reports the Target--Surrogate Matrix for surrogate-open calibration. Each row corresponds to the true held-out unknown preliminary action, each column corresponds to the surrogate-open class used during calibration, and each cell reports unknown-class F1. The diagonal is omitted because the target unknown cannot also serve as its own surrogate.
