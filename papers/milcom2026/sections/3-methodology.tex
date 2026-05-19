@@ -1,72 +1,94 @@
-\subsection{Threat Model and Operational Setting}
-\label{subsec:threat-model}
+This section defines the RF preliminary-action recognition problem and the open-set decision layers evaluated in Section~\ref{sec:experiments}. The paper focuses on the sensing and novelty-detection layer of a larger cyber/electromagnetic framework: detected preliminary actions provide evidence for downstream ATT\&CK/EW technique prediction and response planning, but this work does not claim to solve the full response-policy problem.
 
-We consider a contested Cyber-EMS environment in which a defender operates a sensor (a software-defined radio with antenna array) that observes a shared RF band. An adversary intermittently emits RF waveforms intended to enable a downstream electronic or cyber effect. For example, a burst pattern that probes a receiver's automatic gain control, a sustained emission used as a denial-of-service primitive, a hopping pattern used to evade fixed-channel monitoring, or a replay segment used to inject a previously captured cooperative signal. We refer to these emissions as \emph{preliminary actions} (PAs) following~\cite{trott2026model}, and we treat the \emph{full} attack which is the operational effect that the PA enables as occurring later in time.
+\subsection{Preliminary Actions as Technique Precursors}
+\label{subsec:pa_precursors}
 
-Two assumptions are central. First, the adversary's PA repertoire is \emph{partially} known: the defender has labeled training examples for a finite set of PA classes, but the adversary may at any time deploy a PA whose waveform-level behavior falls outside that set. Second, the defender's response is \emph{costly} and \emph{time-bounded}: each candidate response (continued monitoring, additional sensing, deception, escalation) consumes resources and is only valuable if executed before the adversary's full tactic completes. The objective is therefore not classification accuracy in isolation, but the joint quantity \emph{probability of correctly characterizing the PA}~$\times$~\emph{duration of the resulting QR-CWoS}.
+We consider a contested Cyber-EMS setting in which a defender observes a shared RF band and must identify early RF behaviors that may precede or enable later cyber/electromagnetic effects. We refer to these behaviors as \emph{preliminary actions}. A preliminary action is not itself the full attack technique; rather, it is an observable precursor, prerequisite, or enabling behavior that can populate an evidence layer for later ATT\&CK/EW technique prediction.
 
-\subsection{Preliminary Action Taxonomy}
-\label{subsec:pa-taxonomy}
+The evaluated preliminary-action classes are Scan, Burst, Sustain, Hop, and Replay. Scan represents discovery-like RF behavior. Burst consists of repeated short on-intervals separated by quiet gaps. Sustain corresponds to persistent occupied-channel behavior. Hop captures frequency-agile dwell and revisit patterns. Replay captures repeated waveform/template behavior. The core open-world challenge is that a defender may possess labeled data for some preliminary actions while an adversary emits a behavior outside the known training set. In that case, the detector should reject the window as \texttt{unknown} rather than force it into the nearest known class.
 
-Following the pilot taxonomy of~\cite{trott2026model}, we define four behaviorally distinct PA classes that serve as the trained label space:
+\subsection{Backbone Outputs and OSR Formulation}
+\label{subsec:osr_formulation}
 
+Let $x$ denote an OTA RF window after preprocessing and feature extraction. A closed-set backbone $f_{\theta}$ maps $x$ to logits
+\begin{equation}
+    z = f_{\theta}(x) \in \mathbb{R}^{K},
+\end{equation}
+where $K$ is the number of known classes in the current fold. The backbone also produces softmax probabilities $p=\mathrm{softmax}(z)$, a closed-set prediction $\hat{y}=\arg\max_k p_k$, and an intermediate feature representation $h(x)$.
+
+A standard closed-set classifier always emits one of the $K$ known labels. In open-set recognition, the decision layer instead returns
+\begin{equation}
+    \hat{y}_{\mathrm{osr}} \in \{1,\ldots,K,\texttt{unknown}\}.
+\end{equation}
+The OSR layer therefore must preserve known-class recognition while identifying target-open samples that were excluded from closed-set training.
+
+We use the following confidence and evidence quantities throughout the OSR heads:
 \begin{itemize}
-    \item \textbf{PA2: Burst.} The emitter transmits in many short on-intervals separated by quiet pauses; the defining feature is the temporal pattern of burst lengths and inter-burst gaps rather than the carrier itself.
-    \item \textbf{PA3: Sustain.} The emitter transmits nearly continuously across the observation window with very few start/stop transitions, presenting as a steady occupied channel rather than discrete events.
-    \item \textbf{PA4: Hop.} The emitter transmits while switching among a small set of frequencies, dwelling briefly on each and often revisiting previously used frequencies within the same window.
-    \item \textbf{PA8: Replay.} The emitter records a short segment of a transmission and replays that exact segment repeatedly; replays are bit-for-bit copies of a waveform segment separated by short quiet gaps, which distinguishes them from newly generated bursts.
+    \item $P_1 = \max_k p_k$, the maximum softmax probability;
+    \item $P_1-P_2$, the gap between the largest and second-largest softmax probabilities;
+    \item $H(p)=-\sum_k p_k\log p_k$, the softmax entropy;
+    \item variance-style evidence derived from the logit or feature distribution;
+    \item energy-style evidence derived from the classifier score geometry.
 \end{itemize}
 
-In addition, we hold out at least one PA class entirely from training to serve as the \emph{unseen-tactic} condition. The held-out PA is present in the over-the-air (OTA) test stream but never in training; the pipeline must label it \texttt{unknown} rather than collapse it into the nearest of \{PA2, PA3, PA4, PA8\}.
+\subsection{Baseline OSR Heads}
+\label{subsec:baseline_osr}
 
-\subsection{Signal Acquisition and Preprocessing}
-\label{subsec:preprocessing}
+We compare DQNGuard against two families of OSR decision heads.
 
-Each captured emission is recorded as a complex baseband I/Q stream and segmented into fixed-length analysis windows. For each window we compute (i)~a short-time Fourier spectrogram to expose the time-frequency structure that distinguishes burst from sustain and hop from replay, and (ii)~an event-detection trace that thresholds the per-bin energy to recover the on/off and dwell statistics on which PA2, PA3, and PA4 are partially defined. Windows are validated by the OTA validation pipeline of~\cite{trott2026model} to ensure TX/RX synchronization and to reject windows whose payload integrity has been compromised by channel effects; only validated windows enter the classifier. The output of preprocessing is a tensor representation $x \in \mathbb{R}^{C \times T \times F}$ together with a small vector of hand-engineered event-statistics features used as auxiliary input.
+\paragraph{VarMax.}
+VarMax is the predecessor confidence-based OSR rule. It uses confidence structure in the classifier outputs, including maximum-score and variance-style evidence, to assign an unknownness score to each sample. A calibrated operating rule then accepts the closed-set prediction or rejects the sample as \texttt{unknown}. In this paper VarMax is used as a decision-layer baseline on top of the same backbone outputs whenever possible, so performance differences are attributable to the OSR rule rather than to the feature extractor.
 
-\subsection{Open-Set PA Classification with varMax}
-\label{subsec:varmax}
-
-The PA classifier is a deep neural network $f_\theta$ producing logits $z = f_\theta(x) \in \mathbb{R}^K$ over the $K=4$ trained PA classes. Rather than reading off $\arg\max \mathrm{softmax}(z)$, which is well known to be overconfident on out-of-distribution inputs, we apply the varMax open-set decision rule~\cite{baye2024varmax,broggi2025varmax}, which uses the \emph{variance} and the \emph{maximum} of the logit vector jointly as the basis for a confidence-aware decision. Concretely, at inference time we compute
+\paragraph{DQN-IDS-style confidence head.}
+DQN-IDS motivates a reinforcement-learning-style OSR head over softmax confidence states. The confidence state is
 \begin{equation}
-\hat{y} =
+    s = (P_1,\; P_1-P_2,\; H(p)).
+\end{equation}
+A DQN agent is trained using high- and low-confidence validation anchors, centroid-guided rewards, replay memory, and $\epsilon$-greedy exploration to choose between known and unknown actions. In this paper, this head is treated as an OSR-head ablation. We do not claim deployment-time continual learning unless explicitly evaluated; the relevant comparison is validation-time DQN calibration followed by held-out test evaluation.
+
+\subsection{DQNGuard}
+\label{subsec:dqnguard}
+
+DQNGuard is a three-stage open-set decision layer that uses predicted-class conditional calibration, variance/energy evidence, and known-only budgeted thresholding to reject samples that do not conform to the learned known-class decision structure.
+
+\paragraph{Stage 1: predicted-class conditional calibration.}
+Rather than fitting one global rejection model, DQNGuard conditions calibration on the class predicted by the backbone. For a calibration sample $x_i$, the backbone first predicts $\hat{y}_i$. DQNGuard then compares the sample only against calibration statistics associated with that predicted class. This is important because known classes can have different confidence, variance, and energy profiles; a score that is ordinary for one known class may be anomalous for another.
+
+\paragraph{Stage 2: variance/energy guard evidence.}
+For each predicted class, DQNGuard fits percentile bands over guard evidence computed from the backbone outputs. The implemented guard uses the top-two confidence gap, variance-style evidence, and energy-style evidence. Let $m_j(x)$ denote one such metric for sample $x$ and metric $j$. For predicted class $c$, DQNGuard estimates lower and upper calibration bounds
+\begin{equation}
+    \ell_{c,j} = Q_{\alpha}(m_j \mid \hat{y}=c),
+    \qquad
+    u_{c,j} = Q_{1-\alpha}(m_j \mid \hat{y}=c),
+\end{equation}
+where $Q_{\alpha}$ is a calibration percentile. Samples whose evidence lies outside the predicted-class bands receive larger unknown scores.
+
+\paragraph{Stage 3: known-only budgeted thresholding.}
+DQNGuard converts the guard evidence into a continuous unknown score $r(x)$. The final operating threshold is chosen using known calibration samples only. For a known-rejection budget $\beta$, the threshold is
+\begin{equation}
+    \tau_{\beta} = Q_{1-\beta}\bigl(r(x) \mid x \in \mathcal{D}_{\mathrm{cal}}^{\mathrm{known}}\bigr).
+\end{equation}
+The final prediction is
+\begin{equation}
+\hat{y}_{\mathrm{osr}} =
 \begin{cases}
-\arg\max_k z_k & \text{if } g(z) \geq \tau \\
-\texttt{unknown} & \text{otherwise}
+\texttt{unknown}, & r(x) \geq \tau_{\beta},\\
+\hat{y}, & r(x) < \tau_{\beta}.
 \end{cases}
-\label{eq:varmax-rule}
+\label{eq:dqnguard_decision}
 \end{equation}
-where $g(z)$ is the varMax confidence statistic that combines the spread of the logits with their peak value, and $\tau$ is a calibrated threshold chosen on a held-out validation split that contains both in-distribution PAs and synthetic perturbations. This produces a five-way output: PA2, PA3, PA4, PA8, or \texttt{unknown}. We also retain the continuous confidence value $g(z)$ itself, which we expose to the downstream policy so that ``low-confidence PA2'' and ``high-confidence PA2'' induce distinct policy states.
+The main experiments use $\beta=0.05$, corresponding to a 5\% known-rejection budget. This budgeted rule prevents the OSR layer from improving unknown detection by simply rejecting a large fraction of known samples.
 
-For the application reported in~\cite{trott2026model}, we retain the network architecture validated on the pilot OTA dataset and adapt only the final decision layer. This isolates the effect of the open-set rule from architectural choices and lets us attribute downstream gains to the novelty-aware decision boundary rather than to representation changes.
+\subsection{Calibration Modes}
+\label{subsec:method_calibration_modes}
 
-\subsection{DQN-based Response Selection}
-\label{subsec:dqn}
+The OSR decision layer can be calibrated under different information assumptions.
 
-The varMax output is a label and a confidence, not an action. To map outputs to actions we adopt the DQN-IDS formulation of~\cite{tiwaridqn}, originally developed for open-set network intrusion detection, and adapt it to the EW response setting.
+\paragraph{Surrogate-open calibration.}
+In surrogate-open calibration, a non-target class is withheld from backbone training and used as open-set calibration evidence. The final DQNGuard operating threshold remains known-budgeted: surrogate-open samples may shape or diagnose the guard, but the deployed threshold is selected from known calibration scores.
 
-\paragraph{State.} At each decision step $t$, the agent observes
-\begin{equation}
-s_t = \bigl(\hat{y}_t,\ g(z_t),\ \phi_t,\ h_{t-1}\bigr),
-\label{eq:state}
-\end{equation}
-where $\hat{y}_t \in \{\text{PA2, PA3, PA4, PA8, \texttt{unknown}}\}$ is the varMax verdict, $g(z_t)$ is its confidence, $\phi_t$ is the auxiliary event-statistics vector from preprocessing, and $h_{t-1}$ is a short history summary of recent verdicts (rolling counts and dwell time per class) so the policy can recognize behavioral patterns that span multiple windows. Note that DQN can functionally be an alternative to be used in the place of varMax. For such cases, we will compare the two algorithms isolated later in this paper.
+\paragraph{Target-open calibration.}
+In target-open calibration, a small labeled subset of the held-out target-open class is available during OSR calibration, while the backbone remains trained only on known classes. This is not treated as a deployment assumption. Instead, it is a diagnostic condition that estimates how much performance is recoverable when the calibration set contains examples from the actual held-out unknown class.
 
-\paragraph{Action space.} The agent selects an action $a_t \in \mathcal{A}$ from a discrete set of operationally meaningful responses. In our deployment $\mathcal{A}$ contains: continue passive observation; request a higher-rate capture on the same band; allocate the SDR's directional beam to localize the emitter; deploy an EMS deception waveform consistent with the framework of the parent project; and escalate to operator review. The set is small enough for tabular Q-learning to be infeasible only because of the continuous confidence component, which is why a function-approximation DQN is appropriate.
-
-\paragraph{Reward.} The reward function is the place where QR-CWoS enters training. Rather than rewarding raw classification accuracy, we reward the agent for \emph{opening and maintaining} a usable window. For each episode the reward is the sum of (i)~a positive term proportional to the duration between PA detection and adversary tactic completion (the open window), (ii)~a negative term penalizing actions that unnecessarily consume sensing or deception resources, and (iii)~a large negative terminal reward if the adversary's tactic completes without the defender having selected a response other than passive observation. The \texttt{unknown} verdict is \emph{not} directly penalized; what is penalized is reaching the end of the episode having ignored an unknown.
-
-\paragraph{Training.} We train the DQN with experience replay and a target network, following~\cite{tiwaridqn}. Episodes are constructed by drawing trajectories from the OTA dataset and interleaving held-out PAs at controlled rates, so the policy experiences both familiar and unseen tactics during training. To prevent the policy from overfitting to a particular adversary profile, we vary the inter-PA timing distribution and the prevalence of each PA across episodes.
-
-\subsection{QR-CWoS Quantification}
-\label{subsec:qrcwos}
-
-The pipeline outputs a verdict and an action at every analysis window, but the operational quantity of interest is the QR-CWoS itself. We define the window for an episode as the interval $[t_d, t_c]$, where $t_d$ is the time at which the pipeline first emits a non-passive response with confidence above a deployment threshold, and $t_c$ is the time at which the adversary's full tactic would have completed in the absence of intervention (this completion time is recoverable in our OTA experiments because we control the emitter). Three derived quantities are reported:
-
-\begin{enumerate}
-    \item \textbf{Window duration}, $\Delta t = t_c - t_d$, the time during which the defender has acted but the adversary has not yet completed, i.e., the raw width of the QR-CWoS.
-    \item \textbf{Window reliability}, the fraction of episodes for which $\Delta t$ exceeds a stated operational minimum, conditioned on whether the PA was seen or unseen at training time. This is the resilience axis of QR-CWoS: a wider mean window is not useful if the variance is high.
-    \item \textbf{Window quality under uncertainty}, the conditional distribution of $\Delta t$ given the varMax confidence $g(z_t)$ at $t_d$. This is the quantification axis: it tells the operator how much window to expect for a given confidence level, and it lets the DQN's value function be interpreted as an estimate of expected window value.
-\end{enumerate}
-
-Reporting all three quantities rather than only mean accuracy is what distinguishes a QR-CWoS evaluation from a conventional classification evaluation. It is also what makes the pipeline auditable: an operator can ask, for any deployment, ``what window does this system actually deliver against tactics it has not seen, and how reliably?'', and the pipeline will answer in seconds rather than in classes.
+\paragraph{Target--Surrogate Matrix.}
+To study surrogate transfer, we evaluate a Target--Surrogate Matrix. One class is withheld as the target unknown, one different class is used as the surrogate-open calibration class, and the remaining classes form the known set. This matrix allows us to measure whether a surrogate that is useful for one target unknown also transfers to others, and whether surrogate quality can be predicted from calibration or representation diagnostics.
