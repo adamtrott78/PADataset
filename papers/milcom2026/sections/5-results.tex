@@ -1,0 +1,14 @@
+The results are organized around three questions: whether the proposed DQNGuard layer preserves known-class recognition while detecting unknown preliminary actions, how surrogate-open calibration transfers across target unknown classes, and how much performance changes under more permissive calibration assumptions.
+
+\subsection{Target--Surrogate Transfer}
+
+Figure~\ref{fig:target_surrogate_matrix} reports the Target--Surrogate Matrix for surrogate-open calibration. Each row corresponds to the true held-out unknown preliminary action, each column corresponds to the surrogate-open class used during calibration, and each cell reports unknown-class F1. The diagonal is omitted because the target unknown cannot also serve as its own surrogate.
+
+\begin{figure}[t]
+    \centering
+    \includegraphics[width=\columnwidth]{figures/target_surrogate_matrix/target_surrogate_unknown_f1_matrix.pdf}
+    \caption{Target--Surrogate Matrix for surrogate-open calibration. Rows indicate the true held-out unknown preliminary action, columns indicate the surrogate-open calibration class, and cells report unknown-class F1. Bold entries mark the best surrogate for each target unknown. Surrogate utility is highly target-dependent, motivating explicit analysis of surrogate selection rather than assuming that any withheld class provides equivalent open-set calibration evidence.}
+    \label{fig:target_surrogate_matrix}
+\end{figure}
+
+The matrix shows that surrogate choice materially changes unknown detection. For example, Scan is best detected when Hop is used as the surrogate-open class, whereas Sustain, Hop, and Replay are best detected when Scan is used as the surrogate. This asymmetry indicates that surrogate-open calibration does not provide a universal proxy for target-open behavior. Instead, surrogate usefulness depends on the relationship between the withheld calibration behavior and the true unknown behavior.
