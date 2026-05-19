@@ -1,16 +1,18 @@
-\begin{table}[t]
-\centering
-\caption{Main open-set recognition comparison under fixed PA1-surrogate known-budget calibration. Values are mean $\pm$ standard deviation across held-out preliminary-action folds.}
-\label{tab:main_osr_results}
+\begin{center}
+\refstepcounter{table}\label{tab:main_osr_results}
+{\footnotesize TABLE~\thetable}\\[-1pt]
+{\footnotesize\scshape Main OSR comparison under fixed PA1-surrogate known-budget calibration}\\[-2pt]
+{\scriptsize Values are mean $\pm$ standard deviation across held-out PA folds.}\\[2pt]
 \scriptsize
-\setlength{\tabcolsep}{3pt}
+\resizebox{\columnwidth}{!}{%
 \begin{tabular}{lcccc}
 \hline
-Method & Known rej. $\downarrow$ & Unknown F1 $\uparrow$ & OSR macro F1 $\uparrow$ & AUROC $\uparrow$ \\
+Method & Known rej. $\downarrow$ & Unk. F1 $\uparrow$ & OSR F1 $\uparrow$ & AUROC $\uparrow$ \\
 \hline
 DQNGuard & 0.050 $\pm$ 0.004 & 0.865 $\pm$ 0.142 & 0.881 $\pm$ 0.109 & 0.891 $\pm$ 0.129 \\
-Shreyash CNN + DQNGuard head & 0.063 $\pm$ 0.017 & 0.701 $\pm$ 0.197 & 0.764 $\pm$ 0.119 & 0.829 $\pm$ 0.092 \\
+Shreyash CNN head & 0.063 $\pm$ 0.017 & 0.701 $\pm$ 0.197 & 0.764 $\pm$ 0.119 & 0.829 $\pm$ 0.092 \\
 VarMax surrogate-all & 0.128 $\pm$ 0.043 & 0.745 $\pm$ 0.146 & 0.778 $\pm$ 0.104 & 0.951 $\pm$ 0.060 \\
 \hline
-\end{tabular}
-\end{table}
+\end{tabular}%
+}
+\end{center}

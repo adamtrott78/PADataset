@@ -16,8 +16,8 @@ OUT_CSV = OUTDIR / "main_osr_results_table_summary.csv"
 
 METRICS = [
     ("known_reject_rate", "Known rej."),
-    ("unknown_f1", "Unknown F1"),
-    ("osr_macro_f1", "OSR macro F1"),
+    ("unknown_f1", "Unk. F1"),
+    ("osr_macro_f1", "OSR F1"),
     ("unknown_auroc", "AUROC"),
 ]
 
@@ -29,7 +29,7 @@ METHOD_ORDER = {
 
 METHOD_LABEL = {
     "DQNGuard_PA1_surrogate_knownonly_005": "DQNGuard",
-    "ShreyashCNN_DQNGuard_PA1_surrogate_005": "Shreyash CNN + DQNGuard head",
+    "ShreyashCNN_DQNGuard_PA1_surrogate_005": "Shreyash CNN head",
     "VarMax_surrogate_all_smoke": "VarMax surrogate-all",
 }
 
@@ -44,11 +44,6 @@ def fmt(mean: float, std: float) -> str:
 
 def main() -> None:
     df = pd.read_csv(SRC)
-
-    required = {"comparison_method", *[m for m, _ in METRICS]}
-    missing = required - set(df.columns)
-    if missing:
-        raise ValueError(f"Missing columns: {missing}")
 
     rows = []
     for key, sub in df.groupby("comparison_method", dropna=False):
@@ -67,15 +62,16 @@ def main() -> None:
     summary.to_csv(OUT_CSV, index=False)
 
     lines = []
-    lines.append(r"\begin{table}[t]")
-    lines.append(r"\centering")
-    lines.append(r"\caption{Main open-set recognition comparison under fixed PA1-surrogate known-budget calibration. Values are mean $\pm$ standard deviation across held-out preliminary-action folds.}")
-    lines.append(r"\label{tab:main_osr_results}")
+    lines.append(r"\begin{center}")
+    lines.append(r"\refstepcounter{table}\label{tab:main_osr_results}")
+    lines.append(r"{\footnotesize TABLE~\thetable}\\[-1pt]")
+    lines.append(r"{\footnotesize\scshape Main OSR comparison under fixed PA1-surrogate known-budget calibration}\\[-2pt]")
+    lines.append(r"{\scriptsize Values are mean $\pm$ standard deviation across held-out PA folds.}\\[2pt]")
     lines.append(r"\scriptsize")
-    lines.append(r"\setlength{\tabcolsep}{3pt}")
+    lines.append(r"\resizebox{\columnwidth}{!}{%")
     lines.append(r"\begin{tabular}{lcccc}")
     lines.append(r"\hline")
-    lines.append(r"Method & Known rej. $\downarrow$ & Unknown F1 $\uparrow$ & OSR macro F1 $\uparrow$ & AUROC $\uparrow$ \\")
+    lines.append(r"Method & Known rej. $\downarrow$ & Unk. F1 $\uparrow$ & OSR F1 $\uparrow$ & AUROC $\uparrow$ \\")
     lines.append(r"\hline")
 
     for _, row in summary.iterrows():
@@ -85,12 +81,12 @@ def main() -> None:
         )
 
     lines.append(r"\hline")
-    lines.append(r"\end{tabular}")
-    lines.append(r"\end{table}")
+    lines.append(r"\end{tabular}%")
+    lines.append(r"}")
+    lines.append(r"\end{center}")
     lines.append("")
 
     OUT_TEX.write_text("\n".join(lines))
-
     print(f"Wrote: {OUT_TEX}")
     print(f"Wrote: {OUT_CSV}")
     print(summary[["method", "folds"] + [f"{m}_mean" for m, _ in METRICS]].to_string(index=False))
