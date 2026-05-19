@@ -1,0 +1,8 @@
+aspect=hero_figure
+round=002_tiwari_vs_trott_model_diagrams
+branch=comp-hero_figure
+dpi=180
+created_utc=2026-05-19T11:09:57Z
+
+arguments:
+  papers/milcom2026/composition/scripts/ca_bundle_pages.sh  --aspect  hero_figure  --round  002_tiwari_vs_trott_model_diagrams tiwari 4\,5 trott 2\,4\,8
