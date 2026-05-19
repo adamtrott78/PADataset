@@ -94,48 +94,62 @@ def main() -> None:
     for _, row in df.iterrows():
         mat.loc[row["target"], row["surrogate"]] = float(row["unknown_f1"])
 
-    # Hide diagonal if present; target cannot be its own surrogate.
     for c in order:
         mat.loc[c, c] = np.nan
 
-    fig, ax = plt.subplots(figsize=(3.45, 2.75))
+    fig, ax = plt.subplots(figsize=(3.35, 2.55))
 
     data = mat.to_numpy(dtype=float)
     masked = np.ma.masked_invalid(data)
 
-    im = ax.imshow(masked, vmin=0.0, vmax=1.0, aspect="auto")
+    cmap = plt.get_cmap("viridis").copy()
+    cmap.set_bad(color="white")
+
+    im = ax.imshow(masked, vmin=0.0, vmax=1.0, aspect="equal", cmap=cmap)
 
     ax.set_xticks(np.arange(len(order)))
     ax.set_yticks(np.arange(len(order)))
-    ax.set_xticklabels(order, rotation=35, ha="right", fontsize=8)
-    ax.set_yticklabels(order, fontsize=8)
+    ax.set_xticklabels(order, rotation=35, ha="right", fontsize=7)
+    ax.set_yticklabels(order, fontsize=7)
 
-    ax.set_xlabel("Surrogate-open calibration class", fontsize=8)
-    ax.set_ylabel("Target unknown class", fontsize=8)
-    ax.set_title("Target--Surrogate Unknown-F1 Transfer", fontsize=9, fontweight="bold")
+    ax.set_xlabel("Surrogate-open class", fontsize=7.5)
+    ax.set_ylabel("Target unknown class", fontsize=7.5)
 
-    # Annotate cells and bold the best surrogate in each row.
     for i, target in enumerate(order):
         row_vals = mat.loc[target].dropna()
         best_col = row_vals.idxmax() if len(row_vals) else None
+
         for j, surrogate in enumerate(order):
             val = mat.iloc[i, j]
             if np.isnan(val):
-                ax.text(j, i, "—", ha="center", va="center", fontsize=7)
+                ax.text(j, i, "—", ha="center", va="center", fontsize=7.5, color="black")
             else:
                 weight = "bold" if surrogate == best_col else "normal"
-                ax.text(j, i, f"{val:.2f}", ha="center", va="center", fontsize=7, fontweight=weight)
+                color = "white" if val < 0.38 else "black"
+                ax.text(
+                    j,
+                    i,
+                    f"{val:.2f}",
+                    ha="center",
+                    va="center",
+                    fontsize=7.2,
+                    fontweight=weight,
+                    color=color,
+                )
 
-    cbar = fig.colorbar(im, ax=ax, fraction=0.045, pad=0.03)
-    cbar.set_label("Unknown F1", fontsize=8)
+    cbar = fig.colorbar(im, ax=ax, fraction=0.046, pad=0.025)
+    cbar.set_label("Unknown F1", fontsize=7.5)
     cbar.ax.tick_params(labelsize=7)
 
     ax.set_xticks(np.arange(-0.5, len(order), 1), minor=True)
     ax.set_yticks(np.arange(-0.5, len(order), 1), minor=True)
-    ax.grid(which="minor", linewidth=0.4)
+    ax.grid(which="minor", color="white", linewidth=0.45)
     ax.tick_params(which="minor", bottom=False, left=False)
 
-    fig.tight_layout(pad=0.2)
+    for spine in ax.spines.values():
+        spine.set_linewidth(0.6)
+
+    fig.tight_layout(pad=0.15)
 
     pdf = OUTDIR / "target_surrogate_unknown_f1_matrix.pdf"
     png = OUTDIR / "target_surrogate_unknown_f1_matrix.png"
