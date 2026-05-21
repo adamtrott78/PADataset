@@ -1,14 +1,22 @@
-The results are organized around three questions: whether the proposed DQNGuard layer preserves known-class recognition while detecting unknown preliminary actions, how surrogate-open calibration transfers across target unknown classes, and how much performance changes under more permissive calibration assumptions.
+The results answer two questions. First, under the fixed-surrogate known-budget setting, does DQNGuard improve the operating point of the OSR decision layer? Second, when the surrogate-open class changes, does surrogate calibration transfer across target unknown PA behaviors? Table~\ref{tab:main_osr_results} addresses the first question; Fig.~\ref{fig:target_surrogate_matrix} addresses the second.
 
 \subsection{Main Open-Set Performance}
+\label{subsec:main_results}
 
-Table~\ref{tab:main_osr_results} compares the main OSR decision layers under the fixed PA1-surrogate known-budget calibration setting. DQNGuard achieves the highest unknown F1 and OSR macro F1 while maintaining a low known-rejection rate, indicating that the proposed decision layer improves unknown preliminary-action detection without obtaining the gain by simply rejecting known samples.
+Table~\ref{tab:main_osr_results} compares the main OSR decision layers under the fixed Scan-surrogate calibration setting. This setting uses the same surrogate-open information for each method, so the comparison emphasizes the decision rule rather than the surrogate choice.
 
 \input{tables/main_results/main_osr_results_table}
 
-\subsection{Target--Surrogate Transfer}
+DQNGuard achieves the strongest fixed-budget operating point. It obtains the highest unknown F1 and OSR macro F1 while maintaining the lowest known-rejection rate among the compared methods. This matters because high unknown detection is not useful if it is achieved by rejecting a large fraction of known PA samples. Under the 5\% known-rejection budget, DQNGuard improves unknown detection while preserving the utility of known PA evidence.
 
-Figure~\ref{fig:target_surrogate_matrix} reports the Target--Surrogate Matrix for surrogate-open calibration. Each row corresponds to the true held-out unknown preliminary action, each column corresponds to the surrogate-open class used during calibration, and each cell reports unknown-class F1. The diagonal is omitted because the target unknown cannot also serve as its own surrogate.
+The AUROC column provides a complementary view. VarMax surrogate-all obtains the highest unknown AUROC, indicating that its scalar ranking score separates known and unknown samples well in aggregate. However, the selected operating point has higher known rejection and lower unknown F1 than DQNGuard. This distinction is important: the target application requires a usable thresholded decision layer, not only a good ranking score. DQNGuard is therefore best interpreted as improving the calibrated operating point under a known-rejection constraint.
+
+The DQN-IDS-style confidence head performs competitively but does not match DQNGuard under the same fixed-surrogate setting. This suggests that softmax confidence states alone are not sufficient for the PA routing problem. DQNGuard benefits from combining predicted-class calibration with guard evidence derived from confidence, variance-style, and energy-style structure.
+
+\subsection{Target--Surrogate Transfer}
+\label{subsec:target_surrogate_results}
+
+Figure~\ref{fig:target_surrogate_matrix} reports the Target--Surrogate Matrix for surrogate-open calibration. Rows correspond to the true held-out target unknown PA, columns correspond to the surrogate-open PA used during calibration, and cells report unknown-class F1. The diagonal is omitted because a target unknown cannot also serve as its own surrogate.
 
 \begin{figure}[t]
     \centering
@@ -17,4 +25,8 @@ Figure~\ref{fig:target_surrogate_matrix} reports the Target--Surrogate Matrix fo
     \label{fig:target_surrogate_matrix}
 \end{figure}
 
-The matrix shows that surrogate choice materially changes unknown detection. For example, Scan is best detected when Hop is used as the surrogate-open class, whereas Sustain, Hop, and Replay are best detected when Scan is used as the surrogate. This asymmetry indicates that surrogate-open calibration does not provide a universal proxy for target-open behavior. Instead, surrogate usefulness depends on the relationship between the withheld calibration behavior and the true unknown behavior.
+The matrix shows that surrogate choice materially changes unknown detection. Scan is best detected when Hop is used as the surrogate-open class, whereas Sustain, Hop, and Replay are best detected when Scan is used as the surrogate. Burst is best detected when Replay is used as the surrogate. These asymmetric relationships show that surrogate-open calibration does not provide a universal proxy for target-open behavior.
+
+This result is important because surrogate-open calibration is a realistic compromise: a defender may have examples of some non-target behavior but not examples of the true future unknown. Figure~\ref{fig:target_surrogate_matrix} shows that the value of such a surrogate depends on the relationship between the surrogate behavior and the target unknown behavior. A surrogate that is informative for one target may be uninformative or misleading for another.
+
+The weakest cells are also informative. Several target/surrogate pairs produce near-zero unknown F1, especially when the surrogate behavior does not induce guard evidence that transfers to the target unknown. This indicates that the failure mode is not simply insufficient threshold aggressiveness. Rather, the calibration evidence can be mismatched to the target behavior. The Target--Surrogate Matrix therefore functions as a deployment diagnostic: it identifies when surrogate-open calibration is likely to support unknown detection and when additional calibration evidence or a different surrogate-selection policy is needed.
