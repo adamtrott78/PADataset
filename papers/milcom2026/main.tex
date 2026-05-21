@@ -65,6 +65,14 @@
 open-set recognition, RF signal classification, electronic warfare, preliminary actions, deep reinforcement learning, cyberspace windows of superiority
 \end{IEEEkeywords}
 
+
+\begin{figure*}[!t]
+    \centering
+    \includegraphics[width=\textwidth]{figures/hero_figure/hero_dqnguard_pipeline_s22_tikz.pdf}
+    \caption{End-to-end DQNGuard evidence flow. OTA RF windows are mapped into IQ, FFT, DCT, and polar representations, fused, and processed by a preliminary-action CNN. DQNGuard uses predicted-class calibration, guard evidence, and a known-budget threshold to route each window to known preliminary-action evidence or to an unknown-behavior pool for downstream analysis.}
+    \label{fig:dqnguard_pipeline}
+\end{figure*}
+
 \section{Introduction}
 \input{sections/1-intro}
 

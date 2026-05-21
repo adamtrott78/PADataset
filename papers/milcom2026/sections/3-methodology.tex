@@ -1,11 +1,4 @@
-This section defines the RF preliminary-action recognition problem and the open-set decision layers evaluated in Section~\ref{sec:experiments}. Figure~\ref{fig:dqnguard_pipeline} is the organizing structure for the section. An OTA RF window is first converted into multi-domain signal representations, processed by a closed-set preliminary-action backbone, and then passed to DQNGuard. The final output is not a final ATT\&CK/EW label or response action. It is a routing decision: retain the sample as known preliminary-action evidence, or preserve it as an unknown RF behavior for downstream analysis.
-
-\begin{figure*}[t]
-    \centering
-    \includegraphics[width=\textwidth]{figures/hero_figure/hero_dqnguard_pipeline_s22_tikz.pdf}
-    \caption{End-to-end DQNGuard evidence flow. OTA RF windows are mapped into IQ, FFT, DCT, and polar representations, fused, and processed by a preliminary-action CNN. DQNGuard uses predicted-class calibration, guard evidence, and a known-budget threshold to route each window to known preliminary-action evidence or to an unknown-behavior pool for downstream analysis.}
-    \label{fig:dqnguard_pipeline}
-\end{figure*}
+This section defines the RF preliminary-action recognition problem and the open-set decision layers used in the experiments. Figure~\ref{fig:dqnguard_pipeline} summarizes the evidence flow: an OTA RF window is converted into multi-domain signal representations, processed by a closed-set preliminary-action backbone, and then passed to DQNGuard. The final output is not a final ATT\&CK/EW label or response action. It is a routing decision: retain the sample as known preliminary-action evidence, or preserve it as an unknown RF behavior for downstream analysis.
 
 The method is described in the same order as the figure: preliminary-action evidence, multi-domain PA encoding, backbone outputs, baseline OSR heads, DQNGuard, and calibration regimes.
 
