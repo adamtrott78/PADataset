@@ -153,7 +153,16 @@ with open(log_file, "a", encoding="utf-8") as log:
 
 # Important: MPX CLI expects a terminal-like stdout. Redirecting stdout/stderr
 # to a file can trigger process.stdout.clearLine failures inside MPX.
-proc = subprocess.run(cmd, shell=True, text=True)
+# MPX can also occasionally hang after writing the output, so use a timeout.
+timeout_s = int(os.environ.get("MATHPIX_CMD_TIMEOUT", "180"))
+try:
+    proc = subprocess.run(cmd, shell=True, text=True, timeout=timeout_s)
+except subprocess.TimeoutExpired:
+    if os.path.exists(out_md) and os.path.getsize(out_md) > 0:
+        print(f"Mathpix command timed out after {timeout_s}s, but output exists; accepting: {out_md}")
+        sys.exit(0)
+    raise
+
 if proc.returncode != 0:
     raise SystemExit(proc.returncode)
 PY

@@ -1,0 +1,231 @@
+\title{
+Exploiting Multi-Domain Features for Detection of Unclassified Electromagnetic Signals
+}
+
+\author{
+Xue Wei \({ }^{\ddagger}\), Dola Saha \({ }^{\ddagger}\), and Anna Quach* \\ \({ }^{\ddagger}\) Department of Electrical and Computer Engineering, University at Albany, SUNY \\ *AI Data and Visualization, Idaho National Laboratory \\ Email: \({ }^{\ddagger}\) xwei4@albany.edu, \({ }^{\ddagger}\) dsaha@albany.edu, *anna.quach@inl.gov
+}
+
+\begin{abstract}
+Deep Learning based classification techniques have shown excellent performance in static environments, where the training and testing samples are drawn from the same distribution. However, real world scenarios often present samples that do not belong to the known set of classes chosen during training. This is quite common for electromagnetic signals, where it is impractical to assume that all possible waveforms are known a-priori, specially in scenarios like warfare. To address this problem, we propose a deep learning based adversarial model where the generator learns to generate waveform features that can deceive the discriminator model as true samples. We introduce domain knowledge of wireless signals by decomposing the signal into a lower dimensional unique feature set, which is used for classifying known versus unknown signals. We further introduce multiple domain representations of the signal to extract features and combine them together to accurately classify new waveforms as an unknown class. Our results show that combined features from multiple domains outperform any single domain representation, especially at low SNR regimes with fewer number of samples to classify.
+\end{abstract}
+
+Index Terms-Open Set Recognition, Unknown Signal Identification, Signal Intelligence (SIGINT)
+
+\section*{I. Introduction}
+
+Detection of unknown electromagnetic signal has several application domains. Identifying an unknown signal in a war may lead to insights on oppositions tactical communication capabilities. It can be useful to identify unknown signals to detect spectrum violations. It can also have real impact to identify new electromagnetic signals and flag them as radio frequency interference (RFI) for passive sciences, like radio astronomy and remote sensing. Statistical methods and digital signal processing (DSP) based methods have been used [1] over decades to identify an anomaly in a known data set to classify it as an unknown. However, the performance of these methods are limited.
+
+Deep learning based traditional classification [2]-[4] has achieved high accuracy in recent years compared to image processing approaches. However, the underlying assumption is that the training set contains representations of all possible classes (close set). This assumption of a priori knowledge of all types of waveforms is impractical in the context of detection of new waveforms, where the unknown waveform to be detected exists in the training dataset at the time of model training. Traditional models will mis-classify this new signal not belonging to the close set and derived from outside it, specifically from open set, as one of the known classes
+with high accuracy. Zero-Shot Learning (ZSL) [5] or OneShot Learning tries to alleviate this problem by focusing more on the recognition of known classes where the data is not present during training. ZSL is a useful tool when semantic or meta information for the unknown class is nevertheless known during training; despite the lack of explicit training data. However, in the case of unknown waveforms, not only is class data not available, but the meta-features of the class are also unknown.
+
+Deep learning based anomaly detection methods [6] can be used in such scenarios where the goal is to detect an outlier. The limitation for this approach is that it is a single class classification method, where an overestimation of the determined boundaries could lead to errors in outlier detection. Open set recognition (OSR) takes a step further to classify the data for unknown/unseen classes without any other side-information, like features of unseen samples. This is specifically useful in detection of new waveforms on-the-fly, when it is first transmitted in the field and a trained model is deployed. Timely identification of these new waveforms is the key to isolate it and use it for further processing.
+
+Standard deep neural networks are not suitable for OSR as they often yield high confidence values for inputs, which are significantly different from the training classes. This vulnerability has been exploited for adversarial attacks on deep networks, specifically to change a classifier's labels based on imperceptible changes to the input data [7], [8]. Open set recognition [9], [10] is a fairly new domain of machine learning research, where the goal is to distinguish between types of data it has already seen during the training process from types to which it has not yet been exposed (out-ofdistribution (OOD) data). In other words, OSR addresses the closed set nature of traditional classification models by opening the space to infinite unknown space for unknown classes. Compared to Softmax layer in traditional neural networks, OpenMax [9] was introduced as a new network layer, which estimates the probability of an input being from an unknown class. DNN based prior work on OSR can be categorized based on underlying network: either discriminative or generative. As Generative Adversarial Networks (GANs) [11] can learn data distributions, a GAN-discriminator trained on the closed-set naturally serves as an open-set likelihood function. This is used in recent works [12]-[14] to improve the performance of open set recognition over discriminative methods.
+
+Most of the prior work on OSR is targeted for image classification. They cannot be simply extrapolated in wireless domain as the signals often undergo various channel conditions as well as transceiver hardware non-linearities that distort the received signal. Furthermore, domain knowledge for wireless signals and its propagation characteristics can be utilized to further improve the open set accuracy and interpretability. Recent research on wireless signals attempted for modulation detection [15] and authenticating transmitters based on RF Fingerprinting [16], [17]. Only two prior works exist [18], [19] that aimed at classifying unknown waveforms. The first one focuses on simulated standard compliant wireless signals [18], like 4G LTE, 5G NR, IEEE 802.11ax (WiFi 6), and Bluetooth Low Energy (BLE) 5.0 signals as closed set and AM/FM as open set. It uses a simple threshold on accuracy for determining the unknown class in a discriminative model architecture, due to which the achieved accuracy is quite low at lower SNR regimes where it is unusable. It also requires a very high number of input samples (65536) to classify the signal.
+
+The second work [19] focuses on signals captured over-the-air in ISM band in an indoor setup. The closed class set comprised of Wi-Fi, Bluetooth, ZigBee and cordless phone. The open set consists of signals emitted from video monitor, game controller and microwave oven. A generative model was used with multi-task architecture that provides both signal and modulation type in the training process. Adding this extra feature may improve OSR accuracy at higher SNR compared to only the signal type information. However, at lower SNRs, waveform detection is an easier task than identifying the modulation correctly and may not help to improve the model accuracy. Also, this extra set of labels has to be generated and provided during the model training, which adds to the overhead of model training. Hence, it is essential to innovate in models that can classify unknown electromagnetic waveforms in very low SNRs using few samples from the signal.
+
+In this paper, we propose DUNES, a method for Detection of UNclassified Electromagnetic Signals through multi-domain feature fusion. We hypothesize: a) the channel effects change the structure of the time-frequency domain representations, but does not change the fundamental features embedded in the wireless signal that it is composed of and \(b\) ) an unknown signal may have similarity with a known signal in one form of feature representation, but will differ in another representation, which can be exploited to avoid mis-classification of unknown signals. Based on these two hypotheses, DUNES is developed, which fundamentally differs from prior approaches for OSR. Our contributions can be listed as follows:
+1) We decompose the signal to a lower dimensional fundamental features, which can be used to reconstruct it without any loss using an autoencoder architecture. Instead of using the waveforms directly to train a GAN architecture, we use these features (or decomposed signal) of the waveforms to differentiate between the classes.
+2) We use multiple representations of the same wireless signal: time-domain, frequency-domain (discrete fourier
+
+\begin{figure}
+\includegraphics[alt={},max width=\textwidth]{https://cdn.mathpix.com/cropped/af3ef757-3313-4ffa-9549-9b14c0e0f1c2-2.jpg?height=560&width=860&top_left_y=171&top_left_x=1089}
+\captionsetup{labelformat=empty}
+\caption{Fig. 1: The schema of the proposed DUNES model.}
+\end{figure}
+transform (DFT)) and discrete cosine transform (DCT) to extract different types of features. We perform a fusion of these multi-domain features, which are then fed to a GAN for distinguishing it as a known or unknown waveform. This reduces the probability of mis-classification of unknown classes when waveforms have similar time domain properties.
+3) We show that this combination of feature domains produces better models for distinguishing open and closed set data than using the individual domains by themselves. These results are especially pronounced in extreme conditions of operations, when decisions are made using few samples of the signal in low SNR scenarios.
+
+\section*{II. System Design for dunes}
+
+In this section, we introduce the design of DUNES. The schema of the proposed DUNES model is shown in Figure 1. Our method consists of two main steps: multi-domain feature extraction and fusion, and adversarial training. At first, we extract features from time signals \(X_{T}\), frequency signals \(X_{F}\), and DCT signals \(X_{C}\), and fuse them. Next, we feed the fused features \(Z_{\text {Fuse }}\) into the discriminator \(\mathcal{C}\) of the GAN to assess whether the waveform is from a known or unknown class. The generator \(\mathcal{G}\) creates additional synthetic fused features to augment the data available to the discriminator.
+
+\section*{A. Multi-domain Feature Extraction and Fusion}
+
+Instead of employing received waveforms directly in the training process, we utilize different features or decomposed signals to distinguish between classes. Despite variations in transmission conditions, the basic fundamental features remain consistent across signal types. This characteristic potentially makes the representation more robust to variations caused by channel effects and pathloss, beneficial in scenarios where the quality of the received signal is affected by changing environmental conditions. To address the challenge of misclassification caused by similarities in time or frequency features, we incorporate waveforms from multiple domains: time, frequency, and DCT. Furthermore, we choose the samples
+from the start of the packet, which contains preambles and has a higher correlation property embedded in the signal for it to be detected and identified at lower SNRs. First, we process the time-domain waveform \(X_{T}\) using discrete Fourier transform (DFT) and discrete cosine transform (DCT) to obtain the frequency-domain and DCT-domain waveforms, respectively:
+\[
+\begin{gathered}
+X_{F}=D F T\left(X_{T}\right)=\sum_{n=0}^{N-1} X_{T} \cdot e^{-i 2 \pi n \frac{k}{N}} \\
+X_{C}=D C T\left(X_{T}\right)=\sum_{n=0}^{N-1} X_{T} \cos \left[\frac{\pi}{N}\left(n+\frac{1}{2}\right) k\right]
+\end{gathered}
+\]
+
+While the DFT employs complex exponentials, the DCT relies solely on real cosine functions. Next, we employ three autoencoders, each reconstructing its original input as \(X=\mathcal{D}(\mathcal{E}(X)) \quad X \in\left\{\begin{array}{lll}X_{T} & X_{F} & X_{C}\end{array}\right\}\). The encoder outputs are combined to generate a fused feature representation: \(Z_{\text {fuse }}= \left[\begin{array}{lll}Z_{T} & Z_{F} & Z_{C}\end{array}\right]\). This approach diminishes the likelihood of misclassifying unknown classes, particularly when waveforms exhibit resemblances in time or frequency domain properties. For instance, a single carrier signal occupying the same time and frequency space as an Orthogonal Frequency Division Multiplexing (OFDM) waveform should be categorized into distinct classes.
+
+Let \(s_{1}\) denote a single signal sample from Class \(C\), where \(s_{1} \in C\). The function \(H(\cdot)\) represents the channel effect. We assume that when \(s_{1}\) passes through the channel, resulting in \(H\left(s_{1}\right)\), the fundamental features of the signal \(s_{1}\) are preserved. Consequently, \(H\left(s_{1}\right) \in C\) as well, allowing the signal with channel effect to still be correctly classified into Class \(C\).
+
+We define \(Z_{T_{s_{1}}} \approx Z_{T_{s_{2}}}\) to mean that the time feature of signal \(s_{1}\) is similar to the time feature of signal \(s_{2}\). One signal may share similarities with another in a specific type of feature; however, two signals can be considered to belong to the same class only if all features are similar between them. This can be expressed as:
+\[
+Z_{T_{s_{1}}} \approx Z_{T_{s_{2}}} \wedge Z_{F_{s_{1}}} \approx Z_{F_{s_{2}}} \wedge Z_{C_{s_{1}}} \approx Z_{C_{s_{2}}} \rightarrow s_{1} s_{2} \in C
+\]
+
+On the other hand, if any feature is similar between the two signals, but not all, it implies that the signals cannot be classified in the same class:
+\[
+Z_{T_{s_{1}}} \approx Z_{T_{s_{2}}} \vee Z_{F_{s_{1}}} \approx Z_{F_{s_{2}}} \vee Z_{C_{s_{1}}} \approx Z_{C_{s_{2}}} \nrightarrow s_{1} s_{2} \in C
+\]
+
+\section*{B. Adversarial Training for Open Set Recognition}
+
+We use unsupervised learning for the closed-set data distribution with a GAN [20], using its discriminator as the open-set likelihood function. Recent work [21] has shown that some outlier data as open-training or validation examples, can significantly improve the OSR performance via the training and selection of a simple open-vs-closed binary discriminator. In this work, we choose to discriminatively learn an open-vsclosed binary discriminator \(\mathcal{C}\) by exploiting outlier exposure.
+
+In addition to the fused features from the closed-set \(Z_{\text {Fuse }}^{c}\), we also feed some fused outlier features \(Z_{\text {Fuse }}^{o}\) which are also obtained from the feature fusion process to the discriminator \(\mathcal{C}\). We design the generator \(\mathcal{G}\) to produce synthesized fused features from noise, \(Z_{\text {Gen }}=\mathcal{G}(n)\). These features act as synthetic open-set signals, enhancing the richness of our training dataset. As a result, the discriminator acquires valuable insights derived from closed-set, synthetic data, and outliers, forming a robust foundation for distinguishing between closed-set and openset data, \(\mathcal{C}\left(Z_{\text {Fuse }}^{c} Z_{\text {Fuse }}^{o} Z_{\text {Gen }}\right)=\{\) known unknown \(\}\). Throughout the training process, the discriminator \(\mathcal{C}\) is trained to proficiently differentiate known classes from unknown ones.
+
+\section*{C. Neural Network Architecture}
+1) Autoencoder: We employ three sets of autoencoders to handle the three different types of waveforms \(\left\{X_{T}{ }^{c}{ }^{o} \quad X_{F}{ }^{c}{ }^{o} \quad X_{C}{ }^{c}{ }^{o}\right\} \in \mathbb{R}^{[2 \times N]}\) separately, where the number 2 represents the two channels (real and imaginary parts) of the signal, and \(N\) denotes the length of each sample. Although the architecture of each autoencoder remains consistent, the parameters are unique after training, as illustrated in Table I. The encoder consists of a total of a combination of convolutional layers, followed by BatchNormalization and Tanh activation functions. The decoder reconstructs the original waveform from compressed features and has a total of seven layers with a set of convolutional layer followed by transpose convolutional layer in the reverse order of the encoder. We define the compression ratio as \(\alpha\). The feature \(Z\) produced by the encoder would belong to the real number space with dimension \(\alpha N\), which is \(Z \in \mathbb{R}^{\alpha N}\).
+
+We define \(\mathcal{E}(\theta X)\) and \(\mathcal{D}(\phi Z)\) as the mapping and remapping functions for each set of autoencoders, respectively. These functions map the input waveform \(X\) to a latent space \(Z\) then reconstruct the original waveform \(\hat{X}\) from the latent representation. Additionally, we define \(M S E(X \hat{X})\) as the mean squared error between the original waveform \(X\) and the reconstructed waveform \(\hat{X}\). The loss function of each set of autoencoders can be formulated as follows:
+\[
+\begin{aligned}
+\mathcal{L}_{\mathcal{E}+\mathcal{D}} & =M S E(X \mathcal{D}(\phi \mathcal{E}(\theta X))) \\
+& =\frac{1}{n} \sum_{i=1}^{n}(X-\mathcal{D}(\phi \mathcal{E}(\theta X)))^{2}
+\end{aligned}
+\]
+where \(n\) denotes the total number of samples, \(X \in \left\{\begin{array}{lll}X_{T}{ }^{c}{ }^{o} & X_{F}{ }^{c}{ }^{o} & X_{C}{ }^{c}{ }^{o}\end{array}\right\}\) represent the known and outlier waveforms of time, frequency, and DCT, and \(Z \in \left\{Z_{T}{ }^{c o} Z_{F}{ }^{c o} Z_{C}{ }^{c o}\right\}\) represent the feature for each kind correspondingly.
+2) Generative Adversarial Network: In our system, the generator accepts noise \(z\) as input and generates synthesized fused features \(Z_{\text {Gen }}\) as output. The discriminator processes a combination of close-set features \(Z^{c}\), outlier features \(Z^{o}\), and \(Z_{\text {Gen }}\) as input, making a determination as to whether the input features belong to the known (close set) or unknown (open set). We employ convolutional neural networks to design the generator and discriminator. Both of these models are multilayer perceptron (MLP) networks. The generator consists of a
+
+\begin{table}
+\captionsetup{labelformat=empty}
+\caption{TABLE I: Neural Network Architecture.}
+\begin{tabular}{|l|l|l|l|}
+\hline \multicolumn{2}{|c|}{Autoencoder} & \multicolumn{2}{|c|}{GAN} \\
+\hline Encoder & Decoder & Generator & Discriminator \\
+\hline (Conv1D + & ConvTrans1D/ & Conv1d + & Conv1d + \\
+\hline BatchNorm + & Conv1D + & BatchNorm + & BatchNorm + \\
+\hline Tanh) \(\times 2\) & BatchNorm + & LeakyReLU & LeakyReLU \\
+\hline (Conv1D + & ConvTrans1D/ & Conv1d + & Conv1d + \\
+\hline BatchNorm + & Conv1D + & BatchNorm + & BatchNorm + \\
+\hline Tanh) \(\times 2\) & BatchNorm + & LeakyReLU & LeakyReLU \\
+\hline (Conv1D + & ConvTrans1D/ & Linear + & Dropout \\
+\hline BatchNorm + & Conv1D + & LeakyReLU & \\
+\hline Tanh) \(\times 2\) & BatchNorm + Tanh & & \\
+\hline (Conv1D + & Conv1D + & Linear+ & Linear + Sig- \\
+\hline BatchNorm + & Tanh & LeakyReLU & moid \\
+\hline Tanh) \(\times 2\) & & Linear + Tanh & \\
+\hline
+\end{tabular}
+\end{table}
+set of convolution followed by BatchNormalization or linear layers with LeakyReLU activation function, as detailed in Table I. The last layer is made Tanh to have the generator output scaled between -1 and +1 to simulate the range of the normalized true features ( \(Z\) ) of the Autoencoder. The discriminator consists of a set of convolution layers followed by BatchNormalization with LeakyReLU activation function. The final layer of the discriminator is a linear layer with a Sigmoid activation function, enabling the model to make a binary decision. In training the GAN system, we aim to achieve two distinct goals. First, to confuse the discriminator and increase the difficulty of open-set classification, the generator is trained to produce features similar to the closeset features. Second, the discriminator learns to distinguish between known and unknown features during the training process. The loss function for the generator \(\mathcal{G}\) can be expressed as:
+\[
+\mathcal{L}_{\mathcal{G}}=\min [\log (1-\mathcal{C}(\mathcal{G}(z)))]
+\]
+which encourages the generator to produce samples that have a low probability of being recognized as fake by the discriminator. For the discriminator \(\mathcal{C}\), the loss function incorporates not only the close-set fused features but also outlier features and generated features. The loss function for the discriminator \(\mathcal{C}\) can be formulated as:
+\[
+\begin{aligned}
+\mathcal{L}_{\mathcal{C}} & =\max \left[\log \left(\mathcal{C}\left(Z^{c}\right)\right)+\log (1-\mathcal{C}(\mathcal{G}(z)))\right. \\
+& \left.\left.+\log \left(1-\mathcal{C}\left(Z^{o}\right)\right)\right)\right]
+\end{aligned}
+\]
+which compels the discriminator to effectively differentiate between known and unknown features.
+
+\section*{III. Experiments}
+
+Data: The wireless communication dataset employed in this study encompasses WLAN non-high-throughput (non-HT), Zigbee, Bluetooth Low Energy (LE), 802.11b, and Bluetooth Basic Rate/Enhanced Data Rate (BR/EDR). The carrier frequency of these five datasets is around 2.4 GHz . In the WLAN nonHT dataset, Orthogonal Frequency Division Multiplexing (OFDM) is used for data encoding, while the
+
+\begin{table}
+\captionsetup{labelformat=empty}
+\caption{TABLE II: Training Parameters for the GAN.}
+\begin{tabular}{|l|l|l|l|}
+\hline Parameter & Value & Parameter & Value \\
+\hline Learning rate & 0.00001 & Epochs & 300 \\
+\hline Channel SNR & \(5 \sim 25 \mathrm{~dB}\) & Input size (N) & 32, 64, 128, 256 \\
+\hline outlier / close-set data ratio & 1/3 & Platform & Pytorch \\
+\hline outlier & DSSS & open-set & Zigbee \\
+\hline close-set & \multicolumn{3}{|c|}{WLAN non-HT, Bluetooth LE, Bluetooth BR/EDR} \\
+\hline
+\end{tabular}
+\end{table}
+
+IEEE 802.11b dataset utilizes Direct Sequence Spread Spectrum (DSSS) technology. Bluetooth BR/EDR and Bluetooth LE both utilize frequency-hopping spread spectrum (FHSS) as their spread spectrum technique, with Bluetooth BR/EDR employing 79 channels with a 1 MHz channel bandwidth and Bluetooth LE employing 40 channels with a 2 MHz channel bandwidth. Zigbee is based on IEEE 802.15.4 specifications, and it comprises a suite of high-level communication protocols designed for personal area networks, employing OQPSK modulation. All datasets are generated using MATLAB Bluetooth Toolbox or WLAN Toolbox, with each dataset undergoing additive white Gaussian noise (AWGN) across various signal-to-noise ratios (SNRs) ranging from -20 dB to 25 dB . Each dataset comprises 10,000 packets of I/Q samples for each SNR level.
+Experiment Setup: The neural network models are designed and optimized in the deep learning platform, PyTorch [22]. The three sets of autoencoders are trained first, then the generator and discriminator are trained and updated at the same time. The autoencoders for all the domains are trained with the standard parameter Adam optimizer and initial learning rates of 0.001 , which is reduced to 0.0001 after 100 epochs. The GAN network pair is trained for 300 epochs with the Adam optimizer and a learning rate of 0.00001 . While this is a rather small learning rate, such a choice contributes to the stability of the model. During the training phase, datasets consisting of WLAN non-HT, Bluetooth LE, and Bluetooth BR/EDR are chosen as the close-set datasets. Outlier addition during training is a common practice introduced for out-ofdistribution detection [23]. The 802.11b (DSSS) dataset is included as an outlier, while Zigbee is designated as the openset dataset for the testing phase. The ratio between the outlier and close-set datasets is \(1: 3\). The training parameters are shown in Table II. The ratio of training:validation:testing set is 60:10:30. We compared DUNES with three models labeled as: a) Time, b) DCT and c) Frequency, where each of them uses only one domain for feature extraction and eventually does not require any feature fusion step as described in Figure 1. For the rest of the architecture, training and setup of these three models are exactly the same as DUNES. We choose a threshold on the validation dataset that can clearly distinguish the closed set vs generated and outlier set. We use the same threshold for detection in testing phase.
+
+\section*{IV. Results}
+
+One of the unique intermediate steps of DUNES is to extract features as latent space of an autoencoder model. Figure 2
+
+\begin{figure}
+\includegraphics[alt={},max width=\textwidth]{https://cdn.mathpix.com/cropped/af3ef757-3313-4ffa-9549-9b14c0e0f1c2-5.jpg?height=416&width=891&top_left_y=154&top_left_x=156}
+\captionsetup{labelformat=empty}
+\caption{Fig. 2: Plot of the first two Principal Components (PCs) for combined domains, DUNES for all testing data from -20 dB to 25 dB .}
+\end{figure}
+
+\begin{figure}
+\includegraphics[alt={},max width=\textwidth]{https://cdn.mathpix.com/cropped/af3ef757-3313-4ffa-9549-9b14c0e0f1c2-5.jpg?height=865&width=912&top_left_y=732&top_left_x=148}
+\captionsetup{labelformat=empty}
+\caption{Fig. 3: \(F_{1}\) Score for each domain of signal representation compared to DUNES with varying input sample size ( \(N\) ) and SNR.}
+\end{figure}
+shows the first two principal components of fused feature space ( \(Z_{\text {Fuse }}\) ) for DUNES. Although the overall feature space is quite distinguishable between open and closed, as seen in Figure 2a, we notice that there is significant overlap when we zoom in, as in Figure 2b. So, simply using \(Z_{\text {Fuse }}\) will not suffice to identify whether a sample test signal belongs to the open or closed set. Hence, it establishes the need for generative adversarial learning to model a discriminator that can accurately classify a signal using \(Z_{\text {Fuse }}\) as known or unknown.
+
+\section*{A. \(F_{1}\)-Score}
+
+We compare the performance of each domain and DUNES with varying input sample size ( \(32,64,128\) and 256) and SNR ( -20 dB to 25 dB ) in Figure 3. We use \(\mathrm{F}_{1}\) score as the performance metric, which effectively combines both precision and recall, taking into account both false positives and false
+
+\begin{table}
+\captionsetup{labelformat=empty}
+\caption{TABLE III: AUROC for all SNRs and Sample Sizes}
+\begin{tabular}{|c|c|c|c|c|}
+\hline & \multicolumn{4}{|c|}{ DomAIN } \\
+\hline SAMPLE SIZE & DUNES & Time & Frequency & DCT \\
+\hline 32 & \(\underline{0.9768}\) & 0.8294 & 0.9439 & 0.8033 \\
+\hline 64 & \(\underline{0.9948}\) & 0.9664 & 0.8639 & 0.9589 \\
+\hline 128 & 0.9658 & 0.8717 & 0.9406 & \(\underline{0.9688}\) \\
+\hline 256 & \(\underline{0.9883}\) & 0.9625 & 0.9020 & 0.9856 \\
+\hline
+\end{tabular}
+\end{table}
+negatives. A model with perfect discrimination would have an \(F_{1}\)-score of 1.0. As SNR and number of input sample increases, the performance of all models improves, as there is less noise in the signal and more sampling points (longer duration) for the model to classify the signal as known (from closed set) or unknown (from open set). In all cases, DUNES outperforms other models that uses single domain representations. However, when only a few samples are used to detect the signal, especially when they are hidden under the noise, single domain representation is not useful as their \(\mathrm{F}_{1}\) score drops significantly. DUNES outperforms all individual models by extracting multiple domain features and efficiently fusing these features to improve the detection of unknown signals. This shows DUNES's capability of operating in low SNRs, thus effectively identifying low probability of detection (LPD) signals.
+
+\section*{B. AUROC}
+
+Model superiority can be further examined by reference to the receiver-operating-characteristic (ROC) curve and its respective area-under-the-curve (AUROC). Table III shows the AUROC averaged over all SNRs, where our proposed method, DUNES, outperforms individual domain models for all sample size cases, except 128, with marginally lower value than DCT. Since this result is a combination of all SNRs, we further examine the outcome for two candidate low SNR scenarios.
+
+The first scenario is an extreme condition of operation, where only 32 samples of signal are used for training and testing the model and AUROC is computed at low SNRs, like 0 and -10 dB . Figure 4 shows that DUNES outperforms all other methods for both the SNRs and reaches almost a perfect score of AUROC at higher SNR of 0 dB with only 32 input samples. The second scenario is a much improved condition of operation, where 128 samples of signal are used instead of only 32 samples. Figure 5 shows that with more samples, AUROC for all the domains including DUNES improved compared to only 32 samples, as in Figure 4. At 0 dB , all individual domains perform well, which is expected. However, at lower SNR of -10 dB , DUNES outperforms all other domains, making it ready to be adopted for low SNR scenarios.
+
+\section*{V. Conclusion}
+
+Detection of unknown waveforms in mission critical communications is a critical area of interest for Department of Defense (DoD). In this paper, we have proposed a novel open set recognition framework, DUNES, for differentiating between known signals of interest (closed set) and previously unseen (open set) signals via use of combined domain feature
+
+\begin{figure}
+\includegraphics[alt={},max width=\textwidth]{https://cdn.mathpix.com/cropped/af3ef757-3313-4ffa-9549-9b14c0e0f1c2-6.jpg?height=408&width=901&top_left_y=158&top_left_x=154}
+\captionsetup{labelformat=empty}
+\caption{Fig. 4: AUROC for each domain of signal representation compared to DUNES at low SNR with a sample size of 32 .}
+\end{figure}
+
+\begin{figure}
+\includegraphics[alt={},max width=\textwidth]{https://cdn.mathpix.com/cropped/af3ef757-3313-4ffa-9549-9b14c0e0f1c2-6.jpg?height=405&width=902&top_left_y=687&top_left_x=156}
+\captionsetup{labelformat=empty}
+\caption{Fig. 5: AUROC for each domain of signal representation compared to DUNES at low SNR with a sample size of 128 .}
+\end{figure}
+extraction. Combining features of different representations together, time, domain and DCT, has made DUNES a better and more powerful discriminator than choosing any one of the features alone. Future work will focus on making DUNES more robust by training and testing in several scenarios: wider variety of signals for both close and open set, evaluate the effect of detection error in symbol boundary, effect of carrier frequency offset and detection in presence of other interfering signals; all using both simulated and captured over-the-air signals. Additionally, we plan to classify the closed set into known classes and remove the dependency on start of the packet as input so that DUNES can be used for any kind of signal, both packet based or frame based communication.
+
+\section*{Acknowledgment}
+
+This research is supported in part by Idaho National Laboratory (INL) and the United States Department of Energy (DoE) under Lab Directed Research and Development (LDRD) grant 24A1081-049FP and 296512. This research also made use of the resources of the High Performance Computing Center at INL, which is supported by the Office of Nuclear Energy of the U.S. DoE and the Nuclear Science User Facilities under Contract No. DE-AC07-05ID14517. We thank Daniel Wells from INL for his code contribution and Nicholas Kaminski from INL for his consultation throughout the project.
+
+\section*{References}
+[1] V. Chandola, A. Banerjee, and V. Kumar, "Anomaly detection: A survey," ACM Comput. Surv., vol. 41, jul 2009.
+[2] C. Szegedy, W. Liu, Y. Jia, P. Sermanet, S. Reed, D. Anguelov, D. Erhan, V. Vanhoucke, and A. Rabinovich, "Going deeper with convolutions," in Computer Vision and Pattern Recognition (CVPR), 2015.
+[3] K. He, X. Zhang, S. Ren, and J. Sun, "Deep residual learning for image recognition," in 2016 IEEE Conference on Computer Vision and Pattern Recognition (CVPR), pp. 770-778, 2016.
+[4] G. Huang, Z. Liu, L. Van Der Maaten, and K. Q. Weinberger, "Densely connected convolutional networks," in 2017 IEEE Conference on Computer Vision and Pattern Recognition (CVPR), pp. 2261-2269, 2017.
+[5] W. Wang, V. W. Zheng, H. Yu, and C. Miao, "A survey of zero-shot learning: Settings, methods, and applications," ACM Trans. Intell. Syst. Technol., vol. 10, jan 2019.
+[6] G. Pang, C. Shen, L. Cao, and A. V. D. Hengel, "Deep learning for anomaly detection: A review," ACM Comput. Surv., vol. 54, mar 2021.
+[7] A. Nguyen, J. Yosinski, and J. Clune, "Deep neural networks are easily fooled: High confidence predictions for unrecognizable images," in 2015 IEEE Conference on Computer Vision and Pattern Recognition (CVPR), pp. 427-436, 2015.
+[8] I. J. Goodfellow, J. Shlens, and C. Szegedy, "Explaining and harnessing adversarial examples," 2014.
+[9] W. J. Scheirer, A. de Rezende Rocha, A. Sapkota, and T. E. Boult, "Toward open set recognition," IEEE Transactions on Pattern Analysis and Machine Intelligence, vol. 35, no. 7, pp. 1757-1772, 2013.
+[10] W. J. Scheirer, L. P. Jain, and T. E. Boult, "Probability models for open set recognition," IEEE Transactions on Pattern Analysis and Machine Intelligence, vol. 36, no. 11, pp. 2317-2324, 2014.
+[11] I. Goodfellow, J. Pouget-Abadie, M. Mirza, B. Xu, D. Warde-Farley, S. Ozair, A. Courville, and Y. Bengio, "Generative adversarial nets," in Advances in Neural Information Processing Systems 27 (Z. Ghahramani, M. Welling, C. Cortes, N. D. Lawrence, and K. Q. Weinberger, eds.), pp. 2672-2680, Curran Associates, Inc., 2014.
+[12] S. D. Zongyuan Ge and R. Garnavi, "Generative openmax for multiclass open set classification," in Proceedings of the British Machine Vision Conference (BMVC) (G. B. Tae-Kyun Kim, Stefanos Zafeiriou and K. Mikolajczyk, eds.), pp. 42.1-42.12, BMVA Press, September 2017.
+[13] S. Kong and D. Ramanan, "Opengan: Open-set recognition via open data generation," IEEE Transactions on Pattern Analysis and Machine Intelligence, pp. 1-10, 2022.
+[14] G. Chen, P. Peng, X. Wang, and Y. Tian, "Adversarial reciprocal points learning for open set recognition," IEEE Transactions on Pattern Analysis and Machine Intelligence, vol. 44, no. 11, pp. 8065-8081, 2022.
+[15] X. Zhang, T. Li, P. Gong, R. Liu, X. Zha, and W. Tang, "Open set recognition of communication signal modulation based on deep learning," IEEE Communications Letters, vol. 26, no. 7, pp. 1588-1592, 2022.
+[16] S. Hanna, S. Karunaratne, and D. Cabric, "Open set wireless transmitter authorization: Deep learning approaches and dataset considerations," IEEE Transactions on Cognitive Communications and Networking, vol. 7, no. 1, pp. 59-72, 2021.
+[17] R. Xie, W. Xu, Y. Chen, J. Yu, A. Hu, D. W. K. Ng, and A. L. Swindlehurst, "A generalizable model-and-data driven approach for open-set rff authentication," IEEE Transactions on Information Forensics and Security, vol. 16, pp. 4435-4450, 2021.
+[18] S. R. Shebert, A. F. Martone, and R. M. Buehrer, "Open set wireless standard classification using convolutional neural networks," in MILCOM 2021-2021 IEEE Military Communications Conference (MILCOM), pp. 757-762, 2021.
+[19] J. Gong, X. Qin, and X. Xu, "Multi-task based deep learning approach for open-set wireless signal identification in ism band," IEEE Transactions on Cognitive Communications and Networking, vol. 8, no. 1, pp. 121-135, 2022.
+[20] I. Goodfellow, J. Pouget-Abadie, M. Mirza, B. Xu, D. Warde-Farley, S. Ozair, A. Courville, and Y. Bengio, "Generative adversarial networks," Communications of the ACM, vol. 63, no. 11, pp. 139-144, 2020.
+\([21]\) D. Hendrycks, M. Mazeika, and T. Dietterich, "Deep anomaly detection with outlier exposure," in International Conference on Learning Representations, 2019.
+[22] A. Paszke, S. Gross, F. Massa, A. Lerer, J. Bradbury, G. Chanan, T. Killeen, Z. Lin, N. Gimelshein, L. Antiga, et al., "Pytorch: An imperative style, high-performance deep learning library," Advances in neural information processing systems, vol. 32, pp. 8026-8037, 2019.
+[23] D. Hendrycks and K. Gimpel, "A baseline for detecting misclassified and out-of-distribution examples in neural networks," in International Conference on Learning Representations, 2017.

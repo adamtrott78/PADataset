@@ -1,0 +1,324 @@
+\title{
+Model Evaluation for Radio-Frequency Signal Modulation Classifiers in the Existence of Novel Samples
+}
+
+\author{
+Adam Trott \\ University of Massachusetts \\ Dartmouth \\ atrott@umassd.edu
+}
+
+\author{
+Henry Thompson \\ University of Massachusetts Dartmouth \\ hthompson3@umassd.edu
+}
+
+\author{
+Gokhan Kul \\ University of Massachusetts Dartmouth \\ gkul@umassd.edu
+}
+
+\begin{abstract}
+We present an open-set recognition (OSR) pipeline for radio-frequency \((R F)\) signal modulation that extends the recently proposed varMax uncertainty framework to the communications domain. Leveraging a multi-domain convolutional neural network (CNN) that takes in four representations of an electromagnetic signal in the form of raw In-phase and Quadrature (IQ) values and three transformations, Fast Fourier Transform (FFT), Discrete Cosine Transform (DCT), and polar magnitude, we train on eight signal modulations and treat the ninth modulation as unknown. Per fold, 1000 epochs are used to train each classifier on a unique set of eight modulations. Our approach supports the reliable rejection of unseen modulations on most folds while preserving in-distribution classification accuracy. However, the effectiveness is highly dependent on the makeup of the open and closed sets, and even seemingly inconsequential changes have a significant impact on the model's performance. This study demonstrates the strengths and weaknesses of extending the varMax approach to the \(R F\) domain and introduces modifications that improve the model's performance when trained on heterogeneous data.
+\end{abstract}
+
+Keywords: Deep neural networks, open-set recognition, unknown signal modulation identification
+
+\section*{1. Introduction}
+
+The detection of previously unseen electromagnetic signals underpins a wide spectrum of mission-critical tasks (Shi et al. (2019)). In the tactical domain, recognizing an unfamiliar waveform can reveal an adversary's communication capability. In civilian spectrum management, it enables the prompt
+identification of spectrum violations and mitigates radio-frequency interference that can cripple remote sensing and radio astronomy observations. RF signal modulation classification is inherently an edge domain problem, and real-time unknown detection in this domain is a beneficial form of edge intelligence, as it can be utilized to identify unexpected signals sent to a receiver that could potentially disrupt communication. Classical statistical tests and handcrafted DSP features have long been used for anomaly detection; however, their performance deteriorates when multipath fading, hardware nonlinearities, or adversarial manipulation distort the received signal.
+
+Modern deep neural networks (DNNs) outperform these traditional methods on curated datasets, but they inherit a critical flaw: the softmax layer assumes a closed set in which every test sample belongs to one of the \(K\) classes observed during training (Broggi et al. (2025)). When this assumption is violated, as it inevitably is in a real-world environment, DNNs issue overly confident, yet incorrect predictions. In other words, DNNs are incapable of identifying data that they were not introduced to during the training phase.
+
+This shortcoming has fueled a surge of research in OSR for DNNs, spanning distance-based thresholds (Scheirer et al. (2013)), energy scores (Wang et al. (2021)), and generative adversarial detectors (Ge et al. (2017)). Although effective in computer-vision benchmarks, many of these techniques rely on spatial cues that transfer poorly to sequential data (Broggi et al. (2025)), such as radio frequencies, leaving the open-set recognition problem largely unsolved in this domain.
+
+Recent work by Baye et al. (2024) and Broggi et al. (2025) created the 3-stage decision pipeline varMax: a bias-neutral OSR mechanism applied to intrusion detection of anomalous packets that combines
+(i) the gap between the two largest softmax scores, (ii) the variance of logits before softmax is applied, and (iii) an energy-based out-of-distribution (OOD) detection algorithm. Sections (i) and (iii) of the decision pipeline are axillary methods adapted from older works, Berenbeim et al. (2023) and Wang et al. (2021), respectively, with section (ii) being a novel method based on the hypothesis that when a DNN classifier is provided a sample from the closed set, it is more confident in its final softmax result, and because of this, the variance in its unnormalised logits will be higher. However, if the sample is from the open-set, the variance will be lower.
+
+Additionally, Wei et al. (2024) hypothesized that performing FFT and DCT domain transformations on IQ data can be utilized for the OSR of signal types, as it incentivizes the model to learn more specific discrete features from each class. This was demonstrated by training three autoencoders on each domain of the data. Compressed feature data are then extracted from the latent space of the autoencoders and fused together to be used as training data for a discriminator in a Generative Adversarial Network (GAN) architecture. Through this experiment, Wei et al. (2024) demonstrated that exploiting the multi-domain features of RF data greatly improves OSR performance.
+
+Contributions. We unite these ideas to create the first varMax-enabled OSR system for RF modulations with the following:
+- A four-branch, eight-channel CNN that takes in the raw IQ data, as well as the FFT, DCT of the signal to extract a variety of different features as demonstrated in Wei et al. (2024). Additionally, we utilized polar magnitude as the 4th channel, to increase the inter-class separability for constellation-based modulation types.
+- A three-stage OSR decision logic based on (i) the top2-difference algorithm that compares the difference between top 2 softmax scores Berenbeim et al. (2023), (ii) variance of logits (varMax), and (iii) an energy-based OOD detection algorithm (Wang et al. (2021)).
+- A modification to the variance and energy calculations by creating distributions of both the variance and energy score for each modulation type in the closed-set. Utilizing these, samples that fall below the top-2 threshold are then flagged as ambiguous using the expected ranges of first the logit variance, followed by the energy-based OOD algorithm based on the sample's predicted class.
+
+\section*{2. System Design}
+
+\begin{table}
+\captionsetup{labelformat=empty}
+\caption{Table 1. Nine modulation groups selected for training}
+\begin{tabular}{|l|l|}
+\hline Group & Modulations \\
+\hline \begin{tabular}{l}
+Amplitude-digital \\
+Amplitude-SSB \\
+Amplitude-DSB \\
+APSK \\
+Frequency \\
+Phase-basic \\
+Phase-continuous \\
+Phase-high \\
+QAM
+\end{tabular} & \begin{tabular}{l}
+OOK, 4ASK, 8ASK \\
+AM-SSB-WC, AM-SSB-SC \\
+AM-DSB-WC, AM-DSB-SC \\
+16APSK, 32APSK, 64APSK, 128APSK \\
+FM \\
+BPSK, QPSK, OQPSK \\
+GMSK \\
+8PSK, 16PSK, 32PSK \\
+16QAM, 32QAM, 64QAM, 128QAM, 256QAM
+\end{tabular} \\
+\hline
+\end{tabular}
+\end{table}
+
+\subsection*{2.1. Modulation Grouping}
+
+The dataset employed in this study encompasses a diverse set of 26 modulation types, representing a broad range of signal encoding schemes. While some of these modulations differ substantially in their underlying principles, others exhibit only subtle variations or constitute parameterized variants of a common modulation family. To account for this structural heterogeneity and facilitate more coherent model generalization, we group the modulation types into nine semantically and structurally related categories, as shown in Table 1. We then chose one modulation from each group to include in model training (4ASK, AM-SSB-WC, AM-DSB-WC, 16APSK, OQPSK, GMSK, 32PSK, 64QAM).
+
+\begin{table}
+\captionsetup{labelformat=empty}
+\caption{Table 2. Classifier architecture}
+\begin{tabular}{|l|l|}
+\hline Individual Branch's Channel & Fused Features \\
+\hline \begin{tabular}{l}
+Conv1D( \(1 \rightarrow 32\) ), \(\mathrm{k}=5, \mathrm{~s}=1, \mathrm{p}=2\) \\
++ BatchNorm1D(32) \\
++ LeakyReLU
+\end{tabular} & \begin{tabular}{l}
+Linear(1024 → 512) \\
++ LeakyReLU \\
++ Dropout
+\end{tabular} \\
+\hline \begin{tabular}{l}
+Conv1D \((32 \rightarrow 64), \mathrm{k}=3, \mathrm{~s}=2, \mathrm{p}=1\) \\
++ BatchNorm1D(64) \\
++ LeakyReLU
+\end{tabular} & \begin{tabular}{l}
+Linear(512 → 256) \\
++ LeakyReLU \\
++ Dropout
+\end{tabular} \\
+\hline \begin{tabular}{l}
+Conv1D(64 → 128), k=3, s=2, p=1 \\
++ BatchNorm1D(128) \\
++ LeakyReLU
+\end{tabular} & \\
+\hline \begin{tabular}{l}
+AdaptiveAvgPool1D(output_size=1) \\
++ Flatten → 1024 \\
+(128-D feature per channel)
+\end{tabular} & \begin{tabular}{l}
+Linear(256 → 7) \\
++ Softmax
+\end{tabular} \\
+\hline 8 branches concatenated ⇒ fused feature vector of size 1024 & \\
+\hline
+\end{tabular}
+\end{table}
+
+\subsection*{2.2 Multi-Domain CNN Architecture}
+
+Table 2 summarizes the architecture of our neural network. Four signal transforms each produce two channels (real and imaginary/magnitude+phase), yielding an \(8 \times 1024\) tensor per frame. Eight identical 1-D convolution branches extract local features, which
+are concatenated and compressed to a 256-D latent vector before the final linear classifier.
+
+\section*{2.3. varMax Decision Logic}
+
+After training, we apply three different decision layers: (i) top-2 softmax gap Berenbeim et al. (2023), (ii) logit variance Baye et al. (2024), and (iii) energy score (Wang et al. (2021)). (i) uses a single threshold regardless of the class, while (ii) and (iii) utilize a per-predicted-class percentile-based banded threshold to further filter data from the unknown dataset
+
+\section*{3. Methodology}
+
+This section outlines the components of our open-set modulation classification approach. We begin with the top-two difference algorithm in (i), which evaluates the confidence based on softmax probability gaps. We then describe our implementation of the variance algorithm in (ii), which leverages the variance score of the logits for refined open-set detection. In (iii), we detail the energy-based OOD detection algorithm. In (iv), we outline the complete decision cascade.
+
+\subsection*{3.1. Top-Two Confidence Estimation}
+
+For each input signal x, our classifier produces a logit vector \(\mathbf{z} \in \mathbf{R}^{C}\), where \(C\) is the number of known classes. We apply the softmax function
+\[
+S(\mathbf{z})_{i}=\frac{e^{z_{i}}}{\sum_{j=1}^{C} e^{z_{j}}}, \quad i=1, \ldots, C
+\]
+to compute the class probabilities \(\mathbf{p}\). The top-two confidence score \(\Delta_{2}\) is defined as the absolute difference between the two highest probabilities: \(\Delta_{2}=\mid p_{(1)}- p_{(2)} \mid\). If \(\Delta_{2}\) exceeds a threshold \(\tau\), the prediction is accepted as a known class. Otherwise, the input is flagged for further scrutiny by subsequent tests.
+
+\subsection*{3.2. Variance-Based Confidence Scoring}
+
+When \(\Delta_{2}<\tau\), we compute the variance of the logits before softmax activation to estimate model uncertainty. For input \(\mathbf{x}\) with logits \(\mathbf{z}=\left[z_{1}, \ldots, z_{C}\right]\), we calculate:
+\[
+\mathrm{V}(x)=\frac{1}{N} \sum_{j=1}^{N}\left|z_{j}-\operatorname{mean}(|z|)\right|^{2}
+\]
+
+We then take the sample's calculated variance and compare it to the thresholds of the sample's predicted class. The absolute mean ensures a scale-invariant
+dispersion measurement. According to Baye et al. (2024) less decisive model behavior leads to lower variance in logits, which correlates to samples in the open set, and vice versa. This conclusion is made from the domain they experimented on, therefore, in edge computing and signal frequencies, we need to test the same logic.
+
+When this method is applied to signal data, the heterogeneity of the dataset seems to break this predicted pattern, with the variance scores of the unknown data being distinct from that of the known data, but not always lower. Figure 1a and Figure 1b display columns of all known and unknown data, sorted by the known modulation type our classifier predicted each sample to be, with each sample placed vertically based on its calculated logit variance. Figure 1a uses 32PSK as the unknown dataset. As predicted, its spread is lower than its predicted classes. Figure 1b uses FM as the unknown dataset. Conversely, its spread is higher than its predicted class. This discrepancy suggests that the assumption made in Baye et al. (2024) that unknown samples have consistently lower logit variance than known samples is not true in this case. To address this issue, a banded threshold was utilized, with each end of the band set to a percentile of the logit variance for the distribution of each predicted class.
+
+\subsection*{3.3. Energy-Based Outlier Detection}
+
+For additional OOD verification, we calculate an energy score \(E(\mathbf{x})\) for each input \(\mathbf{x}\) :
+\[
+E(\mathbf{x})=-\log \sum_{j=1}^{C} \exp \left(z_{j}\right)
+\]
+
+This function maps high-confidence logits to low energy values. Theoretically, thresholding \(E(\mathbf{x})\) allows for discrimination between in-distribution (low energy) and out-of-distribution (high energy) samples. This method was also utilized by Baye et al. (2024) as an evaluative tool to refine OOD detection capabilities.
+
+However, applying this method to signal data provides the same mixed results as the logit variance. Figure 1c and Figure 1d display the same columns of known and unknown data sorted using the classifier's known-class prediction, with the samples being placed vertically based on their calculated energy scores. Figure 1c uses 32PSk as the unknown dataset, and its spread is higher than its predicted class, conforming to our understanding of how the energy function is expected to perform. Figure 1d shows the same chart with FM as the unknown dataset. In contrast, its distribution is lower than that of the known data in
+
+\begin{figure}
+\includegraphics[alt={},max width=\textwidth]{https://cdn.mathpix.com/cropped/fdf7966b-42e3-4ce3-b52c-aa66078cc035-04.jpg?height=966&width=1671&top_left_y=197&top_left_x=227}
+\captionsetup{labelformat=empty}
+\caption{Figure 1. Per-class energy and logit variance score spread with higher and lower unknown scores}
+\end{figure}
+the same predicted class. This difference suggests that within this domain, OOD samples do not necessarily have a higher energy score than in-distribution samples. To address this, we have implemented a banded threshold for the energy score using the same method as the banded threshold for logit variance.
+
+\subsection*{3.4. Decision Cascade}
+
+At inference time, each sample is classified using the following decision cascade:
+1. If \(\Delta_{2}>\tau_{\Delta}\) : classify as known.
+2. Else if \(\tau_{\text {var }}^{(\text {cmin })}<V(x)<\tau_{\text {var }}^{(\text {cmax })}\) : classify as known.
+3. Else if \(\tau_{E}^{(\text {cmin })}<E(\mathbf{x})<\tau_{E}^{(\text {cmax })}\) : classify as known.
+4. Else: classify as unknown.
+
+This hierarchical, class-conditioned method offers improved adaptability across modulation types with differing inter-class variabilities and across many different outliers.
+
+\subsection*{3.5. Setting the Thresholds}
+
+Determining appropriate threshold values for all three decision metrics is necessary to ensure sufficient model performance. The top-two threshold is a single constant value across all predicted classes, whereas the variance and energy thresholds are upper and lower percentiles, which are transformed into variance and energy scores by treating each class as its own distribution. These thresholds are not universally fixed, but are calibrated based on the distribution of the top two values, variance, and energy scores observed on a validation set representative of known and unknown samples. They were chosen to optimize the trade-off between sensitivity and specificity when classifying inputs as known or unknown. To obtain an optimistic estimate of the upper bound of this model's performance, we used a sweep to determine the percentile thresholds for each fold.
+
+\section*{4. Experimentation}
+
+We conducted our experiments using the publicly available DeepSig RadioML 2018.01A dataset (O'Shea and West (2018)), which contains over 2 million labeled complex baseband waveforms. Each frame contains a 1028-sample IQ time series drawn from both synthetic and real communication channels.
+
+\subsection*{4.1. Dataset Composition}
+
+The dataset includes 24 modulation types, each sampled across 26 signal-to-noise ratios (SNRs) from -20 dB to +30 dB in 2 dB steps with 4096 frames per modulation/SNR combination. Each frame is represented as a \(2 \times 1024\) matrix with separate I and Q channels.
+
+\subsection*{4.2. Model training}
+
+We trained the model using an integrated NVIDIA 1650 Ti with 4 GB of dedicated RAM. We trained each fold with a batch size of 64, 200 batches per epoch, for 1000 epochs, utilizing the Adam optimizer with a learning scheduler, that smoothly decrements the learning rate from E-3 to E-8 over the course of the training regimen, using the following loss function
+\[
+\mathcal{L}=\mathcal{L}_{\mathrm{CE}}+\lambda \mathcal{L}_{\text {Center }}
+\]
+where \(\lambda=.1\), and where \(\mathcal{L}_{\mathrm{C}}\) is defined as:
+\[
+\mathcal{L}_{C}=\frac{1}{2} \sum_{i=1}^{m}\left\|\mathbf{x}_{i}-\mathbf{c}_{y_{i}}\right\|_{2}^{2}
+\]
+and \(\mathcal{L}_{\mathrm{CE}}\) is defined as:
+\[
+\mathcal{L}_{\mathrm{CE}}=-\sum_{i=1}^{m} \log p_{y_{i}}
+\]
+
+\subsection*{4.3. Group Partitioning}
+
+The modulation types have been split into nine semantically and structurally coherent groups, as shown in Table 1, and we selected one modulation type from each group to train the model on, with a range of SNR values from +6 dB to +30 dB . This ensures that each group is represented in the closed set of our data.
+
+\subsection*{4.4. Evaluation Strategy}
+
+The model's effectiveness is calculated by having one modulation type be the unknown group, cycling through all nine modulation types, and calculating the \(F 1\)-scores for each fold. Each F1-score is calculated based on its accuracy in differentiating known and unknown data to focus on its OSR performance and not the accuracy of the classifier. Each fold is then ran 30 times, and the average performance of each fold is recorded in the results
+
+\section*{5. Results and Discussion}
+
+This section presents a comprehensive evaluation of our approach. We assess its effectiveness by systematically withholding one modulation type as the unknown class and measuring the model's ability to correctly classify the known signals while identifying the unknowns.
+
+In addition to the overall metrics, we examine the performance of our model in comparison with four baseline models to demonstrate its effectiveness. We also test our model across varying SNR levels to demonstrate its performance across a wide variety of conditions present in potential real-world applications.
+
+\subsection*{5.1. Model Performance}
+
+\begin{table}
+\captionsetup{labelformat=empty}
+\caption{Table 3. Leave-one-group-out OSR performance}
+\begin{tabular}{|l|l|l|l|}
+\hline Unknown Group & F1-Score & Unknown Acc. (\%) & Known Acc. (\%) \\
+\hline 4ASK & 0.976 & 83 & 98 \\
+\hline AM-DSB-WC & 0.895 & 83 & 92 \\
+\hline AM-SSB-WC & 0.991 & 99 & 98 \\
+\hline 16APSK & 0.822 & 85 & 80 \\
+\hline FM & 0.931 & 84 & 94 \\
+\hline OQPSK & 0.877 & 76 & 97 \\
+\hline GMSK & 0.763 & 69 & 77 \\
+\hline 32PSK & 0.737 & 75 & 71 \\
+\hline 64QAM & 0.72 & 69 & 73 \\
+\hline
+\end{tabular}
+\end{table}
+
+Table 3 summarizes fold-wise results. Showing the average \(F 1\)-score, the average unknown accuracy (percent of OOD flagged as unknown) and the average known accuracy (percent of known data not flagged). A notable result of this experiment is the wide variety of \(F 1\)-scores when the open set is rotated. Our highest scoring fold was with AM-SSB-WC, with a 0.992 F1-score, and unknown and known accuracies of \(99 \%\) and \(98 \%\), respectively.
+
+It can be concluded that owing to the distinct nature of the AM-SSB-WC waveform, the variance in the resulting logits is extremely high, resulting in very accurate unknown detection. However, when the modulation type AM-DSB-WC is the unknown set, the \(F 1\)-score is 895 , with unknown accuracy \(83 \%\) and known accuracy \(92 \%\). The only difference between these two modulation types is that AM-DSB-WC has both upper and lower sidebands transmitted, whereas AM-SSB-WC has only one. Because AM-SSB-WC only has one sideband, its constellation diagram has IQ values concentrated in one hemisphere, whereas essentially every other modulation type, including AM-DSB-WC, has IQ values situated symmetrically around the origin. This unique representation could
+contribute to a significantly higher logit variance and lower energy score in the unknown set compared to the more symmetrical AM-DSB-WC, which superficially appears more similar to other modulation types. This suggests that the model classifies AM-SSB-WC significantly more confidently than it does the samples correctly predicted in that class.
+
+The wide variety of model performances is also demonstrated when inspecting the lowest-performing modulation type. 64QAM is the modulation type that generated the most difficulty during both the development and testing of not only the unknown detection capability, but also the classifier itself. Quadrature Amplitude Modulation (QAM) encodes information by varying both the amplitude and phase of a carrier signal, resulting in dense constellation diagrams of clusters in a grid-like format centered around the origin, with higher-order QAM formats containing dozens of clusters all situated right next to each other. Amplitude Phase Shift Keying (APSK) also uses the amplitude and phase to encode information; however, unlike QAM, it stores clusters on concentric rings of different amplitude levels, with higher-order models containing dozens of clusters, similar to QAM. Both modulation types use the same transformations to store data, with the only difference being a slight change in the shape of the constellation diagram. This makes even closed-set detection of the two modulation types a challenge, especially at lower SNR values.
+
+The model performs well in differentiating between the two types given enough training time, but when it does not have both types in training, it performs significantly poorer distinguishing between the two, with 64QAM as the unknown set performing the worst out of all nine, with an F1-score of .72, with \(69 \%\) unknown accuracy, and \(73 \%\) known accuracy. Interestingly, and unlike our early implementations, when 16APSK is the unknown set, it performs significantly better, with an F1-score of .822, an unknown accuracy of \(85 \%\), and a known accuracy of \(80 \%\).
+
+Figure 2 shows the model's average unknown \(F 1\)-score per-fold, as well as the value of the F1-scores one standard deviation higher and lower than the mean. Our model provides very consistent results, and the standard deviation appears to decrease as the model performance increases.
+
+\subsection*{5.2. Baseline Performance}
+
+Figure 3 displays the results of our model's performance against four baseline methods: the Varmax model introduced in Baye et al., 2024, the logit variance
+
+\begin{figure}
+\includegraphics[alt={},max width=\textwidth]{https://cdn.mathpix.com/cropped/fdf7966b-42e3-4ce3-b52c-aa66078cc035-06.jpg?height=401&width=823&top_left_y=212&top_left_x=1100}
+\captionsetup{labelformat=empty}
+\caption{Figure 2. Average Unknown \(F_{1}\)-Score and Standard Deviation Per-Fold}
+\end{figure}
+section of the decision cascade introduced in Baye et al., 2024, the energy-based OOD detection algorithm proposed in Wang et al., 2021 and utilized in Baye et al., 2024, and the clustering algorithm k-means.
+
+K -means is an algorithm that partitions large groups of observations into clusters, each of which belongs to the cluster with the nearest centroid. It performs OSR by analyzing the 256 -dimensional latent space and assigns \(k\) centroid values, with \(k\) being the number of known classes. It assigns centroids by choosing the values with the highest quality clustering inside the latent space using only the training data. Once it finds these values, it assigns a threshold \(\tau_{k}\) to each centroid, indicating the maximum distance a sample can be from that class to be considered known. Once the centroid values are chosen, an evaluation is performed using the known and unknown data. If the model has learned how to differentiate between different modulation types effectively, the unknown data should create its own cluster inside the latent space, and samples \(>\tau_{k}\) from each centroid will be flagged as unknown.
+
+K-means is an effective OSR method when the unknown class is sufficiently separated from the known classes in the latent space. This only occurs when the relevant features of the unknown data, which the model has learned to distinguish for classification purposes, are significantly different from the closed set, as shown in Figure 4a. However, when the unknown data are not sufficiently different, as shown in Figure 4b, the unknown sample clusters overlap with the cluster of other known classes, drastically reducing the unknown detection rate of the method. Figure 4c and Figure 4d display the performance of our method on both significantly different and not sufficiently different unknown datasets, respectively.
+
+Figure 3 shows the average unknown \(F 1\)-scores across all folds of our model alongside our four baseline models. Classic Varmax, energy, and variance perform very poorly due to the fact that these models only include a single threshold, which when provided with
+an unknown set that produces results with confidence exceeding that of the known data, are unable to detect any unknown samples. This is due to the fact that their thresholds are assuming that unknown samples will result in lower variance and higher energy scores. However, this is not always the case in this domain. K -means performs considerably better but still falls short of our model's performance.
+
+\begin{figure}
+\includegraphics[alt={},max width=\textwidth]{https://cdn.mathpix.com/cropped/fdf7966b-42e3-4ce3-b52c-aa66078cc035-07.jpg?height=525&width=824&top_left_y=586&top_left_x=244}
+\captionsetup{labelformat=empty}
+\caption{Figure 3. Average Unknown \(F_{1}\)-Score of proposed model vs. baseline models}
+\end{figure}
+
+\subsection*{5.3. Model Performance across SNRs}
+
+This model was designed to perform under an extensive range of operational conditions. Therefore, the model was trained using a wide variety of SNR values. Although our results are fairly positive, it is clear that when the SNR of the sample is lower than the range in our training data, the effectiveness of the model decreases significantly. Figure 5 shows the model's F1-score when tested at individual SNR values ranging from -30 to +20 . Our model was trained on SNR values ranging from +6 to +30 . For most of the folds, SNR values of +6 and above did not have any significant impact on performance. However, when testing SNR values under +6 , the model showed a substantial decrease in performance. Additionally, Figure 5i shows OQPSK with \(F 1\)-scores of approximately . 5 from SNRs of +16 to \(+30, F 1\)-scores ranging from .59 to .79 when tested on SNR values of -6 to +12 . We believe that this outlier is due to the fact that the model with OQPSK as the unknown set is in a unique position to make this determination. At high SNR values, the model confidently predicts unknowns to be 32PSK or 16APSK, leading to low unknown \(F 1\)-scores. At lower SNR values, this certainty of both classes turns into uncertainty between the two, leading to higher energy and lower variance scores, and therefore increased unknown detection. Overall, the performance of our
+model with different modulation types as the unknown set produces a wide variety of results; however, the results are satisfactory, considering the imprecise nature of RF signal data and the similarity of many of these modulation types to one another.
+
+\subsection*{5.4. Evaluating Model Bias}
+
+A key feature of the method described in Baye et al. (2024) is its ability to correctly recognize samples in the open and closed sets without the results being biased towards unknown or known data, making it an important step forward in OSR. Our experiment was designed to test both the model's accuracy and its bias towards recognizing closed- and open-set samples. Considering the individual differences per modulation type, our model seems to have some discrepancies between the unknown and known accuracies. As shown in Table 3, the least biased result is AM-SSB-WC, with a 1\% difference between the unknown and known accuracies. The unknown set most biased towards unknown detection is 16APSK, with a difference in detection percentage of \(5 \%\) in favor of unknown accuracy, and the unknown set most biased towards known set detection is OQPSK, with a difference in detection percentage of \(21 \%\) in favor of the known accuracy. While this may seem like a large discrepancy, it is mostly due to the outlier OQPSK having poor unknown accuracy. Taking the difference between the known and unknown detection rates of each modulation type, while scoring bias towards unknown accuracy as negative and bias towards known accuracy as positive, you are left with 3 modulation types in favor of unknown detection (AM-SSB-WC, 16APSK, 32PSK), 6 modulation types in favor of known detection (4ASK, AM-DSB-WC, FM, and GMSK, 64QAM). If the average of all of those values is taken, the result is an average bias of \(6.33 \%\), in favor of the known accuracy. Overall, this is a small bias and was skewed heavily by the results of OQPSK.
+
+\section*{6. Conclusions}
+
+This study uses a variant of the Varmax OSR decision pipeline applied to signal modulation to explore the generalizability of the approach and extend it to work more efficiently in this new domain. We found, as seen in previous research, that the suggested relationship between the logit variance, a proxy for the model confidence, produced by the known and unknown sets is highly dependent on the characteristics of the closed and open sets and does not follow a clear pattern (of known data producing higher variance and lower energy scores) in all folds of the dataset. We also found that
+
+\begin{figure}
+\includegraphics[alt={},max width=\textwidth]{https://cdn.mathpix.com/cropped/fdf7966b-42e3-4ce3-b52c-aa66078cc035-08.jpg?height=1456&width=1639&top_left_y=216&top_left_x=244}
+\captionsetup{labelformat=empty}
+\caption{Figure 4. Anomaly detection latent space representation: k-means vs varMax}
+\end{figure}
+the heterogeneity of the data necessitated the use of per-class percentile thresholds owing to differences in the energy and variance scores of unknown samples in each fold. To account for both findings, we created a scheme that uses banded thresholds based on the expected variance and energy score distributions per predicted class to flag anomalies. This not only considers the possibility of an unknown input having variance and energy scores that indicate higher model confidence than known samples, potentially due to an overlapping feature space, but also the fact that different classes have significantly different expected variance and energy distributions. This demonstrates not only the robustness of the Varmax decision pipeline, but also its domain limitations and sensitivity to the dataset.
+
+\subsection*{6.1. Future Work}
+
+Owing to the effectiveness of Varmax in its original application in the OSR of packet data, further research on the method and the type of data to which it is most applicable could be highly valuable. In future work, we would like to explore more domains and attempt to find a framework for determining the expected effectiveness of this approach on a given dataset. We would also like to experiment with more folds of varying sizes and determine the relationship between the number of classes in the closed set and the method's effectiveness.
+
+\begin{figure}
+\includegraphics[alt={},max width=\textwidth]{https://cdn.mathpix.com/cropped/fdf7966b-42e3-4ce3-b52c-aa66078cc035-09.jpg?height=1357&width=1675&top_left_y=197&top_left_x=225}
+\captionsetup{labelformat=empty}
+\caption{Figure 5. evaluating \(F_{1}\)-scores per SNR value with each modulation type as unknown}
+\end{figure}
+
+\section*{7. Acknowledgment}
+
+This material is in part based upon work supported by the National Science Foundation under Grant Number 2234915. Any opinions, findings, conclusions, or recommendations expressed in this material are those of the authors and do not necessarily reflect the views of the National Science Foundation.
+
+\section*{References}
+
+Baye, G., Silva, P., Broggi, A., Bastian, N., Fiondella, L., \& Kul, G. (2024). Varmax: Towards confidence-based zero-day attack recognition. 2024 IEEE Military Communications Conference (MILCOM), 863-868. https://doi. org/10.1109/MILCOM61039.2024.10773707
+
+Berenbeim, A. M., Bierbrauer, D. A., Cruickshank, I. J., Thomson, R. H., \& Bastian, N. D. (2023, October). Applications of certainty scoring for machine learning classification in multi-modal contexts [Preprint]. https://doi.org/10.36227/ techrxiv.24257146.v1
+Broggi, A., Baye, G., Silva, P., Costagliola, N., Bastian, N., Fiondella, L., \& Kul, G. (2025). Varmax: Uncertainty and novelty management in deep neural networks. Proceedings of the 58th Hawaii International Conference on System Sciences (HICSS), 7514-7523. https://doi.org/ 10.24251/HICSS.2025.898
+
+Ge, Z., Demyanov, S., Chen, Z., \& Garnavi, R. (2017). Generative OpenMax for multi-class open set classification. Proceedings of the British Machine Vision Conference (BMVC), 42.1-42.12. https://doi.org/10.5244/C.31.42
+
+O'Shea, T., \& West, N. (2018). Radioml 2016.10a and 2018.01a [data set]. https://www.kaggle.com/ datasets/pinxau1000/radioml2018
+Scheirer, W. J., de Rezende Rocha, A., Sapkota, A., \& Boult, T. E. (2013). Toward open set recognition. IEEE Transactions on Pattern Analysis and Machine Intelligence, 35(7), 1757-1772. https://doi.org/10.1109/TPAMI. 2012.256
+
+Shi, Y., Davaslioglu, K., Sagduyu, Y. E., Headley, W. C., Fowler, M., \& Green, G. (2019). Deep learning for RF signal classification in unknown and dynamic spectrum environments. 2019 IEEE International Symposium on Dynamic Spectrum Access Networks (DySPAN), 1-10. https://doi.org/10.1109/DySPAN.2019. 8935684
+Wang, Y., Li, B., Che, T., Zhou, K., Liu, Z., \& Li, D. (2021). Energy-based open-world uncertainty modeling for confidence calibration. Proceedings of the IEEE/CVF International Conference on Computer Vision (ICCV), 9282-9291. https://doi.org/10.1109/ ICCV48922.2021.00917
+Wei, X., Saha, D., \& Quach, A. (2024). Exploiting multi-domain features for detection of unclassified electromagnetic signals. Proceedings of the 2024 IEEE Military Communications Conference (MILCOM), 1-6. https://doi.org/10.1109/MILCOM61039.2024. 10773991
