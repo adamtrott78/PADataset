@@ -542,3 +542,52 @@ If a new chat is taking over, it should first:
    * section rewrite
    * figure/table polish
    * Overleaf packaging
+
+---
+
+## 17. Reference Paper Ingestion Pipeline
+
+The repository now has a reusable pipeline for processing exemplar/reference papers.
+
+Drop source PDFs into:
+
+```text
+papers/milcom2026/reference_notes/staging/
+```
+
+Run from repo root:
+
+```bash
+MATHPIX_CMD='mpx convert "{pdf}" "{out}"' \
+bash papers/milcom2026/tools/process_reference_papers.sh
+```
+
+For each PDF, the pipeline creates:
+
+```text
+papers/milcom2026/reference_notes/papers/<slug>/
+  <slug>.pdf
+  <slug>.mmd
+  images/contact_sheet.png
+  images/pages/<slug>-001.png
+  images/pages/<slug>-002.png
+  ...
+  manifest.json
+  process.log
+```
+
+It also creates a downloadable bundle at:
+
+```text
+papers/milcom2026/reference_notes/reference_paper_exports/<slug>_analysis_bundle.tar.gz
+```
+
+MPX CLI must be installed and authenticated before running the pipeline:
+
+```bash
+npm install -g @mathpix/mpx-cli
+mpx login
+```
+
+The processed `.mmd` file gives text/math structure, while the page PNGs and contact sheet let the AI inspect visual composition, figure placement, table design, and page-level rhetorical structure.
+
