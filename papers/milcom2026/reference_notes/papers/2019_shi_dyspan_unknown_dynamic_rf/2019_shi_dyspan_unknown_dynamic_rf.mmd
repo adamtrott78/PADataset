@@ -1,0 +1,481 @@
+\title{
+Deep Learning for RF Signal Classification in Unknown and Dynamic Spectrum Environments
+}
+
+\author{
+Yi Shi \({ }^{1}\), Kemal Davaslioglu \({ }^{1}\), Yalin E. Sagduyu \({ }^{1}\), William C. Headley \({ }^{2}\), Michael Fowler \({ }^{2}\), and Gilbert Green \({ }^{3}\) \\ \({ }^{1}\) Intelligent Automation, Inc., Rockville, MD, USA \\ \({ }^{2}\) Virginia Tech, Blacksburg, VA, USA \\ \({ }^{3}\) US Army, APG, MD, USA \\ Email: \{yshi, kdavaslioglu, ysagduyu\}@i-a-i.com, \{cheadley, mifowler\}@vt.edu, gilbert.s.greeen2.civ@mail.mil
+}
+
+\begin{abstract}
+Dynamic spectrum access (DSA) benefits from detection and classification of interference sources including innetwork users, out-network users, and jammers that may all coexist in a wireless network. We present a deep learning based signal (modulation) classification solution in a realistic wireless network setting, where 1) signal types may change over time; 2) some signal types may be unknown for which there is no training data; 3) signals may be spoofed such as the smart jammers replaying other signal types; and 4) different signal types may be superimposed due to the interference from concurrent transmissions. For case 1, we apply continual learning and train a Convolutional Neural Network (CNN) using an Elastic Weight Consolidation (EWC) based loss. For case 2, we detect unknown signals via outlier detection applied to the outputs of convolutional layers using Minimum Covariance Determinant (MCD) and k-means clustering methods. For case 3, we extend the CNN structure to capture phase shifts due to radio hardware effects to identify the spoofing signal sources. For case 4, we apply blind source separation using Independent Component Analysis (ICA) to separate interfering signals. We utilize the signal classification results in a distributed scheduling protocol, where innetwork (secondary) users employ signal classification scores to make channel access decisions and share the spectrum with each other while avoiding interference with out-network (primary) users and jammers. Compared with benchmark TDMA-based schemes, we show that distributed scheduling constructed upon signal classification results provides major improvements to innetwork user throughput and out-network user success ratio.
+
+Index Terms-Signal classification, deep learning, continual learning, outlier detection, jammer detection, source separation, distributed scheduling.
+\end{abstract}
+
+\section*{I. Introduction}
+
+Wireless networks are characterized by various forms of impairments in communications due to in-network interference (from other in-network users), out-network interference (from other communication systems), jammers, channel effects (such as path loss, fading, multipath and Doppler effects), and traffic congestion. To support dynamic spectrum access (DSA), innetwork users need to sense the spectrum and characterize interference sources hidden in spectrum dynamics.
+
+Machine learning provides automated means to classify received signals. Supported by recent computational and algorithmic advances, deep learning is promising to extract and
+
+\footnotetext{
+DISTRIBUTION A. Approved for public release: distribution unlimited.
+}
+operate on latent representations of spectrum data that conventional machine learning algorithms have failed to achieve. In particular, deep learning can effectively classify signals based on their modulation types [1]-[7]. Manifested in available datasets (e.g., [1], [7]) for training wireless signal classifiers, a common practice in previous studies is to assume that signal types are known, remain unchanged, and appear without any interference and spoofing effects. However, those assumptions are typically invalid in a realistic wireless network, where
+1) signal types change over time;
+2) some signal types are not known a priori and therefore there is no training data available for those signals;
+3) signals are potentially spoofed, e.g., a smart jammer may replay received signals from other users thereby hiding its identity; and
+4) signals are superimposed due to the interference effects from concurrent transmissions of different signal types.
+It is essential to incorporate these four realistic cases (illustrated in Fig. 1) in building the RF signal classifier so that its outcomes can be practically used in a DSA protocol. We consider a wireless signal classifier that classifies signals based on modulation types into idle, in-network users (such as secondary users), out-network users (such as primary users), and jammers. Using the signal classification results, in-network users allocate time slots for collision-free scheduling in a distributed setting and share the spectrum with each other while protecting out-network user transmissions and avoiding interference from jammers.
+
+Assuming that different signal types use different modulations, we present a convolutional neural network (CNN) that classifies the received I/Q samples as idle, in-network signal, jammer signal, or out-network signal. We start with the simple baseline scenario that all signal types (i.e., modulations) are fixed and known (such that training data are available) and there are no superimposed signals (i.e., signals are already separated). The average accuracy over all signal-to-noise-ratios (SNRs) is 0.934 . We then extend the signal classifier to operate in a realistic wireless network as follows.
+1) New modulations appear in the network over time (see case 1 in Fig. 1) and should be classified as specified signal types. Instead of retraining the signal classifier,
+
+\begin{figure}
+\includegraphics[alt={},max width=\textwidth]{https://cdn.mathpix.com/cropped/acdbc5a8-98e3-4537-a296-51c501deb0b1-02.jpg?height=770&width=1509&top_left_y=163&top_left_x=309}
+\captionsetup{labelformat=empty}
+\caption{Fig. 1. RF signal classification cases, including new signals, unknown signals, replay attacks from jammers, and superimposed signals.}
+\end{figure}
+we design a continual learning algorithm [8] to update the classifier with much lower cost, namely by using an Elastic Weight Consolidation (EWC). This approach achieves over time the level of performance similar to the ideal case when there are no new modulations.
+2) Some signal types such as modulations used in jammer signals are unknown (see case 2 in Fig. 1) such that there is no available training data for supervised learning. We present an outlier detection solution to achieve high accuracy in classifying signals with unknown jamming signals. For that purpose, we apply Minimum Covariance Determinant (MCD) and k-means clustering methods at the outputs of the signal classifier's convolutional layers. This approach successfully classifies all inliers and most of outliers, achieving 0.88 average accuracy.
+3) Smart jammers launch replay attacks by recording signals from other users and transmitting them as jamming signals (see case 3 in Fig. 1). We extend the CNN structure to capture phase shift due to radio hardware effects to identify the spoofing signals and relabel them as jammers. This approach achieves 0.972 accuracy in classifying superimposed signals.
+4) Wireless signals are received as superimposed (see case 4 in Fig. 1) if transmitted at the same time (on the same frequency). We apply blind source separation using Independent Component Analysis (ICA) [9] to obtain each single signal that is further classified by deep learning. This approach achieves 0.837 average accuracy.
+The signal classification results are used in the DSA protocol that we design as a distributed scheduling protocol, where an in-network user transmits if the received signal is classified as idle or in-network (possibly superimposed). If the received signal is classified as in-network, the in-network user needs to share the spectrum with other in-network user(s) based on
+the confidence of its classification. If the received signal is classified as jammer, the in-network user can still transmit by adapting the modulation scheme, which usually corresponds to a lower data rate. We assume that a transmission is successful if the signal-to-interference-and-noise-ratio (SINR) at the receiver is greater than or equal to some threshold required by a modulation scheme. If out-network signals are detected, the in-network user should not transmit to avoid any interference, i.e., out-network users are treated as primary users. Results show that this approach achieves higher throughput for innetwork users and higher success ratio for our-network users compared with benchmark (centralized) TDMA schemes.
+
+The rest of the paper is organized as follows. Section II discusses related work. Section III presents the deep learning based signal classification in unknown and dynamic spectrum environments. Section IV introduces the distributed scheduling protocol as an application of deep learning based spectrum analysis. Section V concludes the paper.
+
+\section*{II. Related Work}
+
+Signal classification is an important functionality for cognitive radio applications to improve situational awareness (such as identifying interference sources) and support DSA. The traditional approaches for signal classification include likelihood based methods or feature based analysis on the received I/Q samples [10]-[12]. However, these two approaches require expert design or knowledge of the signal. They also add complexity to a receiver since the raw I/Q data must be manipulated before classification.
+
+By learning from spectrum data, machine learning has found rich applications in wireless communications [13], [14]. In particular, deep learning has been applied to learn complex spectrum environments, including spectrum sensing by a CNN [15], spectrum data augmentation by generative adversarial
+network (GAN) [16], [17], channel estimation by a feedforward neural network (FNN) [18], and jamming/anti-jamming with FNN in training and test times [19]-[21]. Modulation classification has been extensively studied with deep neural networks [1]-[6], where the goal is to classify a given isolated signal to a known modulation type. In [7], the performance of modulation classification was evaluated with over-the-air measurements. [22] shows that in performance real-world systems depends on whether the training dataset fully captures the variety of interference and hardware types in the real radio environment. Those approaches cannot be readily applied in a wireless network setting, as they do not capture dynamic and unknown signal types, smart jammers that may spoof signal types (e.g., signals may be generated through the GAN [23]) and superposition of signals types due to concurrent transmissions. In this paper, we address these issues to make signal classification applicable for use in a DSA protocol.
+
+\section*{III. Deep Learning based Spectrum Analysis}
+
+We consider different modulation schemes used by different types of users transmitting on a single channel. We start with the baseline case where modulations used by different user types are known and there is no signal superposition (i.e., interfering sources are already separated). We categorize modulations into four signal types:
+1) idle: no signal
+2) in-network user signals: QPSK, 8PSK, CPFSK
+3) jamming signals: QAM16, QAM64, PAM4, WBFM
+4) out-network user signals: AM-SSB, AM-DSB, GFSK
+
+There are in-network users (trying to access the channel opportunistically), out-network users (with priority in channel access) and jammers that all coexist. Out-network users are treated as primary users and their communications should be protected. Without prior domain knowledge other than training data, an in-network user classifies received signals to idle, innetwork, jammer, or out-network. The classifier computes a score vector \(\left(p_{0}, p_{\text {in }}, p_{\text {jam }}, p_{\text {out }}\right)\) for each instance, where \(p_{0}\), \(p_{\text {in }}, p_{\text {jam }}\), and \(p_{\text {out }}\) are the likelihood scores for classifying signals as idle, in-network, jammer, and out-network, respectively. If one score is larger than the other three, the instance is classified as the corresponding case.
+
+\section*{A. The Classifier Structure and Performance}
+
+We use the dataset in [1]. Each sample in the dataset consists of 128 complex valued data points, i.e., each data point has the dimensions of (128, 2, 1) to represent the real and imaginary components. We use 10 modulations (QPSK, 8PSK, QAM16, QAM64, CPFSK, GFSK, PAM4, WBFM, AM-SSB, and AMDSB) collected over a wide range of SNRs from -20 dB to 18 dB in 2 dB increments. These modulations are categorized into signal types as discussed before. At each SNR, there are 1000 samples from each modulation type. Instead of using a conventional feature extraction or off-the-shelf deep neural network architectures such as ResNet, we build a custom deep neural network that takes I/Q data as input.
+
+\begin{figure}
+\includegraphics[alt={},max width=\textwidth]{https://cdn.mathpix.com/cropped/acdbc5a8-98e3-4537-a296-51c501deb0b1-03.jpg?height=338&width=859&top_left_y=176&top_left_x=1082}
+\captionsetup{labelformat=empty}
+\caption{Fig. 2. CNN classifier structure for RF signal classification.}
+\end{figure}
+
+We train a CNN classifier that consists of several convolutional layers and fully connected layers in the last three stages. However, when the filter size in the convolutional layers is not divisible by the strides, it can create checkerboard effects (see [24] for more details). In the CNN classifier structure, shown in Fig. 2, we paid attention to avoid the checkerboard effects and used the following layers:
+- Input shape: \((128,2)\)
+- 2D ZeroPadding with size \((1,1)\)
+- Convolutional layer with 128 filters with size of \((3,3)\)
+- 2D MaxPolling layer with size \((2,1)\) and stride \((2,1)\)
+- Five cascades of the following:
+- 2D Zeropadding with size \((1,1)\)
+- Convolutional layer with 256 filters with size of \((3,3)\)
+- 2D MaxPolling layer with pool size \((2,2)\) and stride \((2,1)\)
+- Fully connected layer with 256 neurons and Scaled Exponential Linear Unit (SELU) activation function, which is \(x\) if \(x>0\) and \(a e^{x}-a\) if \(x \leq 0\) for some constant \(a\)
+- Dropout with probability 0.5
+- Fully connected layer with 64 neurons and SELU activation function
+- Dropout with probability 0.5
+- Fully connected layer with 4 neurons and SELU activation function
+The classifier is trained in TensorFlow [25]. The ADAM optimizer [26] is used with a step size of \(5 \times 10^{-5}\) and the categorical cross-entropy loss function is used for training. Cross-entropy function is given by
+\[
+\mathcal{L}(\boldsymbol{\theta})=-\sum_{i} \beta_{i} \log \left(y_{i}\right),
+\]
+where \(\boldsymbol{\theta}\) is the set of the neural network parameters and \(\left\{\beta_{i}\right\}_{i=1}^{m}\) is a binary indicator of ground truth such that \(\beta_{i}=1\) only if \(i\) is the correct label among \(m\) classes (labels). The neural network output \(\mathbf{y} \in \mathrm{R}^{m}\) is an \(m\)-dimensional vector, where each element in \(y_{i} \in \mathbf{y}\) corresponds to the likelihood of that class being correct.
+
+We split the data into \(80 \%\) for training and \(20 \%\) for testing. The loss function and accuracy are shown in Fig. 3 as a function of training epochs. The testing accuracy is 0.934 . Fig. 4 shows the average confusion matrix of the classifier over all SNR levels. Table I shows the average accuracy vs.
+
+\begin{figure}
+\includegraphics[alt={},max width=\textwidth]{https://cdn.mathpix.com/cropped/acdbc5a8-98e3-4537-a296-51c501deb0b1-04.jpg?height=740&width=783&top_left_y=214&top_left_x=182}
+\captionsetup{labelformat=empty}
+\caption{Fig. 3. CNN classifier performance.}
+\end{figure}
+
+\begin{figure}
+\includegraphics[alt={},max width=\textwidth]{https://cdn.mathpix.com/cropped/acdbc5a8-98e3-4537-a296-51c501deb0b1-04.jpg?height=611&width=645&top_left_y=1121&top_left_x=279}
+\captionsetup{labelformat=empty}
+\caption{Fig. 4. Confusion matrix (averaged over all SNRs).}
+\end{figure}
+
+SNR over all types of signals. The SNR levels are from 0 to 18 dB in 2 dB increments. Fig. 5 shows confusion matrices at \(0 \mathrm{~dB}, 10 \mathrm{~dB}\), and 18 dB SNR levels.
+
+\begin{table}
+\captionsetup{labelformat=empty}
+\caption{TABLE I
+CNN CLASSIFIER ACCURACY (AVERAGED OVER ALL SIGNAL TYPES).}
+\begin{tabular}{c|c||c|c} 
+SNR \((\mathrm{dB})\) & Accuracy & SNR \((\mathrm{dB})\) & Accuracy \\
+\hline 0 & 0.906 & 10 & 0.942 \\
+2 & 0.930 & 12 & 0.950 \\
+4 & 0.928 & 14 & 0.951 \\
+6 & 0.933 & 16 & 0.933 \\
+8 & 0.934 & 18 & 0.934 \\
+\hline
+\end{tabular}
+\end{table}
+
+\section*{B. Continual Learning}
+
+So far, we assumed that all modulation types are available in training data. We now consider the case that initially five modulations are taught to the classifier. Over time, three new modulations are introduced. Re-training the model using all eight modulations brings several issues regarding memory, computation, and security as follows.
+- Memory: Previous data needs to be stored.
+- Computation: Retraining using the complete dataset will take longer.
+- Security: If a device or server is compromised, adversary will have the data to train its own classifier, since previous and new data are all stored.
+On the other hand, if a model is re-trained using the new three modulations with Stochastic Gradient Descent (SGD), performance on the previous five modulations drops significantly (see Fig. 6). This is called catastrophic forgetting [27], [28]. In Fig. 6, Task A is the classification of first five modulations and Task B is the classification of the next three new modulations. SGD suffers from catastrophic forgetting and its accuracy on Task A drops to 0.37 when retrained with Task B.
+
+We apply EWC to address this problem. EWC slows down learning on selected neural network weights to remember previously learned tasks (modulations) [28]. EWC augments loss function using Fisher Information Matrix that captures the similarity of new tasks and uses the augmented loss function \(L(\theta)\) given by
+\[
+L(\theta)=L_{B}(\theta)+\sum_{i} \frac{\lambda}{2} F_{i}\left(\theta_{i}-\theta_{A, i}^{*}\right)^{2},
+\]
+where \(\theta_{A}\) denotes the weights used to classify the first five modulations (Task A), \(L_{B}(\theta)\) is the loss function for Task \(\mathrm{B}, F_{i}\) is the fisher information matrix that determines the importance of old and new tasks, and \(i\) denotes the parameters of a neural network. Higher values on the Fisher diagonal elements \(F_{i}\) indicate more certain knowledge, and thus they are less flexible. This approach helps identify and protect weights. In Fig. 6, we can see that EWC mitigates catastrophic learning to improve the accuracy on Task B such that the accuracy increases over time to the level of Task A.
+
+\section*{C. Classifier for Unknown Type of Signals}
+
+So far, we assumed that all signals including those from jammers are known (inlier) and thus they can be included in the training data to build a classifier. This assumption is reasonable for in-network and out-network user signals. However, jamming signals are possibly of an unknown type (outlier). Then a classifier built on known signals cannot accurately detect a jamming signal. An outlier detection is needed as a robust way of detecting if the (jamming) signal is known or unknown. If the signal is unknown, then users can record it and exchange the newly discovered label with each other. If the signal is known, then the signal passes through the classifier to be labeled. For the outlier detection, as the waveform dimensions are large, we reuse the convolutional layers of the
+
+\begin{figure}
+\includegraphics[alt={},max width=\textwidth]{https://cdn.mathpix.com/cropped/acdbc5a8-98e3-4537-a296-51c501deb0b1-05.jpg?height=559&width=1709&top_left_y=193&top_left_x=195}
+\captionsetup{labelformat=empty}
+\caption{Fig. 5. Confusion matrices at different SNR values.}
+\end{figure}
+
+\begin{figure}
+\includegraphics[alt={},max width=\textwidth]{https://cdn.mathpix.com/cropped/acdbc5a8-98e3-4537-a296-51c501deb0b1-05.jpg?height=590&width=775&top_left_y=947&top_left_x=197}
+\captionsetup{labelformat=empty}
+\caption{Fig. 6. Classifier performance over time.}
+\end{figure}
+classifier to extract the features of the received signal. Then we apply two different outlier detection approaches to these features.
+1) MCD-based Classifier: The first method for the outlier detection is based on the Minimum Covariance Determinant (MCD) method [29], [30]. MCD fits an elliptic envelope to the test data such that any data point outside the ellipse is considered as an outlier. MCD uses the Mahalanobis distance to identify outliers:
+\[
+M D(\mathbf{x})=\sqrt{\left(\mathbf{x}-\mu_{x}\right)^{T}\left(S_{x}\right)^{-1}\left(\mathbf{x}-\mu_{x}\right)},
+\]
+where \(\mu_{x}\) and \(S_{x}\) are the mean and covariance of data \(x\), respectively. We tried two approaches: i) directly apply outlier detection using MCD and ii) extract features and apply MCD outlier detection to these features.
+
+The evaluation settings are as the following:
+- Inlier signals: QPSK, 8PSK, CPFSK, AM-SSB, AMDSB, GFSK
+- Outlier signals: QAM16, QAM64, PAM4, WBFM
+
+\begin{figure}
+\includegraphics[alt={},max width=\textwidth]{https://cdn.mathpix.com/cropped/acdbc5a8-98e3-4537-a296-51c501deb0b1-05.jpg?height=521&width=802&top_left_y=895&top_left_x=1117}
+\captionsetup{labelformat=empty}
+\caption{Fig. 7. MCD-based classifier accuracy on inliers and outliers.}
+\end{figure}
+
+The second approach of feature extraction followed by outlier detection yields the best performance. In the feature extraction step, we freeze the model in the classifier and reuse the convolutional layers. The output of convolutional layers in the frozen model are then input to the MCD algorithm. MCD algorithm has a variable called contamination that needs to be tuned. Contamination accounts for the estimated proportion of outliers in the dataset. In the training step of MCD classifier, we only present the training set of known signals (in-network and out-network user signals), while in the validation step, we test the inlier detection accuracy with the test set of inliers and test the outlier detection accuracy with the outlier set (jamming signals). When some of the jammer characteristics are known, the performance of the MCD algorithm can be further improved. Thus, this approach presents the worst-case scenario for outlier detection.
+
+The classification accuracy for inliers and outliers as a function of contamination factor in MCD is shown in Fig. 7. The best contamination factor is 0.15 , which maximizes the minimum accuracy for inliers and outliers.
+
+Table II shows the accuracy as a function of SNR and Fig. 8 shows confusion matrices at \(0 \mathrm{~dB}, 10 \mathrm{~dB}\), and 18 dB SNR levels.
+
+\begin{figure}
+\includegraphics[alt={},max width=\textwidth]{https://cdn.mathpix.com/cropped/acdbc5a8-98e3-4537-a296-51c501deb0b1-06.jpg?height=564&width=1696&top_left_y=191&top_left_x=210}
+\captionsetup{labelformat=empty}
+\caption{Fig. 8. MCD-based outlier detection confusion matrices at different SNR values.}
+\end{figure}
+
+\begin{table}
+\captionsetup{labelformat=empty}
+\caption{TABLE II
+MCD-based outlier detection accuracy over all SNR values.}
+\begin{tabular}{c|c||c|c} 
+SNR \((\mathrm{dB})\) & Accuracy & SNR \((\mathrm{dB})\) & Accuracy \\
+\hline 0 & 0.822 & 10 & 0.843 \\
+2 & 0.814 & 12 & 0.844 \\
+4 & 0.824 & 14 & 0.847 \\
+6 & 0.832 & 16 & 0.844 \\
+8 & 0.845 & 18 & 0.839 \\
+\hline
+\end{tabular}
+\end{table}
+
+\begin{figure}
+\includegraphics[alt={},max width=\textwidth]{https://cdn.mathpix.com/cropped/acdbc5a8-98e3-4537-a296-51c501deb0b1-06.jpg?height=263&width=325&top_left_y=1295&top_left_x=440}
+\captionsetup{labelformat=empty}
+\caption{Fig. 9. Confusion matrix for k -means clustering based outlier detection.}
+\end{figure}
+2) \(k\)-means Clustering based Classifier: The second method for the outlier detection is the k-means clustering method. This method divides the samples into \(k=2\) clusters by iteratively finding \(k\) cluster centers. We again have innetwork and out-network user signals as inlier and jamming signals as outlier. We first use CNN to extract features and then use k -means clustering to divide samples into two clusters, one for inlier and the other for outlier. The confusion matrix is shown in Fig. 9. The accuracy of correctly identifying inliers has improved with k-means compared to the MCD method. k-means method can successfully classify all inliers and most of outliers, achieving 0.88 average accuracy.
+
+\section*{D. Detection of a Smart Jammer}
+
+Next, we consider a smart jammer that records an innetwork user signal, and then amplifies and forwards it as a replay attack (instead of transmitting a distinct jamming signal, as assumed before). Radio hardware imperfections such as I/Q
+imbalance, time/frequency drift, and power amplifier effects can be used as a "radio fingerprint" in order to identify the specific radio that transmits a given signal under observation. In particular, we aim to design a classifier using I/Q data with hardware impairments to identify the type of a transmitter (innetwork user or jammer).
+
+Suppose the jammer receives the in-network user signal, which is QAM64 at 18 dB SNR, and collects 1000 samples. Then the jammer amplifies and forwards it for jamming. We model the hardware impairment as a rotation on the phase of original signal. This offset will be used in the classifier to detect a jamming signal in a replay attack.
+
+The jammer rotates 1000 samples with different angles \(\theta= \frac{k \pi}{16}\) for \(k=0,1, \cdots, 16\). The jammer uses these signals for jamming. Each of these signals has its \(e^{j \theta}\) rotation.
+
+We design a classifier to detect the difference between these signals. Using 1000 samples for each of 17 rotation angles, we have 17 K samples. We split the data into \(80 \%\) for training and \(20 \%\) for testing. We use patience of 8 epochs (i.e., if loss at epoch \(t\) did not improve for 8 epochs, we stop and take the best ( \(t-8\) ) result) and train for 200 iterations. A CNN structure similar to the one in Section III-A is used. The only difference is that the last fully connected layer has 17 output neurons for 17 cases corresponding to different rotation angles (instead of 4 output neurons). This classifier achieves 0.972 accuracy (see Fig. 10-(a) for validation loss and Fig. 10-(b) for validation accuracy). The confusion matrix is shown in Fig. 11.
+
+\section*{E. Classifier for Superimposed Signals}
+
+We now consider the signal classification for the case that the received signal is potentially a superposition of two signal types. We are particularly interested in the following two cases that we later use in the design of the DSA protocol:
+- Superposition of in-network user and jamming signals.
+- Superposition of jamming and out-network user signals.
+
+We first apply blind source separation using ICA. The signal is separated as two signals and then these separated signals are fed into the CNN classifier for classification into in-network
+
+\begin{figure}
+\includegraphics[alt={},max width=\textwidth]{https://cdn.mathpix.com/cropped/acdbc5a8-98e3-4537-a296-51c501deb0b1-07.jpg?height=1321&width=703&top_left_y=171&top_left_x=247}
+\captionsetup{labelformat=empty}
+\caption{Fig. 10. Classifier performance to detect 17 types of signals.}
+\end{figure}
+
+\begin{table}
+\captionsetup{labelformat=empty}
+\caption{TABLE III
+Accuracy for superimposed signals (averaged over all signal TYPES).}
+\begin{tabular}{c|c||c|c} 
+SNR \((\mathrm{dB})\) & Accuracy & SNR \((\mathrm{dB})\) & Accuracy \\
+\hline 0 & 0.851 & 10 & 0.824 \\
+2 & 0.820 & 12 & 0.834 \\
+4 & 0.857 & 14 & 0.843 \\
+6 & 0.843 & 16 & 0.830 \\
+8 & 0.827 & 18 & 0.841 \\
+\hline
+\end{tabular}
+\end{table}
+user signals, jamming signals, or out-network user signals. We obtained the accuracy as shown Table III and confusion matrices at \(0 \mathrm{~dB}, 10 \mathrm{~dB}\) and 18 dB SNR levels, as shown in Fig. 12, respectively.
+
+\section*{F. Classifier for Superimposed Signals}
+
+\section*{IV. Design Distributed Scheduling Protocol}
+
+The outcome of the deep learning based signal classifier is used by the DSA protocol of in-network users. In this section, we present a distributed scheduling protocol that makes channel access decisions to adapt to dynamics of interference sources along with channel and traffic effects.
+
+\begin{figure}
+\includegraphics[alt={},max width=\textwidth]{https://cdn.mathpix.com/cropped/acdbc5a8-98e3-4537-a296-51c501deb0b1-07.jpg?height=865&width=877&top_left_y=180&top_left_x=1076}
+\captionsetup{labelformat=empty}
+\caption{Fig. 11. The confusion matrix for 17 types of signals.}
+\end{figure}
+
+\section*{A. Superframe structure}
+
+We consider the superframe structure (shown in Fig. 13) that consists of four periods:
+1) Spectrum sensing collects I\&Q data on a channel over a sensing period.
+2) Deep learning based signal classifier determines channel status based on sensing results. The status may be idle, in-network, jammer, or out-network.
+3) Distributed scheduling exchanges control packages and assigns time slots to transmitters in a distributed fashion.
+4) Data transmission period is divided into time slots and each transmitter sends data in its assigned time slots.
+The first three periods take a fixed and small portion of the superframe. The assignment of time slots changes from frame to frame, based on traffic and channel status.
+
+\section*{B. Distributed Scheduling Rules}
+
+Scheduling decisions are made using deep learning classification results. Deep learning provides a score on the confidence of classification to four types of signals: idle, innetwork, jammer, and out-network. We use the scheduling protocol outlined in Algorithm 1 to schedule time for transmission of packets including sensing, control, and user data. If the innetwork user classifies the received signals as out-network, it does not access the channel. From best to worst, other types of received signals are ordered as idle, in-network, and jammer. In-network users that classify received signals to better signal types gain access to channel. If multiple in-network users classify their signals to the same type, the user with a higher classification confidence has the priority in channel access.
+
+\begin{figure}
+\includegraphics[alt={},max width=\textwidth]{https://cdn.mathpix.com/cropped/acdbc5a8-98e3-4537-a296-51c501deb0b1-08.jpg?height=561&width=1694&top_left_y=191&top_left_x=210}
+\captionsetup{labelformat=empty}
+\caption{Fig. 12. Confusion matrices for superimposed signals at different SNR values.}
+\end{figure}
+
+\begin{table}
+\begin{tabular}{|c|c|c|c|}
+\hline Spectrum & Signal Classification & Distributed Scheduling & Data Transmission \\
+Sensing & Predict channel & Exchange control & Time slots \(1,2, \ldots, T\) \\
+Collect I/Q data & status & packets & \\
+\hline
+\end{tabular}
+\captionsetup{labelformat=empty}
+\caption{Fig. 13. The superframe structure.}
+\end{table}
+```
+Algorithm 1 Scheduling based on classification results.
+    Each receiver sends the channel status (type, score) to its
+    transmitter if the type is not out-network. If the channel
+    status is out-network, there should be no transmission to
+    protect out-network user transmissions.
+    If a transmitter receives channel status from its receiver
+    and does not detect an out-network user, it broadcasts a
+    request (type, priorities). Priorities are \(T\) numbers gener-
+    ated based on the received score and are used to compete
+    with other transmitters for \(T\) time slots.
+    A receiver generates and broadcasts a response as follows.
+    if the request type from its transmitter is smaller than the
+    request type from all other transmitters then
+        its transmitter will transmit in all \(T\) time slots.
+    end if
+    if the request type from its transmitter is the same as the
+    request type from some other transmitters then
+        its transmitter will transmit in a time slot \(t\) if its priority
+        in this time slot is the largest among these transmitters'
+        priorities.
+    end if
+    A transmitter will transmit in time slot \(t\) if the response
+    from its receiver approves it to be active in time slot \(t\)
+    and responses from other receivers do not specify another
+    transmitter in this time slot.
+```
+
+
+This protocol is distributed and only requires in-network users to exchange information with their neighbors.
+
+\section*{C. Traffic Profile in Signal Classification}
+
+Traffic profiles can be used to improve signal classification as received signals may be correlated over time. We present next how to learn the traffic profile of out-network users and
+use it for signal classification. We define out-network user traffic profile (idle vs. busy) as a two-state Markov model. That is, if there is no out-network user transmission, it is in state 0 , otherwise it is in state 1 . The transition probability from state \(i\) to \(j\) is \(p_{i j}\). Each in-network user builds its own estimation on this Markov model by online learning as follows.
+1) Initialize the number of state changes as
+\[
+n_{00}=1, n_{01}=1, n_{10}=1, n_{11}=1 .
+\]
+2) Update these numbers based on past state \(i\) and current predicted state \(j\), i.e., \(n_{i j}=n_{i j}+1\).
+3) State transition probability is calculated as \(p_{i j}= n_{i j} /\left(n_{i 0}+n_{i 1}\right)\).
+After learning the traffic profile of out-network users, signal classification results based on deep learning are updated as follows. Suppose the last status is \(s_{t-1}\), where \(s_{t-1}\) is either 0 or 1 . Then based on \(p_{i j}\), we can classify the current status as \(s_{t}^{T}\) with confidence \(c_{t}^{T}\). For example, if \(s_{t-1}=0\) and \(p_{00}>p_{01}\), then \(s_{t}^{T}=0\) and \(c_{t}^{T}=p_{00}\). Suppose the current classification by deep learning is \(s_{t}^{D}\) with confidence \(c_{t}^{D}\), where \(s_{t}^{D}\) is either 0 or 1 and \(c_{t}^{D}\) is in \([0.5,1]\). The classification of idle, in-network, and jammer corresponds to state 0 in this study. We have the following three cases.
+- \(s_{t}^{T}=s_{t}^{D}\). There is no need to change classification.
+- \(s_{t}^{T}=0\) and \(s_{t}^{D}=1\). Then based on traffic profile, the confidence of \(s_{t}^{T}=0\) is \(c_{t}^{T}\) while based on deep learning, the confidence of \(s_{t}^{D}=1\) is \(1-c_{t}^{D}\). We use a weight parameter \(w \in[0,1]\) to combine these two confidences as \(w c_{t}^{T}+(1-w)\left(1-c_{t}^{D}\right)\). If this combined confidence is smaller than 0.5 , we claim that the current state is 1 , otherwise the current state is 0 .
+- \(s_{t}^{T}=1\) and \(s_{t}^{D}=0\). Then based on traffic profile, the confidence of \(s_{t}^{T}=0\) is \(1-c_{t}^{T}\) while based on deep learning, the confidence of \(s_{t}^{D}=0\) is \(c_{t}^{D}\). We combine these two confidences as \(w\left(1-c_{t}^{T}\right)+(1-w) c_{t}^{D}\). If this combined confidence is smaller than 0.5 , we claim that the current state is 1 , otherwise the current state is 0 .
+Note that state 0 needs to be classified as idle, in-network, or jammer based on deep learning. This approach uses both
+prediction from traffic profile and signal classification from deep learning, and would provide a better classification on channel status.
+
+\section*{D. Simulation Results}
+
+In Section III, the test signals are taken one by one from a given SNR. Now, we simulate a wireless network, where the SNR changes depending on channel gain, signals may be received as superposed, signal types may change over time, remain unknown, or may be spoofed by smart jammers.
+
+We consider the following simulation setting.
+- 100 in-network users are randomly distributed in a 50 m \(\times 50 \mathrm{~m}\) region.
+- 2 out-network users and 2 jammers are randomly distributed in the same region.
+- Transmission/interference range is 10 m .
+- 1000 superframes are generated. There are 10 random links to be activated for each superframe. A superframe has 10 time slots for data transmission.
+- Gaussian channel model is assumed.
+- If a transmission is successful, the achieved throughput in a given time slot is 1 (packet/slot).
+The performance measures are in-network user throughput (packet/slot) and out-network user success ratio (\%). The goal is to improve both measures.
+1) Benchmark Schemes: For comparison purposes, we consider two centralized benchmark schemes by splitting a superframe into sufficient number of time slots and assigning them to transmitters to avoid collision.
+- Benchmark scheme 1. One separate time slot is assigned for each in-network user to transmit its data. This scheme needs 100 time slots since there are 100 in-network users.
+- Benchmark scheme 2. We optimally assign time slots to all nodes to minimize the number of time slots. We can build an interference graph, where each node represents a link and each edge between two nodes represents interference between two links if they are activated at the same time. If the maximum degree of this interference graph is \(D\), the minimum number of time slots to avoid all interference is \(D+1\).
+2) System Performance: We first consider the basic setting that there are no outliers (unknown signal types) and no superimposed signals, and traffic profile is not considered. The benchmark performances are given as follows.
+- Benchmark scheme 1: In-network throughput is 760 . Outnetwork user success rate is \(47.57 \%\).
+- Benchmark scheme 2: In-network throughput is 3619. Out-network user success rate is \(47.57 \%\).
+The performance of distributed scheduling with different classifiers is shown in Table IV, where random classifier randomly classifies the channel with probability \(25 \%\).
+
+We considered the effect of no jamming and obtained benchmark performance:
+- Benchmark scheme 1: In-network throughput is 881 . Outnetwork user success is \(47.57 \%\).
+
+\begin{table}
+\captionsetup{labelformat=empty}
+\caption{TABLE IV
+System performance with different classifiers.}
+\begin{tabular}{c|c|c} 
+Classifier & \begin{tabular}{c} 
+In-net user \\
+throughput
+\end{tabular} & \begin{tabular}{c} 
+Out-net user \\
+success ratio
+\end{tabular} \\
+\hline Ideal classifier (no error) & 40,578 & \(100 \%\) \\
+\hline Random classifier & 14,563 & \(80.48 \%\) \\
+\hline One classifier for all SNRs & 38,477 & \(100 \%\) \\
+\hline One classifier for each SNR & 39,153 & \(99.80 \%\)
+\end{tabular}
+\end{table}
+
+\begin{table}
+\captionsetup{labelformat=empty}
+\caption{TABLE V
+System performance with different classifiers and no JAMMING.}
+\begin{tabular}{c|c|c} 
+Classifier & \begin{tabular}{c} 
+In-net user \\
+throughput
+\end{tabular} & \begin{tabular}{c} 
+Out-net user \\
+success ratio
+\end{tabular} \\
+\hline Ideal classifier (no error) & 43,316 & \(100 \%\) \\
+\hline Random classifier & 17,552 & \(80.70 \%\) \\
+\hline One classifier for all SNRs & 41,780 & \(100 \%\) \\
+\hline One classifier for each SNR & 42,614 & \(99.92 \%\)
+\end{tabular}
+\end{table}
+- Benchmark scheme 2: In-network throughput is 4196. Out-network user success is \(47.57 \%\).
+The performance of distributed scheduling with different classifiers is shown in Table V.
+3) Traffic profile integrated with signal classification: We compare results with and without consideration of traffic profile, and benchmarks. We generate another instance with \(p_{00}=p_{11}=0.8\) and \(p_{01}=p_{10}=0.2\). The weight \((w)\) to combine deep learning results and traffic profile results is set as 0.2 . We have the following benchmark performance.
+- Benchmark scheme 1: In-network user throughput is 829 . Out-network user success is \(16 \%\).
+- Benchmark scheme 2: In-network user throughput is 4145. Out-network user success is \(16 \%\).
+
+The performance with and without traffic profile incorporated in signal classification is shown in Table VI.
+4) Classification with Outliers and Superimposed Signals: We compare benchmark results with the consideration of outliers and signal superposition. Benchmark performance is the same as before, since it does not depend on classification:
+- Benchmark scheme 1: In-network user throughput is 829 . Out-network user success is \(16 \%\).
+- Benchmark scheme 2: In-network user throughput is 4145. Out-network user success is \(16 \%\).
+
+The performance with outliers and signal superposition included is shown in Table VII.
+
+In all the cases considered, the integration of deep learning based classifier with distributed scheduling performs always much better than benchmarks.
+
+\section*{V. Conclusion}
+
+We studied deep learning based signal classification for wireless networks in presence of out-network users and jammers. In addition to fixed and known modulations for each signal type, we also addressed the practical cases where 1) modulations change over time; 2) some modulations are unknown for which there is no training data; 3) signals are
+
+\begin{table}
+\captionsetup{labelformat=empty}
+\caption{TABLE VI
+System performance with and without using traffic profile AND NO JAMMING.}
+\begin{tabular}{c|c|c} 
+Classifier & \begin{tabular}{c} 
+In-net user \\
+throughput
+\end{tabular} & \begin{tabular}{c} 
+Out-net user \\
+success ratio
+\end{tabular} \\
+\hline Without traffic profile & 40,714 & \(69 \%\) \\
+\hline With traffic profile & 40,616 & \(70 \%\)
+\end{tabular}
+\end{table}
+
+\begin{table}
+\captionsetup{labelformat=empty}
+\caption{TABLE VII
+System performance with signal superposition and no jamming.}
+\begin{tabular}{c|c|c} 
+Classifier & \begin{tabular}{c} 
+In-net user \\
+throughput
+\end{tabular} & \begin{tabular}{c} 
+Out-net user \\
+success ratio
+\end{tabular} \\
+\hline Without outlier & 40,616 & \(70 \%\) \\
+\hline With outlier & 34,236 & \(69 \%\) \\
+\hline With superimposed signals & 34,503 & \(68 \%\)
+\end{tabular}
+\end{table}
+spoofed by smart jammers replaying other signal types; and 4) signals are superimposed with other interfering signals. In case 1 , we applied continual learning to mitigate catastrophic forgetting. In case 2, we applied outlier detection to the outputs of convolutional layers by using MCD and k -means clustering methods. In case 3, we identified the spoofing signals by extending the CNN structure to capture phase shift due to radio hardware effects. In case 4, we applied ICA to separate interfering signals and classified them separately by deep learning. Results demonstrate the feasibility of using deep learning to classify RF signals with high accuracy in unknown and dynamic spectrum environments. By utilizing the signal classification results, we constructed a distributed scheduling protocol, where in-network (secondary) users share the spectrum with each other while avoiding interference imposed to out-network (primary) users and received from jammers. Compared with benchmark TDMA schemes, we showed that distributed scheduling constructed upon signal classification results provides major improvements to throughput of innetwork users and success ratio of out-network users.
+
+\section*{References}
+\([1]\) T. O'Shea, J. Corgan, and C. Clancy, "Convolutional radio modulation recognition networks," in Proc. International Conference on Engineering Applications of Neural Networks, 2016.
+\([2]\) B. Kim, J. K. amd H. Chae abd D. Yoon, and J. W. Choi, "Deep neural network-based automatic modulation classification technique," in Proc. IEEE International Conference on Information and Communication Technology Convergence (ICTC), 2016.
+[3] G. J. Mendis, J. Wei, and A. Madanayake, "Deep learning-based automated modulation classification for cognitive radio," in Proc. IEEE International Conference on Communication Systems (ICCS), 2016.
+[4] S. Peng, H. Jiang, H. Wang, H. Alwageed, and Y. D. Yao, "Modulation classification using convolutional neural network based deep learning model," in Proc. IEEE Wireless and Optical Communication Conference (WOCC), 2017.
+[5] A. Ali and Y. Fan, "Unsupervised feature learning and automatic modulation classification using deep learning model," Physical Communication, vol. 25, pp. 75-84, 2017.
+[6] Y. Tu, Y. Lin, J. Wang, and J. U. Kim, "Semi-supervised learning with generative adversarial networks on digital signal modulation classification," Comput. Mater. Continua, no. 2, pp. 243-254, 2018.
+[7] T. O'Shea, T. Roy, and T. C. Clancy, "Over-the-air deep learning based radio signal classification," IEEE Journal of Selected Topics in Signal Processing, vol. 12, no. 1, pp. 168-179, 2018.
+[8] M. Ring, "Continual learning in reinforcement environments," Ph.D. dissertation, University of Texas at Austin, 1994.
+[9] S. i. Amari, A. Cichocki, and H. H. Yang, "A new learning algorithm for blind signal separation," in Advances in neural information processing systems, 1996, pp. 757-763.
+[10] O. A. Dobre, A. Abdi, and a. W. S. Y. Bar-Ness, "Survey of automatic modulation classification techniques: classical approaches and new trends," IET Communications, vol. 1, no. 2, pp. 137-156, 2007.
+[11] O. A. Dobre, A. Abdi, Y. Bar-Ness, and W. Su, "Blind modulation classification: a concept whose time has come," in IEEE/Sarnoff Symposium on Advances in Wired and Wireless Communication, 2005.
+[12] W. C. Headley and C. R. da Silva, "Asynchronous classification of digital amplitude-phase modulated signals in flat-fading channels," IEEE Transactions on Communications, vol. 59, no. 1, pp. 7-12, 2011.
+[13] M. Alsheikh, S. Lin, D. Niyato, and H. Tan, "Machine learning in wireless sensor networks: Algorithms, strategies, and applications," IEEE Communications Surveys \& Tutorials, vol. 16, no. 4, pp. 19962018, 2014.
+[14] M. Chen, U. Challita, W. Saad, C. Yin, and M. Debbah, "Machine learning for wireless networks with artificial intelligence: A tutorial on neural networks," arXiv preprint arXiv:1710.02913, 2017.
+[15] W. Lee, M. Kim, D. Cho, and R. Schober, "Deep sensing: Cooperative spectrum sensing based on convolutional neural networks," arXiv preprint arXiv:1705.08164, 2017.
+[16] K. Davaslioglu and Y. E. Sagduyu, "Generative adversarial learning for spectrum sensing," in Proc. IEEE International Conference on Communications (ICC), 2018.
+[17] T. Erpek, Y. E. Sagduyu, and Y. Shi, "Deep learning for launching and mitigating wireless jamming attacks," IEEE Transactions on Cognitive Communications and Networking, vol. 5, no. 1, pp. 2-14, Mar. 2019.
+[18] H. Ye, G. Y. Li, and B. H. Juang, "Power of deep learning for channel estimation and signal detection in ofdm systems," IEEE Wireless Communications Letters, vol. 7, no. 1, pp. 114-117, 2018.
+[19] Y. Shi, T. Erpek, Y. E. Sagduyu, and J. Li, "Spectrum data poisoning with adversarial deep learning," in Proc. IEEE Military Communications Conference (MILCOM), 2018.
+[20] Y. Shi, Y. E. Sagduyu, T. Erpek, K. Davaslioglu, Z. Lu, and J. Li, "Adversarial deep learning for cognitive radio security: Jamming attack and defense strategies," in Proc. IEEE ICC Workshop on Promises and Challenges of Machine Learning in Communication Networks, 2018.
+[21] Y. E. Sagduyu, Y. Shi, and T. Erpek, "IoT network security from the perspective of adversarial deep learning," in Proc. IEEE SECON Workshop on Machine Learning for Communication and Networking in IoT, 2019.
+[22] C. de Vrieze, L. Simic, and P. Mahonen, "The importance of being earnest: Performance of modulation classification for real RF signals," in Proc. IEEE International Symposium on Dynamic Spectrum Access Networks (DySPAN), 2018.
+[23] Y. Shi, K. Davaslioglu, and Y. E. Sagduyu, "Generative adversarial network for wireless signal spoofing," in Proc. ACM Workshop on Wireless Security and Machine Learning.
+[24] A. Odena, V. Dumoulin, and C. Olah, "Deconvolution and checkerboard artifacts," 2016. [Online]. Available: http://distill.pub/2016/deconvcheckerboard/
+[25] M. Abadi, P. Barham, J. C. abnd Z. Chen, A. Davis, J. Dean, M. Devin, S. Ghemawat, G. Irving, M. Isard, and M. Kudlur, "Tensorflow: A system for large-scale machine learning," in Proc. 12th USENIX Symposium on Operating Systems Design and Implementation (OSDI 16), 2016. [Online]. Available: tensorflow.org
+[26] D. Kingma and J. Ba, "Adam: A method for stochastic optimization," CoRR, abs/1412.6980, 2014.
+[27] I. J. Goodfellow, M. Mirza, D. Xiao, A. Courville, and Y. Bengio, "An empirical investigation of catastrophic forgetting in gradient-based neural networks," in arXiv:1312.6211, 2015.
+[28] J. Kirkpatrick, R. Pascanu, N. Rabinowitz, J. Veness, G. Desjardins, A. A. Rusu, K. Milan, J. Quan, T. Ramalho, T. Grabska-Barwinska, and D. Hassabis, "Overcoming catastrophic forgetting in neural networks," Proceedings of the National Academy of Sciences, pp. 3521-3526, 2017.
+[29] M. Hubert and M. Debruyne, "Minimum covariance determinant," Advanced Review, pp. 36-43, 2010.
+[30] P. J. Rousseeuw and K. V. Driessen, "A fast algorithm for the minimum covariance determinant estimator," Technometrics, vol. 41, 1999.
