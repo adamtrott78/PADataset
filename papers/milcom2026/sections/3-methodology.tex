@@ -1,83 +1,99 @@
-This section formalizes the RF preliminary-action recognition problem and the open-set decision layers evaluated in Section~\ref{sec:experiments}. Figure~\ref{fig:dqnguard_pipeline} gives the end-to-end evidence flow used throughout the paper: an OTA RF window is converted into multi-domain preliminary-action evidence, processed by a closed-set backbone, and evaluated by DQNGuard before being routed to known preliminary-action evidence or an unknown pool. The paper focuses on this sensing and novelty-detection layer of a larger cyber/electromagnetic framework; detected preliminary actions can support downstream ATT\&CK/EW technique prediction and response planning, but this work does not claim to solve the full response-policy problem.
+This section defines the RF preliminary-action recognition problem and the open-set decision layers evaluated in Section~\ref{sec:experiments}. Figure~\ref{fig:dqnguard_pipeline} is the organizing structure for the section. An OTA RF window is first converted into multi-domain signal representations, processed by a closed-set preliminary-action backbone, and then passed to DQNGuard. The final output is not a final ATT\&CK/EW label or response action. It is a routing decision: retain the sample as known preliminary-action evidence, or preserve it as an unknown RF behavior for downstream analysis.
 
 \begin{figure*}[t]
     \centering
     \includegraphics[width=\textwidth]{figures/hero_figure/hero_dqnguard_pipeline_s22_tikz.pdf}
-    \caption{End-to-end DQNGuard evidence flow. OTA RF windows are mapped into IQ, FFT, DCT, and polar representations, fused, and processed by a preliminary-action CNN. DQNGuard uses the predicted class, confidence and feature evidence, and a known-budget threshold to retain known preliminary-action evidence or route nonconforming samples to the unknown pool for downstream analysis.}
+    \caption{End-to-end DQNGuard evidence flow. OTA RF windows are mapped into IQ, FFT, DCT, and polar representations, fused, and processed by a preliminary-action CNN. DQNGuard uses predicted-class calibration, guard evidence, and a known-budget threshold to route each window to known preliminary-action evidence or to an unknown-behavior pool for downstream analysis.}
     \label{fig:dqnguard_pipeline}
 \end{figure*}
 
-The remainder of this section follows the structure in Fig.~\ref{fig:dqnguard_pipeline}: we first define preliminary actions as technique precursors, then specify the backbone outputs, baseline OSR heads, DQNGuard decision rule, and calibration modes.
+The method is described in the same order as the figure: preliminary-action evidence, multi-domain PA encoding, backbone outputs, baseline OSR heads, DQNGuard, and calibration regimes.
 
-\subsection{Preliminary Actions as Technique Precursors}
+\subsection{Preliminary Actions as RF Evidence}
 \label{subsec:pa_precursors}
 
-We consider a contested Cyber-EMS setting in which a defender observes a shared RF band and must identify early RF behaviors that may precede or enable later cyber/electromagnetic effects. We refer to these behaviors as \emph{preliminary actions}. A preliminary action is not itself the full attack technique; rather, it is an observable precursor, prerequisite, or enabling behavior that can populate an evidence layer for later ATT\&CK/EW technique prediction.
+We consider a contested Cyber-EMS setting in which a defender observes a shared RF band and must recognize early signal behaviors that may precede, enable, or contextualize later cyber/electromagnetic effects. We refer to these behaviors as \emph{preliminary actions} (PAs). A PA is not itself the final attack technique; it is precursor evidence that can support later ATT\&CK/EW hypothesis generation, label-making, or response planning.
 
-The evaluated preliminary-action classes are Scan, Burst, Sustain, Hop, and Replay. Scan represents discovery-like RF behavior. Burst consists of repeated short on-intervals separated by quiet gaps. Sustain corresponds to persistent occupied-channel behavior. Hop captures frequency-agile dwell and revisit patterns. Replay captures repeated waveform/template behavior. The core open-world challenge is that a defender may possess labeled data for some preliminary actions while an adversary emits a behavior outside the known training set. In that case, the detector should reject the window as \texttt{unknown} rather than force it into the nearest known class.
+The evaluated PA classes are Scan, Burst, Sustain, Hop, and Replay. Scan represents discovery-like RF activity. Burst consists of repeated short on-intervals separated by quiet gaps. Sustain corresponds to persistent occupied-channel behavior. Hop captures frequency-agile dwell and revisit patterns. Replay captures repeated waveform or template behavior. In an open-world setting, a defender may possess labeled examples for only some PA behaviors while observing a signal behavior outside the training taxonomy. The decision layer should then reject the window as \texttt{unknown} rather than force it into the nearest known PA class.
+
+\subsection{Multi-Domain PA Encoder}
+\label{subsec:pa_encoder}
+
+Let $x$ denote an OTA RF window after preprocessing. The PA backbone does not operate on a single signal view. Instead, each window is represented through four complementary domains:
+\begin{itemize}
+    \item raw complex IQ samples, which preserve the original time-domain waveform structure;
+    \item FFT features, which expose spectral occupancy and frequency-domain structure;
+    \item DCT features, which provide a compact transformed representation of signal variation;
+    \item polar features, which separate magnitude and phase-oriented behavior.
+\end{itemize}
+These representations are fused and passed to a CNN encoder/head. This design follows the RF-specific observation that unknown behavior may be more visible in one representation than another. For example, a behavior that is ordinary in energy envelope may still be unusual in spectral occupancy, phase structure, or transformed coefficient geometry.
+
+The backbone is trained as a closed-set PA classifier within each fold. DQNGuard is not a replacement for this backbone. It is a decision layer over the backbone outputs that determines whether the closed-set prediction should be trusted as known PA evidence or routed to the unknown pool.
 
 \subsection{Backbone Outputs and OSR Formulation}
 \label{subsec:osr_formulation}
 
-Let $x$ denote an OTA RF window after preprocessing and feature extraction. A closed-set backbone $f_{\theta}$ maps $x$ to logits
+For a window $x$, the closed-set backbone $f_{\theta}$ produces logits
 \begin{equation}
     z = f_{\theta}(x) \in \mathbb{R}^{K},
 \end{equation}
-where $K$ is the number of known classes in the current fold. The backbone also produces softmax probabilities $p=\mathrm{softmax}(z)$, a closed-set prediction $\hat{y}=\arg\max_k p_k$, and an intermediate feature representation $h(x)$.
+where $K$ is the number of known PA classes in the current fold. The backbone also produces softmax probabilities $p=\mathrm{softmax}(z)$, a closed-set prediction $\hat{y}=\arg\max_k p_k$, and an intermediate feature representation $h(x)$.
 
-A standard closed-set classifier always emits one of the $K$ known labels. In open-set recognition, the decision layer instead returns
+A standard closed-set classifier always emits one of the $K$ known labels. The open-set decision layer instead returns
 \begin{equation}
     \hat{y}_{\mathrm{osr}} \in \{1,\ldots,K,\texttt{unknown}\}.
 \end{equation}
-The OSR layer therefore must preserve known-class recognition while identifying target-open samples that were excluded from closed-set training.
+The decision layer must therefore preserve known-class recognition while rejecting target-open samples that were excluded from closed-set training.
 
-We use the following confidence and evidence quantities throughout the OSR heads:
+All evaluated OSR heads operate on evidence derived from the same backbone outputs:
 \begin{itemize}
     \item $P_1 = \max_k p_k$, the maximum softmax probability;
     \item $P_1-P_2$, the gap between the largest and second-largest softmax probabilities;
     \item $H(p)=-\sum_k p_k\log p_k$, the softmax entropy;
-    \item variance-style evidence derived from the logit or feature distribution;
-    \item energy-style evidence derived from the classifier score geometry.
+    \item variance-style evidence derived from logit or feature dispersion;
+    \item energy-style evidence derived from logit score geometry.
 \end{itemize}
+The first three quantities summarize softmax confidence. The latter two expose structure that may remain hidden when all probability mass is forced onto the known labels.
 
 \subsection{Baseline OSR Heads}
 \label{subsec:baseline_osr}
 
-We compare DQNGuard against two families of OSR decision heads.
+We compare DQNGuard against two decision-head families.
 
 \paragraph{VarMax.}
-VarMax is the predecessor confidence-based OSR rule. It uses confidence structure in the classifier outputs, including maximum-score and variance-style evidence, to assign an unknownness score to each sample. A calibrated operating rule then accepts the closed-set prediction or rejects the sample as \texttt{unknown}. In this paper VarMax is used as a decision-layer baseline on top of the same backbone outputs whenever possible, so performance differences are attributable to the OSR rule rather than to the feature extractor.
+VarMax is the predecessor confidence-based OSR rule. It assigns an unknownness score using classifier-output structure, including maximum-score, variance-style, and energy-style evidence. A calibrated operating rule then either accepts the closed-set prediction or rejects the sample as \texttt{unknown}. In this paper, VarMax is evaluated as a decision-layer baseline on top of the same backbone outputs whenever possible, so differences are attributable to the OSR rule rather than to a different feature extractor.
 
 \paragraph{DQN-IDS-style confidence head.}
-DQN-IDS motivates a reinforcement-learning-style OSR head over softmax confidence states. The confidence state is
+DQN-IDS motivates a learned decision head over softmax confidence states. The confidence state is
 \begin{equation}
     s = (P_1,\; P_1-P_2,\; H(p)).
 \end{equation}
-A DQN agent is trained using high- and low-confidence validation anchors, centroid-guided rewards, replay memory, and $\epsilon$-greedy exploration to choose between known and unknown actions. In this paper, this head is treated as an OSR-head ablation. We do not claim deployment-time continual learning unless explicitly evaluated; the relevant comparison is validation-time DQN calibration followed by held-out test evaluation.
+A DQN agent is trained to choose between known and unknown actions using validation anchors and reward shaping. In this paper, this head is treated as a comparison OSR head over fixed backbone outputs. We do not claim deployment-time continual reinforcement learning; the comparison is validation-time DQN calibration followed by held-out test evaluation.
 
-\subsection{DQNGuard}
+\subsection{DQNGuard Decision Layer}
 \label{subsec:dqnguard}
 
-DQNGuard is a three-stage open-set decision layer that uses predicted-class conditional calibration, variance/energy evidence, and known-only budgeted thresholding to reject samples that do not conform to the learned known-class decision structure.
+DQNGuard is a three-stage open-set decision layer. Its purpose is to decide whether the predicted PA should be retained as known evidence or whether the window should be routed as an unknown RF behavior. The stages are predicted-class conditional calibration, variance/energy guard evidence, and known-only budgeted thresholding.
 
 \paragraph{Stage 1: predicted-class conditional calibration.}
-Rather than fitting one global rejection model, DQNGuard conditions calibration on the class predicted by the backbone. For a calibration sample $x_i$, the backbone first predicts $\hat{y}_i$. DQNGuard then compares the sample only against calibration statistics associated with that predicted class. This is important because known classes can have different confidence, variance, and energy profiles; a score that is ordinary for one known class may be anomalous for another.
+DQNGuard does not fit one global rejection model. For each calibration sample $x_i$, the backbone first predicts $\hat{y}_i$. DQNGuard then compares the sample only against calibration statistics associated with that predicted class. This matters because known PA classes can have different confidence, variance, and energy profiles. A score that is ordinary for one PA may be anomalous for another.
 
 \paragraph{Stage 2: variance/energy guard evidence.}
-For each predicted class, DQNGuard fits percentile bands over guard evidence computed from the backbone outputs. The implemented guard uses the top-two confidence gap, variance-style evidence, and energy-style evidence. Let $m_j(x)$ denote one such metric for sample $x$ and metric $j$. For predicted class $c$, DQNGuard estimates lower and upper calibration bounds
+For each predicted class, DQNGuard fits percentile bands over guard evidence computed from the backbone outputs. Let $m_j(x)$ denote metric $j$ for sample $x$. In the implemented guard, the metrics include confidence-gap, variance-style, and energy-style evidence. For predicted class $c$, DQNGuard estimates
 \begin{equation}
     \ell_{c,j} = Q_{\alpha}(m_j \mid \hat{y}=c),
     \qquad
     u_{c,j} = Q_{1-\alpha}(m_j \mid \hat{y}=c),
 \end{equation}
-where $Q_{\alpha}$ is a calibration percentile. Samples whose evidence lies outside the predicted-class bands receive larger unknown scores.
+where $Q_{\alpha}$ is a calibration percentile. Samples whose evidence lies outside the predicted-class bands receive larger unknown scores. This converts several heterogeneous evidence channels into a single nonconformity score $r(x)$.
 
 \paragraph{Stage 3: known-only budgeted thresholding.}
-DQNGuard converts the guard evidence into a continuous unknown score $r(x)$. The final operating threshold is chosen using known calibration samples only. For a known-rejection budget $\beta$, the threshold is
+The final operating threshold is selected using known calibration samples only. For a known-rejection budget $\beta$, the threshold is
 \begin{equation}
-    \tau_{\beta} = Q_{1-\beta}\bigl(r(x) \mid x \in \mathcal{D}_{\mathrm{cal}}^{\mathrm{known}}\bigr).
+    \tau_{\beta} =
+    Q_{1-\beta}\bigl(r(x) \mid x \in \mathcal{D}_{\mathrm{cal}}^{\mathrm{known}}\bigr).
 \end{equation}
-The final prediction is
+The final decision is
 \begin{equation}
 \hat{y}_{\mathrm{osr}} =
 \begin{cases}
@@ -86,18 +102,18 @@ The final prediction is
 \end{cases}
 \label{eq:dqnguard_decision}
 \end{equation}
-The main experiments use $\beta=0.05$, corresponding to a 5\% known-rejection budget. This budgeted rule prevents the OSR layer from improving unknown detection by simply rejecting a large fraction of known samples.
+The main experiments use $\beta=0.05$, corresponding to a 5\% known-rejection budget. This is the key operating constraint: DQNGuard cannot improve unknown detection merely by rejecting a large fraction of known PA samples.
 
-\subsection{Calibration Modes}
+\subsection{Calibration Regimes}
 \label{subsec:method_calibration_modes}
 
-The OSR decision layer can be calibrated under different information assumptions.
+The OSR layer can be calibrated under different information assumptions.
 
 \paragraph{Surrogate-open calibration.}
-In surrogate-open calibration, a non-target class is withheld from backbone training and used as open-set calibration evidence. The final DQNGuard operating threshold remains known-budgeted: surrogate-open samples may shape or diagnose the guard, but the deployed threshold is selected from known calibration scores.
+In surrogate-open calibration, a non-target class is withheld from backbone training and used as open-set calibration evidence. The final DQNGuard threshold remains known-budgeted: surrogate-open samples may shape or diagnose the guard, but the deployed threshold is selected from known calibration scores.
 
 \paragraph{Target-open calibration.}
-In target-open calibration, a small labeled subset of the held-out target-open class is available during OSR calibration, while the backbone remains trained only on known classes. This is not treated as a deployment assumption. Instead, it is a diagnostic condition that estimates how much performance is recoverable when the calibration set contains examples from the actual held-out unknown class.
+In target-open calibration, a small labeled subset of the held-out target-open class is available during OSR calibration, while the backbone remains trained only on known classes. We treat this as a diagnostic condition rather than a deployment assumption. It estimates how much performance is recoverable when calibration contains examples from the actual target unknown.
 
 \paragraph{Target--Surrogate Matrix.}
-To study surrogate transfer, we evaluate a Target--Surrogate Matrix. One class is withheld as the target unknown, one different class is used as the surrogate-open calibration class, and the remaining classes form the known set. This matrix allows us to measure whether a surrogate that is useful for one target unknown also transfers to others, and whether surrogate quality can be predicted from calibration or representation diagnostics.
+To study surrogate transfer, we evaluate a Target--Surrogate Matrix. One class is withheld as the target unknown, one different class is used as the surrogate-open calibration class, and the remaining classes form the known set. This matrix tests whether a surrogate that helps one target unknown also helps others. As shown in Section~\ref{sec:results}, surrogate usefulness is highly target-dependent.
