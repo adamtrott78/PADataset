@@ -17,6 +17,13 @@ These classifications are first-pass provisional audits. They should be updated 
 | 2017_guo_calibration_modern_neural_networks | should cite | TECHNICAL_REFERENCE; SECTION_MODEL | TECHNICAL_LINEAGE; METHOD_EXPOSITION_MODEL; TABLE_MODEL | confidence calibration definition, reliability diagrams, accuracy-vs-confidence distinction | 8 | 4 | 16 |
 | 2019_shi_dyspan_unknown_dynamic_rf | candidate cite | SECTION_MODEL; TECHNICAL_REFERENCE | EXPERIMENT_DESIGN_MODEL; RESULTS_NARRATIVE_MODEL; FIGURE_MODEL; TECHNICAL_LINEAGE | RF unknown/dynamic spectrum setting, replay/spoofing, superposition, downstream scheduling use | 15 | 9 | 12 |
 | 2020_liu_energy_ood_detection | should cite | TECHNICAL_REFERENCE; SECTION_MODEL | TECHNICAL_LINEAGE; METHOD_EXPOSITION_MODEL; RESULTS_NARRATIVE_MODEL | energy-score definition, softmax-vs-energy distinction, OOD scoring threshold | 10 | 4 | 15 |
+| 2021_fadul_adversarial_spread_spectrum_milcom | optional | STYLE_REFERENCE; SECTION_MODEL | VENUE_STYLE_MODEL; PROBLEM_FRAMING_MODEL; METHOD_EXPOSITION_MODEL; CLAIM_BOUNDARY_MODEL | MILCOM RF/security pacing, contribution list, bounded threat model, negative model for generic DL openings | 8 | 11 | 10 |
+| 2022_specforce_battlefield_spectrum_sensors | candidate cite | SECTION_MODEL; CLAIM_BOUNDARY_MODEL | PROBLEM_FRAMING_MODEL; CLAIM_BOUNDARY_MODEL; EXPERIMENT_DESIGN_MODEL; FIGURE_MODEL | battlefield spectrum-sensor component framing, IoBT operational motivation, real sensor evaluation | 10 | 9 | 16 |
+| 2022_sensing_throughput_tradeoffs_gan_nextg_spectrum | optional | SECTION_MODEL; RESULTS_NARRATIVE_MODEL | RESULTS_NARRATIVE_MODEL; TABLE_MODEL; CLAIM_BOUNDARY_MODEL; EXPERIMENT_DESIGN_MODEL | operating tradeoff narration, constrained spectrum-sensing result tables | 8 | 10 | 14 |
+| 2023_searchlight_rf_energy_detection_milcom | candidate cite | CORE_MODEL; SECTION_MODEL | VENUE_STYLE_MODEL; PROBLEM_FRAMING_MODEL; METHOD_EXPOSITION_MODEL; EXPERIMENT_DESIGN_MODEL; RESULTS_NARRATIVE_MODEL; FIGURE_MODEL; CLAIM_BOUNDARY_MODEL | best RF/MILCOM style model, practical detector outputs, system pipeline, OTA result narration | 11 | 14 | 20 |
+| 2023_stealth_spectrum_sensing_data_falsification_milcom | candidate cite | SECTION_MODEL; PROBLEM_FRAMING_MODEL | PROBLEM_FRAMING_MODEL; CLAIM_BOUNDARY_MODEL; RESULTS_NARRATIVE_MODEL; EXPERIMENT_DESIGN_MODEL | battlefield sensing failure mode, detector failure analysis, surrogate-transfer analogy | 10 | 12 | 17 |
+| 2024_hyperadv_rfml_dynamic_defense_milcom | optional | SECTION_MODEL; VENUE_STYLE_MODEL | VENUE_STYLE_MODEL; METHOD_EXPOSITION_MODEL; RESULTS_NARRATIVE_MODEL; CLAIM_BOUNDARY_MODEL; FIGURE_MODEL | RFML security method/results model, compact tradeoff table, clean baseline-vs-proposed contrast | 11 | 13 | 18 |
+| 2024_stitching_spectrum_signal_stitching | candidate cite | CORE_MODEL; SECTION_MODEL | FIGURE_MODEL; METHOD_EXPOSITION_MODEL; EXPERIMENT_DESIGN_MODEL; RESULTS_NARRATIVE_MODEL; PROBLEM_FRAMING_MODEL | best visual/methodology exemplar, OTA dataset realism, RF pipeline structure | 11 | 11 | 20 |
 
 ## Seed Library Verdict
 
@@ -65,3 +72,27 @@ For results and discussion, synthesize:
 1. Trott for target/fold dependence.
 2. Wei for RF result interpretation.
 3. Energy for claim-boundary discipline.
+
+
+## Style Exemplar Batch Verdict
+
+The style-exemplar batch changes the revision strategy. The library is no longer only a technical lineage library; it now contains RF, spectrum, wireless-security, and battlefield-sensing exemplars that can guide page economy, operational framing, figures, tables, and results narration.
+
+Highest-value style models:
+
+1. Searchlight is the best direct RF/MILCOM system-component exemplar.
+2. Stitching the Spectrum is the best visual and methodology exemplar.
+3. HyperAdv is the strongest compact RFML method/results exemplar.
+4. SpecForce is the best IoBT/spectrum-sensor claim-boundary exemplar.
+5. Stealth SSDF is the strongest failure-mode and detector-failure narrative exemplar.
+6. Sensing-Throughput is useful for operating-tradeoff narration.
+7. Fadul Spread Spectrum is useful as a partial MILCOM style reference and as a negative model for avoiding generic deep-learning openings.
+
+Immediate revision consequences:
+
+- Start with the RF/EMS operational failure mode, not generic deep-learning progress.
+- State DQNGuard's operational product: known PA evidence or unknown-behavior routing.
+- Use Figure 1 as the structural map of the methodology.
+- Treat Table I as fixed-budget operating-point evidence.
+- Treat Figure 2 as surrogate-transfer failure analysis.
+- Repeat the claim boundary: DQNGuard is a sensing and triage layer, not a full QR-CWoS response planner or final semantic labeler.
