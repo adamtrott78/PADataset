@@ -1,49 +1,52 @@
-We design the experimental protocol to evaluate open-set recognition (OSR) for RF preliminary-action detection. The core task is to train a closed-set backbone on a subset of known preliminary actions and then determine whether DQNGuard can preserve known-class accuracy while rejecting withheld preliminary actions as \texttt{unknown}. We separate the evaluation into fixed-surrogate, target--surrogate, and target-open calibration regimes so that improvements can be attributed to either the OSR decision rule or to the calibration information made available.
+We design the experimental protocol to test the routing problem introduced in Fig.~\ref{fig:dqnguard_pipeline}: given a closed-set RF preliminary-action backbone, can an OSR decision layer retain useful known-PA evidence while rejecting withheld PA behaviors as \texttt{unknown}? The experiments separate decision-rule effects from calibration-information effects by evaluating fixed-surrogate, target--surrogate, and target-open calibration regimes.
 
 \subsection{Research Questions}
 \label{subsec:rqs}
 
-The experiments are organized around four questions:
+The experiments are organized around three questions:
 \begin{itemize}
-    \item \textbf{RQ1.} Under a fixed Scan-surrogate calibration condition, does DQNGuard improve open-set preliminary-action detection relative to VarMax?
-    \item \textbf{RQ2.} How sensitive is DQNGuard to the choice of surrogate-open class in the Target--Surrogate Matrix?
-    \item \textbf{RQ3.} Does target-open calibration with a small number of held-out target-open examples explain failures of surrogate-open calibration?
-    \item \textbf{RQ4.} Can surrogate quality be predicted from calibration recall, confidence geometry, feature geometry, or closed-set route-alignment diagnostics?
+    \item \textbf{RQ1.} Under a fixed surrogate-open calibration condition, does DQNGuard improve open-set PA detection relative to VarMax and a DQN-IDS-style confidence head?
+    \item \textbf{RQ2.} How sensitive is DQNGuard to the choice of surrogate-open calibration class?
+    \item \textbf{RQ3.} When a small number of target-open examples are available for calibration, how much of the surrogate-open performance gap is explained by the absence of target-specific open evidence?
 \end{itemize}
+
+RQ1 evaluates the proposed decision rule at a common operating point. RQ2 tests whether surrogate-open calibration transfers across PA behaviors. RQ3 is diagnostic: it does not assume that target-open examples are available at deployment, but it helps determine whether failures are caused by poor surrogate choice rather than by the backbone representation alone.
 
 \subsection{OTA Dataset and Capture Setup}
 \label{subsec:dataset}
 
-The OTA corpus spans WiFi, Bluetooth, and Zigbee emissions and five preliminary-action classes: Scan, Burst, Sustain, Hop, and Replay. The legacy repository identifiers for these classes are retained in code and result files for traceability, but the paper refers to the classes by behavior name.
+The OTA corpus contains WiFi, Bluetooth, and Zigbee emissions and five PA behaviors: Scan, Burst, Sustain, Hop, and Replay. These behavior names are used throughout the paper even though legacy repository identifiers are retained in code and result files for traceability.
 
-For each protocol/action pair, the generation target is 10,000 windows. Burst, Sustain, Hop, and Replay were generated together per protocol and split across 20 shards; each shard therefore contains 2,000 windows, or 500 windows per class. Scan was generated separately under the same seed schedule and capture setup and split across 5 shards of 2,000 windows. Each spliced OTA window contains 400,000 complex I/Q samples. At the recorded OTA sample rate of 12.5 MS/s, each window spans 32 ms.
+Each spliced OTA window contains 400,000 complex I/Q samples. At the recorded OTA sample rate of 12.5 MS/s, each window spans 32 ms. For each protocol/action pair, the generation target is 10,000 windows. Burst, Sustain, Hop, and Replay were generated together per protocol and split across 20 shards. Scan was generated separately under the same seed schedule and capture setup and split across five shards. The shard structure is used for reproducibility and data management; the OSR evaluation is defined by the PA-class folds described below.
 
 The OTA capture setup used two Ettus USRP N210 radios equipped with SBX/CBX daughterboards and VERT2450 omnidirectional antennas. The radios were separated by approximately 11 inches and connected through a NETGEAR ProSAFE GS108 Gigabit switch to a Lambda Vector Pro workstation. The captures used a 2.437 GHz center frequency with TX/RX gains fixed at 30/10 dB.
 
 \subsection{Backbone Training and Splits}
 \label{subsec:backbone_training}
 
-For each fold, the closed-set backbone is trained only on the classes designated as known for that fold. The withheld target class is excluded from closed-set training and is used only for open-set evaluation or, in the target-open calibration regime, for OSR calibration. The backbone outputs logits, softmax probabilities, predicted known labels, and intermediate features; these outputs are then consumed by VarMax, DQN-IDS-style heads, or DQNGuard.
+Each fold designates some PA classes as known and withholds one class as the target unknown. The closed-set backbone is trained only on the known classes for that fold. The target unknown is excluded from closed-set training and appears only during open-set evaluation, except in the target-open diagnostic regime where a small labeled subset is used for OSR calibration.
 
-The evaluated runs use the OTA feature cache with cache length 16,384, source type \texttt{ota}, protocol tag \texttt{all}, dataset tag \texttt{ota\_core\_high\_run01}, learning rate $2\times 10^{-4}$, entropy loss weight 0.05, and seed 0. Known samples are partitioned using the open-PA split mode into 70\% training, 15\% validation, and 15\% testing. Where calibration caps are used, the OSR calibration set contains 625 known samples and 625 open samples. The main DQNGuard operating point uses a 5\% known-rejection budget.
+The backbone produces the outputs consumed by all decision heads: logits, softmax probabilities, predicted known labels, and intermediate features. VarMax, DQN-IDS-style heads, and DQNGuard are therefore compared as decision layers over the same closed-set backbone outputs.
+
+The evaluated runs use the OTA feature cache with cache length 16,384, source type \texttt{ota}, protocol tag \texttt{all}, dataset tag \texttt{ota\_core\_high\_run01}, learning rate $2\times10^{-4}$, entropy loss weight 0.05, and seed 0. Known samples are partitioned using the open-PA split mode into 70\% training, 15\% validation, and 15\% testing. Where calibration caps are used, the OSR calibration set contains 625 known samples and 625 open samples. The main DQNGuard operating point uses a 5\% known-rejection budget.
 
 \subsection{Open-Set Calibration Regimes}
 \label{subsec:calibration_regimes}
 
-We evaluate three calibration regimes.
+We evaluate three calibration regimes. The regimes differ only in what open evidence is available to the OSR decision layer; the closed-set backbone remains trained only on known PA classes.
 
-\paragraph{Regime A: Scan-surrogate method ablation.}
-The first regime fixes the surrogate-open calibration class to Scan and evaluates the four remaining actions, Burst, Sustain, Hop, and Replay, as target unknowns. This regime isolates the OSR decision mechanism: VarMax and DQNGuard receive the same fixed surrogate-open information, so differences in performance are attributable to the decision rule rather than to a different surrogate choice.
+\paragraph{Regime A: fixed-surrogate method comparison.}
+The first regime fixes the surrogate-open calibration class to Scan and evaluates Burst, Sustain, Hop, and Replay as target unknowns. This setting isolates the OSR decision mechanism. Because the compared decision heads receive the same fixed surrogate-open information, performance differences are attributable primarily to the decision rule rather than to a different surrogate choice.
 
 \paragraph{Regime B: Target--Surrogate Matrix.}
-The second regime evaluates a full Target--Surrogate Matrix. In each cell, one class is withheld as the target unknown, one different class is used as the surrogate-open calibration class, and the remaining three classes form the known set. With five preliminary-action classes, this produces 20 ordered target/surrogate cells. This matrix measures how strongly DQNGuard depends on surrogate choice and whether some surrogate actions transfer better across target unknowns than others.
+The second regime evaluates all ordered target/surrogate pairs. In each cell, one class is withheld as the target unknown, one different class is used as the surrogate-open calibration class, and the remaining three classes form the known set. With five PA classes, this produces 20 target/surrogate cells. This regime tests whether surrogate-open calibration is interchangeable across PA behaviors or whether surrogate usefulness is target-dependent.
 
-\paragraph{Regime C: target-open calibration.}
-The third regime evaluates target-open calibration. In this condition, a small labeled subset of the held-out target-open class is available for OSR calibration, but the closed-set backbone is still trained only on known classes. We use the term target-open calibration rather than oracle calibration because the setting is not a deployment assumption; it is an upper-bound diagnostic that tests whether failures under surrogate-open calibration are explained by the absence of target-open examples.
+\paragraph{Regime C: target-open diagnostic calibration.}
+The third regime uses a small labeled subset of the held-out target-open class during OSR calibration, while still excluding that class from closed-set backbone training. This is not the assumed deployment condition. It is a diagnostic upper-bound condition that asks whether surrogate-open failures can be explained by the absence of calibration examples from the true target unknown.
 
 \subsection{Metrics}
 \label{subsec:metrics}
 
-We report known rejection rate, unknown precision, unknown recall, unknown F1, OSR macro F1, OSR accuracy, and unknown AUROC. The known rejection rate is the fraction of known test samples rejected as \texttt{unknown}. Unknown F1 measures binary detection of the held-out target-open class. OSR macro F1 averages performance across the known classes and the unknown class, penalizing methods that improve novelty detection by sacrificing known-class recognition.
+We report known rejection rate, unknown precision, unknown recall, unknown F1, OSR macro F1, OSR accuracy, and unknown AUROC. The known rejection rate is the fraction of known test samples incorrectly rejected as \texttt{unknown}. Unknown F1 measures binary detection of the held-out target-open class. OSR macro F1 averages performance across the known classes and the unknown class, penalizing methods that improve unknown detection by sacrificing known-class recognition.
 
-For DQNGuard, the main operating threshold is selected from known calibration scores only. With a 5\% known-rejection budget, the threshold is set at the 95th percentile of known calibration unknown scores. Open calibration samples may be used to fit or diagnose the guard, but in the known-budgeted setting they do not determine the final threshold.
+Known rejection is central to the evaluation because unknown detection can be made artificially high by rejecting too many known samples. For DQNGuard, the main operating threshold is selected from known calibration scores only. With a 5\% known-rejection budget, the threshold is set at the 95th percentile of known calibration unknown scores. Open calibration samples may shape or diagnose guard evidence, but in the known-budgeted setting they do not determine the final operating threshold.
