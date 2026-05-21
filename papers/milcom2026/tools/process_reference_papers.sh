@@ -194,7 +194,7 @@ process_pdf() {
   local image_dir="$paper_dir/images"
   local page_dir="$image_dir/pages"
   local pdf_dst="$paper_dir/$slug.pdf"
-  local md_dst="$paper_dir/$slug.md"
+  local md_dst="$paper_dir/$slug.mmd"
   local contact_dst="$image_dir/contact_sheet.png"
   local manifest="$paper_dir/manifest.json"
   local log_file="$paper_dir/process.log"

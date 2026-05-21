@@ -15,7 +15,7 @@ papers/milcom2026/reference_notes/papers/
 Each processed paper contains:
 
 - renamed PDF
-- Mathpix markdown file or a placeholder if Mathpix is not configured
+- Mathpix Markdown `.mmd` file or a placeholder if Mathpix is not configured
 - rendered PNG for every page
 - contact sheet PNG
 - manifest JSON
@@ -32,6 +32,6 @@ Mathpix integration is controlled with MATHPIX_CMD. The command must use:
 
 Example:
 
-MATHPIX_CMD='mathpix convert "{pdf}" --format md --output "{out}"' bash papers/milcom2026/tools/process_reference_papers.sh
+MATHPIX_CMD='mpx convert "{pdf}" "{out}"' bash papers/milcom2026/tools/process_reference_papers.sh
 
 If the local Mathpix CLI uses a different syntax, change only MATHPIX_CMD, not the pipeline script.
