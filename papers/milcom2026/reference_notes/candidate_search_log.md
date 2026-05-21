@@ -239,3 +239,44 @@ Priority order:
 4. Only then add more technical lineage papers.
 
 The goal is to process a small, high-quality batch rather than a large uncontrolled pile.
+
+---
+
+## 7. ScholarGPT Polished Short-Paper Search Pass
+
+Search source: ScholarGPT fresh exemplar pass.
+Search purpose: fill the remaining style/library gaps after technical OSR/OOD lineage was already covered.
+
+Main conclusion:
+
+The useful candidates from this pass are not primarily OSR papers. They are RF, spectrum, wireless security, and operational sensing papers that can teach MILCOM/IEEE page economy, component framing, practical RF experiment reporting, and claim boundaries.
+
+### Highest-priority candidates
+
+| Candidate | Initial decision | Main roles | Notes |
+|---|---|---|---|
+| Adversarial Machine Learning for Enhanced Spread Spectrum Communications | process now | VENUE_STYLE_MODEL; PROBLEM_FRAMING_MODEL; METHOD_EXPOSITION_MODEL; CLAIM_BOUNDARY_MODEL | Strong MILCOM RF/security pacing candidate |
+| SpecForce | process now | PROBLEM_FRAMING_MODEL; FIGURE_MODEL; CLAIM_BOUNDARY_MODEL; EXPERIMENT_DESIGN_MODEL | Best system-component and battlefield IoT/spectrum-sensor framing |
+| Stealth Spectrum Sensing Data Falsification Attacks | process now if PDF available | PROBLEM_FRAMING_MODEL; EXPERIMENT_DESIGN_MODEL; RESULTS_NARRATIVE_MODEL; CLAIM_BOUNDARY_MODEL | Strong battlefield sensing failure-mode candidate |
+| Searchlight | process now if PDF available | METHOD_EXPOSITION_MODEL; EXPERIMENT_DESIGN_MODEL; RESULTS_NARRATIVE_MODEL; TABLE_MODEL | Strong practical RF detector/results-reporting model |
+| Stitching the Spectrum | process now | METHOD_EXPOSITION_MODEL; FIGURE_MODEL; RESULTS_NARRATIVE_MODEL | Strong pipeline and visual model |
+| HyperAdv | process now | VENUE_STYLE_MODEL; METHOD_EXPOSITION_MODEL; CLAIM_BOUNDARY_MODEL; RESULTS_NARRATIVE_MODEL | RFML security component and claim-boundary model |
+
+### Second-wave candidates
+
+| Candidate | Initial decision | Main roles | Notes |
+|---|---|---|---|
+| WRIST | hold for second wave | EXPERIMENT_DESIGN_MODEL; FIGURE_MODEL; RESULTS_NARRATIVE_MODEL | Longer RF system paper; useful for setup/results |
+| Practical Training for RF Fingerprinting of Commercial Transmitters at the Edge | hold for second wave | EXPERIMENT_DESIGN_MODEL; METHOD_EXPOSITION_MODEL; TABLE_MODEL | Compact RF capture/evaluation candidate |
+| Sensing-Throughput Tradeoffs with GANs for NextG Spectrum Sharing | process if results exemplar needed | RESULTS_NARRATIVE_MODEL; TABLE_MODEL; CLAIM_BOUNDARY_MODEL | Useful for tradeoff/result narration |
+| IoT-Enabled Machine Learning for an Algorithmic Spectrum Decision Process | hold for decision-layer framing | METHOD_EXPOSITION_MODEL; CLAIM_BOUNDARY_MODEL; PROBLEM_FRAMING_MODEL | Useful conceptual analogue for sensing-to-decision handoff |
+
+### Hold candidates
+
+Channel-Aware Adversarial Attacks, DeepWiFi, and The Best Defense Is a Good Offense are useful RFML/security references but are longer journal papers and not immediate six-page MILCOM style models.
+
+Tri-Hybrid MIMO is polished but too tutorial/architecture-oriented for the current revision pass.
+
+### Award-note policy
+
+Do not record award-winning status unless verified from a primary source. Several candidate notes mention author-level awards rather than paper-specific awards.
