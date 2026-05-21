@@ -1,0 +1,371 @@
+\title{
+Sensing-Throughput Tradeoffs with Generative Adversarial Networks for NextG Spectrum Sharing
+}
+
+\author{
+Yi Shi \({ }^{1}\) and Yalin E. Sagduyu \({ }^{2}\) \\ ¹Commonwealth Cyber Initiative, Virginia Tech, Arlington, VA, USA \\ \({ }^{2}\) National Security Institute, Virginia Tech, Arlington, VA, USA
+}
+
+\begin{abstract}
+Spectrum coexistence is essential for next generation (NextG) systems to share the spectrum with incumbent (primary) users and meet the growing demand for bandwidth. One example is the 3.5 GHz Citizens Broadband Radio Service (CBRS) band, where the 5 G and beyond communication systems need to sense the spectrum and then access the channel in an opportunistic manner when the incumbent user (e.g., radar) is not transmitting. To that end, a high-fidelity classifier based on a deep neural network is needed for low misdetection (to protect incumbent users) and low false alarm (to achieve high throughput for NextG). In a dynamic wireless environment, the classifier can only be used for a limited period of time, i.e., coherence time. A portion of this period is used for learning to collect sensing results and train a classifier, and the rest is used for transmissions. In spectrum sharing systems, there is a well-known tradeoff between the sensing time and the transmission time. While increasing the sensing time can increase the spectrum sensing accuracy, there is less time left for data transmissions. In this paper, we present a generative adversarial network (GAN) approach to generate synthetic sensing results to augment the training data for the deep learning classifier so that the sensing time can be reduced (and thus the transmission time can be increased) while keeping high accuracy of the classifier. We consider both additive white Gaussian noise (AWGN) and Rayleigh channels, and show that this GAN-based approach can significantly improve both the protection of the high-priority user and the throughput of the NextG user (more in Rayleigh channels than AWGN channels).
+\end{abstract}
+
+\section*{I. Introduction}
+
+To improve spectrum utilization, spectrum co-existence has been widely accepted in designing new systems that need to share the spectrum with incumbent users. For example, in the 3.5 GHz Citizens Broadband Radio Service (CBRS) band, three types of users, incumbent users, Priority Access License (PAL) users, and General Authorized Access (GAA) users, share the spectrum [1]. Once the Environmental Sensing Capability (ESC) detects the incumbent user (such as radar), the Spectrum Access System (SAS) is informed to reconfigure the access to the spectrum. As the spectrum environment is complex, deep learning provides a powerful capability to detect wireless signals of interest, whereas conventional machine learning algorithms cannot typically achieve high accuracy especially in the low signal-to-noise-ratio (SNR) regime [2]-[6].
+
+In this spectrum sharing system, the NextG user needs to sense the incumbent user activities and transmit only if the incumbent user is detected. We assume that time is slotted and incumbent user will not change its busy/idle status within
+a time slot. Then, the NextG user can sense channel at the beginning of a slot and apply a classifier to detect incumbent user activities. In this paper, we consider a deep neural network as the deep learning-based classifier. The NextG user starts with a learning phase to collect sensing results and train a deep neural network as the classifier that is then used in the subsequent transmission phase.
+
+If the incumbent user channel is static, the trained classifier can be always used without loss on accuracy. However, the incumbent user channel may change over time (e.g., due to the mobility) and thus the accuracy of the trained classifier may decrease. To achieve good throughput and to protect the incumbent user transmissions, the NextG user needs to retrain its classifier over time. We assume that the NextG user needs to retrain its classifier periodically to accommodate potential changes in channel, traffic, and interference effects, i.e., the NextG user trains a classifier in the learning phase at the beginning of each time frame and then uses this classifier in the transmission phase (the rest of a time frame). The length of a time frame is determined by the incumbent user channel coherent time. It is clear that a long sensing phase increases the accuracy of the incumbent user detection (by collecting more sensing samples), but the remaining time for the NextG user transmission becomes limited. On the other hand, a short sensing phase may not be sufficient to train a classifier with high accuracy. Thus, there is a well-known fundamental tradeoff between sensing and transmission phases [7].
+
+In this paper, we improve the balance of this sensingthroughput tradeoff by applying a generative adversarial network (GAN) to generate synthetic sensing results and use both real and synthetic sensing results as the input to train a deep learning-based classifier. The GAN was used originally introduced for computer vision applications [8] and then later extended to generate synthetic data in the wireless domain for various purposes. The GAN was used to augment training data to improve wireless signal classifiers [9] and modulation classifiers [10]. In [11], the GAN was used to generate synthetic signals for various RF environments. In [12], [13], the GAN was used to generate synthetic signals for spoofing attacks. In [14], the GAN was used to train a wireless anomaly/outlier detector. In [15], the GAN was used to assist a jammer to determine whether there is a transmission to be jammed. In [16], the GAN was used to enhance an antijamming spectrum access scheme. The GAN was also used to
+generate wireless signals for camouflage [17] or against user equipment (UE) identification [18]. In [19], the GAN was used to train an optimizer an autoencoder communications system for interference suppression. In [20] and [21], the GAN was used to model and generate wireless channel data. In [22], the GAN was used to generate channel status information.
+
+In this paper, we use the GAN to generate more sensing results to train a high-fidelity detector for the incumbent user activities. In [23], the GAN was used to generate more channel data samples to improve channel estimation with limited sensing data. In [24], the GAN was used to generate more data samples to train a modulation classifier. Compared to the previous studies that have focused on the data generation objectives, our goal in this paper is to study the effect of the GAN on the sensing-throughput trade-offs by shortening the length of the learning phase via the GAN and thus obtaining a long transmission phase for the NextG user to achieve high throughput. Our results show that the GAN can improve the incumbent user detection (in terms of small misdetection probability) and the NextG user throughput compared with the scheme without the GAN for both AWGN and Rayleigh channels. Our results indicate that the GAN can be effectively used to improve spectrum utilization for NextG spectrum sharing systems without extra communication or sensing capabilities.
+
+The remaining of this paper is organized as follows. Section II presents the NextG spectrum coexistence system, where the sensing process may be enhanced by the GAN to improve the throughput. Section III evaluates the performance with and without the GAN. Section IV concludes this paper.
+
+\section*{II. System Model}
+
+We consider a NextG spectrum sharing scenario (illustrated in Fig. [1], where the NextG user applies a deep learningbased classifier (namely, a deep neural network) to detect the ongoing incumbent user transmissions. This classifier needs to be retrained periodically due to changes in the incumbent user signals. We consider the coherence time, namely the time period when the channel characteristics remains the same, as a time frame. The NextG user needs to train a classifier first and then uses this classifier in the remaining of the time frame. The problem is how to determine a suitable training period so that (i) the achieved throughput is maximized and (ii) the impact on the incumbent user is minimized. If the training period is too short, the classifier may have a high false alarm probability (the transmission opportunity is lost) and a high misdetection probability (the impact on the incumbent user is large). If the training period is too long, the remaining time is short and thus the NextG user may not achieve a large throughput. The optimal length of the training period has been studied for cognitive radio networks [7].
+
+In this paper, we utilize the GAN to generate additional sensing results and then use both real and synthetic results to train a classifier. We will show that with the GAN, the training period can be made shorter and the system performance can be improved. Table I shows the notation used in this paper.
+
+\begin{figure}
+\includegraphics[alt={},max width=\textwidth]{https://cdn.mathpix.com/cropped/b1f5377b-c425-4f33-a6d6-713614cf18d0-2.jpg?height=274&width=869&top_left_y=171&top_left_x=1084}
+\captionsetup{labelformat=empty}
+\caption{Fig. 1. Example of NextG spectrum sharing.}
+\end{figure}
+
+\begin{table}
+\captionsetup{labelformat=empty}
+\caption{TABLE I
+notation.}
+\begin{tabular}{|l|l|}
+\hline \(T\) & The length of a time frame (coherence time for a trained classifier) \\
+\hline \(S\) & The length of a time slot \\
+\hline \(F\) & The number of sensing results in a sample \\
+\hline L & The number of slots in the learning period \\
+\hline \(\hat{L}\) & The reduced number of slots in the learning period by using GAN \\
+\hline \(p_{s}\) & The fraction of time in a slot to collect sensing results in the training period \\
+\hline \(r\) & Throughput \\
+\hline \(\hat{r}\) & Throughput by using GAN \\
+\hline \(p_{B}\) & The probability that incumbent user is busy \\
+\hline \(p_{F A}\) & The false alarm probability \\
+\hline \(\hat{p}_{F A}\) & The false alarm probability by using GAN \\
+\hline \(p_{N}\) & The failure probability due to random large noise \\
+\hline \(p_{M D}\) & The misdetection probability \\
+\hline \(\hat{p}_{M D}\) & The misdetection probability by using GAN \\
+\hline \(n\) & The number of synthetic samples \\
+\hline
+\end{tabular}
+\end{table}
+
+\section*{A. Sensing and Transmission Scheme}
+
+The time structure is shown in Fig. 2. The length of a time frame is \(T\), where we normalize the time for obtaining one sensing result as 1 . In this time frame, there are many time slots and the incumbent user does not change its busy/idle status within a time slot. Denote the time slot length as \(S\).
+- The training time uses \(L\) time slots to collect data (namely, power levels of received signals) for deep learning. The NextG receiver senses most of the time (e.g., \(p_{s}=85 \%\) ) in a slot to collect sensing data. To determine the busy/idle status, the NextG transmitter transmits in the remaining time. If successfully received (for most of transmissions), this slot is considered as idle, otherwise this slot is considered as busy. At the end of the learning period, the NextG receiver has many sensing results for idle/busy slots. The results in the same class are grouped with size \(F\) to construct machine learning samples. With samples and their class (status) information, the NextG
+
+\begin{figure}
+\includegraphics[alt={},max width=\textwidth]{https://cdn.mathpix.com/cropped/b1f5377b-c425-4f33-a6d6-713614cf18d0-2.jpg?height=205&width=869&top_left_y=2217&top_left_x=1087}
+\captionsetup{labelformat=empty}
+\caption{Fig. 2. The time structure.}
+\end{figure}
+
+\begin{figure}
+\includegraphics[alt={},max width=\textwidth]{https://cdn.mathpix.com/cropped/b1f5377b-c425-4f33-a6d6-713614cf18d0-3.jpg?height=196&width=866&top_left_y=189&top_left_x=174}
+\captionsetup{labelformat=empty}
+\caption{Fig. 3. The GAN structure.}
+\end{figure}
+receiver can build a deep learning-based classifier to predict the channel status.
+- The remaining of the frame is used for transmissions. Within a slot, the NextG receiver first senses \(F\) power levels, then runs the classifier to determine the channel status. If the channel is idle, the NextG transmitter transmits data in the remainder of this slot.
+
+Assume the throughput by successful transmission over 1 unit of time is 1 . Then, the throughput can be calculated as
+\[
+r=(T-L S)\left(1-p_{B}\right)\left(1-p_{F A}\right)\left(\frac{S-F}{S}\right)\left(1-p_{N}\right),
+\]
+where \(p_{B}\) (e.g., 0.5 ) is the probability that the incumbent user is busy, \(p_{F A}\) is the false alarm probability, and \(p_{N}\) is the failure probability due to random large noise (e.g., 5 as a threshold for noise with mean 0 and variance 1 and incumbent user signal with mean 3 and variance 1). We need to determine \(L\), which in turn will determine the transmission time \(T-L S\) and the throughput \(r\). Another performance metric is the misdetection probability \(p_{M D}\) (or the protection of the incumbent user), which also depends on \(L\). A large \(L\) can reduce \(p_{M D}\) but also reduce \(T-L S\). Thus, there is a tradeoff between the NextG user throughput and the incumbent user protection when we determine \(L\).
+
+\section*{B. GAN-Enhanced Spectrum Sensing Scheme}
+
+Instead of just considering a tradeoff when we determine \(L\), we can employ the GAN to achieve better performance. The GAN is trained at the end of the learning period. We then use the GAN to generate more samples to train a classifier. The GAN consists of a deep neural network as the generator and a deep neural network as the discriminator (see Fig. 3). The generator can generate synthetic sensing results (statistically similar to real sensing results) by using real sensing results and some random noise as input. The discriminator classifies sensing results as real or synthetic. During the training of the GAN, the classification results are provided to the generator as feedback. Once trained, the generator can generate synthetic sensing results that cannot be distinguished from real.
+
+Since the GAN is used to generate more samples at the end of training period and the NextG user uses both real and synthetic samples as training data to build a deep learningbased classifier, it is expected that this classifier can achieve better performance in terms of false alarm probability \(\hat{p}_{F A}\) and misdetection probability \(\hat{p}_{M D}\) while using less number
+
+\begin{table}
+\captionsetup{labelformat=empty}
+\caption{TABLE II
+The deep neural network structure of the classifier.}
+\begin{tabular}{c|c|c|c} 
+layer & \begin{tabular}{c} 
+number of \\
+neurons
+\end{tabular} & \begin{tabular}{c} 
+activation \\
+function
+\end{tabular} & \begin{tabular}{c} 
+dropout \\
+rate
+\end{tabular} \\
+\hline \hline Hidden 1 & 128 & Relu & 0.2 \\
+\hline Hidden 2 & 64 & Relu & 0.2 \\
+\hline Hidden 3 & 32 & Relu & 0.2 \\
+\hline Output & 2 & Softmax &
+\end{tabular}
+\end{table}
+of learning slots \(\hat{L}\). Then, the throughput is updated as
+\[
+\hat{r}=(T-\hat{L} S)\left(1-p_{B}\right)\left(1-\hat{p}_{F A}\right)\left(\frac{S-F}{S}\right)\left(1-p_{N}\right) .
+\]
+
+For easy comparison, the generated samples will be the same as the samples that the NextG receiver can obtain by using some additional slots. That is, suppose that the NextG user uses \(n\) additional slots and obtains around \(\frac{n S p_{s}}{F}\) samples. To be comparable, the number of generated samples is \(\left\lfloor\frac{n S p_{s}}{F}\right\rfloor\) and we say that these synthetic samples are generated for \(n\) synthetic slots. The time for training a GAN is similar to the time for training a classifier.
+
+\section*{III. Performance Evaluation}
+
+We consider a time frame of \(T=20,000\) and a slot has length \(S=20\). During the learning period, \(p_{s}=85 \%\) of a slot is used to collect sensing results and the remaining time is used to determine the channel status (the incumbent user's busy/idle status). After the learning period, \(F=5\) sensing results are collected at the beginning of each slot to determine the channel status. The probability that the incumbent user is active is \(p_{B}=0.5\). We consider Gaussian and Rayleigh channels. We use a feedforward neural network (see Table II) to build the classifier. After hyperparameter optimization, we end up with three hidden layers with 128, 64, and 32 neurons. The ReLU activation function is used at each hidden layer. After each hidden layer, we add a dropout layer with rate 0.2 to avoid overfitting. The last layer has two neurons (corresponding to two classes) and uses a Softmax activation function. We use categorical cross-entropy as the loss function, Root Mean Squared Propagation (RMSprop) as the optimizer, and accuracy as the optimization metric.
+
+The GAN model to generate synthetic sensing results consists of two deep neural networks, one for the generator and one for discriminator. The structure of these two networks is shown in Table III The generator has three hidden layers, each with 128 neurons. The output layer has \(S p_{s}\) neurons, i.e., its output constitutes the synthetic sensing results in a slot. The discriminator also has three hidden layers, each with 128 neurons. The output layer has one neuron with Sigmoid activation function, i.e., its output is the probability that the input sample is real. The loss function is sigmoid crossentropy, which is used as the optimization metric. We use Adam as the optimizer. Once trained, the generator provides synthetic samples as the output. Then, we build a classifier using the same feedforward neural network architecture that we used to build a classifier without the GAN.
+
+\begin{table}
+\captionsetup{labelformat=empty}
+\caption{TABLE III
+The GAN neural network structure.}
+\begin{tabular}{c|c||c|c}
+\multicolumn{2}{c|}{ Generator } & \multicolumn{2}{c}{ Discriminator } \\
+\hline parameter & value & parameter & value \\
+\hline Hidden & \(3 \times 128\) & Hidden & \(3 \times 128\) \\
+\hline Output & \(S p_{s}\) & Output & 1 \\
+\hline Activation & Sigmoid & Activation & Sigmoid \\
+\hline Loss & crossentropy & Loss & crossentropy \\
+\hline Optimizer & Adam & Optimizer & Adam
+\end{tabular}
+\end{table}
+
+\begin{table}
+\captionsetup{labelformat=empty}
+\caption{TABLE IV
+Comparison of the performance with and without the GAN for AWGN CHANNEL AND \(\hat{L}=10\).}
+\begin{tabular}{c|c|c||c|c|c}
+\multicolumn{3}{c|}{ No GAN } & \multicolumn{3}{c}{ GAN } \\
+\hline\(L\) & \(r\) & \(p_{M D}(\%)\) & \(\hat{L}+n\) & \(\hat{r}\) & \(\hat{p}_{M D}(\%)\) \\
+\hline 15 & 6912 & 17.83 & \(10+5\) & 7252 & 23.33 \\
+\hline 20 & 7016 & 15.81 & \(10+10\) & 7180 & 13.44 \\
+\hline 25 & 6928 & 13.61 & \(10+15\) & 7208 & 11.20 \\
+\hline 30 & 7032 & 8.73 & \(10+20\) & 7134 & 22.00 \\
+\hline 35 & 7004 & 10.00 & \(10+25\) & 7034 & 6.11 \\
+\hline 40 & 6932 & 11.46 & \(10+30\) & 7005 & 13.24 \\
+\hline 45 & 6887 & 7.13 & \(10+35\) & 7022 & 16.70 \\
+\hline 50 & 6814 & 10.92 & \(10+40\) & 7064 & 12.22
+\end{tabular}
+\end{table}
+
+\section*{A. Results for AWGN Channel}
+
+We start with Gaussian channel. In the first set of results, we fix the training time \(\hat{L}=10\) and consider different number of GAN training data samples so that the total training time is varied from \(L=15\) to 50 . Table IV shows the comparison with and without the GAN. The use of the GAN for sensing data augmentation may improve the throughput as well as the misdetection probability. We also observe that the classifier built upon too many synthetic samples may not achieve high accuracy. As a result, both the throughput and the misdetection probability performance may not be satisfactory. By considering both throughput and misdetection probability objectives, the best choice is to have \(n=15\) synthetic samples generated by the GAN.
+
+Next, we vary \(\hat{L}\). For \(\hat{L}=15\), we show the results with and without the GAN in Table V Again, using the GAN can improve the throughput as well as the misdetection probability. By considering both throughput and misdetection probability measures, the best choice is to have \(n=35\) synthetic samples. For \(\hat{L}=20\), we show the results with and without the GAN in Table VI. By considering both throughput and misdetection probability measures, the best choice is to have \(n=80\) synthetic samples. For \(\hat{L}=25\), we show the results with and without the GAN in Table VII. By considering both throughput and misdetection probability measures, the best choice to have \(n=115\) synthetic samples. For \(\hat{L}=30\), we show the results with and without the GAN in Table VIII. By considering both throughput and misdetection probability measures, the best choice is to have \(n=130\) synthetic samples.
+
+We summarize the results for different \(L\) (without the GAN) or \(\hat{L}+n\) (with the GAN) in Table IX Figure 4 shows the
+
+\begin{table}
+\captionsetup{labelformat=empty}
+\caption{TABLE V
+Comparison of the performance with and without the GAN for AWGN CHANNEL AND \(\hat{L}=15\).}
+\begin{tabular}{c|c|c||c|c|c}
+\multicolumn{3}{c|}{ No GAN } & \multicolumn{3}{c}{ GAN } \\
+\hline\(L\) & \(r\) & \(p_{M D}(\%)\) & \(\hat{L}+n\) & \(\hat{r}\) & \(\hat{p}_{M D}(\%)\) \\
+\hline 20 & 7016 & 15.81 & \(15+5\) & 7180 & 13.44 \\
+\hline 30 & 7032 & 8.73 & \(15+15\) & 7134 & 22.00 \\
+\hline 40 & 6932 & 11.46 & \(15+25\) & 7005 & 13.24 \\
+\hline 50 & 6814 & 10.92 & \(15+35\) & 7064 & 12.22 \\
+\hline 60 & 6756 & 10.17 & \(15+45\) & 7193 & 21.31 \\
+\hline 70 & 6697 & 7.07 & \(15+55\) & 7251 & 21.11 \\
+\hline 80 & 6625 & 8.87 & \(15+65\) & 7192 & 10.45 \\
+\hline 90 & 6581 & 5.91 & \(15+75\) & 7163 & 11.27 \\
+\hline 100 & 6508 & 13.05 & \(15+85\) & 7236 & 18.24
+\end{tabular}
+\end{table}
+
+\begin{table}
+\captionsetup{labelformat=empty}
+\caption{TABLE VI
+Comparison of the performance with and without the GAN for AWGN CHANNEL AND \(\hat{L}=20\).}
+\begin{tabular}{c|c|c||c|c|c}
+\multicolumn{3}{c|}{ No GAN } & \multicolumn{3}{c}{ GAN } \\
+\hline\(L\) & \(r\) & \(p_{M D}(\%)\) & \(\hat{L}+n\) & \(\hat{r}\) & \(\hat{p}_{M D}(\%)\) \\
+\hline 40 & 6932 & 11.46 & \(20+20\) & 7061 & 13.55 \\
+\hline 60 & 6756 & 10.17 & \(20+40\) & 7090 & 13.14 \\
+\hline 80 & 6625 & 8.87 & \(20+60\) & 7193 & 11.91 \\
+\hline 100 & 6508 & 13.05 & \(20+80\) & 7149 & 9.86 \\
+\hline 120 & 6405 & 15.87 & \(20+100\) & 7119 & 14.17 \\
+\hline 140 & 6288 & 13.95 & \(20+120\) & 7134 & 8.83 \\
+\hline 160 & 6142 & 10.29 & \(20+140\) & 7150 & 12.11 \\
+\hline 180 & 5994 & 8.31 & \(20+160\) & 7134 & 9.24 \\
+\hline 200 & 5831 & 11.03 & \(20+180\) & 7119 & 7.19
+\end{tabular}
+\end{table}
+
+\begin{table}
+\captionsetup{labelformat=empty}
+\caption{TABLE VII
+Comparison of the performance with and without the GAN for AWGN CHANNEL AND \(\hat{L}=25\).}
+\begin{tabular}{c|c|c||c|c|c}
+\multicolumn{3}{c|}{ No GAN } & \multicolumn{3}{c}{ GAN } \\
+\hline\(L\) & \(r\) & \(p_{M D}(\%)\) & \(\hat{L}+n\) & \(\hat{r}\) & \(\hat{p}_{M D}(\%)\) \\
+\hline 40 & 6932 & 11.46 & \(25+15\) & 7061 & 14.02 \\
+\hline 60 & 6756 & 10.17 & \(25+35\) & 7061 & 8.45 \\
+\hline 80 & 6625 & 8.87 & \(25+55\) & 6986 & 11.55 \\
+\hline 100 & 6508 & 13.05 & \(25+75\) & 7032 & 10.72 \\
+\hline 120 & 6405 & 15.87 & \(25+95\) & 7075 & 8.45 \\
+\hline 140 & 6288 & 13.95 & \(25+115\) & 7075 & 6.19 \\
+\hline 160 & 6142 & 10.29 & \(25+135\) & 7032 & 6.80 \\
+\hline 180 & 5994 & 8.31 & \(25+155\) & 6986 & 10.10 \\
+\hline 200 & 5831 & 11.03 & \(25+175\) & 7047 & 16.70
+\end{tabular}
+\end{table}
+
+\begin{table}
+\captionsetup{labelformat=empty}
+\caption{TABLE VIII
+Comparison of the performance with and without the GAN for AWGN CHANNEL AND \(\hat{L}=30\)}
+\begin{tabular}{c|c|c||c|c|c}
+\multicolumn{3}{c|}{ No GAN } & \multicolumn{3}{c}{ GAN } \\
+\hline\(L\) & \(r\) & \(p_{M D}(\%)\) & \(\hat{L}+n\) & \(\hat{r}\) & \(\hat{p}_{M D}(\%)\) \\
+\hline 40 & 6932 & 11.46 & \(30+10\) & 7077 & 6.65 \\
+\hline 60 & 6756 & 10.17 & \(30+30\) & 7077 & 6.24 \\
+\hline 80 & 6625 & 8.87 & \(30+50\) & 6988 & 12.47 \\
+\hline 100 & 6508 & 13.05 & \(30+70\) & 7032 & 6.24 \\
+\hline 120 & 6405 & 15.87 & \(30+90\) & 7017 & 8.32 \\
+\hline 140 & 6288 & 13.95 & \(30+110\) & 7032 & 7.48 \\
+\hline 160 & 6142 & 10.29 & \(30+130\) & 7090 & 3.95 \\
+\hline 180 & 5994 & 8.31 & \(30+150\) & 7060 & 5.61 \\
+\hline 200 & 5831 & 11.03 & \(30+170\) & 7047 & 9.36
+\end{tabular}
+\end{table}
+
+\begin{figure}
+\captionsetup{labelformat=empty}
+\caption{TABLE IX
+Comparison of the performance with and without the GAN for AWGN CHANNEL UNDER DIFFERENT \(\hat{L}\) AND \(n\).}
+\includegraphics[alt={},max width=\textwidth]{https://cdn.mathpix.com/cropped/b1f5377b-c425-4f33-a6d6-713614cf18d0-5.jpg?height=869&width=749&top_left_y=294&top_left_x=208}
+\end{figure}
+
+Fig. 4. The ratio of throughout improvement for AWGN channel.
+throughput improvement (in terms of \((\hat{r}-r) / r \times 100\) ) with and without the GAN. This improvement increases with \(L\) (or \(\hat{L}+n)\). With larger \(L\) or \(\hat{L}+n\), the throughput is always decreasing. The misdetection probability tends to decrease also. If \(\hat{p}_{M D}<10 \%\), the choice of \(\hat{L}=15\) and \(n=35\) achieves the best results. If \(\hat{p}_{M D}<5 \%\), the choice of \(\hat{L}=30\) and \(n=130\) achieves the best results.
+
+\section*{B. Results for Rayleigh Channel}
+
+Next, we consider Rayleigh channel. The spectrum sensing task for Rayleigh channel is more challenging and thus more time is needed for learning (i.e., larger \(\hat{L}\) ) to ensure good performance. We start with \(\hat{L}=50\). Table X shows that the use of the GAN can improve the misdetection probability and the throughput is maximized when \(n=100\). However, the misdetection probability is high ( \(24.59 \%\) ). For \(\hat{L}=100\), Table XI shows the results with and without the GAN. By considering both throughput and misdetection probability measures, the best choice is to have \(n=200\) synthetic samples. Again, the misdetection probability is high ( \(17.32 \%\) ). For \(\hat{L}=200\), Table XII shows the results with and without the GAN. By considering both throughput and misdetection probability measures, the best choice is to have \(n=200\) synthetic samples. For \(\hat{L}=300\), Table XIII shows the results with and without the GAN. By considering both throughput and misdetection probability measures, the best choice is to have \(n=200\) synthetic samples.
+
+We show the results for Rayleigh channel and different \(\hat{L}+n\) in Table XIV Figure 5 shows the throughput improve-
+
+\begin{table}
+\captionsetup{labelformat=empty}
+\caption{TABLE X
+Comparison of the performance with and without the GAN for Rayleigh CHANNEL AND \(\hat{L}=50\)}
+\begin{tabular}{c|c|c||c|c|c}
+\multicolumn{3}{c|}{ No GAN } & \multicolumn{3}{c}{ GAN } \\
+\hline\(L\) & \(r\) & \(p_{M D}(\%)\) & \(\hat{L}+n\) & \(\hat{r}\) & \(\hat{p}_{M D}(\%)\) \\
+\hline 100 & 4576 & 35.50 & \(50+50\) & 3771 & 22.73 \\
+\hline 150 & 4381 & 32.79 & \(50+100\) & 4548 & 24.59 \\
+\hline 200 & 4119 & 26.17 & \(50+150\) & 3987 & 23.76 \\
+\hline 250 & 3895 & 26.46 & \(50+200\) & 4187 & 26.86
+\end{tabular}
+\end{table}
+
+\begin{table}
+\captionsetup{labelformat=empty}
+\caption{TABLE XI
+Comparison of the performance with and without the GAN for Rayleigh CHannel and \(\hat{L}=100\)}
+\begin{tabular}{c|c|c||c|c|c}
+\multicolumn{3}{c|}{ No GAN } & \multicolumn{3}{c}{ GAN } \\
+\hline\(L\) & \(r\) & \(p_{M D}(\%)\) & \(\hat{L}+n\) & \(\hat{r}\) & \(\hat{p}_{M D}(\%)\) \\
+\hline 150 & 4381 & 32.79 & \(100+50\) & 4512 & 28.14 \\
+\hline 200 & 4119 & 26.17 & \(100+100\) & 4454 & 25.32 \\
+\hline 300 & 3646 & 20.40 & \(100+200\) & 4050 & 17.32 \\
+\hline 400 & 2956 & 7.82 & \(100+300\) & 4392 & 23.59 \\
+\hline 500 & 2448 & 7.09 & \(100+400\) & 4432 & 23.81 \\
+\hline 600 & 2020 & 9.80 & \(100+500\) & 4218 & 10.82
+\end{tabular}
+\end{table}
+ment (in terms of \((\hat{r}-r) / r \times 100\) ) with and without the GAN. This improvement increases with \(L\) (or \(\hat{L}+n\) ). With larger \(L\) or \(\hat{L}+n\), the throughput is again always decreasing. The misdetection probability tends to decrease also. If \(\hat{p}_{M D}<10 \%\), the choice of \(\hat{L}=200\) and \(n=200\) achieves the best results. The GAN offers more throughput improvement for Rayleigh channels (up to \(47 \%\) ) than AWGN channels (up to \(20 \%\) ) because Rayleigh channels are more complex than AWGN channels and thus more (real or synthetic) samples are needed to train a classifier under Rayleigh channels.
+
+\section*{IV. Conclusion}
+
+In this paper, we studied a spectrum coexistence system such as the CBRS band, where the NextG user uses a
+
+\begin{table}
+\captionsetup{labelformat=empty}
+\caption{TABLE XII
+Comparison of the performance with and without the GAN for Rayleigh channel and \(\hat{L}=200\)}
+\begin{tabular}{c|c|c||c|c|c}
+\multicolumn{3}{c|}{ No GAN } & \multicolumn{3}{c}{ GAN } \\
+\hline\(L\) & \(r\) & \(p_{M D}(\%)\) & \(\hat{L}+n\) & \(\hat{r}\) & \(\hat{p}_{M D}(\%)\) \\
+\hline 250 & 3895 & 26.46 & \(200+50\) & 3964 & 13.09 \\
+\hline 300 & 3646 & 20.40 & \(200+100\) & 3916 & 10.86 \\
+\hline 400 & 2956 & 7.82 & \(200+200\) & 3877 & 8.64 \\
+\hline 500 & 2448 & 7.09 & \(200+300\) & 3879 & 9.88 \\
+\hline 600 & 2020 & 9.80 & \(200+400\) & 3866 & 9.63
+\end{tabular}
+\end{table}
+
+\begin{table}
+\captionsetup{labelformat=empty}
+\caption{TABLE XIII
+Comparison of the performance with and without the GAN for Rayleigh channel and \(\hat{L}=300\)}
+\begin{tabular}{c|c|c||c|c|c}
+\multicolumn{3}{c|}{ No GAN } & \multicolumn{3}{c}{ GAN } \\
+\hline\(L\) & \(r\) & \(p_{M D}(\%)\) & \(\hat{L}+n\) & \(\hat{r}\) & \(\hat{p}_{M D}(\%)\) \\
+\hline 400 & 2956 & 7.82 & \(300+100\) & 3646 & 9.92 \\
+\hline 500 & 2448 & 7.09 & \(300+200\) & 3596 & 9.07 \\
+\hline 600 & 2020 & 9.80 & \(300+300\) & 3478 & 9.63
+\end{tabular}
+\end{table}
+
+\begin{table}
+\captionsetup{labelformat=empty}
+\caption{TABLE XIV
+Comparison of the performance with and without the GAN for Rayleigh channel under different \(\hat{L}\) and \(n\).}
+\begin{tabular}{c|c|c||c|c|c}
+\(L\) or & \multicolumn{2}{|c|}{ No GAN } & \multicolumn{3}{c}{ GAN } \\
+\cline { 2 - 6 }\(\hat{L}+n\) & \(r\) & \(p_{M D}(\%)\) & \(n\) & \(\hat{r}\) & \(\hat{p}_{M D}(\%)\) \\
+\hline 150 & 4381 & 32.79 & 100 & 4548 & 24.59 \\
+\hline 300 & 3646 & 20.40 & 200 & 4050 & 17.32 \\
+\hline 400 & 2956 & 7.82 & 200 & 3877 & 8.64 \\
+\hline 500 & 2448 & 7.09 & 200 & 3596 & 9.07
+\end{tabular}
+\end{table}
+
+\begin{figure}
+\includegraphics[alt={},max width=\textwidth]{https://cdn.mathpix.com/cropped/b1f5377b-c425-4f33-a6d6-713614cf18d0-6.jpg?height=467&width=682&top_left_y=627&top_left_x=240}
+\captionsetup{labelformat=empty}
+\caption{Fig. 5. The ratio of throughout improvement for Rayleigh channel.}
+\end{figure}
+deep learning-based classifier to identify the incumbent user transmissions by analyzing the spectrum sensing results. A fundamental tradeoff in such a system is that the NextG user needs to spend time to collect spectrum sensing data and build its classifier, which reduces the transmission time and consequently its throughput. One way to improve the performance is using the GAN to generate synthetic sensing data and using such data, along with real sensing data, as the training data to build a classifier. This approach can reduce the sensing time and thus increase the transmission time while keeping the classifier accuracy still high. We showed that for both AWGN and Rayleigh channels, the GAN can achieve a larger NextG user throughput than the approach without the GAN and still protect the incumbent user transmissions. We also showed that the GAN can improve the NextG user throughput more in Rayleigh channels (up to \(47 \%\) ) than AWGN channels (up to 20\%).
+
+\section*{References}
+[1] "Citizens broadband radio service," Code of Federal Regulations, Title 47, Part 96, 2015.
+[2] T. J. O'Shea, T. Roy, and T. C. Clancy, "Over-the-air deep learning based radio signal classification," IEEE Journal of Selected Topics in Signal Processing, 2018.
+[3] S. Rajendran, W. Meert, D. Giustiniano, V. Lenders and S. Pollin, "Deep learning models for wireless signal classification with distributed lowcost spectrum sensors," IEEE Transactions on Cognitive Communications and Networking, 2018.
+[4] Y. Shi, K. Davaslioglu, Y. E. Sagduyu, W. C. Headley, M. Fowler, and G. Green, "Deep learning for RF signal classification in unknown and dynamic spectrum environments," IEEE International Symposium on Dynamic Spectrum Access Networks (DySPAN), 2019.
+[5] W. M. Lees, A. Wunderlich, P. J. Jeavons, P. D. Hale, and M. R. Souryal, "Deep learning classification of \(3.5-\mathrm{GHz}\) band spectrograms with applications to spectrum sensing," IEEE Transactions on Cognitive Communications and Networking, 2019.
+[6] T. Erpek, T. O'Shea, Y. E. Sagduyu, Y. Shi, and T. C. Clancy, "Deep learning for wireless communications" in Development and Analysis of Deep Learning Architectures, Springer, 2020.
+[7] C. Liang, Y. Zeng, E.C. Peh, and A.T. Hoang, "Sensing-throughput tradeoff for cognitive radio networks," IEEE Transactions on Wireless Communications, 2008.
+[8] I. Goodfellow, J. Pouget-Abadie, M. Mirza, B. Xu, D. Warde-Farley, S. Ozair, A. Courville, and Y. Bengio, "Generative adversarial nets," Advances in Neural Information Processing Systems, 2014.
+[9] K. Davaslioglu and Y. E. Sagduyu, "Generative adversarial learning for spectrum sensing," IEEE International Conference on Communications (ICC), 2018.
+[10] M. Patel, X. Wang, and S. Mao, "Data augmentation with conditional GAN for automatic modulation classification," in Proc. ACM Workshop on Wireless Security and Machine Learning (WiseML), 2020.
+[11] T. Roy, T. O'Shea, and N. West, "Generative adversarial radio spectrum networks," in Proc. ACM Workshop on Wireless Security and Machine Learning (WiseML), 2019.
+[12] Y. Shi, K. Davaslioglu, and Y.E. Sagduyu, "Generative adversarial network in the air: Deep adversarial learning for wireless signal spoofing," IEEE Transactions on Cognitive Communications and Networking, 2021.
+[13] Y. Shi, K. Davaslioglu, and Y. E. Sagduyu, "Generative adversarial network for wireless signal spoofing," ACM Conference on Security and Privacy in Wireless and Mobile Networks (WiSec) Workshop on Wireless Security and Machine Learning (WiseML), 2019.
+[14] E. Ayanoglu, K. Davaslioglu, and Y. E. Sagduyu, "Machine learning in NextG networks via generative adversarial networks," IEEE Transactions on Cognitive Communications and Networking, 2022.
+[15] T. Erpek, Y.E. Sagduyu, and Y. Shi, "Deep learning for launching and mitigating wireless jamming attacks," IEEE Transactions on Cognitive Communications and Networking, 2019.
+[16] H. Han, X. Wang, F. Gu, W. Li, Y. Cai, Y. Xu, and Y. Xu, "Better late than never: GAN-enhanced dynamic anti-jamming spectrum access with incomplete sensing information," IEEE Wireless Communications Letters, 2021.
+[17] T. Hou, T. Wang, Z. Lu, Y. Liu, and Y. E. Sagduyu, "IoTGAN: GAN powered camouflage against machine learning based IoT device identification," IEEE International Symposium on Dynamic Spectrum Access Networks (DySPAN), 2021.
+[18] Y. E. Sagduyu, T. Erpek, and Y. Shi, "Adversarial machine learning for 5G communications security," Game Theory and Machine Learning for Cyber Security, IEEE Press-Wiley, 2021.
+[19] K. Davaslioglu, T. Erpek, and Y. E. Sagduyu, "End-to-end autoencoder communications with optimized interference suppression," arXiv preprint arXiv:2201.01388
+[20] T. J. O'Shea, T. Roy, and N. West, "Approximating the void: Learning stochastic channel models from observation with variational generative adversarial networks," in IEEE International Conference on Computing, Networking and Communications (ICNC), 2019.
+[21] Y. Yang, Y. Li, W. Zhang, F. Qin, P. Zhu, and C.-X. Wang, "Generative-adversarial-network-based wireless channel modeling: Challenges and opportunities," IEEE Communications Magazine, 2019.
+[22] H. Ye, L. Liang, G.Y. Li, and B.-H. Juang, "Deep learning-based end-to-end wireless communication systems with conditional GANs as unknown channels," IEEE Transactions on Wireless Communications, 2020.
+[23] T. Hu, Y. Huang, Q. Zhu, and Q. Wu, "Channel estimation enhancement with generative adversarial networks," IEEE Transactions on Cognitive Communications and Networking, 2020.
+[24] B. Tang, Y. Tu, Z. Zhang, and Y. Lin, "Digital signal modulation classification with data augmentation using generative adversarial nets in cognitive radio networks," IEEE Access, 2018.

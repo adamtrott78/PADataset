@@ -1,0 +1,276 @@
+\title{
+Stealth Spectrum Sensing Data Falsification Attacks Affecting IoT Spectrum Monitors on the Battlefield
+}
+
+\author{
+Pedro Miguel Sánchez Sánchez \({ }^{* 1}\), Enrique Tomás Martínez Beltrán \({ }^{1}\), Alberto Huertas Celdrán \({ }^{2}\), Robin Wassink \({ }^{2}\), Gérôme Bovet \({ }^{3}\), Gregorio Martínez Pérez \({ }^{1}\), and Burkhard Stiller \({ }^{2}\)
+}
+
+\begin{abstract}
+Resource-constrained spectrum sensors from the Internet of Battlefield Things (IoBT) monitor the frequency spectrum to communicate over unoccupied bands, intercept enemy transmissions, or decode valuable information. However, they are also susceptible to Spectrum Sensing Data Falsification (SSDF) attacks manipulating the sensing data and impacting the previous services. Detection systems based on fingerprinting and machine learning have shown promising performance while detecting existing SSDF attacks. However, novel attacks reducing their impact on sensors behaviors have not been analyzed yet. Thus, this work redesigns and reimplements seven SSDF attacks by modifying spectrum data in the sensor memory instead of at later stages in the file system. Several experiments with current intelligent detection systems demonstrated that more effort is needed from the defensive perspective since the new SSDF attacks evade their detection. In this sense, literature-based detection methods achieve less than a 0.50 True Positive Rate when detecting the new implementations of the attacks.
+\end{abstract}
+
+Index Terms-Spectrum Sensing Data Falsification Attacks, Battlefield, Spectrum Monitoring, Fingerprinting, System calls
+
+\section*{I. Introduction}
+
+The Internet of Battlefield Things (IoBT) [1] integrates the Internet of Things (IoT) with the necessities of military scenarios where features such as security, privacy, and availability are critical. The nature of the IoBT, characterized by the constant movement of troops, vehicles, and military hardware, necessitates wireless communications [2]. Consequently, radio frequency (RF) spectrum must be securely and aptly managed to choose unoccupied frequency bands, establish secure transmissions, intercept enemy messages, and decode valuable
+
+\footnotetext{
+*Corresponding author.
+\({ }^{1}\) Pedro Miguel Sánchez Sánchez, Enrique Tomás Martínez Beltrán, and Gregorio Martínez Pérez are with the Department of Information and Communications Engineering, University of Murcia, 30100 Murcia, Spain (pedromiguel.sanchez@um.es; enriquetomas@um.es, gregorio@um.es).
+\({ }^{2}\) Alberto Huertas Celdrán, Robin Wassink, and Burkhard Stiller are with the Communication Systems Group (CSG) at the Department of Informatics (IfI), University of Zurich UZH, 8050 Zürich, Switzerland (e-mail: huertas@ifi.uzh.ch; robin.wassink@uzh.ch; stiller@ifi.uzh.ch).
+\({ }^{3}\) Gérôme Bovet is with the Cyber-Defence Campus within armasuisse Science \& Technology, 3602 Thun, Switzerland (gerome.bovet@armasuisse.ch).
+
+This work has been partially supported by (a) the Swiss Federal Office for Defense Procurement (armasuisse) with the DEFENDIS and CyberForce projects, and (b) the University of Zürich UZH, and (c) 21629/FPI/21, Seneca Foundation - Science and Technology Agency of the Region of Murcia (Spain),.
+}
+data. In the IoBT, one of the most common strategies to enforce the aforementioned tasks involves deploying resourceconstrained spectrum sensors that can monitor and decode transmissions across various radio bands [3]. These sensors offer several benefits, including portability, accuracy, simplicity, and cost-efficiency. However, they are also susceptible to cyberattacks.
+
+On the battlefield, cyberwar and cyberattacks are common hostile activities aimed at infiltrating strategic targets such as enemy communications, area defense, or crucial infrastructures [4]. In this context, IoBT spectrum sensors serve as ideal targets due to their computational and storage limitations, which can impede maintaining up-to-date software and deploying cybersecurity mechanisms. One of the main threats affecting IoBT spectrum sensors is Spectrum Sensing Data Falsification (SSDF) attacks, which main goal is to manipulate the spectrum data that sensors monitor and report. The intentions of SSDF attacks range from concealing illicit transmissions or instigating interference and collisions to simulating non-existent transmissions, thereby misleading enemy communication strategies.
+
+One of the most prominent manners to execute SSDF attacks in IoBT spectrum sensors is to use malware samples, such as backdoors, that get access and manipulate the spectrum data before it is sent. Traditionally, SSDF attacks have been detected by analyzing spectrum data and reaching a consensus between different sensors closely located [5]. However, these detection approaches need redundant and trustworthy sensors and fail when detecting attacks sending outdated spectrum data or adding minor perturbations. Nowadays, some of the most precise and promising solutions combine machine learning (ML) and device fingerprinting [6]. These solutions model the behavior of IoBT spectrum sensors from different perspectives, such as consumption of CPU, RAM, disk, network, or syscalls, to later detect deviations produced by SSDF attacks [7]. However, the effectiveness of existing detection systems has been tested with a limited set of SSDF attacks having a remarkable impact on the device behavior. In this context, there is a lack of work proposing new SSDF attacks able to manipulate spectrum data while impacting the IoBT spectrum sensor behavior in a reduced manner. A rich and heterogeneous set of SSDF attacks is critical to test the suitability of existing detection systems and improve detection systems if needed.
+
+To improve the previous limitations, this work presents two
+main contributions. The first is the redesign and implementation of seven SSDF attacks (repeat, mimic, confusion, noise, spoof, freeze, and delay) manipulating the data spectrum while having a reduced impact on IoBT sensors file system. The seven SSDF attacks have been implemented in a physical IoBT spectrum sensor belonging to the ElectroSense platform [8]. Then, the second contribution consists of evaluating and comparing the detection performance of recent and promising detection systems (based on fingerprinting and ML) when IoBT spectrum sensors are affected by the previous seven attacks. The experiments demonstrated that most SSDF attacks remain undetected, with a True Positive Rate in the detection below 0.50 , and more effort is needed from the defensive side.
+
+The remainder of this article is structured as follows. Section II reviews SSDF attacks and detection mechanisms. Section III illustrates the scenario chosen for evaluating the approach novelty and the different SSDF attacks implemented in this work. Section IV describes the attack monitoring and detection results using literature-based methods. Finally, Section V provides the main conclusions of the present work and describes future directions.
+
+\section*{II. Related Work}
+
+This section reviews the most relevant SSDF attacks and defense methods to detect and mitigate them. A summary of the work comparison is shown in TABLE I.
+
+\begin{table}
+\captionsetup{labelformat=empty}
+\caption{TABLE I: Comparison of SSDF Attacks and Detectors}
+\begin{tabular}{|l|l|l|l|l|}
+\hline Ref. (year) & Attack Type & Data Source & Detection Method & Performance \\
+\hline [9] (2019) & Malware & Network packets & Random Forest & 95\% \\
+\hline [10] (2020) & Botnet & Protocol attributes & Clustering & 97-100\% \\
+\hline [11] (2020) & SSDF & NA & Bayesian-inference & 80-100\% \\
+\hline [5] (2021) & SSDF & Spectrum data & AI and genetic algorithms & NA \\
+\hline [6] (2023) & SSDF & Device resources & Unsupervised ML/DL & 80-100\% \\
+\hline [12] (2023) & SSDF & Device resources & Federated Learning & 90-100\% \\
+\hline
+\end{tabular}
+\end{table}
+
+Spectrum sensing is susceptible to a range of malicious activities. According to [13], malevolent actions can be grouped into four distinct categories: (i) misbehavior, (ii) selfishness, (iii) cheating, and (iv) maliciousness, each with distinct attack targets. Misbehavior involves violating rules established by the network or spectrum sensing platform, such as unauthorized transmissions. In contrast, selfishness manifests as monopolizing network resources for the attacker's advantage, for instance, by fabricating non-existent transmissions to disrupt other users. Cheating encompasses the provision of falsified spectrum information, a tactic aimed at improving the attacker's Quality of Service (QoS). Lastly, maliciousness denotes a deliberate attack on spectrum sensing to degrade the QoS of other nodes and diminish network efficiency [14].
+
+The most similar work to the paper at hand regarding attacks and devices is presented in [6]. The authors proposed seven novel SSDF attacks (Repeat, Mimic, Confusion, Noise, Spoof, Freeze, and Delay) affecting spectrum data. All attacks are implemented by modifying the legitimate code of RF spectrum sensors. Additionally, the authors proposed a detection system based on fingerprinting and ML, which provided promising
+results when detecting most of the previous attacks. Compared to the paper at hand, during the design and implementation of the SSDF attacks, the authors did not consider their impact on the sensor behavior. Another noteworthy study is [10], where the authors examine frequency distributions of protocol attributes and employ clustering algorithms to distinguish botnet behaviors. They reported an accuracy rate of \(97-100 \%\), mainly relying on network features as behavior markers. Similarly, the research in [9] combines ML techniques with network packets to identify diverse malware affecting IoT devices, achieving a \(95 \%\) accuracy rate on their test datasets. A notable addition to the literature is the work [12]. The authors propose an innovative approach integrating device fingerprinting with ML/DL techniques, specifically Federated Learning (FL). The study concludes that FL models show promising performance in detecting SSDF attacks. However, these models are vulnerable without anti-adversarial mechanisms, especially when more than \(16 \%\) adversaries are present.
+
+Another relevant detection system was presented in [11], proposing a Bayesian-inference-based sliding window trust model for detecting different probabilistic SSDF attacks. However, these studies have a significant limitation in detecting SSDF attacks that repeat identical spectrum data or introduce minor variations. A detailed review of current SSDF attack detection mechanisms, including reputation-based, neighborhood distance, abnormality detection, AI-based, genetic algorithms, and outlier detection approaches, is conducted in [5]. The primary focus o these techniques is the analysis of spectrum data. However, some methods require the collaboration of multiple sensors and operate under the assumption of trusted scenarios.
+
+In conclusion, it is evident that while significant strides have been made in SSDF attacks and detection systems, gaps persist. In particular, there is no work proposing SSDF attacks that affect the RF sensor behavior in a reduced manner. In addition to that, existing detectors have not been evaluated with stealth attacks.
+
+\section*{III. IoBt Spectrum Sensors and SSDF Attacks}
+
+IoBT spectrum sensors are resource-constrained devices, such as Raspberry Pis, equipped with Software-defined Radio (SDR) kits. The primary functions of these sensors involve i) segmenting the RF (Radio Frequency) spectrum into fixedsize intervals; ii) scanning each segment within the entire radio frequency spectrum; iii) collecting various types of data per segment, including IQ Data or Power Spectrum Data (PSD) with information about the spectrum occupancy, and iv) transmitting collected data to a central platform responsible for processing and analyzing the data to provide heterogeneous services.
+
+In this work, the previous functionality is provided by an existing crowdsensing radio frequency platform called ElectroSense [8]. ElectroSense presents a flexible and scalable architecture consisting of three major components: sensors,
+a centralized controller infrastructure, and the backend. This work, however, concentrates exclusively on the sensors. Spectrum sensors in ElectroSense are Raspberry Pis 3 Model B equipped with an RTL-SDR USB dongle to monitor and send spectrum data to the backend. The software used on the ElectroSense sensors is written in C++, open source, and publicly available. It starts initiating its components, and then it begins scanning the segments of the radio frequency channels. In each segment, the IQ samples are captured with the RTLSDR USB. These IQ samples, which are quadrature signals in the time domain, are transformed before being sent to the backend. Before the transmission, the SSDF attacks affect the spectrum data by altering the data collection or processing code.
+
+\section*{A. Novel Spectrum Sensing Data Falsification Attacks}
+
+SSDF attacks tamper the data scanned by IoBT spectrum sensors to disrupt the spectrum optimization, monitoring, and decoding services. In particular, this work reimplements seven SSDF attacks proposed in [6] and called repeat, mimic, noise, confusion, spoof, freeze, and delay SSDF attacks. Existing implementations of these attacks use the sensor file system to manipulate spectrum data [6]. However, they strongly affect the sensor behavior and enable their detection [7]. Therefore, this work considers memory variable vectors to reimplement each attack.
+1) Repeat: This attack senses one segment of a radio frequency channel and replicates its data across the target spectrum segment range over time. Once the source segment is copied to the auxiliary variable, the data is injected over the whole range until the attack stops. This attack is implemented by Algorithm 1, receiving the attacked frequency as Att_freq and the bandwidth of the attack as Att_bw. The function sdr.readSamples() reads the spectrum samples for a certain frequency. Then, the reading cycle of frequencies (from 80 MHz to 1.6 GHz ) is repeated until the spectrum monitoring task stops.
+```
+Algorithm 1 SSDF Attack: Repeat
+    Repeat_segment ← empty vector
+    while Running \(=\) True do
+        iq_vector \(=\) sdr.readSamples()
+        if Att_freq < current_freq < Att_freq + Att_bw then
+            if Repeat_segment = empty then
+                Repeat_segment \(=\) iq_vector
+            else
+                iq_vector \(=\) Repeat_segment
+            end if
+        end if
+    end while
+```
+
+2) Freeze: The behavior of the freeze attack is defined as repeating the same sample values of a selected segment over time. It can be seen as a variation of the Repeat attack where different segments are repeated in the same order. Algorithm 2 shows how the selected radio frequency segment
+(Freeze_segment) is injected in the segments of the attacked frequency and bandwidth:
+```
+Algorithm 2 SSDF Attack: Freeze
+    Freeze_segment ← empty vector
+    SegmentCount ← 0
+    while Running = True do
+        iq_vector \(=\) sdr.readSamples()
+        if Att_freq < current_freq < Att_freq + Att_bw then
+            iq_vector \(=\) Freeze_segment \([\) SegmentCount \(]\)
+            SegmentCount++
+        end if
+    end while
+```
+
+3) Mimic: The mimic attack is a sophisticated version of the repeat attack. This attack defines a second radio frequency channel segment, and the spectrum values of the second frequency are copied to the first frequency in every monitoring cycle. In contrast to the repeat attack, the spectrum is not just being replaced by the spectrum values at \(t=0\). The implementation details of this attack are provided by Algorithm 3.
+```
+Algorithm 3 SSDF Attack: Mimic
+    Mimic_segment ← empty vector
+    \(i \leftarrow 0\)
+    while Running \(=\) True do
+        iq_vector \(=\) sdr.readSamples()
+        if Att_freq < current_freq < Att_freq + Att_bw then
+            Mimic_segment append iq_vector
+        end if
+        if Att_freq \(2<\) current_freq < Att_freq \(2+A t t \_b w\)
+    then
+            iq_vector \(=\) Mimic_segment \([i]\)
+            \(i++\)
+        end if
+        if current_freq \(>A t t \_f r e q 2+A t t \_b w\) then
+            clear Mimic_segment
+            Reset \(i \leftarrow 0\)
+        end if
+    end while
+```
+
+4) Spoof: This attack is like the mimic one, where a selection of spectrum segments are replaced by others, but adding noise to the copied segment values. Algorithm 4 shows the implementation of this attack.
+5) Noise: It adds random noise to the samples of the attacked radio frequency channel segments. The noise attack implementation uses a system-specific source of randomness, the filesystem path "/dev/urandom". In this sense, the system treats this source as a file. Algorithm 5 shows how noise is added to the iq_vector of the attacked frequencies.
+6) Confusion: This SSDF attack swaps the data segments of two selected radio frequency channels. It employs two auxiliary vectors to store the legitimate samples of each target frequency. Then, it swaps the sent data between frequencies and resets the auxiliary vectors. Due to room constraints, its algorithm is not shown.
+```
+Algorithm 4 SSDF Attack: Spoof
+    Spoof_segment ← empty vector
+    \(i \leftarrow 0\)
+    while Running \(=\) True do
+        iq_vector \(=\) sdr.readSamples()
+        if Att_freq < current_freq < Att_freq + Att_bw then
+            Spoof_segment append iq_vector
+        end if
+        if Att_freq \(2<\) current_freq \(<A t t_{-} f r e q 2+A t t \_b w\)
+    then
+            iq_vector \(=\) Spoof_segment \([i]+\) randomValue
+            i++
+        end if
+        if current_freq \(>A t t \_\)freq \(2+A t t \_b w\) then
+            clear Spoof_segment
+            Reset \(i \leftarrow 0\)
+        end if
+    end while
+```
+
+```
+Algorithm 5 SSDF Attack: Noise
+    while Running = True do
+        iq_vector \(=\) sdr.readSamples()
+        if Att_freq < current_freq < Att_freq + Att_bw then
+            iq_vector \(=\) iq_vector + randomValue
+        end if
+    end while
+```
+
+7) Delay: From the design perspective, this attack is the most sophisticated one. The values of the affected radio frequency segments need to be stored and repeated after the delay time has been reached. This attack is implemented as a count of segment cycles. It relies on a three-dimensional array consisting of nested vectors containing the iq_vectors for multiple segments over time. Basically, there exist three modes: init, filling, and full. Init is the first iteration, thereafter comes filling, and once the Delay_segment is full, the mode full is activated. The different modes are explained in Algorithm 6 and kept rather simple to demonstrate the idea.
+
+\section*{IV. Detection of SSDF Attacks}
+
+This section evaluates the stealth capabilities of the seven SSDF attacks affecting an ElectroSense sensor and presented in the previous section. For that, recent and promising systems detecting SSDF attacks have been reviewed to later select one of the most effective ones in terms of detection performance. Finally, the selected detector is based on system calls and ML/DL anomaly detection [7].
+
+\section*{A. Detection System based on ML and Fingerprinting}
+
+The selected work uses system calls to create a valuable fingerprint of the sensor behavior and later detect the SSDF attacks. Therefore, the detection system needs to supervise all instructions sent by the sensor scanning process and all its sub-processes to the kernel. This is done with the Linux system monitoring tool perf trace. At this step, only the system calls name, and its corresponding timestamps are saved in a CSV file and used in the subsequent processes.
+```
+Algorithm 6 SSDF Attack: Delay
+    Delay_segment ← empty 3d array
+    mode ⟵ init, filling or full
+    delay \(\leftarrow x\)
+    \(i \leftarrow 0\)
+    CurrentIteration ← 0
+    while Running \(=\) True do
+        iq_vector \(=\) sdr.readSamples ()
+        if Att_freq < current_freq < Att_freq + Att_bw then
+            if mode \(=\) init then
+                Delay_segment append vector of size delay with
+    iq_vector at the first position
+            end if
+            if mode \(==\) filling then
+                Delay_segment[i][CurrentIteration] append
+    iq_vector
+                \(i++\)
+            end if
+            if mode == full then
+                Exchange iq_vector with
+    Delay_segment[i][CurrentIteration]
+                i++
+            end if
+        end if
+        if current_freq \(>A t t \_\)freq \(+A t t \_b w\) then
+            Reset \(i \leftarrow 0\)
+            when CurrentIteration \(==\) delay then Reset
+    CurrentIteration else CurrentIteration++
+        end if
+    end while
+```
+
+
+To create such a CSV file, the Raspberry Pi 3, acting as an ElectroSense sensor, was monitored for two and a half hours for every behavior, including normal and under SSDF attacks. It created 300 samples for 30 s of monitoring, inspired by the configuration of [7], where \(360 \times 60 \mathrm{~s}\) was used. For each of the seven SSDF attacks, different configurations of affected data spectrum bandwidth were considered. In particular, the following attacking ranges have been observed: \(20 \mathrm{kHz}, 200 \mathrm{kHz}, 20 \mathrm{MHz}, 200 \mathrm{MHz}\), and 800 MHz . It resulted in 2400 samples of 30 s of monitoring for each bandwidth which meant an approximate total monitoring time of six days, including the preprocessing time.
+
+Once the datasets with normal and malicious system calls were created, they were used in a common ML pipeline. More in detail, the detection framework has been implemented in Python and scikit-learn for preprocessing and machine learning, pickle for object serialization, numpy \& pandas for data frame handling and matplotlib \& seaborn for visualization. The first step of the ML pipeline involves data cleaning to remove erroneous and useless data. To prepare the data for training ML algorithms, the textual data needs to be transformed into numerical data. This is done using a feature extraction process to convert the sequence of system calls into feature vectors. TABLE II describes the nine approaches for feature extraction. Frequency approaches, counting the number of occurrences of the syscalls in a certain time window, have been combined with n-grams up to \(n=3\). The outcome of the feature extraction step is nine datasets, one per feature extraction technique. Two
+of the datasets are sequence-related, resulting from applying one-hot encoding and dictionary techniques; the other seven are different configurations of bag-of-words encoded features.
+
+\begin{table}
+\captionsetup{labelformat=empty}
+\caption{TABLE II: Feature Extraction Approaches}
+\begin{tabular}{ll}
+\hline Feature Extraction & Feature Encoding \\
+\hline Bag-of-words & Frequency 1-Gram, 2-Gram, 3-Gram \\
+& TFIDF 1-Gram, 2-Gram, 3-Gram \\
+& Hashing \\
+\hline Sequence & One-hot encoding \\
+& Dictionary index encoding \\
+\hline
+\end{tabular}
+\end{table}
+
+Finally, Robust covariance, One-Class Support Vector Machine, Isolation Forest, Stochastic Gradient Descent One-Class Support Vector Machine, and the Local Outlier Factor are trained, and their performance is evaluated. For that, the datasets modeling the normal behavior serve as training data for the different ML algorithms. Then, the data of the different configurations of each SSDF attack are evaluated to measure the detection performance.
+
+The performance of the ML models was evaluated based on two different scores, the True Positive Rate (TPR) and the True Negative Rate (TNR). A True Positive (TP) stands for a correctly classified anomaly, while a True Negative (TN) represents a correctly detected normal behavior. The opposite stands for False Positive (FP) and False Negative (FN). Thus, the TPR describes the ratio of actual positives (anomalies) correctly predicted. It is calculated by \(T P R=\frac{T P}{T P+F N}\) Finally, the ratio of actual negatives correctly predicted (normal behavior) is the TNR, calculated by \(T N R=\frac{T N}{T N+F P}\).
+
+After initial experiments, the frequency 3-gram feature obtained the best results. Fig. 1 compares the features for all bandwidths across all ML algorithms. It is worth highlighting the weak performance of the sequence features with dictionary index-encoding and one-hot-encoding. Additionally, the best TPR is reached by the 3-gram frequency feature, and it is the feature extraction method employed in the rest of the evaluation.
+
+\begin{figure}
+\includegraphics[alt={},max width=\textwidth]{https://cdn.mathpix.com/cropped/52930aa3-ffd5-4646-affd-91d54971b1db-5.jpg?height=619&width=773&top_left_y=1811&top_left_x=201}
+\captionsetup{labelformat=empty}
+\caption{Fig. 1: Feature Comparison with Different Features}
+\end{figure}
+
+Fig. 2 shows the TNR for normal behavior evaluation using 3-gram frequency features. The obtained 0.90 suggest a viable training of the ML models (except for the LOF). Note that SGD OC-SVM offers 1 TPR, but as it will be shown later, its attack detection capabilities are very reduced.
+
+\begin{figure}
+\includegraphics[alt={},max width=\textwidth]{https://cdn.mathpix.com/cropped/52930aa3-ffd5-4646-affd-91d54971b1db-5.jpg?height=579&width=773&top_left_y=451&top_left_x=1142}
+\captionsetup{labelformat=empty}
+\caption{Fig. 2: Total TNR of Normal Behavior}
+\end{figure}
+
+Fig. 3 shows the TPR for the malicious behaviors separately and the average for all the attacks tested across the observed attacking bandwidths. Assessing the differences between the behaviors, spoof, and noise stand out. As the data exploration has yielded, the system calls bash open and bash \({ }_{\text {close }}\) appear, as those attacks generate deviating system calls due to their dependence on a file to generate random noise. The Robust Covariance algorithm detects those anomalies in the lower bandwidths perfectly with 1 TPR. Attacks that involve two segments, mimic, confusion, and spoof, have an increased detection rate at the 800 MHz bandwidth, possibly because almost every data point needs to be manipulated.
+
+In conclusion, most SSDF attacks present a low TPR, with an average lower than 0.50 for all ML models and frequency bandwidths. These are poor detection results compared to the literature, where most attacks are almost perfectly detected [12], [6]. Only repeat and freeze attacks are not ideally detected in the literature. Still, with the new implementation, these attacks have an even lower TPR, with a TPR below 0.20 in most model/bandwidth combinations. Therefore, it can be stated that the new implementations offer better resilience against state-of-the-art detection methods, showing their weaknesses when stealth implementations are present.
+
+\section*{V. Conclusion and Future Work}
+
+This work has designed and implemented novel versions of seven existing SSDF attacks to test the robustness of existing detection systems. These SSDF attacks manipulate the data spectrum in the sensor memory to achieve a low impact on the sensor behavior, something not considered in the literature. The seven attacks have been deployed in a Raspberry Pi 3, acting as a spectrum sensor of an open-source and crowdsensing platform called ElectroSense. After that, a recent
+
+\begin{figure}
+\includegraphics[alt={},max width=\textwidth]{https://cdn.mathpix.com/cropped/52930aa3-ffd5-4646-affd-91d54971b1db-6.jpg?height=811&width=1845&top_left_y=182&top_left_x=139}
+\captionsetup{labelformat=empty}
+\caption{Fig. 3: Detection Performance of ML Models for Different Configurations of SSDF Attacks}
+\end{figure}
+and effective detector based on ML and fingerprinting has been considered and implemented to evaluate its performance while detecting the proposed attacks. More in detail, natural language processing (NLP) techniques have been employed by the detector to process the system call traces into numerical values. After that, unsupervised ML algorithms based on anomaly detection have been used to predict normal and malicious behaviors. According to the obtained results, it can be concluded that existing detection systems are not reliable in identifying the new SSDF attacks. This is because the new implementation requires fewer system calls to access kernel space and consequently produces fewer detectable anomalies.
+
+As future work, it is planned to work on detection systems that consider novel data sources able to model the small perturbations added by the new SSDF attacks implemented in the sensor memory. It is also planned to evaluate the SSDF attacks and detection systems in several spectrum sensors with different hardware and software configurations.
+
+\section*{References}
+[1] S. Russell and T. Abdelzaher. The internet of battlefield things: the next generation of command, control, communications and intelligence (c3i) decision-making. In MILCOM 2018-2018 IEEE Military Communications Conference (MILCOM), pages 737-742. IEEE, 2018.
+\([2]\) D. Papakostas, T. Kasidakis, E. Fragkou, and D. Katsaros. Backbones for internet of battlefield things. In 2021 16th Annual Conference on Wireless On-demand Network Systems and Services Conference (WONS), pages 1-8. IEEE, 2021.
+[3] M. Suchanski, P. Kaniewski, J. Romanik, E. Golan, and K. Zubel. Electronic warfare systems supporting the database of the radio environment maps. In XII Conference on Reconnaissance and Electronic Warfare Systems, volume 11055, pages 180-189. SPIE, 2019.
+[4] E. Izycki and E. W. Vianna. Critical infrastructure: A battlefield for cyber warfare? In ICCWS 2021 16th International Conference on Cyber Warfare and Security, page 454. Academic Conferences Limited, 2021.
+[5] P. S. Chatterjee. Systematic survey on ssdf attack and detection mechanism in cognitive wireless sensor network. In 2021 International Conference on Intelligent Technologies (CONIT), pages 1-5, 2021.
+[6] A. Huertas Celdrán, P. M. Sánchez Sánchez, G. Bovet, G. Martínez Pérez, and B. Stiller. Cyberspec: Behavioral fingerprinting for intelligent attacks detection on crowdsensing spectrum sensors. IEEE Transactions on Dependable and Secure Computing, pages 1-14, 2023.
+[7] A. Huertas Celdrán, P. M. Sánchez Sánchez, C. Feng, G. Bovet, G. Martínez Pérez, and B. Stiller. Privacy-preserving and syscall-based intrusion detection system for iot spectrum sensors affected by data falsification attacks. IEEE Internet of Things Journal, 10(10):8408-8415, 2023.
+[8] S. Rajendran, R. Calvo-Palomino, M. Fuchs, B. Van den Bergh, H. Cordobés, D. Giustiniano, S. Pollin, and V. Lenders. Electrosense: Open and Big Spectrum Data. IEEE Communications Magazine, 56(1):210-217, January 2018.
+[9] A. Kumar and T. J. Lim. Edima: early detection of iot malware network activity using machine learning techniques. In 2019 IEEE 5th World Forum on Internet of Things (WF-IoT), pages 289-294, 2019.
+[10] A. Blaise, M. Bouet, V. Conan, and S. Secci. Botfp: Fingerprints clustering for bot detection. In NOMS 2020-2020 IEEE/IFIP Network Operations and Management Symposium, pages 1-7, 2020.
+[11] Y. Fu and Z. He. Bayesian-inference-based sliding window trust model against probabilistic ssdf attack in cognitive radio networks. IEEE Systems Journal, 14(2):1764-1775, 2020.
+[12] P. M. Sánchez Sánchez, A. Huertas Celdrán, T. Schenk, A. L. B. Iten, G. Bovet, G. Martínez Pérez, and B. Stiller. Studying the robustness of anti-adversarial federated learning models detecting cyberattacks in iot spectrum sensors. IEEE Transactions on Dependable and Secure Computing, 2023.
+[13] S. Alrabaee, M. Khasawneh, A. Agarwal, N. Goel, and M. Zaman. Applications architectures and protocol design issues for cognitive radio networks: a survey. International Journal of Wireless and Mobile Computing, 7(5):415-427, 2014.
+[14] M. Khasawneh and A. Agarwal. A collaborative approach for monitoring nodes behavior during spectrum sensing to mitigate multiple attacks in cognitive radio networks. Security and Communication Networks, 2017, 2017.
