@@ -23,7 +23,7 @@ Each processed paper contains:
 
 Downloadable analysis bundles are written to:
 
-~/adamArchives/reference_paper_exports/
+papers/milcom2026/reference_notes/reference_paper_exports/
 
 Mathpix integration is controlled with MATHPIX_CMD. The command must use:
 

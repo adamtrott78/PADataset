@@ -5,7 +5,7 @@ ROOT="$(git rev-parse --show-toplevel 2>/dev/null || pwd)"
 REF_ROOT="$ROOT/papers/milcom2026/reference_notes"
 STAGING="$REF_ROOT/staging"
 LIBRARY="$REF_ROOT/papers"
-EXPORT_ROOT="${REFERENCE_EXPORT_ROOT:-$HOME/adamArchives/reference_paper_exports}"
+EXPORT_ROOT="${REFERENCE_EXPORT_ROOT:-$REF_ROOT/reference_paper_exports}"
 DPI="${DPI:-220}"
 CONTACT_COLS="${CONTACT_COLS:-3}"
 THUMB_WIDTH="${THUMB_WIDTH:-900}"
@@ -150,9 +150,12 @@ cmd = template.replace("{pdf}", pdf).replace("{out}", out_md)
 
 with open(log_file, "a", encoding="utf-8") as log:
     log.write(f"Running Mathpix command:\n{cmd}\n\n")
-    proc = subprocess.run(cmd, shell=True, text=True, stdout=log, stderr=log)
-    if proc.returncode != 0:
-        raise SystemExit(proc.returncode)
+
+# Important: MPX CLI expects a terminal-like stdout. Redirecting stdout/stderr
+# to a file can trigger process.stdout.clearLine failures inside MPX.
+proc = subprocess.run(cmd, shell=True, text=True)
+if proc.returncode != 0:
+    raise SystemExit(proc.returncode)
 PY
     if [[ -s "$out_md" ]]; then
       echo "Wrote Mathpix markdown: $out_md"
