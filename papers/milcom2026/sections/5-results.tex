@@ -7,7 +7,7 @@ Table~\ref{tab:main_osr_results} compares OSR decision layers under the fixed Sc
 
 \input{tables/main_results/main_osr_results_table}
 
-DQNGuard achieves the strongest fixed-budget operating point: it obtains the highest unknown F1 and OSR macro F1 while maintaining the lowest known-rejection rate among the compared methods. VarMax surrogate-all obtains the highest unknown AUROC, indicating strong aggregate ranking separation, but its selected operating point has higher known rejection and lower unknown F1 than DQNGuard. The DQN-IDS-style confidence head is competitive but does not match DQNGuard, suggesting that softmax confidence states alone are insufficient for PA routing.
+DQNGuard achieves the strongest fixed-budget operating point: it obtains the highest unknown F1 and OSR macro F1 while maintaining the lowest known-rejection rate among the compared methods. This matters because high unknown detection is not useful if it is achieved by rejecting a large fraction of known PA samples. VarMax surrogate-all obtains the highest unknown AUROC, indicating strong aggregate ranking separation, but its selected operating point has higher known rejection and lower unknown F1 than DQNGuard. The target application requires a usable thresholded decision layer, not only a good ranking score. The DQN-IDS-style confidence head is competitive but does not match DQNGuard, suggesting that softmax confidence states alone are insufficient for PA routing.
 
 \subsection{Target--Surrogate Transfer}
 \label{subsec:target_surrogate_results}
