@@ -591,3 +591,338 @@ mpx login
 
 The processed `.mmd` file gives text/math structure, while the page PNGs and contact sheet let the AI inspect visual composition, figure placement, table design, and page-level rhetorical structure.
 
+
+---
+
+## 18. MILCOM 2026 Final Hand-In State
+
+This section documents the final hand-in state of the MILCOM 2026 DQNGuard paper.
+
+Final paper title:
+
+    DQNGuard: Towards Open-World RF Preliminary-Action Detection
+
+Final paper directory:
+
+    papers/milcom2026/
+
+Final source branch lineage:
+
+    comp-hero-figure
+    milcom2026-final-handin
+
+The final hand-in branch should be treated as the source snapshot used for the Overleaf submission / hand-in PDF.
+
+### 18.1 Final Paper Status
+
+The final paper compiles to six pages in IEEE two-column conference format.
+
+The final section order is:
+
+    0-abstract.tex       Abstract
+    1-intro.tex          I. Introduction
+    2-related.tex        II. Related Works
+    3-methodology.tex    III. Methodology
+    4-experiments.tex    IV. Experimental Design
+    5-results.tex        V. Results
+    6-discussion.tex     VI. Discussion
+    7-conclusion.tex     VII. Conclusion
+
+Important caution:
+
+    If the Abstract starts with Results text, or if the Target--Surrogate Matrix appears on the first page, the section files are misordered or stale. This happened during one Overleaf migration. The fix is to upload a clean ZIP where main.tex and all section files are at the correct relative paths.
+
+### 18.2 Final Overleaf Verification
+
+The final Overleaf PDF was visually checked after repairing the section-file ordering issue.
+
+The correct first page contains:
+
+    Title and author block
+    Abstract beginning with "RF sensing can provide early evidence..."
+    Index Terms
+    I. Introduction beginning with "Modern military operations..."
+
+The correct second page starts with Figure 1:
+
+    End-to-end DQNGuard evidence flow
+
+The Target--Surrogate Matrix is Figure 2 and appears in the Results section, not on page 1.
+
+The final document has:
+
+    6 pages
+    2 figures
+    1 results table
+    11 references
+
+### 18.3 Final Figures
+
+Figure 1 is the DQNGuard evidence-flow / pipeline figure.
+
+Purpose:
+
+    Explain the full routing logic visually:
+    RF input -> multi-domain PA encoder -> DQNGuard -> OSR outputs.
+
+Expected source/output files:
+
+    papers/milcom2026/figures/hero_figure/
+    papers/milcom2026/figures/hero_figure/hero_dqnguard_pipeline_s22_tikz.pdf
+    papers/milcom2026/figures/hero_figure/hero_dqnguard_pipeline_s22_tikz.tex
+
+Figure 2 is the Target--Surrogate Matrix.
+
+Purpose:
+
+    Show that surrogate-open calibration is target-dependent and that withheld surrogate classes are not interchangeable proxies for future unknown behaviors.
+
+Expected source/output files:
+
+    papers/milcom2026/figures/target_surrogate_matrix/
+    papers/milcom2026/figures/target_surrogate_matrix/target_surrogate_unknown_f1_matrix.pdf
+    papers/milcom2026/figures/target_surrogate_matrix/target_surrogate_unknown_f1_matrix.csv
+    papers/milcom2026/figures/target_surrogate_matrix/make_target_surrogate_matrix.py
+
+### 18.4 Final Table
+
+Table I is the fixed Scan-surrogate OSR comparison.
+
+Purpose:
+
+    Compare DQNGuard against the DQN-IDS-style confidence head and VarMax surrogate-all under the same surrogate-open calibration condition.
+
+Expected table source:
+
+    papers/milcom2026/tables/main_results/main_osr_results_table.tex
+
+Expected generator / supporting output:
+
+    papers/milcom2026/tables/main_results/make_main_results_table.py
+    papers/milcom2026/tables/main_results/main_osr_results_table_summary.csv
+
+Core result:
+
+    DQNGuard has the best fixed-budget operating point:
+    highest unknown F1 and OSR macro F1 while maintaining the lowest known rejection.
+
+### 18.5 Final Claim Boundary
+
+The paper does not claim to be:
+
+    a complete QR-CWoS response system
+    a final ATT&CK/EW semantic labeling system
+    a full attack-chain planner
+    an autonomous EW response selector
+    a new RF waveform generator
+    a deployment-time continual reinforcement learning system
+
+The paper claims:
+
+    DQNGuard is a budgeted open-set decision layer for OTA RF preliminary-action recognition.
+    It routes windows as known preliminary-action evidence or unknown behavior.
+    It improves the fixed-budget OSR operating point relative to VarMax and a DQN-IDS-style confidence head.
+    Surrogate-open calibration is target-dependent.
+    The Target--Surrogate Matrix can function as a diagnostic for surrogate transfer and surrogate selection.
+
+### 18.6 Final Reference Set
+
+The final six-page version uses a compact 11-reference bibliography.
+
+Reference roles:
+
+    Baye et al. varMax MILCOM
+        closest confidence-based OSR predecessor
+
+    Broggi et al. varMax uncertainty/novelty
+        lab-lineage and novelty-management framing
+
+    Trott et al. RF modulation OSR
+        RF novelty and multi-domain representation lineage
+
+    Tiwari et al. DQN-IDS
+        DQN-style confidence decision-head comparison
+
+    Scheirer et al. Toward Open Set Recognition
+        canonical OSR formulation
+
+    Bendale and Boult OpenMax
+        open-set deep-network lineage
+
+    Guo et al. calibration
+        closed-set neural confidence calibration
+
+    Liu et al. energy OOD
+        energy-style OOD evidence
+
+    Wang et al. energy open-world calibration
+        open-world energy/calibration lineage
+
+    Bell et al. Searchlight
+        MILCOM RF sensing / OTA sensing style and operational anchor
+
+    Wei et al. multi-domain EMS
+        MILCOM multi-domain electromagnetic signal detection precedent
+
+References intentionally removed during final page balancing:
+
+    SpecForce
+    Stitching the Spectrum
+
+Reason:
+
+    Both were useful during exemplar analysis, but retaining them pushed the paper over six pages. Searchlight and Wei provide enough final-paper coverage for RF sensing and multi-domain EMS context.
+
+### 18.7 Final Prose Decisions
+
+The final paper was compressed to six pages without removing the core argument.
+
+Important retained prose:
+
+    The operating-point framing in Results and Discussion.
+    The known-rejection-budget explanation.
+    The warning that high unknown detection is not useful if achieved by rejecting too many known PA samples.
+    The interpretation of the Target--Surrogate Matrix as a deployment diagnostic.
+    The claim boundary that DQNGuard is a sensing and triage layer, not a complete response system.
+
+Important formatting polish:
+
+    IEEEtran paragraph headings were replaced with inline italic labels for Stage 1/2/3 and Regime A/B/C to avoid ugly labels such as "a) Stage 1: ...:".
+
+### 18.8 Clean Local Build Command
+
+From the repository root:
+
+    cd papers/milcom2026
+
+    latexmk -C -outdir=build main.tex >/dev/null 2>&1 || true
+    latexmk -pdf -bibtex -interaction=nonstopmode -file-line-error -synctex=1 -outdir=build main.tex
+    latexmk -pdf -bibtex -interaction=nonstopmode -file-line-error -synctex=1 -outdir=build main.tex
+    latexmk -pdf -bibtex -interaction=nonstopmode -file-line-error -synctex=1 -outdir=build main.tex
+
+    pdfinfo build/main.pdf | grep Pages
+    pdftotext build/main.pdf - | grep -n "\?\?\|\[\?\]" || true
+
+Expected result:
+
+    Pages: 6
+    No unresolved refs/cites printed
+
+### 18.9 Page Preview Command
+
+From the paper directory:
+
+    rm -rf build/page_previews
+    mkdir -p build/page_previews
+    pdftoppm -png -r 220 build/main.pdf build/page_previews/page
+    ls -lh build/page_previews/page-*.png
+
+Use the rendered page PNGs for visual inspection before any final upload.
+
+### 18.10 Clean Overleaf Export Command
+
+From the repository root:
+
+    cd ~/adamArchives/Adam/varMax/PADataset
+
+    cd papers/milcom2026
+    latexmk -C -outdir=build main.tex >/dev/null 2>&1 || true
+    latexmk -pdf -bibtex -interaction=nonstopmode -file-line-error -synctex=1 -outdir=build main.tex
+    latexmk -pdf -bibtex -interaction=nonstopmode -file-line-error -synctex=1 -outdir=build main.tex
+    latexmk -pdf -bibtex -interaction=nonstopmode -file-line-error -synctex=1 -outdir=build main.tex
+
+    cd ~/adamArchives/Adam/varMax/PADataset
+
+    EXPORT_ROOT="$HOME/adamArchives/overleaf_exports"
+    STAMP="$(date +%Y%m%d_%H%M%S)"
+    EXPORT_DIR="$EXPORT_ROOT/milcom2026_overleaf_final_$STAMP"
+    ZIP_PATH="$EXPORT_ROOT/milcom2026_overleaf_final_$STAMP.zip"
+
+    mkdir -p "$EXPORT_ROOT"
+    rm -rf "$EXPORT_DIR"
+    mkdir -p "$EXPORT_DIR"
+
+    rsync -av \
+      --exclude='build/' \
+      --exclude='page_previews/' \
+      --exclude='reference_notes/' \
+      --exclude='*.bak' \
+      --exclude='*.aux' \
+      --exclude='*.bbl' \
+      --exclude='*.blg' \
+      --exclude='*.log' \
+      --exclude='*.out' \
+      --exclude='*.synctex.gz' \
+      --exclude='*.fls' \
+      --exclude='*.fdb_latexmk' \
+      papers/milcom2026/ "$EXPORT_DIR/"
+
+    cd "$EXPORT_DIR"
+    zip -r "$ZIP_PATH" .
+
+    echo "Created:"
+    ls -lh "$ZIP_PATH"
+
+Critical Overleaf rule:
+
+    main.tex must be at the ZIP root.
+    Do not upload a ZIP with an extra nested folder.
+    If replacing a broken Overleaf project, delete stale files first or create a new blank project.
+
+### 18.11 Overleaf Failure Mode and Fix
+
+Failure observed:
+
+    Target--Surrogate Matrix appeared on page 1.
+    Abstract contained Results text.
+    Introduction contained Methodology text.
+    Later sections were shifted.
+
+Cause:
+
+    Section files in the uploaded ZIP were mismatched or stale, even though main.tex preserved the correct include order.
+
+Fix:
+
+    Rebuild a clean ZIP from the repository.
+    Confirm section files before upload.
+    Prefer a new blank Overleaf project over uploading into a stale broken project.
+
+Quick local sanity check:
+
+    for f in papers/milcom2026/sections/*.tex; do
+      echo "===== $f ====="
+      head -n 3 "$f"
+    done
+
+Expected starts:
+
+    0-abstract.tex: RF sensing can provide early evidence...
+    1-intro.tex: Modern military operations increasingly depend...
+    2-related.tex: Open-set recognition (OSR) studies...
+    3-methodology.tex: This section defines the RF preliminary-action recognition...
+    4-experiments.tex: We design the experimental protocol...
+    5-results.tex: The results answer two questions...
+    6-discussion.tex: The results support three observations...
+    7-conclusion.tex: This paper introduced DQNGuard...
+
+### 18.12 Final Human Review Checklist
+
+Before any official submission:
+
+    Confirm title and author order.
+    Confirm all affiliations and emails.
+    Confirm page count is exactly 6.
+    Confirm no "??" references or citations.
+    Confirm Fig. 1 is the DQNGuard pipeline on page 2.
+    Confirm Fig. 2 is the Target--Surrogate Matrix in Results.
+    Confirm Table I appears in Results.
+    Confirm references are numbered and cited correctly.
+    Confirm no stale Overleaf section mismatch.
+    Confirm the final PDF begins with the correct Abstract.
+    Confirm QR-CWoS, ATT&CK, EW, OTA, PA, OSR are used consistently.
+
+### 18.13 Final Emotional Context
+
+This paper went through an intense final compression and migration process. The final source state should be preserved carefully. Avoid broad rewrites after this point unless explicitly requested. Future work should be done on a new branch.
+
