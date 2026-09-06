@@ -2,7 +2,7 @@
 
 > **Purpose of this README:** this is the bootstrap/context document for humans and future AI chats working in this repository. Read this file before changing code, launching a data collection, running experiments, interpreting results, or editing a paper.
 >
-> The repository grew from a preliminary-action (PA) RF dataset project into a reusable research framework covering deterministic waveform generation, over-the-air (OTA) acquisition, signal resplicing, feature caching, model training, open-set-recognition (OSR) experiments, result aggregation/diagnostics, and comparative paper composition.
+> The repository grew from a preliminary-action (PA) RF dataset project into a reusable research framework covering deterministic waveform generation, over-the-air (OTA) acquisition, signal resplicing, feature caching, model training, open-set-recognition (OSR) experiments, result aggregation/diagnostics, and evidence-grounded, exemplar-guided paper composition.
 
 ## 0. Repository state and branch doctrine
 
@@ -223,7 +223,7 @@ scripts/                       preprocess/train/eval orchestration
 results*/                      generated experiment outputs; usually ignored
 _runtime/                      worker logs/status; generated
 _feature_cache_nvme/           generated feature caches; never source control
-papers/                        paper source + paper-composition framework
+papers/                        paper source + evidence/exemplar composition records
 docs/                          durable experiment history, inventories, diagnostics
 legacy/                        historical notebooks/scripts only
 tools/                         dataset/OTA utilities
@@ -1236,9 +1236,75 @@ The hero figure has its own tracked design/comparative history under:
 papers/milcom2026/composition/aspects/hero_figure/
 ```
 
-## 17.6 Exemplar/reference-paper ingestion
+## 17.6 The paper-composition method that was actually used
 
-The paper was not written by asking an AI for generic “good academic prose.” Strong papers were converted into analyzable reference artifacts and compared section-by-section.
+The final DQNGuard manuscript was **not** produced by mechanically executing the early comparative-analysis framework in `papers/milcom2026/composition/` or by forcing every reference paper through a large scorecard. Those files record an exploratory plan from an earlier stage. They are useful historical provenance, but they are **not the workflow a future chat should copy**.
+
+The method that survived into the final paper was simpler and more effective:
+
+1. establish the scientific ground truth and claim boundaries first;
+2. build a technically complete evidence-driven draft;
+3. curate several kinds of real papers, each for a specific reason;
+4. analyze useful papers individually and extract transferable heuristics;
+5. synthesize those heuristics into section-level writing rules;
+6. revise the manuscript in targeted passes;
+7. score/audit the whole paper against the same standards used to judge the exemplars;
+8. spend the remaining page budget on the prose changes with the largest clarity gain;
+9. finish with a human read-through plus mechanical build/reference checks.
+
+The key distinction is **reference relevance is not the same as exemplar value**. A paper can be essential technical lineage but a poor writing model; another paper can be technically distant but an excellent model for problem framing, page economy, a figure, a results narrative, or claim boundaries.
+
+### A. Start from evidence, not style
+
+Before polishing prose, read:
+
+```text
+papers/milcom2026/PAPER_GROUND_TRUTH.md
+papers/milcom2026/PAPER_EVIDENCE_MAP.md
+papers/milcom2026/HANDIN_MANIFEST.md
+```
+
+The first draft should be generated from the actual method, run artifacts, reduced results, figures/tables, and known system boundaries. Lock down:
+
+- what the experiments prove,
+- what they do not prove,
+- the paper's main claim,
+- the paper's secondary/diagnostic findings,
+- the role of the proposed method inside the larger operational system,
+- which claims require citations.
+
+For DQNGuard, this prevented the prose from drifting into a claim that the work solved the full QR-CWoS response loop. The paper evaluates an RF open-set sensing/decision layer that can feed downstream reasoning; it does not claim to implement the whole downstream system.
+
+### B. Build a role-based paper library
+
+The successful reference search used three overlapping groups.
+
+**1. Direct technical sources and lineage.** These are papers we actually cite or rely on for definitions, predecessors, baselines, or technical language. For DQNGuard this included the varMax lineage, DQN-IDS, prior RF open-set work, multi-domain RF/EMS work, and foundational OSR/OOD/calibration papers. These sources control technical accuracy first; they are writing exemplars only when they are also well composed.
+
+**2. Close venue/domain exemplars.** Select short MILCOM/IEEE RF, spectrum, communications, and security papers that resemble the target audience and page budget. Use them to learn six-page pacing, first-page economy, experimental exposition, figure/table density, and results narration. The DQNGuard searches deliberately added polished RF/MILCOM-style papers after the initial citation set because the citation set alone did not cover these communication problems.
+
+**3. Award-recognized or unusually polished exemplars.** Add a small number of exceptionally well written systems/security papers. Some may have verified awards or recognition; others may be included simply because their composition is unusually strong. Even when the technical topic is more distant, use these for problem framing, operational stakes, evidence chains, discussion structure, and claim-boundary discipline -- not for importing unrelated technical assumptions or their longer-page layout.
+
+Representative recorded DQNGuard examples included Baye et al. varMax and Wei et al. multi-domain EMS as close MILCOM models; Scheirer, Bendale/Boult, Guo, and Liu for technical OSR/OOD/calibration precision; and polished systems/security papers such as ZMap, Foreshadow, Carlini/Wagner, DolphinAttack, and Spectre for selected rhetorical lessons. Additional RF-style searches included papers such as Searchlight, SpecForce, spectrum-sensing/security work, Stitching the Spectrum, and HyperAdv. **Do not assume every historical candidate must be reused for a new paper. Choose papers that fill the new paper's actual communication gaps.**
+
+A useful lightweight role vocabulary is:
+
+```text
+TECHNICAL_LINEAGE
+VENUE_STYLE_MODEL
+PROBLEM_FRAMING_MODEL
+METHOD_EXPOSITION_MODEL
+EXPERIMENT_DESIGN_MODEL
+RESULTS_NARRATIVE_MODEL
+FIGURE_MODEL
+TABLE_MODEL
+CLAIM_BOUNDARY_MODEL
+LAB_CONTINUITY
+```
+
+These are tags, not a mandatory scoring system.
+
+### C. Ingest only the papers worth close reading
 
 Reference infrastructure:
 
@@ -1259,14 +1325,14 @@ npm install -g @mathpix/mpx-cli
 mpx login
 ```
 
-Put source PDFs in the staging directory, then run:
+Then process selected PDFs:
 
 ```bash
 MATHPIX_CMD='mpx convert "{pdf}" "{out}"' \
   bash papers/milcom2026/tools/process_reference_papers.sh
 ```
 
-For each paper, the pipeline creates a package containing:
+The processing package can contain:
 
 ```text
 <paper>.pdf
@@ -1277,31 +1343,114 @@ manifest.json
 process.log
 ```
 
-This gives a future AI both semantic structure (Mathpix Markdown) and visual/layout structure (page PNGs/contact sheet).
+Use the original PDF/page images for layout, visual hierarchy, figures/tables, and exact appearance. Use Mathpix Markdown for semantic/section analysis. Mathpix is never the authoritative source for exact publication text.
 
-## 17.7 Comparative-analysis loop
+### D. Analyze each useful paper individually
 
-The successful paper workflow was:
+Do **not** begin with a rigid `our section vs. exemplar A vs. exemplar B vs. exemplar C` matrix. Read each useful paper on its own terms and record only what transfers.
 
-1. choose one aspect to improve,
-2. select strong exemplars,
-3. convert them to PDF + Markdown + page images,
-4. compare exemplar structure/rhetoric/layout,
-5. extract explicit heuristics,
-6. apply only the useful heuristics to the current paper,
-7. compile,
-8. render all pages,
-9. check evidence/claims,
-10. commit the successful iteration.
+For each paper, answer:
 
-This process is documented further in:
+- Why is this paper in the library?
+- Which section/artifact does it teach us about?
+- What does it do unusually well?
+- What concrete structural or rhetorical heuristic can be extracted?
+- What should **not** transfer because the domain, claims, page length, or evaluation differs?
 
-```text
-AI_HANDOFF_README.md
-papers/milcom2026/reference_notes/PAPER_COMPOSITION_FRAMEWORK.md
-papers/milcom2026/reference_notes/REFERENCE_LIBRARY_FRAMEWORK.md
-papers/milcom2026/composition/
-```
+Examples of the kind of heuristic we actually wanted:
+
+- turn the operational problem into a crisp failure mode quickly;
+- make a narrow component important by locating it clearly inside a larger system;
+- use one readable pipeline figure rather than decorative architecture clutter;
+- describe evaluation conditions before asking the reader to interpret scores;
+- narrate why a result happens and what tradeoff it represents, not only which number wins;
+- state what the method does **not** decide so the contribution remains credible;
+- use venue exemplars for density/page economy and technical papers for definitions/lineage, rather than pretending one paper can model everything.
+
+The output is a small set of **transferable heuristics**, not a large comparative-analysis report.
+
+### E. Synthesize heuristics before rewriting
+
+Once several papers have been analyzed, combine repeated lessons into rules for the current paper. For a short IEEE/MILCOM paper, the DQNGuard process converged on a communication package roughly like:
+
+- an operational first-page hook and explicit failure mode;
+- one central pipeline/system figure;
+- compact methodology that follows the pipeline in reader order;
+- a clearly separated experimental-design section;
+- one main comparison table plus one diagnostic figure/matrix;
+- results prose that explains the operating-point tradeoff and mechanisms;
+- a discussion that states implications, limitations, and the boundary of the component;
+- a short conclusion with no new claims.
+
+Section-specific lessons should be derived from the current exemplar set, not copied blindly from this historical list.
+
+### F. Revise in targeted passes, then score the whole paper
+
+Apply the synthesized heuristics to the manuscript **without changing scientific truth**. Prefer targeted section/paragraph rewrites over uncontrolled paper-wide regeneration. Preserve terminology and advisor/lab framing when they are technically correct.
+
+After a coherent draft exists, perform the same kind of quality review used on the reference papers. The DQNGuard final passes repeatedly evaluated the paper as a reviewer would, including:
+
+- problem framing and significance,
+- novelty/contribution clarity,
+- technical correctness,
+- method explanation,
+- experimental rigor and fairness,
+- results narrative and claim/evidence alignment,
+- limitations and claim boundaries,
+- abstract quality,
+- figure/table usefulness and readability,
+- page economy,
+- overall readability / reviewer effort.
+
+The purpose of scoring is diagnostic: identify the weakest reviewer-facing dimension and fix that next. Do not optimize a synthetic total score at the expense of scientific correctness.
+
+### G. Treat the page limit as an information budget
+
+The final DQNGuard paper reached six pages through both compression **and later decompression**. This is important: once the draft fits, do not assume shorter prose is better.
+
+For every substantial pass:
+
+1. compile;
+2. verify the actual page count;
+3. render every page;
+4. inspect section flow, columns, figures/tables, whitespace, and line wrapping.
+
+When space is scarce, triage prose by **clarity improvement per added line**. The final process explicitly inventoried compressed passages, estimated how much each compression hurt comprehension, estimated the line cost of restoring clarity, and spent remaining space on the highest-value fixes first. Conversely, when the paper overflowed, compression targeted lower-value/redundant prose before cutting necessary explanation.
+
+Do not fill space merely because it exists. Use available lines only when they reduce ambiguity, lower reviewer effort, strengthen claim/evidence flow, or restore an important limitation/definition. DQNGuard's final layout intentionally used most of the six-page budget and placed the conclusion cleanly in the final column, but that exact column placement is historical, not a universal rule.
+
+### H. Run a hostile/low-effort-reader clarity pass
+
+Before submission, read the paper as if the reviewer is skeptical, rushed, or looking for an easy misunderstanding. Every major claim should be difficult to misread.
+
+Check especially:
+
+- acronyms are expanded before first use;
+- specialized terms are defined before they carry argumentative weight;
+- the reader can state the task, method input/output, calibration/evaluation regime, and operating constraint without reverse-engineering them;
+- baseline comparisons are fair and described consistently;
+- figures/tables are referenced explicitly and near the relevant prose;
+- the abstract tells the same story as the body;
+- limitations prevent overclaiming without obscuring the contribution.
+
+This pass is where DQNGuard's abstract, acronym setup, compressed prose, and several reviewer-risk ambiguities received late improvements.
+
+### I. Finish with human and mechanical verification
+
+The last pass is not another rewrite. It is a proofread and reproducibility check.
+
+For DQNGuard the finalization loop included:
+
+- a human line-by-line read-through;
+- checking exact experimental constants against the repository/figures;
+- checking acronym definitions and terminology;
+- checking figure/table references and captions;
+- checking citations and claim boundaries;
+- rebuilding from the intended LaTeX source;
+- confirming the PDF is exactly within the page limit;
+- rendering the final PDF and visually reviewing every page;
+- guarding against stale preview/build paths;
+- committing the successful state before Overleaf/export/submission.
 
 ### Writing doctrine
 
@@ -1313,15 +1462,31 @@ The desired style is:
 - rhetorically clear,
 - concise but not compressed into ambiguity,
 - grounded in experiment outputs,
-- guided by excellent real papers rather than generic AI style.
+- guided by excellent real papers rather than generic AI style,
+- written so a skeptical reviewer can recover the paper's logic with minimal effort.
 
 Avoid:
 
 - hype,
 - vague “AI paper” phrasing,
 - unsupported generalization,
-- claiming a full autonomous system when only one layer was evaluated,
+- copying exemplar wording or technical assumptions,
+- claiming a full system when only one layer/component was evaluated,
+- using the old comparative-analysis scorecards/CA rounds as mandatory procedure,
 - rewriting an entire paper to solve one local prose issue.
+
+### Historical warning: old composition-framework documents
+
+The following files preserve the earlier, more elaborate comparative-analysis idea:
+
+```text
+papers/milcom2026/reference_notes/PAPER_COMPOSITION_FRAMEWORK.md
+papers/milcom2026/reference_notes/REFERENCE_LIBRARY_FRAMEWORK.md
+papers/milcom2026/composition/comparative_revision_plan.md
+papers/milcom2026/composition/ASPECT_REGISTRY.md
+```
+
+Keep them for provenance. **Do not treat them as the current paper-writing algorithm.** If they conflict with this README, this README reflects the later/final DQNGuard process and takes precedence.
 
 ---
 
@@ -1351,7 +1516,9 @@ Then reuse the concepts, not the historical claims:
 - generated figure/table scripts,
 - Mathpix/reference-paper ingestion,
 - page rendering,
-- comparative heuristics,
+- role-based exemplar selection and synthesized writing heuristics,
+- reviewer-style scoring/audits,
+- page-budget clarity triage,
 - final build verification,
 - clean Overleaf export.
 
@@ -1647,13 +1814,15 @@ legacy/
 If the task is **paper composition**:
 
 ```text
-AI_HANDOFF_README.md
+README.md                                   # Section 17 is the current method
+AI_HANDOFF_README.md                         # history/context; Section 17 overrides older composition recipes
 papers/milcom2026/PAPER_GROUND_TRUTH.md
 papers/milcom2026/PAPER_EVIDENCE_MAP.md
-papers/milcom2026/reference_notes/PAPER_COMPOSITION_FRAMEWORK.md
-papers/milcom2026/reference_notes/REFERENCE_LIBRARY_FRAMEWORK.md
-papers/milcom2026/composition/
+papers/milcom2026/HANDIN_MANIFEST.md
+papers/milcom2026/reference_notes/          # actual source/exemplar artifacts
 ```
+
+Historical note: `PAPER_COMPOSITION_FRAMEWORK.md`, `REFERENCE_LIBRARY_FRAMEWORK.md`, and `papers/milcom2026/composition/` preserve the earlier formal comparative-analysis experiment. They are useful provenance but are **not** the workflow a new chat should follow; Section 17 of this README takes precedence.
 
 ---
 
