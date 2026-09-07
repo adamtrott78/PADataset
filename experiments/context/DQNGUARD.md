@@ -133,6 +133,9 @@ disjointness yourself; the CLI does not enforce the whole experimental design.
 
 ## Target–Surrogate Matrix
 
+For validating completed pair coverage and rendering the paper matrix, use the
+[results and analysis workflow](RESULTS.md).
+
 For five PAs there are twenty ordered target/surrogate pairs with distinct
 classes. Each cell requires a matching trained backbone with the other three
 PAs as known classes. In its saved config, `pas` contains those three plus the
