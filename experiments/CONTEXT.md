@@ -10,6 +10,9 @@ continue to the [backbone context](context/BACKBONE.md).
 For external-surrogate guard calibration and known-budget thresholding, read
 the [DQNGuard context](context/DQNGUARD.md).
 
+For VarMax acceptance rules and calibration sweeps, read the
+[VarMax context](context/VARMAX.md).
+
 ## Conceptual model and source ownership
 
 A backbone learns the selected known PA classes. An OSR method operates on its
