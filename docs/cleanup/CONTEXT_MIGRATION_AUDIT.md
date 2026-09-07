@@ -8,6 +8,29 @@ the context hierarchy at `a08bd19ff3d6040c0767abb614e14f069cedd073` and the
 maintenance context added with this audit. No legacy deletion is executed by
 this checkpoint. Paths below identify original files, including future removals.
 
+## Batch 3 completion record
+
+The removal pass is based on commit
+`6a2f157f1ca1be51448207b7b01f4d86d6b45f95`. All 18 entries originally classified
+RETIRE or MIGRATE-RETIRE in the ledger below are now removed from the working
+branch. No files were moved. Their preservation destinations were completed in
+Batch 2; the original files remain recoverable from the preservation branch.
+The original ledger is retained as an audit trail, not a pending work list.
+
+Gate E: checked all surviving first-party Markdown links to retired paths and
+162 local links across README plus the 12 scoped contexts against the prospective
+post-removal tree. No active link repair was necessary. Searched 409 inspected
+text sources for removed-path references. Remaining references are this audit,
+the explicitly historical concatenated DQN review bundle, and the historical
+spring-clean script's placeholder-writing code. The maintenance context explains
+why that script must not be replayed; its code is unchanged.
+
+Validation is static documentation/interface verification, not execution of
+hardware, training, OSR, OCR or final-paper reproduction. Independent Phase 9
+cold-start validation remains required. The final 8192-result lineage is still
+unresolved and was not changed by cleanup. See FINAL_REPORT.md for the complete
+implementation record and PHASE9_VALIDATION.md for the operator prompt package.
+
 ## Disposition meanings
 
 - **REPLACE:** rewrite the entry point after its destinations are complete.
