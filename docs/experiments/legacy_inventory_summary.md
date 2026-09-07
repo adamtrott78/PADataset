@@ -1,3 +1,5 @@
+> **Historical evidence.** This record describes an earlier run, design iteration or recovery. Its next steps, paths, scores and settings are historical observations, not current instructions. Current workflow: [owning context](../../experiments/CONTEXT.md).
+
 # Legacy PADataset Experiment Inventory
 
 Generated from local ignored artifacts. This file is safe to commit because it contains metadata only, not checkpoints or raw data.

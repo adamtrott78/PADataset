@@ -1,3 +1,5 @@
+> **Historical evidence.** This record describes an earlier run, design iteration or recovery. Its next steps, paths, scores and settings are historical observations, not current instructions. Current workflow: [owning context](CONTEXT.md).
+
 # Spring clean
 
 This cleanup pass preserves core dataset generation and CNN/OSR library code while moving notebook-era interfaces and local artifacts out of the active repo root.
@@ -27,4 +29,3 @@ Preserved as historical artifacts:
 
 New intended operating model:
 manifest -> parallel launcher -> one-run worker -> verified artifacts -> dashboard -> reducer -> OSR evaluation.
-

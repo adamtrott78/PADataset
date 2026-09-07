@@ -1,3 +1,5 @@
+> **Historical evidence.** Snapshot preserved from the pre-modularization paper records. Draft replacements, suggested next experiments and build expectations below are not current instructions. Author-confirmed final paper pooling is 8192; the recorded 16384 configurations describe recovered exploratory runs. Their linkage to final 8192 results remains unresolved. Comparative labels must be interpreted using the RF-adapted DQN-IDS context. Current workflow: [owning context](CONTEXT.md).
+
 # MILCOM 2026 Hand-In Manifest
 
 This file documents the final hand-in source state for the MILCOM 2026 DQNGuard paper.
@@ -81,4 +83,3 @@ Expected:
 ## Overleaf Migration Warning
 
 If Overleaf shows the Target--Surrogate Matrix on page 1, or if the Abstract begins with Results text, the section files are mismatched. Re-export a clean ZIP and upload into a new blank Overleaf project.
-

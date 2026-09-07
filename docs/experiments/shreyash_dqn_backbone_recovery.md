@@ -1,3 +1,5 @@
+> **Historical evidence.** This record describes an earlier run, design iteration or recovery. Its next steps, paths, scores and settings are historical observations, not current instructions. Current workflow: [owning context](../../experiments/CONTEXT.md).
+
 # Shreyash DQN/CNN backbone recovery
 
 This document extracts implementation evidence from the four legacy non-PA notebooks associated with Shreyash's CICIDS/UNSW CNN+DQN workflow.

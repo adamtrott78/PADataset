@@ -1,3 +1,5 @@
+> **Historical evidence.** This record describes an earlier run, design iteration or recovery. Its next steps, paths, scores and settings are historical observations, not current instructions. Current workflow: [owning context](../../../../../CONTEXT.md).
+
 # Scripted Hero Figure Candidate S2
 
 ## Purpose

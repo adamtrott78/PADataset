@@ -1,3 +1,5 @@
+> **Historical evidence.** This record describes an earlier run, design iteration or recovery. Its next steps, paths, scores and settings are historical observations, not current instructions. Current workflow: [owning context](../../../docs/cleanup/CONTEXT.md).
+
 systemctl --user stop buh_orchestrate_20260511_012345.service
 
 # --- 0) START ---

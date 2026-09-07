@@ -1,3 +1,5 @@
+> **Optional historical template.** Use only the fields useful to the current analysis. Scores and full cards are not mandatory; follow [paper methodology](../../CONTEXT.md) for focused individual analysis and heuristic synthesis.
+
 # Exemplar Card: <Paper Title>
 
 ## 1. Bibliographic Identity

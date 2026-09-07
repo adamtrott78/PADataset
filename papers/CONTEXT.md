@@ -252,8 +252,8 @@ The old composition frameworks, aspect registry and CA-round records document an
 earlier approach, not a required writing algorithm. Useful exemplar observations
 and figure-design lessons may be retained as evidence, but do not reactivate
 mandatory scorecards or comparison rounds. Git and the preservation branch retain
-retired documents when the later cleanup phase removes them. This migration
-leaves the README and legacy files in place until the planned integration pass.
+retired documents. The root README routes paper tasks here; historical records
+do not override this methodology.
 
 ## Creating a new paper
 Do not overwrite `papers/milcom2026/` for a new venue/project.

@@ -1,3 +1,5 @@
+> **Historical evidence.** This record describes an earlier run, design iteration or recovery. Its next steps, paths, scores and settings are historical observations, not current instructions. Current workflow: [owning context](../../CONTEXT.md).
+
 # Candidate Search Log
 
 This file tracks targeted searches for additional reference and exemplar papers for the MILCOM 2026 DQNGuard paper.

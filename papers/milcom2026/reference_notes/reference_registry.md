@@ -1,3 +1,5 @@
+> **Historical evidence.** Citation statuses and scores below are provisional historical analysis, not current bibliography facts or mandatory scoring rules. Current workflow: [owning context](../../CONTEXT.md).
+
 # Reference Registry
 
 This registry tracks processed reference and exemplar papers for the MILCOM 2026 DQNGuard paper.
@@ -96,3 +98,14 @@ Immediate revision consequences:
 - Treat Table I as fixed-budget operating-point evidence.
 - Treat Figure 2 as surrogate-transfer failure analysis.
 - Repeat the claim boundary: DQNGuard is a sensing and triage layer, not a full QR-CWoS response planner or final semantic labeler.
+
+## Source roles preserved from the early related-work scaffold
+
+The early RELATED_WORK_SYNTHESIS inventory assigned Baye to original varMax
+framing, Broggi to uncertainty/novelty management, Trott RF VarMax to RF banded
+variance/energy rejection, and Tiwari to DQN confidence-state decisions. These
+roles are already represented in this registry and the individual cards. Its
+additional labmate attack-chain-prediction entry supplied downstream QR-CWoS
+motivation only; the scaffold did not identify a complete converted source.
+Verify the actual publication and citation before using that claim. Old
+“converted?” flags and unfilled TODOs are not current ingestion status.

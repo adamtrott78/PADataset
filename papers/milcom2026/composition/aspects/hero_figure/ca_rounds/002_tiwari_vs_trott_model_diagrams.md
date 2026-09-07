@@ -1,3 +1,5 @@
+> **Historical evidence.** This record describes an earlier run, design iteration or recovery. Its next steps, paths, scores and settings are historical observations, not current instructions. Current workflow: [owning context](../../../../../CONTEXT.md).
+
 # Comparative Analysis Round 002: Tiwari DQN-IDS vs. Trott RF VarMax Model Diagrams
 
 ## Aspect

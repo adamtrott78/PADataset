@@ -1,3 +1,5 @@
+> **Historical evidence.** This record describes an earlier run, design iteration or recovery. Its next steps, paths, scores and settings are historical observations, not current instructions. Current workflow: [owning context](../../../../experiments/CONTEXT.md).
+
 # High-confidence PA2-as-PA8 impostor diagnostic
 
 Diagnostic source run:

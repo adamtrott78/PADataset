@@ -280,3 +280,21 @@ until then, use the source links above for those details.
 
 For checkout inspection, local-only source preservation, and maintenance-tool
 boundaries, see [repository maintenance](../docs/cleanup/CONTEXT.md).
+
+## Design a new run group
+
+State the scientific question and smallest comparison that can answer it before
+expanding the catalog. Encode the group in pa_experiment_catalog.py, inspect the
+generated effective configs/manifests, perform a scoped smoke run, reduce the
+completed results and diagnose failures before expanding the grid. Historical
+“mandatory” groups and seed-0 plans are not universal requirements for new work.
+Record seeds and distinguish variation across folds from variation across seeds.
+
+For old family correspondence and confidence-labeled reconstructed settings, use
+[legacy reconstruction](../docs/experiments/legacy_digital_reconstruction.md)
+only as historical evidence. A similar family name is not an exact configuration.
+
+For `gpu_lock_busy`, inspect `nvidia-smi`, the worker process and its log before
+changing scheduling. A lock-file pathname existing under /tmp is not proof of
+an active lock; do not unlink locks while a worker may own them. Follow the
+specific launcher's policy rather than assuming all local wrappers share it.

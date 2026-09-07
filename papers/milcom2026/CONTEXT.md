@@ -120,7 +120,7 @@ appearance via the PDF and every page PNG; a contact sheet is only an overview.
 
 The repository already has the needed ingestion wrapper. It calls the configured
 Mathpix command, which uploads the PDF for OCR; this is not local plain-text
-extraction. The README's command is supported by the
+extraction. The command syntax is supported by the
 [official Mathpix CLI documentation](https://mathpix.com/docs/snip/mpx-cli):
 `mpx convert input.pdf output.mmd`. The API-key path uses the existing
 `MATHPIX_OCR_API_KEY` environment variable. Install `@mathpix/mpx-cli` only if
@@ -271,7 +271,58 @@ bibliography and external graphics/table dependencies. A clean package must
 contain those assets and use the intended main.tex; do not upload only edited
 prose and assume the correct figure version is already present. Preserve a
 reviewed source commit before export and verify the resulting PDF in the
-destination environment. No automatic Overleaf export tool is assumed here.
+destination environment. The export recipe below packages files; it does not
+upload or submit anything.
+
+## Export a clean Overleaf source package
+
+First rebuild and review the intended revision using the workflows above. This
+recipe migrates the handoff's rsync/ZIP process, with a fresh temporary directory
+instead of deleting/reusing an export directory. Run from the repository root;
+it requires `rsync`, `mktemp` and `zip` in addition to the build tools.
+
+```bash
+paper_export_dir=$(mktemp -d /tmp/padataset_overleaf_XXXXXX)
+paper_export_zip="${paper_export_dir}.zip"
+rsync -a \
+  --exclude='build/' --exclude='page_previews/' \
+  --exclude='reference_notes/' --exclude='composition/' \
+  --exclude='*.bak' --exclude='*.bak_*' \
+  --exclude='*.aux' --exclude='*.bbl' --exclude='*.blg' \
+  --exclude='*.log' --exclude='*.out' --exclude='*.synctex.gz' \
+  --exclude='*.fls' --exclude='*.fdb_latexmk' \
+  papers/milcom2026/ "$paper_export_dir/"
+test -f "$paper_export_dir/main.tex"
+(cd "$paper_export_dir" && zip -qr "$paper_export_zip" .)
+python - "$paper_export_zip" <<'PY'
+import sys, zipfile
+with zipfile.ZipFile(sys.argv[1]) as z:
+    names=set(z.namelist())
+    assert {'main.tex','references.bib','IEEEtran.cls'} <= names
+    assert 'sections/0-abstract.tex' in names
+    assert 'sections/7-conclusion.tex' in names
+    assert z.testzip() is None
+print(sys.argv[1])
+PY
+```
+
+The ZIP has `main.tex` at its root, not under a second project directory. Source
+figures, generated PDF graphics and table inputs under `figures/` and `tables/`
+are copied; regenerate required assets first if they are missing locally. This
+minimal archive check is not a dependency-completeness or compilation test.
+If a future manuscript includes a file from an excluded directory, adjust the
+selection after inspecting its dependencies. The recipe excludes `.bbl` and
+therefore expects bibliography compilation; use the destination's requirements
+when a submission specifically needs a `.bbl`.
+
+Compile the extracted package in isolation and review its PDF before upload.
+In Overleaf, select the intended `main.tex` and preserve the matching relative
+section/asset paths. An abstract containing Results text or displaced sections
+calls for inspecting the uploaded files and compile target; figure placement
+alone does not prove a mismatch. Preserve the existing project before replacing
+files, or use a new project when recovering a confused upload. Recheck the
+destination PDF and its three-view analysis package. The ZIP remains under
+`/tmp` until copied to the user's chosen durable export location.
 
 Source interfaces checked at
 `565179b5f2e78950cb59a38473169bc45ec5a35d`; Mathpix CLI/API documentation checked

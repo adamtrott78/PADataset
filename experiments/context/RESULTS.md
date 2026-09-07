@@ -332,3 +332,23 @@ Interfaces checked against source at
 `a12ad5851b90b37b9f8868e940af16b8a379748b`. Staging examples were exercised with
 the supplied historical CSVs in an isolated copy; no models or experiments were
 run, and no final-paper reproduction claim follows from those renderer checks.
+
+## Preserve a research result
+
+Keep heavy banks/caches/checkpoints in their prepared storage, reduced summaries
+and tables tied to their generating inputs, and selected reviewable evidence in
+docs/experiments/run_results, run_diagnostics or run_incidents. Record source
+commit/diff, deterministic plan/seed identity, tape/spec pairing and capture logs,
+bank labels, cache namespace/length/normalization, effective run configs,
+checkpoint selection and explicit evaluator/calibration settings. Preserve
+important failures and exclusions instead of silently dropping them from a
+comparison. Commit selected source/configuration and evidence paths deliberately;
+.gitignore may exclude even small CSV products.
+
+Diagnostic owners include export_highconf_open_impostors.py,
+export_bank_spectrogram_impostors.py, export_osr_selection_provenance.py,
+plot_osr_confusion_matrices.py and plot_osr_confusion_montage_clean.py in
+experiments/. Inspect their source/CLI for the requested diagnostic. The retained
+[PA2-as-PA8 record](../../docs/experiments/run_diagnostics/highconf_pa2_as_pa8_stale/README.md)
+shows cached eight-channel model input, not an I/Q spectrogram. A sudden confusion
+change warrants checking source/label/provenance before tuning the model.

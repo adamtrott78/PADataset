@@ -1,3 +1,5 @@
+> **Historical evidence.** This record describes an earlier run, design iteration or recovery. Its next steps, paths, scores and settings are historical observations, not current instructions. Current workflow: [owning context](../../experiments/CONTEXT.md).
+
 # Legacy Digital-Noisy Experiment Reconstruction
 
 This report is generated from local metadata inventories only. It does not include raw checkpoints, tensors, H5 cache contents, or MAT files.
@@ -87,3 +89,90 @@ This report is generated from local metadata inventories only. It does not inclu
 ## First reconstruction conclusion
 
 The old digital-noisy experiment program can be reconstructed from committed metadata inventories. The next step is to map the inferred families and source profile into `pa_experiment_catalog.py`, then rerun only missing/ambiguous cells rather than repeating the entire historical search.
+
+## Preserved historical family interpretation
+
+Extracted from the pre-modularization final_rerun_plan and prior-chat knowledge
+at commit `077c8d9466e1a4e70bb8163560e4b52e108cef92`. This appendix preserves
+historical correspondence and uncertainty, not new experiment requirements.
+The original plan's mandatory rerun/seed policy is superseded. Current family
+definitions and overrides belong to the experiment context and executable catalog.
+Historical 16384 defaults do not establish the author-confirmed 8192 paper profile.
+
+### Legacy-to-modern correspondence recorded by the old plan
+
+The following correspondences were the plan author's reconstruction/proposal;
+an approximate mapping does not reproduce a saved run. Compare the actual
+source, PA universe, splits, optimizer, loss weights, selection metric and cache
+headers before interpreting a bridge experiment. “Final branch” below names
+the historical planning snapshot, not the current scientific operating profile.
+
+| old family name | old source/root | old purpose | old key hyperparameters | new family name | new hyperparameters | exact / approximate / superseded |
+| --- | --- | --- | --- | --- | --- | --- |
+| `ref_base_ent005` | `results_pa_confmanifold_refined` | reference deployable backbone with entropy regularization | lr `5e-4`, ls `0.10`, entropy `0.05`, dropout `0.30`, batch `16`, epochs `200`, `open_conf`, `dqn_proxy_softmax3` | `ref_ent005_lr5e4` | lr `5e-4`, ls `0.10`, entropy `0.05`, dropout `0.30`, epochs `60`, patience `10`, OTA-first defaults | **approximate modernized equivalent** |
+| `ref_base_lr2e4` | `results_pa_confmanifold_refined` / followup context | lower-lr reference control backbone | lr `2e-4`, ls `0.10`, entropy `0.00`, dropout `0.30`, batch `16`, epochs `200`, `open_conf` | `ref_noent_lr5e4` and partially `ref_ent005_lr2e4` | not exact; new family split separates lr and entropy axis | **superseded / split across new families** |
+| `ref_pms_drop040` | refined / finalist-followup family | stronger regularized comparison, paperish / PMS style | lr `1e-4`, wd `1e-4`, lambda_center `0.1`, ls `0.05`, entropy `0.05`, dropout `0.40`, grad clip `1.0`, plateau scheduler | none exact in final branch | would require explicit legacy bridge config if rerun | **superseded** |
+| `ref_base_nocenter` | `results_pa_confmanifold_refined` | test no-center-loss representation | lr `5e-4`, ls `0.10`, entropy `0.00`, dropout `0.30` | none exact | final branch currently keeps `lambda_center=0.1` globally | **superseded** |
+| `confman_baseline_knownonly` | `results_pa_confmanifold_coarse` | known-only stopping baseline | lr `5e-4`, ls `0.10`, entropy `0.00`, dropout `0.30`, `known_only` stop mode | none exact | final system standardized on `open_conf` | **superseded** |
+| `confman_baseline_openconf` | `results_pa_confmanifold_coarse` | baseline open-confidence stopping reference | lr `5e-4`, ls `0.10`, entropy `0.00`, dropout `0.30`, `open_conf` | `ref_noent_lr5e4` | close modern equivalent with updated OTA defaults | **approximate** |
+| `confman_paperish_mild` | `results_pa_confmanifold_coarse` | coarse broad-search mild regularization variant | lr `1e-4`, ls `0.00`, entropy `0.02`, dropout `0.50` | none exact | no direct final branch equivalent | **superseded** |
+| `confman_paperish_mid` | `results_pa_confmanifold_coarse` | coarse broad-search mid regularization variant | lr `1e-4`, ls `0.00`, entropy `0.05`, dropout `0.50` | none exact | no direct final branch equivalent | **superseded** |
+| `confman_paperish_mid_smooth` | `results_pa_confmanifold_coarse` | coarse broad-search mid + smoothing | lr `1e-4`, ls `0.05`, entropy `0.05`, dropout `0.50` | none exact | no direct final branch equivalent | **superseded** |
+| `confman_paperish_strong` | `results_pa_confmanifold_coarse` | coarse broad-search stronger regularization variant | lr `1e-4`, ls `0.00`, entropy `0.10`, dropout `0.50` | none exact | no direct final branch equivalent | **superseded** |
+
+### Naming mismatch resolution
+
+The old refined-family names bundled multiple axes into a single historical label. The new final-branch families separate the retained axes more cleanly:
+
+- old `ref_base_ent005` maps most directly to **`ref_ent005_lr5e4`**
+- old `ref_base_lr2e4` is **not one exact family** in the final branch; its legacy role is now represented by comparing:
+  - `ref_ent005_lr2e4`
+  - `ref_noent_lr5e4`
+- old no-label-smoothing / no-entropy ablations map to **`ref_ls000_noent_lr5e4`**
+- old center-loss ablations and paperish coarse families are treated as **superseded**, not as mandatory exact reruns
+
+---
+
+### Original confidence-labeled hyperparameter reconstruction
+
+The table below combines committed branch constants with prior-chat reconstruction. Values are grouped by confidence.
+
+| family | lr | label smoothing | entropy loss weight | center loss / lambda_center | dropout | weight decay | grad clip | scheduler | early stopping mode | selection metric | batch size | epochs | confidence |
+| --- | --- | --- | --- | --- | --- | --- | --- | --- | --- | --- | --- | --- | --- |
+| `ref_base_ent005` | `5e-4` | `0.10` | `0.05` | likely none or baseline default only | `0.30` | baseline / small | none | cosine in final system; legacy varied | `open_conf` | `dqn_proxy_softmax3` in legacy; later broader OSR metrics | `16` | `200` old, `60` in new runner | prior-chat memory + run-name reconstruction |
+| `ref_base_lr2e4` | `2e-4` | `0.10` | `0.00` | likely none or baseline default only | `0.30` | baseline / small | none | cosine in final system; legacy varied | `open_conf` | `dqn_proxy_softmax3` legacy | `16` | `200` old | prior-chat memory |
+| `ref_pms_drop040` | `1e-4` | `0.05` | `0.05` | `lambda_center = 0.1` | `0.40` | `1e-4` | `1.0` | plateau | `open_conf` | proxy metric / OSR-aware | `16` | `200` old | prior-chat memory |
+| `ref_base_nocenter` | `5e-4` | `0.10` | `0.00` | no center loss | `0.30` | baseline / small | none | legacy default | `open_conf` | `dqn_proxy_softmax3` | `16` | `200` | reconstructed from run names and branch doc |
+| `confman_baseline_knownonly` | `5e-4` | `0.10` | `0.00` | none | `0.30` | baseline / small | none | legacy default | `known_only` | `dqn_proxy_softmax3` reported in reconstruction tables | `16` | `200` | committed reconstruction |
+| `confman_baseline_openconf` | `5e-4` | `0.10` | `0.00` | none | `0.30` | baseline / small | none | legacy default | `open_conf` | `dqn_proxy_softmax3` | `16` | `200` | committed reconstruction |
+| `confman_paperish_mild` | `1e-4` | `0.00` | `0.02` | none / unclear | `0.50` | paperish coarse default | none | legacy default | `open_conf` | `dqn_proxy_softmax3` | `16` | `200` | committed reconstruction |
+| `confman_paperish_mid` | `1e-4` | `0.00` | `0.05` | none / unclear | `0.50` | paperish coarse default | none | legacy default | `open_conf` | `dqn_proxy_softmax3` | `16` | `200` | committed reconstruction |
+| `confman_paperish_mid_smooth` | `1e-4` | `0.05` | `0.05` | none / unclear | `0.50` | paperish coarse default | none | legacy default | `open_conf` | `dqn_proxy_softmax3` | `16` | `200` | committed reconstruction |
+| `confman_paperish_strong` | `1e-4` | `0.00` | `0.10` | none / unclear | `0.50` | paperish coarse default | none | legacy default | `open_conf` | `dqn_proxy_softmax3` | `16` | `200` | committed reconstruction |
+
+### Findings and limitations retained from the old knowledge export
+
+- **Committed inventory evidence:** the digital `pilot_noisy_torch` subset had
+  113 completed summaries over PA2/PA3/PA4/PA8; these counts describe the sampled
+  inventory, not all subsequent research. Earlier sections retain the result
+  roots and recovered metrics.
+- **Reconstructed chronology:** baseline/cache sweeps led to coarse confidence
+  manifold searches, refined reference families, an OSR backbone bank, finalist
+  follow-ups and exploratory Bluetooth/Zigbee OTA transfer checks.
+- **Prior-chat interpretation, not newly verified ranking:** `ref_base_ent005`
+  was regarded as the strongest deployable candidate, `ref_base_lr2e4` as a
+  control, and `ref_pms_drop040` as a structured comparison. PA2 was considered
+  repeatedly difficult, with PA8 often easier. Do not promote these judgments
+  to current OTA results or general behavior rankings.
+- **Historical scope:** early BT/ZB OTA runs were limited transfer experiments,
+  not the later unified OTA paper evidence. Old digital work used four PAs;
+  later DISTINCT/MASTER sets change the task and cannot be compared by run name
+  alone.
+- **Interpretation lesson:** strong closed-set accuracy or an oracle/proxy score
+  need not imply reliable rejection under available deployment calibration.
+  DQN-style proxy selection metrics are not proof that a DQN decision head ran.
+  Read method-specific calibration definitions before comparing thresholds.
+- **Uncertainty retained:** center-loss values and some optimizer details were
+  not uniformly preserved. Family names mixed source, fold, cache length,
+  selection mode and timestamp. The confidence labels above must remain attached
+  to recovered values; saved configuration is needed for an exact replication.

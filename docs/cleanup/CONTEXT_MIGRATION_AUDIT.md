@@ -19,7 +19,52 @@ this checkpoint. Paths below identify original files, including future removals.
 - **RETAIN-OPTIONAL:** useful aid, explicitly nonmandatory.
 - **RETAIN:** useful component boundary.
 
-## Remaining gates before integration and removal
+## Batch 2 integration record
+
+Baseline for this integration: `26cd3ae39f4d8597653fcd3f003b2ce78c0151fd`.
+Content-preservation gates A–D are complete for documentation integration:
+
+| Gate | Concrete result |
+|---|---|
+| A | README replaced with scientific model, environment/artifact boundaries and direct task routes. Section coverage ledger follows. |
+| B | HANDIN_MANIFEST, PAPER_GROUND_TRUTH and PAPER_EVIDENCE_MAP have explicit historical/provenance boundaries. Clean source-export recipe migrated to paper tools; final run lineage remains unresolved rather than relabeled. |
+| C | Existing legacy_digital_reconstruction now retains the complete family correspondence table without rerun mandates, the original confidence-labeled parameter table and scoped historical findings. Retained incident/recovery/iteration records explicitly mark old instructions historical. |
+| D | Retained hero heuristics preserve source-specific Baye/Wei/Broggi/Tiwari/Trott observations and winning-config evidence labels; registry preserves the incomplete downstream source lead; exemplar template is optional. |
+
+All six MIGRATE-RETIRE entries in the original ledger now have their preservation
+destination populated. Ledger dispositions below are the original audit decisions,
+not deletion records. Gate E's final removal/dependency check and Phase 9 independent
+cold-start validation remain for the subsequent batch. No legacy files were deleted.
+
+Validation: new shell/Python blocks parsed; new relative links resolved; the
+Overleaf export recipe passed an isolated fixture check; paper methodology
+stages A–I and writing doctrine remain byte-identical to the previous context.
+No actual paper compilation, model evaluation, OCR request or hardware run was
+performed. Independent cold-start behavior is not established by these checks.
+
+### Original README section coverage
+
+| Original section(s) | Owner / treatment |
+|---|---|
+| 0–2 branch, orientation, bootstrap | README; maintenance context. Replace broad mandatory handoff reading with task-scoped routes. |
+| 3 environment | README overview; exact setup remains with generation, experiment and paper contexts. |
+| 4–5 repository map, PA taxonomy | README router and PA table; experiment/preprocess contexts own universes and labels. |
+| 6 generation | protocol/CONTEXT.md |
+| 7–8 capture and resplice | txrx/CONTEXT.md |
+| 9–10 bank and cache | scripts/preprocess/CONTEXT.md |
+| 11–12 training and reduction | experiments/CONTEXT.md; BACKBONE.md; RESULTS.md |
+| 13 OSR and diagnostics | Method contexts and RESULTS.md; diagnostic source owners retained. |
+| 14 new run groups | experiments/CONTEXT.md; historical mandatory reruns replaced with question-driven design. |
+| 15 result persistence | RESULTS.md research-record guidance and maintenance context. |
+| 16 legacy recovery | Existing legacy_digital_reconstruction with preserved confidence labels; maintenance context. |
+| 17 paper | papers/CONTEXT.md preserves section 17.6 methodology; papers/milcom2026/CONTEXT.md owns files, build, three-view OCR review and export. |
+| 18 new paper | papers/CONTEXT.md separate project workflow |
+| 19–20 Git/artifact hygiene | docs/cleanup/CONTEXT.md; root history boundary |
+| 21 recovery | Owner contexts; GPU-lock and diagnostic gaps filled in experiment/results contexts. |
+| 22 reproducibility | RESULTS.md provenance requirements plus upstream validation in generation/capture/preprocess contexts. |
+| 23 repeated cookbook | Remove duplicates; use source-checked owner commands. |
+
+## Original gates and their rationale
 
 **A — README coverage and routing.** Check every existing README section against
 the owning context before replacing it. Preserve scientific scope (PA precursor
