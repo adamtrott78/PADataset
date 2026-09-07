@@ -13,6 +13,9 @@ the [DQNGuard context](context/DQNGUARD.md).
 For VarMax acceptance rules and calibration sweeps, read the
 [VarMax context](context/VARMAX.md).
 
+For RF-adapted DQN-IDS training, recovery and Keras guard evaluation, read the
+[DQN-IDS adaptation context](context/DQN_IDS.md).
+
 ## Conceptual model and source ownership
 
 A backbone learns the selected known PA classes. An OSR method operates on its

@@ -190,8 +190,8 @@ own hyperparameters and `.keras` loading/custom-loss conventions when reproducin
 this track rather than inheriting PyTorch settings.
 
 The streaming trainer exposes `--resume`; the PyTorch worker does not offer an
-equivalent capability. Keras lifecycle and calibration details belong with the
-DQN-IDS adaptation context. The inspected comparator evaluator adds a banded
+equivalent capability. Keras lifecycle and calibration details are in the
+[DQN-IDS adaptation context](DQN_IDS.md). The inspected comparator evaluator adds a banded
 guard to this Keras backbone; document backbone identity and decision-layer
 identity separately when interpreting the manuscript's “DQN-IDS-style head.”
 
