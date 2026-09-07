@@ -6,6 +6,9 @@ The [experiment framework](../CONTEXT.md) owns run lifecycle. Method contracts
 are in [DQNGuard](DQNGUARD.md), [VarMax](VARMAX.md) and
 [DQN-IDS adaptation](DQN_IDS.md).
 
+For turning verified evidence into a manuscript, continue to the
+[paper-composition methodology](../../papers/CONTEXT.md).
+
 ## Source ownership and evidence boundary
 
 | Tracked source | Responsibility |
