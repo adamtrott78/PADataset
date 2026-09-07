@@ -7,6 +7,8 @@ Load method implementation details only for the decision layer you are using.
 
 For architecture, losses, checkpoint loading and the classifier evidence API,
 continue to the [backbone context](context/BACKBONE.md).
+For external-surrogate guard calibration and known-budget thresholding, read
+the [DQNGuard context](context/DQNGUARD.md).
 
 ## Conceptual model and source ownership
 
