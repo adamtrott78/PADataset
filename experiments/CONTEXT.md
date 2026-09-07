@@ -5,6 +5,9 @@ understand completion and rerun behavior. Start at the [root README](../README.m
 Inputs must satisfy the [bank/cache context](../scripts/preprocess/CONTEXT.md).
 Load method implementation details only for the decision layer you are using.
 
+For architecture, losses, checkpoint loading and the classifier evidence API,
+continue to the [backbone context](context/BACKBONE.md).
+
 ## Conceptual model and source ownership
 
 A backbone learns the selected known PA classes. An OSR method operates on its
@@ -260,6 +263,6 @@ only on Lambda through ignored directories or symlinks.
 These contracts were checked against source at
 `9eb7bcb80bb0ae9b5976f0e243cc6e5326fcbef3`; example shell/Python syntax and CLI
 options were checked without launching training or OSR. A successful one-epoch
-workflow checks execution, not research validity. The next documentation layers
-cover backbone details, DQNGuard, VarMax, DQN-IDS adaptation and result analysis;
-until those contexts are added, use the source links above for those details.
+workflow checks execution, not research validity. Backbone details are covered in
+the linked context. Method and result-analysis contexts are added separately;
+until then, use the source links above for those details.
