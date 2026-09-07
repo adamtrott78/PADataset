@@ -277,3 +277,6 @@ options were checked without launching training or OSR. A successful one-epoch
 workflow checks execution, not research validity. Backbone details are covered in
 the linked context. Method and result-analysis contexts are added separately;
 until then, use the source links above for those details.
+
+For checkout inspection, local-only source preservation, and maintenance-tool
+boundaries, see [repository maintenance](../docs/cleanup/CONTEXT.md).
