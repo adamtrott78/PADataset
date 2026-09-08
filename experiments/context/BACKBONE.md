@@ -25,10 +25,12 @@ closed-set prediction; rejection belongs to the downstream decision layer.
 
 ## PyTorch architecture and tensor contracts
 
-`ModulationClassifierReduced` consumes `[B,8,L]`, where B is batch size, eight
-channels are the ordered IQ/FFT/DCT/polar stack, and L is pooled window length.
-Use L=8192 for the author-confirmed paper setting. Do not confuse the cache's
-average pooling with the pooling inside each convolutional branch.
+`ModulationClassifierReduced` consumes `[B,8,L]`, where B is batch size,
+eight channels are the ordered IQ/FFT/DCT/polar stack, and L is pooled
+window length. The surviving final experiment lineage uses L=16384; the
+accepted manuscript's 8192 statement is a provenance conflict rather
+than evidence of a rerun. Do not confuse the cache's average pooling
+with the pooling inside each convolutional branch.
 
 | Stage | Operation | Output per window |
 |---|---|---|
@@ -48,9 +50,9 @@ changes the method input and must be deliberate.
 
 `input_len` is stored as model/checkpoint metadata; `forward` does not enforce it.
 Adaptive branch pooling permits multiple input lengths without changing the
-classifier weight shapes. Successful checkpoint loading therefore cannot prove
-that the original input length was 8192. Inspect actual cache shape and run
-provenance as described in the preprocessing context.
+classifier weight shapes. Successful checkpoint loading therefore cannot prove the input length used
+for a historical execution. Inspect actual cache shape and run provenance
+as described in the preprocessing context.
 
 ## Training objective and model selection
 
@@ -103,14 +105,14 @@ import h5py
 import torch
 from osr_core import load_backbone_run
 
-run_dir = 'results_pa_context_train01/context_og_ref_unkPA2_c8192_seed0'
+run_dir = 'results_pa_context_train01/context_og_ref_unkPA2_c16384_seed0'
 handle = load_backbone_run(run_dir, 'best_model', device='cpu')
-assert handle.checkpoint['input_len'] == handle.config['cache_len'] == 8192
+assert handle.checkpoint['input_len'] == handle.config['cache_len'] == 16384
 assert len(handle.class_names) == handle.num_classes
 cache_files = sorted(Path(handle.config['cache_root']).expanduser().glob('*.h5'))
 assert cache_files, 'No feature caches at saved path'
 with h5py.File(cache_files[0], 'r') as f:
-    assert f['Xfeat'].shape[1:] == (8, 8192)
+    assert f['Xfeat'].shape[1:] == (8, 16384)
     x = torch.from_numpy(f['Xfeat'][0:1]).float()
 with torch.no_grad():
     logits, features = handle.model(x, return_features=True)

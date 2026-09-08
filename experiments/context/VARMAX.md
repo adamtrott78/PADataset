@@ -32,6 +32,33 @@ It supports AUROC ranking; the final decision still uses the acceptance rules.
 An accepted window can have a positive unknown score. Do not replace the rule
 with `score > 0` or import DQNGuard's 5% percentile cutoff.
 
+
+## Historical role in the DQNGuard lineage
+
+VarMax predates DQNGuard in this project and supplied two distinct ideas
+that later became central.
+
+First, the author's earlier RF OSR work introduced predicted-class
+variance/energy bands because an unknown RF example could fall either above
+or below the distribution of the known class to which the classifier routed
+it. A class-conditioned acceptance interval was therefore more useful than
+assuming one global "unknown means larger" or "unknown means smaller"
+direction.
+
+Second, while applying VarMax to the **digital** PA dataset, the author
+developed the project's surrogate-open calibration strategy. A known PA was
+temporarily treated as a pseudo-unknown during threshold selection, then
+those settings were evaluated on a different true withheld PA. The
+surprising ability of some surrogate-derived settings to transfer to the
+true unknown made surrogate calibration worth pursuing, while variation
+across surrogate choices showed that transfer was target-dependent.
+
+This historical surrogate experiment is the conceptual predecessor of both
+the fixed-PA1 DQNGuard experiments and the later full Target–Surrogate
+analysis. It should not be confused with a claim that every current VarMax
+or DQNGuard threshold is fitted from surrogate data. The executable rules
+and evidence partitions below define what the present code actually does.
+
 ## Choose a calibration regime
 
 | CLI mode | Calibration evidence |
@@ -63,14 +90,14 @@ calibration is omitted, so custom callers must pass explicit validation splits.
 
 ## Run one surrogate evaluation
 
-Use a completed, reviewed 8192-length PyTorch run and validated cache from the
-framework workflow. The example below consumes its one-epoch demonstration run;
+Use the completed, reviewed 16384-length demonstration run and validated
+cache from the framework workflow. The example below consumes its one-epoch demonstration run;
 it checks execution rather than reproducing paper performance. Run in `(DNNs)`
 from the repository root. Pick a free GPU and a new output directory.
 
 ```bash
 cd ~/adamArchives/Adam/varMax/PADataset
-export PA_VARMAX_RUN="results_pa_context_train01/context_og_ref_unkPA2_c8192_seed0"
+export PA_VARMAX_RUN="results_pa_context_train01/context_og_ref_unkPA2_c16384_seed0"
 export PA_VARMAX_OUT="results_pa_context_varmax01/og_PA2_surrogate_all"
 python - <<'PY'
 import json
@@ -79,7 +106,7 @@ from pathlib import Path
 run = Path(os.environ['PA_VARMAX_RUN'])
 cfg = json.loads((run / 'config.json').read_text())
 assert cfg['split_mode'] == 'open_pa' and cfg['unknown_pas'] == ['PA2']
-assert cfg['cache_len'] == 8192 and cfg['skip_cache_build']
+assert cfg['cache_len'] == 16384 and cfg['skip_cache_build']
 assert (run / 'best_model.pt').is_file()
 assert not Path(os.environ['PA_VARMAX_OUT']).exists(), 'Choose a fresh output directory.'
 PY

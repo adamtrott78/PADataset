@@ -21,6 +21,72 @@ candidates for later label-making and behavior discovery. This is not the whole
 QR-CWoS system. The evaluator described here writes aggregate results, not a
 persistent unknown-window discovery pool or an attack-chain prediction.
 
+
+## Historical design lineage
+
+The executable contract below describes the current implementation. The
+following section records the author-confirmed research history that
+explains why those pieces were combined; it is design provenance, not a
+substitute for reading current source.
+
+DQNGuard emerged from three pre-existing lines of work:
+
+1. **RF VarMax / predicted-class guards.** The author's earlier RF
+   open-set-recognition work had already found that a single global
+   variance direction was unreliable across modulation classes. Its
+   practical solution was predicted-class-conditioned percentile bands for
+   logit variance and, later, energy. These class-banded variance/energy
+   guards are the direct conceptual ancestor of the deterministic guard
+   portion of DQNGuard.
+2. **Surrogate-open calibration on the digital PA dataset.** While testing
+   VarMax on the digital preliminary-action dataset, the author began
+   withholding an otherwise known PA as a pseudo-unknown surrogate and
+   tuning VarMax against it. Thresholds calibrated with one known PA acting
+   as surrogate often transferred reasonably to a different genuinely
+   withheld PA. This experiment created the project's surrogate-open idea
+   and also exposed that surrogate usefulness depends on the target.
+3. **DQN-IDS confidence decision.** The DQN component was adapted from the
+   peer DQN-IDS work: the author's existing RF CNN supplied classifier
+   outputs and the DQN consumed confidence-state evidence such as maximum
+   softmax probability, the top-two probability gap, and entropy. Directly
+   using the DQN's known/unknown action on PA OSR performed poorly,
+   particularly as an unknown-rejection operating rule, so the DQN was not
+   retained as the sole final decision.
+
+During the May 13–14, 2026 redesign, the author was explicitly enumerating
+possible next directions. One option was an **amalgamation of VarMax and
+DQN-IDS**. That option became DQNGuard: retain the DQN-derived confidence
+signal, place the previously developed predicted-class variance/energy
+guard logic around it, carry forward the surrogate-open calibration idea,
+and control the final operating point with an explicit known-rejection
+budget rather than trusting the raw DQN action alone.
+
+The first surviving artifacts explicitly named **DQNGuard** were sent in
+the early morning of May 14 after that redesign window. They show a
+PA1-surrogate experiment against the original PA2/PA3/PA4/PA8 target set
+and are titled as **known-only OSR, Budget = 0.05**. The accompanying early
+architecture figure already contains the recognizable ingredients:
+DQN-derived confidence, predicted-class variance and energy bands, stored
+guard parameters, and a global score threshold selected under a known-only
+rejection budget.
+
+This chronology establishes the conceptual synthesis but does not make the
+early figure an executable specification. In particular, the author's
+historical description of the first design is that surrogate-open examples
+were used to tune the VarMax-derived variance/energy threshold behavior.
+The **current** `BandedGuardDQNOSR` contract below is different in an
+important detail: its predicted-class gap/variance/energy bands are fitted
+from known calibration windows, while surrogate-open calibration influences
+DQN fitting; the final continuous-score cutoff is then selected from known
+calibration only. Preserve both facts rather than retroactively forcing the
+earliest prototype rationale onto current code.
+
+The early fixed-PA1 experiment was also not yet the later full
+Target–Surrogate Matrix. It used Scan/PA1 as one external surrogate while
+PA2, PA3, PA4, and PA8 took turns as the actual unseen target. The later
+work generalized this question to arbitrary distinct target/surrogate
+combinations across all five PAs, producing twenty ordered cells.
+
 ## Calibration and decision mechanics
 
 The dedicated evaluator constructs a `softmax3` DQN confidence state from maximum
@@ -89,7 +155,7 @@ Choose a new output directory for each changed configuration or calibration.
 
 ```bash
 cd ~/adamArchives/Adam/varMax/PADataset
-export PA_GUARD_RUN="results_pa_context_train01/context_og_ref_unkPA2_c8192_seed0"
+export PA_GUARD_RUN="results_pa_context_train01/context_og_ref_unkPA2_c16384_seed0"
 export PA_GUARD_OUT="results_pa_context_dqnguard01/og_PA2_surPA1_budget005"
 python - <<'PY'
 import json
@@ -100,7 +166,7 @@ cfg = json.loads((run / 'config.json').read_text())
 assert cfg['split_mode'] == 'open_pa'
 assert cfg['unknown_pas'] == ['PA2']
 assert set(cfg['pas']) == {'PA2', 'PA3', 'PA4', 'PA8'}
-assert cfg['cache_len'] == 8192 and cfg['skip_cache_build']
+assert cfg['cache_len'] == 16384 and cfg['skip_cache_build']
 assert (run / 'best_model.pt').is_file()
 assert not Path(os.environ['PA_GUARD_OUT']).exists(), 'Choose a fresh output directory.'
 print('Known: PA3/PA4/PA8; target: PA2; external surrogate: PA1')
@@ -145,9 +211,10 @@ the cache. Reusing a backbone that trained on the surrogate changes the regime.
 
 The existing [L2O manifest](../../manifests/l2o_surrogate_matrix_gpu0.tsv) records
 `run_name`, `gpu`, `cfg_path`, `target_unknown`, `surrogate_open`, `known_pas`.
-These are different columns from the shared training TSV. Existing L2O names and
-configs include exploratory 16384 settings; do not treat them as the final 8192
-paper snapshot without tracing their provenance.
+These are different columns from the shared training TSV. Existing L2O names/configs and the surviving Target–Surrogate experiment
+lineage use 16384. The accepted manuscript's 8192 statement must be
+tracked separately as a manuscript-provenance conflict; do not relabel
+the c16384 execution chain as exploratory.
 
 For each reviewed cell, use the same dedicated command above, replacing
 `--run-dir` with its completed backbone directory, `--surrogate-open-pa` with

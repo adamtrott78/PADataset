@@ -29,11 +29,47 @@ paths or symlinks. A GitHub checkout lacking them cannot reproduce experiments
 merely by running a plot script. Rendering existing CSVs needs pandas, NumPy and
 Matplotlib; it does not need radios, caches or trained models.
 
-The author confirms 8192 pooled length for final paper experiments and identifies
-16384 runs as exploratory. Supplied historical comparison/matrix CSVs were traced
-to 16384 run configs and sampled caches. Rendering those CSVs verifies their
-data-to-asset path, not their identity as the final 8192 paper evidence. Do not
-rewrite measurements or relabel run provenance to remove that distinction.
+Surviving final experiment provenance uses **16,384** pooled samples.
+The tracked paper evidence records themselves list cache length 16,384,
+and recovered comparison/Target–Surrogate chains resolve to c16384
+configurations and caches. Late manuscript/figure edits and the accepted
+paper report 8,192, but no corresponding surviving 8,192 rerun
+provenance has been recovered.
+
+Treat 8,192 as a **manuscript-provenance conflict**. It must remain
+visible when reconciling the accepted paper, but it must not be used to
+relabel the surviving 16,384 experiment chain as exploratory or to
+rewrite measured CSV values. For any individual result, the saved
+config, actual HDF5 shape, checkpoint/evaluator chain and source row
+remain the authority.
+
+
+## Historical progression of surrogate analysis
+
+The final twenty-cell Target–Surrogate Matrix was not the project's first
+surrogate experiment.
+
+The progression established by recovered experiment history and the
+author's dated artifacts is:
+
+digital VarMax surrogate tests
+→ surrogate-open transfer recognized as useful but target-dependent
+→ direct DQN-IDS-style decision experiments
+→ May 13–14 DQNGuard synthesis
+→ first surviving DQNGuard run using fixed surrogate PA1/Scan against
+  targets PA2/PA3/PA4/PA8 under a 0.05 known-only operating budget
+→ later generalization to all five targets and every distinct surrogate.
+
+The first DQNGuard confusion matrices already showed strongly
+target-dependent unknown behavior, including structured confusions between
+behaviorally similar PA pairs. Treat those early artifacts as historical
+evidence of the problem, not as cells of the final twenty-pair matrix.
+
+With five PAs, the generalized design has `5 × 4 = 20` ordered
+target/surrogate cells because target and surrogate roles are directional.
+A complete final matrix therefore answers a broader question than the first
+fixed-PA1 experiment: **which available surrogate transfers best to each
+particular unseen target?**
 
 ## Collect a scoped set of summaries
 

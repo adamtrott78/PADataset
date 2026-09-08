@@ -164,21 +164,23 @@ profile, `open_conf_selection_metric="dqn_proxy_expanded5"` controls that choice
 the simultaneous `model_selection_metric="val_macro_f1"` field does not override
 the active open-confidence selection path.
 
-Use 8,192 pooled length for the author-confirmed paper setting. Historical
-catalog defaults, names and exploratory configs include 16,384. Effective JSON
-and actual cache shape must agree; changing a name or CLI flag is insufficient.
+Surviving final experiment provenance uses a pooled length of **16,384**.
+The accepted manuscript's 8,192 statement is a separate
+manuscript-provenance conflict, not evidence of an 8,192 rerun.
+Effective JSON and actual cache shape remain authoritative for any
+particular execution; changing a name or CLI flag is insufficient.
 
 ## Prepare one explicit configuration
 
 Run commands from the repository root in the existing `(DNNs)` environment.
 This example uses an already validated **full OTA core cache**, including the
 three protocols and five PAs. The upstream Burst-only demonstration cache is
-insufficient. Set `PA_EXPERIMENT_CACHE` to your actual verified 8,192 cache root;
+insufficient. Set `PA_EXPERIMENT_CACHE` to your actual verified 16,384 cache root;
 the path below is a placeholder to replace, not a known local artifact location.
 
 ```bash
 cd ~/adamArchives/Adam/varMax/PADataset
-export PA_EXPERIMENT_CACHE="/absolute/path/to/verified/8192/core/cache"
+export PA_EXPERIMENT_CACHE="/absolute/path/to/verified/16384/core/cache"
 python - <<'PY'
 import csv
 import json
@@ -190,7 +192,7 @@ cache = Path(os.environ['PA_EXPERIMENT_CACHE']).expanduser().resolve()
 assert cache.is_dir() and any(cache.glob('*.h5')), cache
 template = Path('manifests/configs/ota_primary_matrix/og_ref_ent005_lr2e4_unkPA2_c16384_seed0.json')
 cfg = json.loads(template.read_text())
-run_name = 'context_og_ref_unkPA2_c8192_seed0'
+run_name = 'context_og_ref_unkPA2_c16384_seed0'
 save_root = 'results_pa_context_train01'
 cfg_path = Path('manifests/configs/context_train01') / (run_name + '.json')
 manifest = Path('manifests/context_train01.tsv')
@@ -198,7 +200,7 @@ assert not cfg_path.exists() and not manifest.exists(), 'Choose new example name
 assert not (Path(save_root) / run_name).exists(), 'Run directory already exists.'
 cfg.update({
     'run_name': run_name, 'save_root': save_root,
-    'cache_len': 8192, 'cache_root': str(cache),
+    'cache_len': 16384, 'cache_root': str(cache),
     'epochs': 1, 'early_stopping_patience': 1,
     'skip_cache_build': True, 'force_rebuild_cache': False,
     'use_timestamped_run_dir': False, 'overwrite_existing_run': False,
@@ -250,9 +252,9 @@ Important override order: a run group replaces paper sets, save root and seeds;
 `--families` can replace its family list. Source-profile overrides are applied
 after base configuration, and the OTA profile replaces `cache_root` even when
 `--cache-root` was supplied. Generated cache length and `c16384` names are also
-fixed by current code. There is no generator `--cache-len` flag. Review/amend the
-generated JSON, run names and TSV together before using an 8,192 cache, following
-the explicit-configuration pattern above. Metadata-only `no_rerun` groups and
+fixed by current code. There is no generator `--cache-len` flag. Review/amend the generated JSON, run names and TSV together before
+deliberately using a cache length that differs from the generated
+configuration, following the explicit-configuration pattern above. Metadata-only `no_rerun` groups and
 unresolved `top_selected` families cannot be launched directly.
 
 An existing manifest filename does not establish an identically named catalog
@@ -287,7 +289,7 @@ GPU lock. TSV config paths must be repository-relative because the wrapper
 prepends `REPO`; avoid tabs, newlines and shell metacharacters in manifest fields.
 
 For the example, the run directory is
-`results_pa_context_train01/context_og_ref_unkPA2_c8192_seed0/`.
+`results_pa_context_train01/context_og_ref_unkPA2_c16384_seed0/`.
 
 | Artifact | Meaning |
 |---|---|

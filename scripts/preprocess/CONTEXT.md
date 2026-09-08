@@ -83,7 +83,7 @@ It does not guarantee equal counts across different PAs. `all` mode retains all
 available records. Compare the printed counts with intended coverage before
 continuing; absent PA files can otherwise lead to incomplete selections.
 
-## Build a manifest and an 8,192-length cache
+## Build a manifest and a pooled feature cache
 
 Return to Bash at the repository root in the existing `(DNNs)` environment.
 The Python feature builder imports NumPy, SciPy, PyTorch and h5py. No training
@@ -91,7 +91,8 @@ job is launched by these commands.
 
 ```bash
 cd ~/adamArchives/Adam/varMax/PADataset
-export PA_CACHE_ROOT="$PWD/_feature_cache_nvme/len8192/norm/ota_burst_context01"
+export PA_CACHE_LEN=16384
+export PA_CACHE_ROOT="$PWD/_feature_cache_nvme/len${PA_CACHE_LEN}/norm/ota_burst_context01"
 python manifestBuild.py \
   --data-root "$PWD/data" \
   --source-type ota --source-name ota_burst_context01 \
@@ -100,7 +101,7 @@ python manifestBuild.py \
   --out "$PWD/results/manifests/ota_burst_context01.json"
 python cacheBuild.py \
   --data-root "$PWD/data" --cache-root "$PA_CACHE_ROOT" \
-  --cache-len 8192 --normalize \
+  --cache-len "$PA_CACHE_LEN" --normalize \
   --source-type ota --source-name ota_burst_context01 \
   --dataset-tag ota_burst_context01 --noise-tag burst_context01 \
   --manifest-path "$PWD/results/manifests/ota_burst_context01.json"
@@ -138,12 +139,18 @@ count, and L is pooled window length. HDF5 also holds `y_pa`, `proto`, `y_joint`
 optional sample metadata, and attributes including `cache_len`, `normalize` and
 source identity. The loader consumes `Xfeat` directly without repooling it.
 
-For the paper workflow, use **L=8192**, as confirmed by the author. L=16384 was
-an exploratory comparison whose benefit was negligible according to the author.
-Old filenames/configuration defaults can retain 16384. The inspected CSV-linked
-artifacts include actual 16384 caches, so those artifacts alone do not identify
-the final 8192 paper run snapshot. This distinction belongs in reproduction
-provenance; do not silently alter existing results or infer shape from a name.
+Cache length is a provenance field, not a manuscript constant. Earlier
+PADataset work evaluated multiple pooled lengths, including 8,192 and
+16,384. The surviving final OTA/DQNGuard experiment lineage uses
+**L=16,384**. The late manuscript/figure statement of 8,192 does not
+have corresponding surviving rerun provenance and is retained as a
+manuscript-provenance conflict.
+
+The example above therefore defaults to 16,384. If deliberately
+evaluating another pooled length, use a separate cache root and record
+the actual HDF5 `Xfeat` shape and `cache_len` attribute with the run.
+Never infer experimental length from a paper sentence, directory name,
+or checkpoint compatibility alone.
 
 ## Inspect before training or evaluation
 
@@ -157,13 +164,14 @@ from pathlib import Path
 import h5py
 import numpy as np
 root = Path(os.environ['PA_CACHE_ROOT'])
+L = int(os.environ['PA_CACHE_LEN'])
 files = sorted(root.glob('*.h5'))
 assert files, f'No cache files in {root}'
 for path in files:
     with h5py.File(path, 'r') as f:
         shape = f['Xfeat'].shape
-        assert len(shape) == 3 and shape[0] > 0 and shape[1:] == (8, 8192), (path, shape)
-        assert int(f.attrs['cache_len']) == 8192 and int(f.attrs['normalize']) == 1
+        assert len(shape) == 3 and shape[0] > 0 and shape[1:] == (8, L), (path, shape)
+        assert int(f.attrs['cache_len']) == L and int(f.attrs['normalize']) == 1
         for key in ['y_pa', 'proto', 'y_joint']:
             assert f[key].shape == (shape[0],), (path, key)
         assert np.all(f['y_pa'][:] == 1), path
@@ -177,7 +185,7 @@ For a full corpus, replace the Burst-only label checks with expected PA/protocol
 coverage and compare source identities and file counts with the manifest. The
 existing audit reads first and last feature slices for finiteness/readability.
 It does not check every tensor value, require a nonempty directory, enforce
-8192, or prove every file was fully written. A successful audit is one check,
+the intended pooled length, or prove every file was fully written. A successful audit is one check,
 not a substitute for coverage and provenance checks.
 
 Existing cache files are skipped unless `--force` is passed. A failed build can

@@ -30,10 +30,13 @@ live in main.tex even when its graphic source is in figures/.
 The tracked main.tex includes the s22 hero PDF. The recovered Lambda source
 contains a later s23 source; a higher suffix or an old “winning configuration”
 document does not identify the active figure. Check the actual include path in
-the intended manuscript before editing or compiling. Final-paper source selection
-and the historical 8192/16384 result linkage remain provenance questions, documented
-in [results and analysis](../../experiments/context/RESULTS.md). Do not silently
-overwrite scientific prose or switch a dirty Lambda checkout to settle them.
+the intended manuscript before editing or compiling. Cache-length provenance is now explicit in
+[results and analysis](../../experiments/context/RESULTS.md): the
+surviving final experiment lineage is 16,384, while late/accepted
+manuscript text reports 8,192 without surviving rerun provenance.
+Preserve that manuscript conflict rather than silently editing
+historical measurements or switching a dirty Lambda checkout to make
+the sources agree.
 
 ## Edit an aspect and rebuild the manuscript
 

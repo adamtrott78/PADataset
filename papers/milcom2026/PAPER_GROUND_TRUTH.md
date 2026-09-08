@@ -1,4 +1,4 @@
-> **Historical evidence.** Snapshot preserved from the pre-modularization paper records. Draft replacements, suggested next experiments and build expectations below are not current instructions. Author-confirmed final paper pooling is 8192; the recorded 16384 configurations describe recovered exploratory runs. Their linkage to final 8192 results remains unresolved. Comparative labels must be interpreted using the RF-adapted DQN-IDS context. Current workflow: [owning context](CONTEXT.md).
+> **Historical evidence.** Snapshot preserved from the pre-modularization paper records. Draft replacements, suggested next experiments and build expectations below are not current instructions. The snapshot's evaluated configuration records 16,384 pooled samples. Late/accepted manuscript text reports 8,192 without corresponding surviving rerun provenance; preserve that as a manuscript-provenance conflict rather than relabeling the recorded 16,384 experiment lineage as exploratory. Comparative labels must be interpreted using the RF-adapted DQN-IDS context. Current workflow: [owning context](CONTEXT.md).
 
 # MILCOM 2026 Paper Ground Truth
 

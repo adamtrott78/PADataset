@@ -101,7 +101,7 @@ automatically current runbooks.
 |---|---|---|
 | Generate a WiFi Burst PA shard; change a behavior or dataset plan | [PA generation](protocol/CONTEXT.md) | [OTA capture](txrx/CONTEXT.md) to build tapes, record and resplice |
 | Capture generated RF over the air or recover captured windows | [OTA capture](txrx/CONTEXT.md) | [Banking and caches](scripts/preprocess/CONTEXT.md) |
-| Build a bank, inspect PA labels, or create an 8,192-length cache | [Banking and caches](scripts/preprocess/CONTEXT.md) | [Experiment framework](experiments/CONTEXT.md) |
+| Build a bank, inspect PA labels, or create/inspect a pooled feature cache | [Banking and caches](scripts/preprocess/CONTEXT.md) | [Experiment framework](experiments/CONTEXT.md) |
 | Configure a run, add a run group, launch a matrix or recover a partial run | [Experiment framework](experiments/CONTEXT.md) | Method context below and [results](experiments/context/RESULTS.md) |
 | Change training, inspect model dimensions, or load a checkpoint | [Backbone](experiments/context/BACKBONE.md) | [Experiment framework](experiments/CONTEXT.md) |
 | Run DQNGuard with a held-out target and explicit 5% operating budget | [DQNGuard](experiments/context/DQNGUARD.md) | [Results](experiments/context/RESULTS.md) for matrix/table prerequisites |
@@ -178,9 +178,12 @@ For implementation mechanics, inspect current executable source and effective
 configuration. For a particular run, trace saved configuration, cache headers,
 checkpoint/evaluator summaries and result provenance. If they disagree with an
 intended setting or paper claim, report the discrepancy and investigate it.
-Do not silently rewrite either side to make them match. Author-confirmed paper
-pooling is **8,192**; recovered exploratory artifacts use **16,384**. The supplied
-historical CSVs' connection to the final 8,192 results remains unresolved; see
+Do not silently rewrite either side to make them match. Surviving final OTA/DQNGuard experiment provenance uses **16,384**
+pooled samples. Late manuscript/figure text, including the accepted
+paper, reports **8,192** without corresponding surviving rerun
+provenance. Preserve that as a manuscript-provenance conflict; do not
+relabel the 16,384 experiment chain as exploratory to make the paper
+wording agree. See
 [results provenance](experiments/context/RESULTS.md).
 
 ## Paper workflow and preserved history

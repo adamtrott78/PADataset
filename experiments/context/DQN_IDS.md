@@ -28,12 +28,40 @@ Conversely, general `--method-family dqn` evaluation does not load Keras models.
 The paper-facing name “DQN-IDS-style head” needs this implementation distinction
 when tracing a result; a method label alone cannot establish backbone identity.
 
+
+## Historical role in DQNGuard's creation
+
+Distinguish the **idea inherited from DQN-IDS** from the later Keras
+comparator documented on this page.
+
+During DQNGuard development, the peer DQN-IDS confidence mechanism was first
+adapted as a decision layer over the author's existing RF PA CNN. Its state
+used the same confidence-family signals represented in this repository:
+maximum softmax probability, top-two probability gap, and entropy, with the
+centroid/anchor-guided DQN supplying a known/unknown confidence decision.
+
+The direct DQN action did not perform well enough on preliminary-action
+open-set recognition to remain the sole decision rule. Rather than discard
+the confidence signal, the author combined it with the predicted-class
+variance/energy guards inherited from the earlier RF VarMax work and with
+the surrogate-open strategy discovered during digital-PA VarMax testing.
+That May 13–14, 2026 synthesis became DQNGuard.
+
+The **paper-facing RF-adapted DQN-IDS comparator** below is a separate later
+experimental track with its own TensorFlow/Keras backbone and guard
+evaluator. It must not be projected backward onto the origin story as if
+DQNGuard had originally been created by attaching guards to this Keras
+model. The historical precursor was the DQN-IDS decision concept applied to
+the author's PA classifier.
+
 ## Training contract
 
-The streaming adapter converts cached `[8,L]` windows into `[L,8]` for Keras,
-inferring L from actual input. The code comment mentioning 16384 is not a shape
-constraint. Use 8192 for the author-confirmed paper setting and verify the actual
-cache; historical exploratory paths/configs at 16384 are not the final paper run.
+The streaming adapter converts cached `[8,L]` windows into `[L,8]` for
+Keras, inferring L from actual input. A code comment or checkpoint shape
+compatibility is not provenance by itself. The surviving final
+experiment lineage uses **L=16384**; late/accepted manuscript text
+reports 8192 without corresponding surviving rerun provenance. Verify
+the actual cache and saved run configuration for every comparator run.
 
 The model uses Conv1D filters 8/24/32 with kernel 3, ReLU, BatchNorm and max pooling;
 global average pooling; a 48-unit dense layer, ReLU and dropout 0.5; then a
@@ -63,18 +91,18 @@ which must provide TensorFlow/Keras as well as the shared PyTorch/data dependenc
 
 ```bash
 cd ~/adamArchives/Adam/varMax/PADataset
-export PA_KERAS_CFG="manifests/configs/context_keras01/context_keras_unkPA2_c8192_seed0.json"
-export PA_KERAS_RUN="results_pa_context_keras01/context_keras_unkPA2_c8192_seed0"
+export PA_KERAS_CFG="manifests/configs/context_keras01/context_keras_unkPA2_c16384_seed0.json"
+export PA_KERAS_RUN="results_pa_context_keras01/context_keras_unkPA2_c16384_seed0"
 python - <<'PY'
 import json
 import os
 import subprocess
 from pathlib import Path
-source = Path('manifests/configs/context_train01/context_og_ref_unkPA2_c8192_seed0.json')
+source = Path('manifests/configs/context_train01/context_og_ref_unkPA2_c16384_seed0.json')
 cfg = json.loads(source.read_text())
 assert cfg['split_mode'] == 'open_pa' and cfg['unknown_pas'] == ['PA2']
 assert set(cfg['pas']) == {'PA2', 'PA3', 'PA4', 'PA8'}
-assert cfg['cache_len'] == 8192 and cfg['skip_cache_build']
+assert cfg['cache_len'] == 16384 and cfg['skip_cache_build']
 out = Path(os.environ['PA_KERAS_RUN'])
 target = Path(os.environ['PA_KERAS_CFG'])
 assert not out.exists() and not target.exists(), 'Choose fresh names.'
