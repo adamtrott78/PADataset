@@ -12,15 +12,48 @@ headers and guard intervals. RX records the tape, then resplicing identifies
 headers and recovers windows plus their PA/window IDs. Bank building and feature
 caching happen afterward; a successful capture is not yet a training dataset.
 
+
 | Source | Inputs and outputs |
 |---|---|
 | [build_tx_tape_shards.m](build_tx_tape_shards.m) | Pilot plan/shards → paired TX tape and TX spec |
-| [make_recording_session_plan_v01.m](make_recording_session_plan_v01.m) | Dataset IDs/shard count → ordered steps and resolved file paths |
-| [tx_stream_tape_batch_v01.m](tx_stream_tape_batch_v01.m) | Plan + TX settings → operator-paced playback/logs |
-| [rx_capture_tape_batch_v01.m](rx_capture_tape_batch_v01.m) | Same plan + RX settings → raw OTA tape/logs |
-| [tx_stream_tape.m](tx_stream_tape.m), [rx_capture_tape.m](rx_capture_tape.m) | SDR implementation and actual sample-rate settings |
-| [rx_resplice_tape_simple.m](rx_resplice_tape_simple.m) | OTA tape + matching spec → recovered PA windows and drop diagnostics |
+| [txrx_capture.m](txrx_capture.m) | Mature same-host one-shard TX/RX capture, RAM preallocation, quality gate and OTA save |
+| [capture_batch.m](capture_batch.m) | Explicit protocol/dataset/shard jobs → gated retries, capture logs and OTA artifacts |
+| [rx_resplice_tape_simple.m](rx_resplice_tape_simple.m) | OTA tape + exact matching TX spec → recovered PA windows and drop diagnostics |
+| [resplice_worker.m](resplice_worker.m) | One-shard non-destructive resplice worker used by later parallel orchestration |
+| [make_recording_session_plan_v01.m](make_recording_session_plan_v01.m) | Historical cross-protocol recording schedule and resolved paths |
+| [tx_stream_tape_batch_v01.m](tx_stream_tape_batch_v01.m), [rx_capture_tape_batch_v01.m](rx_capture_tape_batch_v01.m) | Historical separate-process plan-driven TX/RX workflow |
+| [tx_stream_tape.m](tx_stream_tape.m), [rx_capture_tape.m](rx_capture_tape.m) | Historical separate-process SDR implementation |
 | [rx_resplice_tape_batch_v01.m](rx_resplice_tape_batch_v01.m) | Separate v05 resplicing workflow; different output subtree |
+
+
+
+## Acquisition architectures: historical and current
+
+Three different planning/control concepts exist in this subsystem and must
+not be conflated.
+
+**Dataset-generation plan.** `pa_make_dataset_plan.m` defines canonical
+generated sample/segment identities and transport-shard tasks. It is the
+upstream scientific/data contract described in `protocol/CONTEXT.md`.
+
+**Historical recording-session plan.**
+`make_recording_session_plan_v01.m` created an ordered cross-protocol
+schedule with record/canary steps and resolved TX/spec/RX/log paths. It was
+designed for a separate TX/RX operator workflow. It remains useful
+provenance, but surviving evidence does not establish it as the driver of
+the mature production campaign.
+
+**Mature same-host capture runtime.** The later successful path uses
+`txrx_capture.m`, normally through `capture_batch.m`, with both N210s
+controlled from one MATLAB process on the same host. This avoids the
+fragile coordination of independent TX and RX MATLAB processes. It is
+host-coordinated capture, not proof of PPS, shared 10-MHz, MIMO-cable, or
+timed-radio synchronization.
+
+For a future collection, preserve the deterministic generation plan and
+tape/spec contracts, but build any new multi-shard operator manifest around
+the same-host capture worker rather than automatically reviving the
+historical two-process recording-session plan.
 
 ## Build the Burst example's transport tape
 
@@ -47,7 +80,13 @@ the tape incrementally to a v7.3 MAT file, but playback loads the whole tape int
 RAM; streamed construction does not imply constant-memory playback. Its payload
 window is 400,000 samples, frame size 100,000, and guard length 200,000 samples.
 
-## Create and inspect a one-step recording plan
+## Historical recording-session plan
+
+
+This section preserves the earlier plan-driven architecture because its
+files may still appear in the repository or old run evidence. It is **not**
+the recommended physical-capture interface for a new campaign.
+
 
 ```matlab
 session_tag = "wifi_burst_context01_capture01";
@@ -74,49 +113,152 @@ paths from one computer resolve on another. TX needs its tape, RX needs its spec
 Recorded `tx_exists` fields are a planning-time snapshot; recheck the files before
 capture. A different session tag does **not** change the dataset/shard OTA filename.
 
-## Run a physical capture
 
-The implementation uses `comm.SDRuTransmitter`/`comm.SDRuReceiver` with platform
-`N200/N210/USRP2`, a 100 MHz master clock and interpolation/decimation 8, giving
-**12.5 MS/s**. Use the existing MATLAB USRP support and the actual connected
-hardware's IP address, antenna port, center frequency and gain. These values
-depend on the lab setup and are deliberately not guessed.
+### Historical plan caveats
 
-Use separate MATLAB sessions for RX and TX. TX opens a figure and uses SPACE to
-start tape playback, so it needs a working graphical MATLAB display; a headless
-`matlab -batch` call is not an equivalent capture command. For a host with a
-working display, launch `matlab -desktop` and perform the linked path setup.
+A custom `session_tag` controls where the plan MAT/text summary is saved,
+but the current `make_step` implementation constructs each `log_file` under
+`<snr_regime>_session/logs/...`. Therefore `plan.session_tag` does not
+necessarily identify the actual per-step log path. Inspect
+`capture_plan.steps(i).log_file` instead of reconstructing that path from
+the session tag.
 
-On each host, set `plan_file` to the local recording-plan MAT path. Set `fc_hz`
-to the same center frequency in Hz on both hosts. Set `rx_ip`, `rx_gain_db`,
-`rx_ant` on RX and `tx_ip`, `tx_gain_db`, `tx_ant` on TX from the actual setup.
-Then these are the exact MATLAB calls:
+The old separate-process TX path also should not be described as waiting
+indefinitely for operator SPACE input. The inspected
+`tx_stream_tape.m` contains a ten-second automatic transition. Preserve
+that behavior as historical implementation detail rather than as the
+recommended capture synchronization mechanism.
+
+
+## Recommended physical capture: same-host coordinated path
+
+The mature production implementation controls both radios from one MATLAB
+process through `txrx_capture.m`. `capture_batch.m` adds shard iteration,
+retries, downstream-artifact skips, quality logging, and post-save
+verification.
+
+`txrx_capture.m` uses a 100-MHz master clock and integer
+interpolation/decimation factor 8, yielding an actual sample rate of
+**12.5 MS/s**. That actual rate, not an old nominal 12-MHz comment, controls
+OTA timing. A 400,000-sample payload therefore spans 32 ms over this
+transport.
+
+The current batch source contains historical Lambda lab defaults for the
+radio IPs, center frequency, gains, antenna, retry count, and quality gate.
+Those are evidence of the executed campaign, not universal settings. For a
+new collection, pass the actual current hardware/RF values explicitly and
+record them with the acquisition provenance.
+
+For a deliberately selected one-shard pilot, use a template that refuses
+to operate until the hardware values have been filled in:
 
 ```matlab
-% RX host: start this first, then press ENTER at its arm prompt.
-rx_capture_tape_batch_v01(plan_file, rx_ip, fc_hz, rx_gain_db, rx_ant, ...
-    'step_ids', 1);
+protocol = "wifi";
+dataset_id = "wifi_burst_context01";
+shard_id = 1;
+
+tx_ip = "REPLACE_TX_IP";
+rx_ip = "REPLACE_RX_IP";
+fc_hz = NaN;
+tx_gain_db = NaN;
+rx_gain_db = NaN;
+ant = "TX/RX";
+
+assert(~startsWith(tx_ip, "REPLACE") && ~startsWith(rx_ip, "REPLACE"), ...
+    "Fill the current radio IPs before capture.");
+assert(all(isfinite([fc_hz tx_gain_db rx_gain_db])), ...
+    "Fill center frequency and gains before capture.");
+
+txrx_capture(protocol, tx_ip, rx_ip, fc_hz, ...
+    tx_gain_db, rx_gain_db, ant, dataset_id, shard_id, ...
+    'quality_enable', true, ...
+    'quality_max_events', 4, ...
+    'quality_min_fill_frac', 0.999);
 ```
+
+
+The `4`-event and `0.999` fill settings above match the later
+`capture_batch.m` defaults; treat them as historical campaign-quality
+settings rather than universal RF constants. For repeated shards, prefer
+`capture_batch` so failed acquisitions can be retried and recorded
+explicitly:
 
 ```matlab
-% TX host: once RX is armed, select the same step and follow the TX figure prompt.
-tx_stream_tape_batch_v01(plan_file, tx_ip, fc_hz, tx_gain_db, tx_ant, ...
-    'step_ids', 1);
+jobs = struct( ...
+    'protocol', protocol, ...
+    'dataset_id', dataset_id, ...
+    'shards', 1);
+
+capture_batch(jobs, ...
+    'tx_ip', tx_ip, ...
+    'rx_ip', rx_ip, ...
+    'ant', ant, ...
+    'fc_hz', fc_hz, ...
+    'tx_gain_db', tx_gain_db, ...
+    'rx_gain_db', rx_gain_db, ...
+    'max_capture_attempts', 20, ...
+    'max_capture_events', 4, ...
+    'min_fill_frac', 0.999, ...
+    'overwrite', false);
 ```
 
-Both batch runners prompt before each step and offer skip/quit. `step_ids` selects
-plan positions; it is not a PA identifier. TX prompts in the terminal and then
-waits for SPACE in its figure. RX waits for start synchronization. The wrappers
-do not automatically skip a previously successful capture.
 
-The example's raw output is
-`txrx/tapes/ota/wifi/wifi_burst_context01/ota_tape_shard_001.mat`, containing
-`x_tape` and `rx_cfg`. Each step also writes TX/RX log MATs with `_tx`/`_rx`
-suffixes at the plan's log location. Check `log.status`, `log.error_message`,
-saved tape existence and `rx_cfg`; a log marked `ok` alone does not establish
-that all intended PA windows survived transport.
+The mature capture implementation is deliberately **RAM-first**. It loads
+the TX artifacts before radio work, reshapes the tape into frames,
+preallocates the full complex-single RX buffer, pre-touches TX/RX memory,
+warms and flushes the receiver, streams the main tape with minimal work in
+the RF hot loop, applies the capture-event/fill gate, and only then
+persists an accepted OTA artifact.
+
+During development, direct-to-disk MAT writes inside live RF acquisition
+were tried and produced severe overrun/corruption problems. That approach
+was abandoned in favor of keeping disk I/O outside the RF hot loop. Do not
+reintroduce live storage writes simply to lower RAM use without a new
+controlled capture-quality validation.
+
+Exact warmup, guard, trimming, search, and quality constants changed during
+development and some current source values remain campaign-specific.
+Inspect `txrx_capture.m` and `capture_batch.m` before a new acquisition
+instead of copying an old chat value.
+
+A successful raw artifact is normally
+`txrx/tapes/ota/<protocol>/<dataset_id>/ota_tape_shard_###.mat`. File
+existence alone is not capture success. Check the requested tape/spec
+identity, `txrx_cfg`, capture overrun/underrun count, fill fraction, and the
+later resplice coverage.
+
+For a future large journal collection, retain this same-host worker but put
+the repeated shard schedule, START/DONE/ERROR logging, status dashboard,
+retry policy, and resume logic into a reviewed tracked shell/manifest
+control layer. Test that wrapper on a small pilot before full acquisition.
 
 ## Recover windows with the simple resplicer
+
+
+The exact TX spec used for transmission is part of the recovery contract,
+not optional side metadata. The current resplicer loads
+`tx_spec.tx_params`, `tx_spec.sync`, and `tx_spec.tx_index`, derives the PA
+universe dynamically from `tx_index`, and uses transport geometry plus
+sequence chaining to recover payloads.
+
+A major historical failure mode was accepting a CRC-valid header that was
+globally plausible but semantically impossible for the expected record.
+The current decoder therefore checks more than CRC: for an ordinary header,
+its sequence must be in the TX-index range and the decoded PA/window ID must
+match the corresponding authoritative TX-index row. This prevents many
+false locks that simple global ID-range checks would accept.
+
+Recovery proceeds from an initial header through expected record geometry,
+local/slip searches, optional whole-record skip recovery, hard reacquisition,
+and operator fallback anchors. Payload extraction is conservative: a window
+is kept only when the next boundary proves sufficient separation; otherwise
+it is recorded as dropped, for example `truncated_or_unproven` or an
+`unpaired_tail`.
+
+Do not hardcode the historical PA2/PA3/PA4/PA8 universe into new recovery
+orchestration. The active resplicer enumerates PAs from the matching
+`tx_index`, which is required for later-added PA1 and future extensions.
+
 
 Keep the raw capture and its spec available at their canonical paths. The full
 dataset ID below is explicit; the resplicer also accepts a suffix and prepends

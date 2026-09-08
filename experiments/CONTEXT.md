@@ -31,6 +31,10 @@ the class supplied as a surrogate during calibration.
 |---|---|
 | [pa_constants.py](pa_constants.py), [pa_experiment_catalog.py](pa_experiment_catalog.py) | PA subsets, source profiles, families and named run groups |
 | [pa_make_train_manifest.py](pa_make_train_manifest.py) | Catalog/grid → JSON configs and training TSV |
+
+| [pa_trainctl.sh](../scripts/train/pa_trainctl.sh) | Operator control panel for common training actions; records reusable commands under `commands/train/` |
+| [pa_dashboard.sh](../scripts/train/pa_dashboard.sh), [watch_pa_train.sh](../scripts/train/watch_pa_train.sh), [pa_tqdm_watch.sh](../scripts/train/pa_tqdm_watch.sh) | Training observation/progress interfaces |
+| [pa_osr_dashboard.sh](../scripts/eval/pa_osr_dashboard.sh) | General OSR observation/dashboard interface |
 | [pa_train_one.py](pa_train_one.py), [discriminate.py](../discriminate.py) | One PyTorch backbone training run and completion checks |
 | [prepData.py](../prepData.py) | Cached data selection and splits |
 | [run_pa_train_parallel.sh](../scripts/train/run_pa_train_parallel.sh) | GPU assignment, locks, worker logs |
@@ -47,6 +51,94 @@ DQNGuard, [varmax_osr.py](../varmax_osr.py) for VarMax, and
 the peer's DQN-IDS architecture for RF inputs. It is a distinct backbone track;
 do not apply PyTorch checkpoint commands to its `.keras` files or equate every
 comparator with a pure confidence head on the same backbone.
+
+
+## Control plane, observation plane and authority
+
+The mature experiment workflow separates **what schedules work**, **what
+watches work**, and **what establishes scientific completion**.
+
+### Control plane
+
+Reviewed JSON configurations and TSV manifests identify the intended run
+set. `pa_trainctl.sh` is an operator-facing control panel for common actions
+including manifest creation, launch, watch, reduction, verification, cache
+audit, and status inspection. It records many invoked command bodies as
+timestamped scripts beneath `commands/train/`, preserving a reusable
+operational trail.
+
+`run_pa_train_parallel.sh` consumes manifest rows, assigns the requested GPU
+through `CUDA_VISIBLE_DEVICES`, applies its lock policy and CPU-thread caps,
+writes worker/job logs, and invokes one `pa_train_one.py --cfg ...`
+process per row. The manifest + launcher + single-run worker are the control
+plane. A dashboard does not redefine the experiment.
+
+### Observation plane
+
+`pa_dashboard.sh`, `watch_pa_train.sh`, `pa_tqdm_watch.sh`,
+`pa_osr_dashboard.sh`, worker logs, GNU Parallel joblogs, `nvidia-smi`, and
+targeted process inspection answer operational questions such as what is
+active, what failed, which GPU is occupied, and where progress was last
+reported.
+
+These are discovery and observation interfaces. A dashboard displaying
+DONE, a stale progress JSON, an existing lock pathname, or a zero process
+exit is not by itself scientific authority.
+
+### Authority and completion
+
+For a deterministic shared PyTorch training run, the worker's canonical
+existing-completion test is the presence of:
+
+- `config.json`
+- `best_model.pt`
+- `final_model.pt`
+- `history.json`
+- `summary.json`
+
+`train_complete.json`, `train_progress.json`, dashboard state, runtime
+indexes, and joblogs are useful operational evidence but do not override
+absent or inconsistent canonical artifacts. Conversely, specialized
+wrappers can impose additional marker requirements. State which completion
+contract is being applied.
+
+A saved config is also not sufficient if the HDF5 cache actually loaded is
+missing, malformed, or inconsistent with that configuration. Preserve the
+chain source revision/diff → manifest/config → actual cache → checkpoint →
+evaluator → summary.
+
+## Monitoring and partial-sweep recovery
+
+Use **smoke → small real run → full matrix** for new campaigns. Before
+scaling, verify that the small run exercises the intended real data path,
+produces the expected artifacts, and can be interpreted by the intended
+evaluator/reducer.
+
+During a parallel sweep, inspect manifest identities, worker logs, GNU
+Parallel joblog, GPU processes/utilization, and completion artifacts
+together. The shared `/tmp/padataset_gpu_<gpu>.lock` convention coordinates
+launchers that honor it; the mere existence of that pathname does not prove
+a live owner. Do not remove a lock while a worker may still hold it.
+
+When only part of a matrix fails:
+
+1. preserve failed run directories and logs;
+2. compare expected manifest rows against valid completion artifacts;
+3. identify the exact failed or missing identities;
+4. diagnose the resource, configuration, cache, source, or code failure;
+5. create a targeted continuation or rerun plan;
+6. verify the repaired campaign against the full expected identity set.
+
+Do not erase an entire result root simply because one row failed.
+`pa_train_one.py` is not a general checkpoint-resume mechanism: a nonempty
+partial deterministic run directory can block rerun, while a directory
+satisfying the existing-completion check may be skipped. Deliberate recovery
+may therefore require a new run identity, preservation of the failed
+directory, or a reviewed specialized continuation procedure.
+
+`pa_trainctl.sh status`, `verify`, and `watch` are useful conveniences for
+the ChatGPT/terminal loop, but they should lead to artifact inspection
+rather than replace it.
 
 ## Configuration, folds and source boundaries
 
@@ -275,8 +367,7 @@ These contracts were checked against source at
 `9eb7bcb80bb0ae9b5976f0e243cc6e5326fcbef3`; example shell/Python syntax and CLI
 options were checked without launching training or OSR. A successful one-epoch
 workflow checks execution, not research validity. Backbone details are covered in
-the linked context. Method and result-analysis contexts are added separately;
-until then, use the source links above for those details.
+the linked context. Method and result-analysis contexts are the linked scoped owners above; use them together with the exact executable source required for the task.
 
 For checkout inspection, local-only source preservation, and maintenance-tool
 boundaries, see [repository maintenance](../docs/cleanup/CONTEXT.md).

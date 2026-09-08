@@ -26,6 +26,60 @@ five-class corpus. Explicitly include PA1 when that is the intended collection.
 The orchestration spans `core/`, `tools/` and `protocol/`; there is no
 `txrx_tools/data_generation/` entry point in this implementation.
 
+
+## Dataset-plan contract and future PA extension
+
+`pa_make_dataset_plan.m` is the deterministic **dataset-generation plan**.
+It is distinct from any later recording-session or runtime acquisition
+schedule. The planner deliberately decouples semantic dataset identity from
+transport sharding: with the same PA order, collection size, segment
+structure, and seed namespace, canonical segment/window identity does not
+depend on how many TX transport shards are later built.
+
+Each planned shard contains tasks carrying fields including `pa`,
+`seed_segment_id`, `global_window_ids`, `global_pa_local_idx`,
+`n_windows`, and `transport_shard_id`. Preserve the persisted
+`dataset_plan.mat` and generated metadata with a collection because these
+identities connect digital generation to transport, OTA recovery, and later
+provenance.
+
+In the current planner, PA8 is window-intrinsic while the other represented
+PA names use segment-based seed namespaces. Planner support is not the same
+thing as waveform-generator support: a PA can be representable in
+`pa_make_dataset_plan.m` while still lacking a usable protocol generator or
+dispatch case. An early PA1 staging attempt encountered exactly that
+distinction before PA1 generation was later implemented.
+
+The surviving production taxonomy uses PA1/PA2/PA3/PA4/PA8 because the
+project began from a broader eight-PA conceptual design. Historical PA5,
+PA6, and PA7 concepts remain design hypotheses rather than automatically
+implemented production classes. A future journal should not activate one
+merely because its identifier exists in old planning logic.
+
+For a genuinely new PA, use this order:
+
+behavior definition and leakage review
+→ protocol generator implementation
+→ generator-dispatch integration
+→ deterministic small-pilot validation
+→ transport PA-ID/header validation
+→ tape/spec validation
+→ small OTA pilot
+→ resplice/bank/label validation
+→ scaled collection.
+
+Use a new collection identity for changed behavior/configuration. Put
+repeated generation/capture work into reviewed tracked scripts or manifests
+and use the repository's AI-assisted Git workflow instead of accumulating
+untracked terminal history.
+
+PA1 also demonstrates an incremental-extension case. The original
+PA2/PA3/PA4/PA8 corpus had already been generated, captured, respliced,
+banked, and cached before PA1 was added. The later PA1 workflow processed
+the new behavior separately and integrated it downstream rather than
+regenerating every valid older PA. The preprocessing context documents that
+compatibility pattern for future additions.
+
 ## Environment and path setup
 
 Use the existing MATLAB installation with the protocol toolboxes. WiFi uses WLAN
@@ -96,8 +150,7 @@ larger shard plans require substantially more RAM and disk.
   generator protocol, and use a protocol-prefixed dataset ID.
 - `n_per_pa` must be divisible by `n_shards`; their quotient must be divisible
   by `windows_per_segment`. Use positive integers even where the parser accepts
-  a wider numeric range. Production defaults are 10,000 windows/PA, ten shards,
-  and ten windows/segment; start with a small shard to validate the environment.
+  a wider numeric range. The current planner defaults are 10,000 windows/PA, ten shards, and ten windows/segment. These are planner defaults, not a universal production geometry: the later `high_run01` campaign used twenty transport/capture shards. Start with a small shard to validate the environment.
 - To generate another shard of an existing unchanged plan, load its
   `dataset_plan.mat` and call `gen_pilot_shards("wifi", S.plan, 'shards', 2)`.
   This requires that shard 2 actually exists in the plan. Existing pilot files
@@ -130,6 +183,22 @@ actual output dimensions before tape building. `starter_ota12.json` is not the
 generator's default and the inspected version fails JSON parsing; do not simply
 substitute it as a working configuration. Protocol-specific constructors may
 also reject incompatible configured rates.
+
+
+### Current WiFi PA2 `burst_count` caveat
+
+The current WiFi `pa_gen_windows_pa2_stream.m` loads
+`pas.PA2.params.burst_count` into `bc_rng`, but the implementation does not
+subsequently use that value to limit the number of generated bursts.
+Instead, it repeatedly samples burst duration and inter-burst timing until
+the required simulated extent has been covered.
+
+Therefore a configured PA2 `burst_count` range is **not an enforced
+generator contract in the current source**. Do not describe a generated
+corpus as satisfying that count merely because the JSON/configuration
+contains the field. If burst count becomes scientifically important for a
+new collection, correct the implementation, create a new dataset identity,
+and validate the generated schedule before capture.
 
 ## Validation and recovery
 

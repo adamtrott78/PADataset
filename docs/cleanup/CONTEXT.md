@@ -47,6 +47,77 @@ and nonignored untracked files. A clean status does not mean local datasets or
 caches are absent. Inspect the specific artifact path needed for the task;
 avoid recursively inventorying tensor storage just to answer a source question.
 
+
+### Complete an AI-assisted source change safely
+
+The preferred collaboration loop is:
+
+inspect exact local/GitHub state
+→ make one bounded change
+→ execute and validate on the prepared machine when runtime behavior matters
+→ inspect the explicit diff
+→ stage reviewed paths
+→ commit
+→ push
+→ have ChatGPT reread the pushed commit before the next source mutation.
+
+If the prepared Lambda checkout contains unrelated tracked edits, untracked
+research source, paper work, or ignored runtime artifacts, do not
+stash/clean/switch it merely to perform documentation or source work. An
+isolated Git worktree from the reviewed branch is often safer. Record both
+worktree paths and branches so later commands cannot silently operate on the
+wrong checkout.
+
+JupyterLab and other long-lived graphical workspaces do not automatically
+follow the terminal into a new Git worktree. Before editing, verify the
+actual checkout with `pwd`, `git branch --show-current`, and
+`git rev-parse HEAD`.
+
+Before staging a successful change, use the narrow sequence:
+
+```bash
+git diff --check
+git status --short
+git diff -- path/to/reviewed_file1 path/to/reviewed_file2
+git add path/to/reviewed_file1 path/to/reviewed_file2
+git diff --cached --check
+git diff --cached
+git commit -m "descriptive message"
+git push origin "$(git branch --show-current)"
+```
+
+
+Do not use `git add .` as a shortcut in a prepared research checkout.
+After pushing, compare the remote branch/commit with the intended local
+commit and let the next ChatGPT turn reread that pushed GitHub state.
+
+For a large copy/paste operation in an interactive SSH session, put strict
+Bash mode inside a child process rather than enabling `errexit` in the
+persistent login shell:
+
+```bash
+bash <<'TASK'
+set -euo pipefail
+
+# bounded operation here
+
+TASK
+
+rc=$?
+echo "task exit status: $rc"
+```
+
+
+A failure then terminates the bounded child operation without terminating
+the user's SSH login shell.
+
+Copy/paste integrity is also a source-safety issue. If a ChatGPT response
+visibly terminates a code fence early and shell commands continue as prose,
+do not infer where the boundary was supposed to be and do not run a
+reconstructed command. Request a corrected single block. Responses that
+generate Markdown containing fenced code should use a longer outer fence or
+another representation that cannot collide with the embedded fence.
+
 ### Determine why a required file is missing from GitHub
 
 Set the path to one specific required file:

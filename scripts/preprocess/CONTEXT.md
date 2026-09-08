@@ -185,7 +185,128 @@ leave a partial file that a later ordinary invocation skips. Use a fresh cache
 root after a failed build or changed source; `--force` deliberately replaces
 existing cache files and should not be used while training/evaluation reads them.
 
-## Separate PA1 acquisition and historical orchestration
+
+## Historical BUH production orchestration
+
+`legacy/preprocessing/buh_pipeline/` is historical in interface and path
+assumptions, but it is not merely abandoned prototype code. Surviving
+scripts, runtime logs, worker logs, and later recovery tools establish the
+architecture that operated the large OTA preprocessing campaign.
+
+The main historical control path was:
+
+`run_buh.sh`
+→ transient `systemd-run --user` service
+→ `buh_orchestrate.sh`
+→ artifact-derived status queues
+→ capture
+→ parallel resplice
+→ parallel banking
+→ PA1 integration/relabeling
+→ parallel cache construction.
+
+The archived sources include:
+
+| Historical source | Operational role |
+|---|---|
+| [run_buh.sh](../../legacy/preprocessing/buh_pipeline/run_buh.sh) | Starts a transient user-systemd unit and follows it with `journalctl` |
+| [buh_orchestrate.sh](../../legacy/preprocessing/buh_pipeline/buh_orchestrate.sh) | Runs stage transitions, GNU Parallel worker pools, logging and final summary |
+| [pipeline_status_buh.sh](../../legacy/preprocessing/buh_pipeline/pipeline_status_buh.sh) | Classifies protocol/dataset/shard artifacts into next-action queues |
+| [buh.txt](../../legacy/preprocessing/buh_pipeline/buh.txt) | Historical operator notes for journal/log/process monitoring |
+
+The important design principle is **artifact-driven orchestration**. A shard
+was classified from outputs actually present: TX tape/spec, OTA tape,
+spliced PA files, bank files, cache files, and stranded temporary artifacts.
+Queues such as CAPTURE, RESPLICE, BANK, CACHE, and BLOCKED represented the
+next missing operation. This is more reliable than assuming a stage
+completed because its command had once been launched.
+
+`buh_orchestrate.sh` also used separate worker pools for resplicing, banking,
+and caching and retained GNU Parallel joblogs plus per-stage logs.
+`run_buh.sh` used a transient user-systemd service so a long operation could
+survive terminal fragility while remaining observable through
+`journalctl`.
+
+### Why the pipeline became workerized
+
+Workerization was a throughput and resource-utilization optimization, not a
+change to the scientific preprocessing definition. Resplicing, banking,
+and especially feature-cache construction took extremely long when
+performed serially. Lambda's large RAM and compute capacity made it much
+faster to split independent shards or files into concurrent workers than
+to leave the machine underutilized.
+
+Parallel execution may change scheduling, logging, and recovery behavior;
+it must not silently change the per-record signal transformation, labels,
+cache schema, or provenance. Parallelize only units with independent
+mutation boundaries, control per-worker CPU math threads where appropriate,
+and verify expected artifacts after the pool finishes.
+
+### Evolution from bulk orchestration to surgical recovery
+
+Later scripts made the operational unit progressively smaller and recovery
+increasingly explicit:
+
+- `run_unified_core_splitpa1_cache_v01.sh`, `v02`, and `v03` iterated on
+  five-class PA1/core integration, prechecks, relabeling, concurrent cache
+  construction, and verification.
+- `run_filemax_core_cache_v01.sh` moved cache construction toward one
+  independent task per source MAT file so a much larger rolling worker pool
+  could occupy the machine.
+- `run_filemax_core_cache_resume_v01.sh` reconstructs unfinished work from
+  prior `FILECACHE DONE` records, excludes confirmed source stems, removes
+  partial/unconfirmed H5 outputs for pending stems, and launches only the
+  remaining file-level tasks.
+- `run_missing_h5_cache_v01.sh` independently enumerates expected source
+  files and schedules only sources whose corresponding H5 artifact is
+  absent.
+
+The reusable recovery pattern is:
+
+preserve logs and partial-run evidence
+→ derive the expected work universe
+→ identify completed work from authoritative artifacts and verified
+  completion records
+→ rebuild only missing or untrusted independent units
+→ inspect worker/joblog failures
+→ verify final coverage.
+
+Do not respond to one failed worker by deleting a complete multi-hour
+preprocessing tree and starting from zero.
+
+### Historical BUH is not the future one-click command
+
+Do not execute the archived BUH scripts unchanged merely because they were
+production-used. They encode historical dataset names, shard geometry,
+cache settings, path assumptions, and capture policies. Their status-script
+path and capture-gate values also reflect the historical runtime and should
+be reconciled against currently tracked source before reuse.
+
+For a future journal collection, preserve the proven architecture rather
+than the literal old command: use a reviewed tracked manifest/wrapper around
+current generation, same-host capture, resplice, bank, and cache owners;
+make status artifact-driven; use worker pools for independent expensive
+stages; log START/DONE/ERROR identities; make reruns skip verified work;
+and validate the wrapper on a small pilot before scaling.
+
+## Incremental PA1 integration into the existing core
+
+
+PA1 records the project's first large **incremental corpus extension**.
+The original PA2/PA3/PA4/PA8 corpus had already been generated,
+transmitted, captured, respliced, banked, and cached before PA1 was added.
+Reprocessing every valid older PA was prohibitively expensive, so PA1 was
+acquired and processed separately and then integrated downstream into the
+existing core.
+
+This history explains the otherwise unusual split/part machinery below.
+It also provides a future-journal pattern: adding a new PA does not
+inherently require recapturing every old PA. Generate, capture, resplice,
+and bank the new behavior under its own provenance-preserving collection;
+adapt physical partitioning only as required by the existing loader/cache
+contract; preserve one semantic label; audit the combined mapping; then
+build a clean combined experiment view.
+
 
 The existing PA1 split helper maps five PA1 acquisition shards to twenty core
 shards: acquisition shard = `floor((core_shard-1)/4)+1`; each core shard selects

@@ -26,6 +26,75 @@ checkout needs inspection before integration; see
 [repository maintenance](docs/cleanup/CONTEXT.md). Do not switch it automatically
 just because this page describes `research-framework`.
 
+
+## AI-assisted terminal and Git workflow
+
+The recommended operating model for this repository is an iterative
+ChatGPT ↔ terminal ↔ GitHub loop. This operating style evolved later than
+some of the original waveform, acquisition, and preprocessing code, but it
+is the preferred way to operate those older stages during future
+journal-extension work.
+
+1. Start from this README, then read the owning context and the exact
+   executable sources required for the task.
+2. Establish the local checkout's branch, HEAD, dirty state, required
+   runtime artifacts, and relevant hardware/GPU state before proposing a
+   mutation. Never switch, clean, stash, or overwrite a dirty research
+   checkout merely to match a documentation branch. Use an isolated Git
+   worktree when appropriate.
+3. ChatGPT should provide one bounded copy/paste command block at a time.
+   The user executes it on the prepared machine and returns the exact
+   stdout/stderr, logs, status, or generated artifacts. A command that was
+   inspected or proposed is not evidence that it actually executed.
+4. When a workflow has state, retries, concurrency, monitoring, recovery,
+   or repeated use, prefer a reusable tracked `.sh`, `.py`, or `.m`
+   operational artifact over a long collection of one-off terminal
+   commands.
+5. Validate the produced artifact and scientific/data contract, not merely
+   process exit. Dashboards and progress markers are observation aids;
+   saved configs, cache contents, capture metadata, checkpoints, summaries,
+   and the producing source establish what actually happened.
+6. After a successful tracked change, inspect `git diff --check` and the
+   explicit file diff, stage only reviewed paths, inspect
+   `git diff --cached`, commit, and push the current working branch. Avoid
+   broad `git add .` in a prepared research checkout.
+7. After the push, ChatGPT should reread the pushed GitHub commit before
+   making the next source-changing recommendation. GitHub is the
+   synchronization point for tracked source. Ignored/local Lambda
+   artifacts still require targeted inspection on the prepared machine.
+
+**Copy/paste integrity is part of the workflow.** Before running a supplied
+command, verify that every intended shell line is visibly inside one fenced
+code block. If rendering closes a code fence early and shell text appears
+as ordinary prose, do not reconstruct, concatenate, or execute the command
+manually; ask for the complete block to be resent. When a response contains
+a command that itself writes Markdown code fences, use a longer outer fence
+or another representation that cannot collide with the embedded fence.
+
+**Interactive-shell safety matters too.** Do not enable `set -e` or
+`set -euo pipefail` directly in the user's long-lived SSH login shell for a
+large ChatGPT-supplied operation. Run strict-mode work inside a child
+`bash`, subshell, or tracked script so a guarded failure terminates that
+operation without terminating the SSH session.
+
+**Multiple worktrees can make visual tools misleading.** An existing
+JupyterLab workspace may still be rooted in another checkout and therefore
+show a different branch's files. Before editing, trust the terminal's
+`pwd`, `git branch --show-current`, and `git rev-parse HEAD`; do not infer
+checkout identity from an already-open Jupyter browser path.
+
+Context documents should distinguish three kinds of knowledge:
+
+- **Scientific/data contract:** what must remain true regardless of the
+  operator interface.
+- **Historical implementation:** what actually happened and why old
+  scripts, paths, defaults, or recovery tools exist.
+- **Recommended future operation:** how this subsystem should be operated
+  now using the mature artifact-driven and Git-synchronized workflow.
+
+Historical commands are therefore evidence and design history, not
+automatically current runbooks.
+
 ## Choose a task
 
 | Task | Read first | Continue when needed |
