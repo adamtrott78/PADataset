@@ -16,6 +16,17 @@ Phase 10 is documentation/operator validation only. It does not establish RF
 hardware execution, model reproduction, accepted-paper numerical reproduction,
 or correctness of local-only runtime artifacts.
 
+## Completed evaluation
+
+Phase 10 has been completed. The final result is
+**PASS_DOCUMENTATION_ONLY**: all five cases passed 6/6 after one independent
+pipeline-orchestration retest. Runtime reproduction remains **NOT ESTABLISHED**.
+
+See [PHASE10_RESULTS.md](PHASE10_RESULTS.md) for the complete evaluation record,
+including the initial 5/6 reader miss, its classification, and the successful
+retest. The validation target remains the pinned tree above; this results record
+does not retroactively change the tree that was tested.
+
 ## Test protocol
 
 Use **five separate blank chats**, one per case. Do not allow one test response
