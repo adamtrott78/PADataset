@@ -16,7 +16,7 @@ Statuses:
 |---|---|---|---|
 | 1 | Title | Introduce the work and speaker | TBD |
 | 2 | Closed-set RF classifiers cannot say "I don't know" | Establish the capability gap | **CONCEPT LOCKED** |
-| 3 | Preliminary Actions describe RF behavior before full attack attribution | Define PAs and make the five behaviors tangible | TBD |
+| 3 | Preliminary Actions capture RF behavior, not final attack labels | Define PAs and make the five behaviors tangible | **CONCEPT LOCKED** |
 | 4 | OTA dataset and system overview | Show what was actually collected and evaluated | TBD |
 | 5 | Existing OSR heads do not provide the operating behavior we need | Motivate DQNGuard from VarMax and DQN-IDS | TBD |
 | 6 | DQNGuard adds class-conditional guards and a known-rejection budget | Explain the proposed decision layer | TBD |
@@ -196,27 +196,129 @@ This should transition directly into Slide 3.
 
 ---
 
-# Slide 3 — Preliminary Actions
+# Slide 3 — Preliminary Actions capture RF behavior, not final attack labels
 
 ## Status
 
-**TBD**
+**CONCEPT LOCKED**
 
-Next design task.
+## Audience takeaway
 
-The slide should answer, in plain language:
+> A Preliminary Action is observable RF behavior that may precede, enable, or contextualize a later cyber or Electronic Warfare attack technique. It is precursor evidence, not a final attack-technique label.
 
-> What exactly is a Preliminary Action, how is it different from protocol/modulation classification, and what five behaviors were evaluated?
+The audience should understand that the project classifies **behavior visible in RF**, not final ATT&CK/EW attribution.
 
-Potential five final behaviors:
+## Slide title
 
-- Scan
-- Burst
-- Sustain
-- Hop
-- Replay
+**Preliminary Actions capture RF behavior, not final attack labels**
 
-Do not lock composition until this slide is explicitly reviewed.
+## Supporting sentence
+
+**Preliminary Actions are observable RF behaviors, not final attack-technique labels.**
+
+Keep the visible slide text short. The fuller MITRE ATT&CK connection belongs in the spoken script.
+
+## Visual concept
+
+Use five equal behavior cards across the middle of the slide. The slide should be dominated by the five behaviors themselves rather than by another flowchart.
+
+Each card should contain:
+
+1. behavior name,
+2. representative RF/spectrogram-style thumbnail,
+3. one very short plain-English behavioral description.
+
+### Behavior cards
+
+**Scan**  
+Discovery-like activity
+
+**Burst**  
+Short transmissions + quiet gaps
+
+**Sustain**  
+Persistent channel occupancy
+
+**Hop**  
+Frequency dwell + revisits
+
+**Replay**  
+Repeated waveform / template
+
+Prefer representative examples from the actual dataset or existing presentation assets over generic icons.
+
+Do not show repository identifiers PA1 / PA2 / PA3 / PA4 / PA8 in the main slide. Those identifiers are implementation provenance, not audience-facing terminology.
+
+## Bottom conceptual contrast
+
+At the bottom of the slide, make the claim boundary explicit with two compact labels:
+
+**WHAT IT TELLS US**  
+Observable RF behavior
+
+**WHAT IT DOES NOT CLAIM**  
+Final attack-technique attribution
+
+Optional footer:
+
+**Same behavioral taxonomy evaluated across WiFi, Bluetooth, and Zigbee.**
+
+This footer also prepares the transition into the OTA dataset/system slide.
+
+## Rough visual mockup
+
+```text
+┌───────────────────────────────────────────────────────────────────────────────┐
+│ Preliminary Actions capture RF behavior, not final attack labels             │
+│ Preliminary Actions are observable RF behaviors, not final attack-technique   │
+│ labels.                                                                       │
+│                                                                               │
+│   ┌──────────┐ ┌──────────┐ ┌──────────┐ ┌──────────┐ ┌──────────┐           │
+│   │   SCAN   │ │  BURST   │ │ SUSTAIN  │ │   HOP    │ │  REPLAY  │           │
+│   │          │ │          │ │          │ │          │ │          │           │
+│   │ [RF img] │ │ [RF img] │ │ [RF img] │ │ [RF img] │ │ [RF img] │           │
+│   │          │ │          │ │          │ │          │ │          │           │
+│   │Discovery │ │Short TX +│ │Persistent│ │Freq dwell│ │Repeated  │           │
+│   │ activity │ │quiet gaps│ │ occupancy│ │+ revisits│ │ template │           │
+│   └──────────┘ └──────────┘ └──────────┘ └──────────┘ └──────────┘           │
+│                                                                               │
+│   WHAT IT TELLS US                          WHAT IT DOES NOT CLAIM             │
+│   Observable RF behavior                    Final attack-technique attribution │
+│                                                                               │
+│   Same behavioral taxonomy evaluated across WiFi, Bluetooth, and Zigbee      │
+└───────────────────────────────────────────────────────────────────────────────┘
+```
+
+## Why this visual is structured this way
+
+Slide 2 establishes that the classifier needs an `UNKNOWN` option. The natural next question is:
+
+> Unknown relative to what?
+
+Slide 3 answers that question by making the known PA taxonomy concrete.
+
+The audience should leave understanding that these are **behavioral RF patterns** intended to serve as precursor evidence. They should not leave thinking the model directly assigns final ATT&CK or EW attack-technique labels.
+
+## Speaker script
+
+See [SCRIPT.md](SCRIPT.md#slide-3--preliminary-actions-capture-rf-behavior-not-final-attack-labels).
+
+## Transition
+
+End with:
+
+> **"To test that in the real RF environment, we built an over-the-air dataset spanning all three protocol families."**
+
+This transitions directly into Slide 4.
+
+## Terminology / claim constraints
+
+- Use **cyber or Electronic Warfare attack technique** rather than the vaguer term `effect`.
+- The MITRE ATT&CK connection may be stated as downstream **ATT&CK-style reasoning**, not as a claim that the PA labels themselves are ATT&CK technique labels.
+- Preserve the paper's framing that a PA may **precede, enable, or contextualize** a later attack technique.
+- Do not overstate temporal ordering by defining every PA as something that literally occurs before an attack.
+- Use **Scan, Burst, Sustain, Hop, Replay** in the main talk; reserve PA numbers for backup/provenance.
+- Do not imply that protocol identity is the PA label. The same behavioral taxonomy is studied across WiFi, Bluetooth, and Zigbee.
 
 ---
 
