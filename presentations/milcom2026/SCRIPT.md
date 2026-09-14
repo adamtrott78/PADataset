@@ -97,6 +97,39 @@ With that dataset in place, the next question is how to decide when the classifi
 
 ---
 
-# Slide 5
+# Slide 5 — Unknown detection is only useful if known behavior stays usable
+
+## Target speaking time
+
+Approximately **55-65 seconds**.
+
+## Script
+
+Once we have a closed-set PA classifier, the next problem is deciding when its prediction should be rejected.
+
+We explored two useful directions that informed DQNGuard.
+
+The first is VarMax. VarMax uses structure in the classifier outputs—including confidence, variance, and energy-style evidence—to assign an unknownness score and threshold that score. That gives us useful evidence for novelty, but the operating point still depends heavily on where that threshold is placed.
+
+The second direction is a DQN-style confidence head. Here, features such as maximum softmax probability, the gap between the top two predictions, and entropy are treated as a confidence state, and a learned decision head chooses between known and unknown.
+
+Both approaches are useful, but for our application there is one requirement we want to make explicit: detecting more unknowns cannot come at the cost of arbitrarily rejecting known Preliminary Actions.
+
+So instead of asking only, "How well can I separate known from unknown?" we ask, "How well can I detect unknown behavior while staying inside a fixed known-rejection budget?"
+
+That operating constraint is the central idea behind DQNGuard.
+
+## Delivery notes
+
+- Present VarMax and the DQN-style head as useful predecessors, not strawmen.
+- Keep the DQN-style confidence state simple: `P1`, `P1-P2`, and entropy.
+- Do not imply that the DQN-style diagram connects to the known-rejection-budget panel; they are separate conceptual panels.
+- Stress the phrase **fixed known-rejection budget** at the end.
+- Do not reveal Table I results yet.
+- The final sentence transitions directly into Slide 6.
+
+---
+
+# Slide 6
 
 **TBD — write only after the slide concept is reviewed and locked.**
