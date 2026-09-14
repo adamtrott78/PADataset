@@ -18,7 +18,7 @@ Statuses:
 | 2 | Closed-set RF classifiers cannot say "I don't know" | Establish the capability gap | **CONCEPT LOCKED** |
 | 3 | Preliminary Actions capture RF behavior, not final attack labels | Define PAs and make the five behaviors tangible | **CONCEPT LOCKED** |
 | 4 | We evaluate the same five behaviors over-the-air across three protocol families | Show what was actually collected and evaluated | **CONCEPT LOCKED** |
-| 5 | Existing OSR heads do not provide the operating behavior we need | Motivate DQNGuard from VarMax and DQN-IDS | TBD |
+| 5 | Unknown detection is only useful if known behavior stays usable | Motivate DQNGuard from VarMax and DQN-IDS | **CONCEPT LOCKED** |
 | 6 | DQNGuard adds class-conditional guards and a known-rejection budget | Explain the proposed decision layer | TBD |
 | 7 | Evaluation separates the true unknown from calibration surrogates | Explain target unknown, surrogate unknown, and fair comparison | TBD |
 | 8 | DQNGuard improves the usable fixed-budget operating point | Present the main method comparison | TBD |
@@ -466,6 +466,194 @@ This transitions into the OSR decision-layer motivation.
 - The OTA window is **400,000 complex IQ samples at 12.5 MS/s**, corresponding to **32 ms**.
 - Main capture frequency: **2.437 GHz**.
 - A generation target of 10,000 windows per protocol/action pair exists in the paper, but it is intentionally omitted from the main slide unless later needed for audience context.
+
+
+---
+
+# Slide 5 — Unknown detection is only useful if known behavior stays usable
+
+## Status
+
+**CONCEPT LOCKED**
+
+## Audience takeaway
+
+> A detector can appear good at finding unknowns simply by rejecting too many legitimate known samples. The operational requirement is unknown detection under an explicit cost on known rejection.
+
+This slide motivates DQNGuard from the operating requirement rather than from algorithm names.
+
+## Slide title
+
+**Unknown detection is only useful if known behavior stays usable**
+
+## Supporting sentence
+
+**The OSR decision must detect unfamiliar behavior without solving the problem by rejecting too much known data.**
+
+## Visual concept
+
+Use a three-panel horizontal story:
+
+1. **VarMax — score-based rejection**
+2. **DQN-style confidence head — learned decision**
+3. **Operational requirement — explicit known-rejection budget**
+
+The three panels are conceptually related but are **not one continuous pipeline**. In particular, the DQN-style panel must not visually connect to the known-rejection-budget panel with a shared arrow.
+
+### Left panel — VarMax
+
+Heading:
+
+**VARMAX — SCORE-BASED REJECTION**
+
+Plain-English role:
+
+**Uses confidence, variance, and energy-style evidence to score unfamiliar inputs.**
+
+Simple flow:
+
+```text
+classifier evidence
+       ↓
+unknownness score
+       ↓
+   threshold
+       ↓
+ known / unknown
+```
+
+Positive tag:
+
+**✓ useful unknownness evidence**
+
+Limitation tag:
+
+**✕ threshold choice can sacrifice known samples**
+
+Do not frame VarMax as a failed method. It is prior work that supplies useful novelty evidence and motivates part of DQNGuard.
+
+### Middle panel — DQN-style confidence head
+
+Heading:
+
+**DQN-STYLE CONFIDENCE HEAD**
+
+Plain-English role:
+
+**Learns a known/unknown decision from confidence-state features.**
+
+The correct diagram is:
+
+```text
+P1      ┐
+P1-P2   ├──→ learned decision ───→ known / unknown
+H(p)    ┘
+```
+
+Alternative polished rendering:
+
+```text
+[DQN confidence state]
+ P1
+ P1 − P2
+ H(p)
+        ↓
+ [learned decision]
+        ↓
+ known / unknown
+```
+
+The three confidence features all feed into **one learned decision block**. No arrow from this panel should cross into or point at the operational-requirement panel.
+
+Positive tag:
+
+**✓ learned decision boundary**
+
+Limitation tag:
+
+**✕ no explicit guarantee on known rejection**
+
+### Right panel — operational requirement
+
+Heading:
+
+**WHAT DEPLOYMENT ACTUALLY NEEDS**
+
+Core visual:
+
+```text
+Detect unknowns
+      +
+Preserve known classifications
+      ↓
+EXPLICIT KNOWN-REJECTION BUDGET
+```
+
+Strong callout:
+
+> **Reject unfamiliar behavior — but only within a controlled known-sample cost.**
+
+This should be the visually strongest panel because it is the requirement DQNGuard is designed around.
+
+## Rough visual mockup — corrected
+
+```text
+┌──────────────────────────────────────────────────────────────────────────────────┐
+│ Unknown detection is only useful if known behavior stays usable                 │
+│ The OSR decision must detect unfamiliar behavior without rejecting too much      │
+│ legitimate known data.                                                          │
+│                                                                                  │
+│   VARMAX                    DQN-STYLE HEAD             OPERATIONAL REQUIREMENT    │
+│                                                                                  │
+│   classifier evidence       P1      ┐                  Detect unknowns            │
+│          ↓                  P1-P2   ├──→ learned             +                   │
+│   unknownness score         H(p)    ┘    decision      Preserve known             │
+│          ↓                               ↓                   ↓                    │
+│      threshold                        known / unknown   KNOWN-REJECTION BUDGET    │
+│          ↓                                                                       │
+│    known / unknown                                                               │
+│                                                                                  │
+│   ✓ useful evidence          ✓ learned boundary         “Reject unfamiliar        │
+│   ✕ threshold can            ✕ no explicit               behavior within a        │
+│     sacrifice knowns           known-cost guarantee       controlled cost.”       │
+└──────────────────────────────────────────────────────────────────────────────────┘
+```
+
+The DQN-style arrows above are the **corrected diagram**. They do not cross and do not point toward the known-rejection-budget panel.
+
+## Why this visual is structured this way
+
+The slide should not read as:
+
+> Here are two old methods and now here is our method.
+
+It should read as:
+
+1. VarMax shows that classifier-output structure contains useful novelty evidence.
+2. DQN-style work shows that confidence can be treated as a learned decision state.
+3. Neither framing alone makes the known-sample cost the explicit operating constraint.
+4. Therefore the next design requirement is a known-rejection budget.
+
+This makes Slide 6 feel like a direct response to a clearly established requirement.
+
+## Speaker script
+
+See [SCRIPT.md](SCRIPT.md#slide-5--unknown-detection-is-only-useful-if-known-behavior-stays-usable).
+
+## Transition
+
+End with:
+
+> **“That operating constraint is the central idea behind DQNGuard.”**
+
+This transitions directly into Slide 6.
+
+## Terminology / claim constraints
+
+- Do not show Table I numbers on this slide; save the empirical payoff for the results section.
+- Do not imply that VarMax or the DQN-style head are useless; present them as useful predecessors with different operating behavior.
+- Do not claim that the DQN-style head literally has no threshold; the presentation claim is that it does not make the known-rejection budget the explicit deployment constraint.
+- Keep the focus on the operational cost of rejecting legitimate known samples.
 
 ---
 
