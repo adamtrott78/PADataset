@@ -17,7 +17,7 @@ Statuses:
 | 1 | Title | Introduce the work and speaker | TBD |
 | 2 | Closed-set RF classifiers cannot say "I don't know" | Establish the capability gap | **CONCEPT LOCKED** |
 | 3 | Preliminary Actions capture RF behavior, not final attack labels | Define PAs and make the five behaviors tangible | **CONCEPT LOCKED** |
-| 4 | OTA dataset and system overview | Show what was actually collected and evaluated | TBD |
+| 4 | We evaluate the same five behaviors over-the-air across three protocol families | Show what was actually collected and evaluated | **CONCEPT LOCKED** |
 | 5 | Existing OSR heads do not provide the operating behavior we need | Motivate DQNGuard from VarMax and DQN-IDS | TBD |
 | 6 | DQNGuard adds class-conditional guards and a known-rejection budget | Explain the proposed decision layer | TBD |
 | 7 | Evaluation separates the true unknown from calibration surrogates | Explain target unknown, surrogate unknown, and fair comparison | TBD |
@@ -319,6 +319,153 @@ This transitions directly into Slide 4.
 - Do not overstate temporal ordering by defining every PA as something that literally occurs before an attack.
 - Use **Scan, Burst, Sustain, Hop, Replay** in the main talk; reserve PA numbers for backup/provenance.
 - Do not imply that protocol identity is the PA label. The same behavioral taxonomy is studied across WiFi, Bluetooth, and Zigbee.
+
+
+---
+
+# Slide 4 — We evaluate the same five behaviors over-the-air across three protocol families
+
+## Status
+
+**CONCEPT LOCKED**
+
+## Audience takeaway
+
+> The classifier is evaluated on real over-the-air RF captures, with the same five behavioral labels expressed through WiFi, Bluetooth, and Zigbee.
+
+This slide establishes experimental scope and credibility without becoming a hardware-specification slide.
+
+## Slide title
+
+**We evaluate the same five behaviors over-the-air across three protocol families**
+
+## Supporting sentence
+
+**WiFi, Bluetooth, and Zigbee each express Scan, Burst, Sustain, Hop, and Replay behavior in captured RF.**
+
+The emphasis should be on **behavior across protocols**, not protocol identification.
+
+## Visual concept
+
+Use two coordinated regions:
+
+1. a large **3 × 5 behavior/protocol matrix** showing dataset scope;
+2. a compact **OTA capture pipeline** showing how one classifier input is produced.
+
+### Left — 3 × 5 dataset scope matrix
+
+Rows:
+
+- WiFi
+- Bluetooth
+- Zigbee
+
+Columns:
+
+- Scan
+- Burst
+- Sustain
+- Hop
+- Replay
+
+Preferred treatment is one representative RF/spectrogram-style thumbnail per cell if the images remain legible. If 15 thumbnails become visually noisy, use a reduced image treatment while preserving the obvious 3-protocol × 5-behavior structure.
+
+Above the matrix, include a compact label:
+
+**5 behaviors × 3 protocols**
+
+The matrix should visually communicate:
+
+> the same behavioral taxonomy is instantiated across multiple protocol families.
+
+### Right — OTA capture pipeline
+
+Keep the acquisition flow intentionally simple:
+
+```text
+USRP N210 TX
+     ↓
+ over the air
+     ↓
+USRP N210 RX
+     ↓
+32 ms RF window
+     ↓
+classifier input
+```
+
+Use the hardware label:
+
+**2× USRP N210 SDRs**
+
+Do **not** label the device as "Ettus N210" in the presentation.
+
+Add only the key capture facts:
+
+- **12.5 MS/s**
+- **400,000 complex IQ samples / window**
+- **2.437 GHz**
+- **32 ms per RF window**
+
+Do not include daughterboard names, antenna model, radio spacing, switch model, gain settings, shard counts, or seed schedules in the main slide. Those belong in backup material if needed.
+
+## Rough visual mockup
+
+```text
+┌──────────────────────────────────────────────────────────────────────────────────┐
+│ We evaluate the same five behaviors over-the-air across three protocol families │
+│ WiFi, Bluetooth, and Zigbee each express the same PA taxonomy in captured RF.   │
+│                                                                                  │
+│                    5 BEHAVIORS × 3 PROTOCOLS          OTA CAPTURE                │
+│                                                                                  │
+│               Scan  Burst Sustain  Hop Replay          ┌───────────┐             │
+│ WiFi          [img] [img]  [img]  [img] [img]         │N210 TX SDR│             │
+│                                                       └─────┬─────┘             │
+│ Bluetooth     [img] [img]  [img]  [img] [img]               │ RF                │
+│                                                               ▼                 │
+│ Zigbee        [img] [img]  [img]  [img] [img]         ┌───────────┐             │
+│                                                       │N210 RX SDR│             │
+│                                                       └─────┬─────┘             │
+│                                                               ▼                 │
+│                                                        32 ms RF window           │
+│                                                                                  │
+│                                           12.5 MS/s • 400k complex IQ samples    │
+│                                           2.437 GHz • 2× USRP N210 SDRs          │
+└──────────────────────────────────────────────────────────────────────────────────┘
+```
+
+## Why this visual is structured this way
+
+Slide 3 defines the PA taxonomy. Slide 4 answers the next audience question:
+
+> What did you actually test this on?
+
+The matrix establishes that the research object is **behavior recognition across protocol realizations**, not simply protocol classification.
+
+The small capture pipeline establishes that evaluation uses captured OTA RF rather than only synthetic or digital waveforms.
+
+Do not spend the audience's attention budget on a large system-architecture diagram here. The major architecture diagram later should be reserved for DQNGuard.
+
+## Speaker script
+
+See [SCRIPT.md](SCRIPT.md#slide-4--we-evaluate-the-same-five-behaviors-over-the-air-across-three-protocol-families).
+
+## Transition
+
+End with:
+
+> **"With that dataset in place, the next question is how to decide when the classifier's prediction should actually be trusted."**
+
+This transitions into the OSR decision-layer motivation.
+
+## Terminology / claim constraints
+
+- Use **USRP N210 SDR** / **USRP N210 software-defined radio** in the presentation.
+- Do not describe the PA label as the protocol label.
+- Emphasize that the same behavioral taxonomy is evaluated across WiFi, Bluetooth, and Zigbee.
+- The OTA window is **400,000 complex IQ samples at 12.5 MS/s**, corresponding to **32 ms**.
+- Main capture frequency: **2.437 GHz**.
+- A generation target of 10,000 windows per protocol/action pair exists in the paper, but it is intentionally omitted from the main slide unless later needed for audience context.
 
 ---
 
