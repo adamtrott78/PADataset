@@ -19,7 +19,7 @@ Statuses:
 | 3 | Preliminary Actions capture RF behavior, not final attack labels | Define PAs and make the five behaviors tangible | **CONCEPT LOCKED** |
 | 4 | We evaluate the same five behaviors over-the-air across three protocol families | Show what was actually collected and evaluated | **CONCEPT LOCKED** |
 | 5 | Unknown detection is only useful if known behavior stays usable | Motivate DQNGuard from VarMax and DQN-IDS | **CONCEPT LOCKED** |
-| 6 | DQNGuard adds class-conditional guards and a known-rejection budget | Explain the proposed decision layer | TBD |
+| 6 | DQNGuard adds a budgeted open-world decision layer to the PA classifier | Explain the proposed decision layer | **CONCEPT LOCKED** |
 | 7 | Evaluation separates the true unknown from calibration surrogates | Explain target unknown, surrogate unknown, and fair comparison | TBD |
 | 8 | DQNGuard improves the usable fixed-budget operating point | Present the main method comparison | TBD |
 | 9 | Performance still depends strongly on the unseen behavior | Explain the across-fold standard deviation correctly | TBD |
@@ -654,6 +654,187 @@ This transitions directly into Slide 6.
 - Do not imply that VarMax or the DQN-style head are useless; present them as useful predecessors with different operating behavior.
 - Do not claim that the DQN-style head literally has no threshold; the presentation claim is that it does not make the known-rejection budget the explicit deployment constraint.
 - Keep the focus on the operational cost of rejecting legitimate known samples.
+
+
+---
+
+# Slide 6 — DQNGuard adds a budgeted open-world decision layer to the PA classifier
+
+## Status
+
+**CONCEPT LOCKED**
+
+## Audience takeaway
+
+> DQNGuard does not replace the PA classifier. It evaluates whether the classifier's prediction conforms to learned known behavior and routes nonconforming observations to an unknown pool under an explicit known-rejection budget.
+
+This is the central architecture slide of the talk.
+
+## Slide title
+
+**DQNGuard adds a budgeted open-world decision layer to the PA classifier**
+
+## Supporting sentence
+
+**DQNGuard decides whether the classifier's prediction conforms to learned known behavior.**
+
+Keep this sentence short. The mechanism is already visible in the hero figure.
+
+## Canonical visual asset
+
+Reuse the final hero figure from the accepted paper.
+
+**Canonical source file:**
+
+`papers/milcom2026/figures/hero_figure/hero_dqnguard_pipeline_s22_tikz.tex`
+
+The accepted paper references a compiled vector PDF named:
+
+`papers/milcom2026/figures/hero_figure/hero_dqnguard_pipeline_s22_tikz.pdf`
+
+but that compiled PDF is not currently tracked in GitHub. The presentation-building workflow should therefore render/export the **s22 TikZ source** to a presentation-friendly vector format, preferably SVG or another PowerPoint-safe vector representation, rather than using an earlier SVG iteration.
+
+Do **not** substitute an older `s1`–`s13` SVG merely because it is already an SVG. The s22 TikZ source is the authoritative final figure.
+
+## Figure content that must remain legible
+
+The hero figure communicates this left-to-right evidence flow:
+
+```text
+RF Input
+   ↓
+Multi-Domain PA Encoder
+   IQ | FFT | DCT | Polar
+   ↓
+PA CNN
+   ↓
+PA prediction / logits / softmax / features
+   ↓
+DQNGuard
+   1. Predicted-class calibration
+   2. Guard evidence
+   3. Known-budget threshold (β = 0.05)
+   ↓
+Known PA  OR  Unknown
+   ↓
+Downstream ATT&CK/EW hypotheses / label-making / QR-CWoS planning
+```
+
+The main talk should preserve the entire figure because the audience needs to see that DQNGuard is a **decision layer over a closed-set PA backbone**, not a replacement classifier.
+
+## What is newly introduced on this slide
+
+Slides 2–5 establish:
+
+- why `UNKNOWN` is necessary;
+- what Preliminary Actions are;
+- what OTA dataset was evaluated;
+- why unknown detection must control known-sample cost.
+
+Slide 6 introduces the internal DQNGuard mechanism for the first time:
+
+1. **Predicted-class calibration**  
+   Compare the sample against calibration statistics for the class the backbone predicts.
+
+2. **Guard evidence**  
+   Use confidence-gap, entropy, variance-style, energy-style, and related evidence to measure nonconformity.
+
+3. **Known-budget threshold**  
+   Route the sample as unknown only when its nonconformity crosses a threshold selected from known calibration data to respect the explicit known-rejection budget.
+
+The main experiments use **β = 0.05**, corresponding to a 5% known-rejection budget.
+
+## Visual composition
+
+The slide should be visually simple:
+
+- conclusion-style title at top;
+- one short supporting sentence;
+- final s22 hero figure spanning nearly the full remaining width;
+- no additional bullet column competing with the figure.
+
+Optional presentation polish:
+
+- during narration, use simple progressive emphasis / highlighting over the three DQNGuard stages if PowerPoint animation is reliable;
+- otherwise, keep the full figure static and use a pointer / verbal walk-through.
+
+Do not redraw the architecture from scratch unless the final vector export is unusable at presentation scale.
+
+## Rough visual mockup
+
+```text
+┌──────────────────────────────────────────────────────────────────────────────────┐
+│ DQNGuard adds a budgeted open-world decision layer to the PA classifier          │
+│ DQNGuard decides whether the classifier's prediction conforms to learned known    │
+│ behavior.                                                                         │
+│                                                                                   │
+│  ┌───────────┐  ┌───────────────────────────────┐  ┌──────────────────────┐       │
+│  │ RF INPUT  │→ │ MULTI-DOMAIN PA ENCODER       │→ │      DQNGUARD        │       │
+│  │           │  │ IQ | FFT | DCT | Polar        │  │                      │       │
+│  │ RF window │  │      ↓                         │  │ 1. predicted-class   │       │
+│  │           │  │    PA CNN                      │  │    calibration       │       │
+│  └───────────┘  │      ↓                         │  │          ↓           │       │
+│                 │ pred / logits / softmax / h    │  │ 2. guard evidence    │       │
+│                 └───────────────────────────────┘  │          ↓           │       │
+│                                                    │ 3. known-budget       │       │
+│                                                    │    threshold β=.05    │       │
+│                                                    └──────────┬───────────┘       │
+│                                                               │                   │
+│                                                   ┌───────────┴───────────┐       │
+│                                                   ▼                       ▼       │
+│                                               KNOWN PA                UNKNOWN      │
+│                                                   │                       │       │
+│                                                   └──────→ downstream ←───┘       │
+│                                                          reasoning                 │
+│                                                                                   │
+│                    [USE FINAL s22 PAPER HERO FIGURE, NOT THIS REDRAW]              │
+└──────────────────────────────────────────────────────────────────────────────────┘
+```
+
+The mockup is only an information-layout reminder. The **actual slide should use the final s22 paper figure**.
+
+## Why this visual is structured this way
+
+The paper hero figure already embodies the presentation's communication heuristic: observation -> backbone evidence -> guard decision -> downstream consumer.
+
+Reusing it preserves consistency between the accepted paper and the talk and avoids forcing the audience to reconcile two different architectural representations of DQNGuard.
+
+The slide should make one conceptual point:
+
+> DQNGuard sits between the closed-set classifier and downstream reasoning, and it controls the accept/reject decision under a known-sample cost.
+
+## Speaker script
+
+See [SCRIPT.md](SCRIPT.md#slide-6--dqnguard-adds-a-budgeted-open-world-decision-layer-to-the-pa-classifier).
+
+## Transition
+
+End with:
+
+> **"But this creates one more problem: if the true unknown has never been seen before, what open-set evidence do we use to calibrate that decision?"**
+
+This transitions directly into Slide 7 and introduces surrogate-open calibration exactly when the audience has a reason to care about it.
+
+## Intentionally deferred to Slide 7
+
+Do **not** explain surrogate-open calibration on Slide 6.
+
+After this slide, the audience should understand **how DQNGuard makes the routing decision**, but not yet where surrogate-open calibration evidence comes from.
+
+Slide 7 will introduce:
+
+- target unknown,
+- surrogate unknown,
+- known classes,
+- fixed-surrogate evaluation,
+- the distinction between calibration evidence and the genuinely unseen target behavior.
+
+## Terminology / claim constraints
+
+- DQNGuard is a **decision layer over the PA backbone**, not a replacement classifier.
+- The final deployed threshold is selected from **known calibration scores** under the known-rejection budget.
+- Surrogate-open evidence may shape / diagnose the guard but does not define the final known-budget threshold in the current implementation.
+- Keep downstream ATT&CK/EW / label-making / QR-CWoS boxes visible enough to reinforce that DQNGuard is a sensing and triage layer, not the full response system.
 
 ---
 
