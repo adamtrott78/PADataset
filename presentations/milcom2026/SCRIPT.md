@@ -130,6 +130,52 @@ That operating constraint is the central idea behind DQNGuard.
 
 ---
 
-# Slide 6
+# Slide 6 — DQNGuard adds a budgeted open-world decision layer to the PA classifier
+
+## Target speaking time
+
+Approximately **65-75 seconds**.
+
+## Script
+
+That operating constraint is the central idea behind DQNGuard.
+
+DQNGuard does not replace the PA classifier. The existing multi-domain backbone still takes the RF window, builds IQ, FFT, DCT, and polar representations, and produces the Preliminary Action prediction along with logits, softmax probabilities, and intermediate features.
+
+DQNGuard sits on top of those outputs and asks a different question: does this prediction look like the kind of evidence we normally see for the class the backbone predicted?
+
+It does that in three stages.
+
+First, it conditions calibration on the predicted class, because what looks normal for one Preliminary Action may not look normal for another.
+
+Second, it combines several forms of guard evidence—including confidence-gap, entropy, variance-style, and energy-style information—into a nonconformity score.
+
+Third, it applies a threshold selected from known calibration data. In our main operating point, that threshold corresponds to a five-percent known-rejection budget.
+
+So the final output is a routing decision. If the sample conforms, we keep the PA prediction as known evidence. If it does not, we preserve it as unknown behavior for downstream analysis rather than forcing it into the known taxonomy.
+
+But this creates one more problem: if the true unknown has never been seen before, what open-set evidence do we use to calibrate that decision?
+
+## Delivery notes
+
+- Walk the hero figure **left to right**. Do not narrate every visual element at once.
+- Make clear that the PA backbone remains the classifier; DQNGuard is the **decision layer**.
+- Stress the three DQNGuard stages in order: predicted-class calibration -> guard evidence -> known-budget threshold.
+- Explain the **5% budget** in plain language: only a controlled fraction of known calibration samples may be rejected at the operating point.
+- Do not introduce surrogate terminology until the final question.
+- Keep the downstream boxes in the narration brief; they reinforce system boundary, not the main algorithm.
+- The final question is the direct setup for Slide 7.
+
+## Visual asset
+
+Use the final paper hero figure source:
+
+`papers/milcom2026/figures/hero_figure/hero_dqnguard_pipeline_s22_tikz.tex`
+
+Render/export this authoritative s22 source to a PowerPoint-safe vector asset. Do not substitute an older SVG revision.
+
+---
+
+# Slide 7
 
 **TBD — write only after the slide concept is reviewed and locked.**
