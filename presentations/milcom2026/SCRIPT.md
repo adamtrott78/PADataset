@@ -34,6 +34,39 @@ So what exactly are the RF behaviors we're trying to recognize?
 
 ---
 
-# Slide 3
+# Slide 3 — Preliminary Actions capture RF behavior, not final attack labels
+
+## Target speaking time
+
+Approximately **55-65 seconds**.
+
+## Script
+
+The behaviors we're classifying are what we call Preliminary Actions, or PAs.
+
+A Preliminary Action is not a final attack-technique label. It is observable RF behavior that may precede, enable, or contextualize a later cyber or Electronic Warfare attack technique. That makes it useful as precursor evidence for downstream reasoning, including MITRE ATT&CK-style reasoning.
+
+In this work we evaluate five behaviors. Scan represents discovery-like RF activity. Burst is repeated short transmissions separated by quiet gaps. Sustain is persistent channel occupancy. Hop captures frequency-agile dwell and revisit behavior. And Replay captures repeated waveform or template structure.
+
+The important distinction is the level of the claim. At this stage we're asking, "What behavior can I observe in the RF signal?" We're not yet claiming, "I know exactly what attack technique is occurring."
+
+That makes these detections useful as precursor evidence for downstream reasoning while still preserving uncertainty where appropriate.
+
+We evaluated this same behavioral taxonomy across WiFi, Bluetooth, and Zigbee.
+
+To test that in the real RF environment, we built an over-the-air dataset spanning all three protocol families.
+
+## Delivery notes
+
+- Define **Preliminary Action** before using the acronym PA repeatedly.
+- Stress that the labels describe **observable RF behavior**, not final ATT&CK/EW attribution.
+- Use **cyber or Electronic Warfare attack technique** rather than the vaguer term `effect`.
+- Do not imply that every PA literally occurs before an attack; preserve the broader "precede, enable, or contextualize" framing.
+- Give each of the five behavior cards enough time for the audience to connect the label to its RF pattern.
+- The final sentence is the direct transition to Slide 4.
+
+---
+
+# Slide 4
 
 **TBD — write only after the slide concept is reviewed and locked.**
