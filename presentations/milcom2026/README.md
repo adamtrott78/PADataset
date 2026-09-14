@@ -107,6 +107,7 @@ The current target is approximately 11-12 main slides plus backups. Exact slide 
 - Slide 2: **concept locked; visual composition revised once and retained in full**
 - Slide 3: **concept locked; Preliminary Action framing and five-behavior visual retained in full**
 - Slide 4: **concept locked; OTA 3×5 protocol/behavior matrix and N210 capture overview retained in full**
+- Slide 5: **concept locked; OSR predecessor comparison and corrected DQN-style confidence diagram retained in full**
 - Remaining slides: **to be designed one by one**
 - Final PowerPoint: **not yet built**
 - Final spoken script: **not yet complete**
