@@ -105,6 +105,7 @@ The current target is approximately 11-12 main slides plus backups. Exact slide 
 
 - Deck skeleton: **provisional but strong**
 - Slide 2: **concept locked; visual composition revised once and retained in full**
+- Slide 3: **concept locked; Preliminary Action framing and five-behavior visual retained in full**
 - Remaining slides: **to be designed one by one**
 - Final PowerPoint: **not yet built**
 - Final spoken script: **not yet complete**
