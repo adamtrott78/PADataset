@@ -20,7 +20,7 @@ Statuses:
 | 4 | We evaluate the same five behaviors over-the-air across three protocol families | Show what was actually collected and evaluated | **CONCEPT LOCKED** |
 | 5 | Unknown detection is only useful if known behavior stays usable | Motivate DQNGuard from VarMax and DQN-IDS | **CONCEPT LOCKED** |
 | 6 | DQNGuard adds a budgeted open-world decision layer to the PA classifier | Explain the proposed decision layer | **CONCEPT LOCKED** |
-| 7 | Evaluation separates the true unknown from calibration surrogates | Explain target unknown, surrogate unknown, and fair comparison | TBD |
+| 7 | A surrogate unknown shapes the DQN; the true unknown remains unseen until test | Explain target unknown, surrogate unknown, and fair comparison | **CONCEPT LOCKED** |
 | 8 | DQNGuard improves the usable fixed-budget operating point | Present the main method comparison | TBD |
 | 9 | Performance still depends strongly on the unseen behavior | Explain the across-fold standard deviation correctly | TBD |
 | 10 | Surrogate usefulness depends on the target unknown | Present and interpret the Target-Surrogate Matrix | TBD |
@@ -835,6 +835,183 @@ Slide 7 will introduce:
 - The final deployed threshold is selected from **known calibration scores** under the known-rejection budget.
 - Surrogate-open evidence may shape / diagnose the guard but does not define the final known-budget threshold in the current implementation.
 - Keep downstream ATT&CK/EW / label-making / QR-CWoS boxes visible enough to reinforce that DQNGuard is a sensing and triage layer, not the full response system.
+
+
+---
+
+# Slide 7 — A surrogate unknown shapes the DQN; the true unknown remains unseen until test
+
+## Status
+
+**CONCEPT LOCKED**
+
+## Audience takeaway
+
+> DQNGuard intentionally withholds two PA behaviors from the backbone: one becomes surrogate-open calibration evidence, while the other remains completely unseen until final evaluation.
+
+The surrogate is not a class the backbone is expected to recognize. It is deliberately out-of-taxonomy behavior used to shape the DQN confidence decision. The true target unknown is never used for backbone training or OSR calibration.
+
+## Slide title
+
+**A surrogate unknown shapes the DQN; the true unknown remains unseen until test**
+
+## Supporting sentence
+
+**One leave-two-out backbone is trained on the remaining known PAs; the surrogate is used only for OSR calibration, while the target appears only at test.**
+
+## Concrete example
+
+Use one specific fold to make the roles obvious:
+
+- **Surrogate unknown:** Scan
+- **True target unknown:** Sustain
+- **Known classes:** Burst, Hop, Replay
+
+For this fold, the backbone output taxonomy contains only:
+
+`Burst | Hop | Replay`
+
+There is no Scan output class and no Sustain output class.
+
+## Critical mechanism
+
+The slide must communicate four facts directly:
+
+1. **One backbone, not two.**  
+   The backbone is trained only on Burst, Hop, and Replay.
+
+2. **Scan is withheld from backbone training.**  
+   During OSR calibration, Scan windows are passed through that same three-class backbone. The backbone necessarily forces them into one of its known labels; DQNGuard observes the resulting confidence state as surrogate-open evidence.
+
+3. **The surrogate affects DQN fitting.**  
+   The DQN confidence head is fitted using both known calibration states and surrogate-open states.
+
+4. **Sustain remains completely untouched until final evaluation.**  
+   Sustain is not used for backbone training, DQN fitting, guard-band fitting, or threshold selection. Scan is also absent from final evaluation.
+
+## Important calibration distinction
+
+The surrogate does **not** directly choose every part of DQNGuard.
+
+Current implementation:
+
+- **DQN fitting:** known calibration + surrogate-open calibration
+- **Predicted-class guard bands:** known calibration only
+- **Final 5% score threshold:** known calibration scores only
+- **Final evaluation:** known test classes + target unknown only; surrogate excluded
+
+This distinction must remain explicit so the slide does not imply that the surrogate directly sets the final 5% threshold.
+
+## Visual composition
+
+Use a single central backbone with two clearly separated withheld behaviors.
+
+The slide should read top-to-bottom:
+
+1. train the leave-two-out backbone;
+2. use known + surrogate evidence to fit the DQN;
+3. use known calibration alone to fit guard bands and the 5% operating threshold;
+4. evaluate on known test data plus the untouched target unknown.
+
+The surrogate and target should have visibly different roles:
+
+- **Scan — surrogate-open calibration only**
+- **Sustain — test only**
+
+Use a visible note near the evaluation block:
+
+**Scan is not included in final test metrics.**
+
+## Rough visual mockup
+
+```text
+┌──────────────────────────────────────────────────────────────────────────────────┐
+│ A surrogate unknown shapes the DQN; the true unknown remains unseen until test  │
+│ One leave-two-out backbone is trained on the remaining known PAs.                │
+│                                                                                  │
+│                    EXAMPLE: surrogate = Scan | target = Sustain                  │
+│                                                                                  │
+│                         BACKBONE TRAINING                                         │
+│                  Burst + Hop + Replay only                                       │
+│                              │                                                   │
+│                              ▼                                                   │
+│                   3-class PA backbone                                            │
+│                   Burst | Hop | Replay                                            │
+│                              │                                                   │
+│               ┌──────────────┴──────────────┐                                    │
+│               │                             │                                    │
+│               ▼                             ▼                                    │
+│      KNOWN CALIBRATION                 SCAN SURROGATE                             │
+│      Burst / Hop / Replay              withheld from training                    │
+│               │                             │                                    │
+│               └──────────────┬──────────────┘                                    │
+│                              ▼                                                   │
+│                     FIT DQN CONFIDENCE HEAD                                      │
+│                   known + surrogate states                                       │
+│                              │                                                   │
+│          ┌───────────────────┴───────────────────┐                               │
+│          │                                       │                               │
+│          ▼                                       ▼                               │
+│  FIT GUARD BANDS ON KNOWN ONLY        SET 5% THRESHOLD ON KNOWN ONLY            │
+│          │                                       │                               │
+│          └───────────────────┬───────────────────┘                               │
+│                              ▼                                                   │
+│                         FINAL EVALUATION                                          │
+│             Known test: Burst + Hop + Replay                                     │
+│             Target unknown: Sustain                                              │
+│             Surrogate Scan: NOT INCLUDED                                         │
+│                              │                                                   │
+│                              ▼                                                   │
+│                        KNOWN / UNKNOWN?                                           │
+└──────────────────────────────────────────────────────────────────────────────────┘
+```
+
+## Why this visual is structured this way
+
+The audience already knows from Slide 6 how DQNGuard scores an observation. Slide 7 answers the harder question:
+
+> If the real unknown has never been seen, where does open-set calibration evidence come from?
+
+The answer is not to expose the true target unknown. Instead, a second withheld PA acts as a **surrogate unknown**. It shapes the DQN confidence decision, and the resulting system is then tested on a different PA that remained completely unseen.
+
+The scientific transfer being tested is therefore:
+
+> **Can open-set behavior learned from one withheld PA help reject a different withheld PA?**
+
+This is the central surrogate-open contribution and must be visually obvious.
+
+## Main comparison regime
+
+For the main method comparison:
+
+- **Scan is fixed as the surrogate**
+- **Burst, Sustain, Hop, and Replay each take a turn as the target unknown**
+
+For each fold, Scan and the target are both absent from backbone training. The remaining three behaviors form the known taxonomy.
+
+The reported mean and standard deviation in the main result table are therefore across these held-out target folds, not repeated stochastic reruns.
+
+## Speaker script
+
+See [SCRIPT.md](SCRIPT.md#slide-7--a-surrogate-unknown-shapes-the-dqn-the-true-unknown-remains-unseen-until-test).
+
+## Transition
+
+End with:
+
+> **“With that fixed-surrogate design, we can now ask whether DQNGuard gives us a better usable operating point than the existing OSR heads.”**
+
+This transitions directly into Slide 8.
+
+## Terminology / claim constraints
+
+- Do not describe the surrogate as a label the backbone should predict.
+- The backbone's known taxonomy contains only the remaining three PA classes in each Target–Surrogate fold.
+- Do not claim there are two separately trained backbones whose thresholds are transferred between them.
+- The surrogate affects **DQN fitting**.
+- Guard bands and the final known-budget threshold are fitted from **known calibration** only in the current implementation.
+- The target unknown is never used during backbone training or surrogate-open OSR calibration.
+- The surrogate is excluded from final evaluation metrics.
 
 ---
 
