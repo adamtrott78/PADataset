@@ -67,6 +67,36 @@ To test that in the real RF environment, we built an over-the-air dataset spanni
 
 ---
 
-# Slide 4
+# Slide 4 — We evaluate the same five behaviors over-the-air across three protocol families
+
+## Target speaking time
+
+Approximately **50-60 seconds**.
+
+## Script
+
+We evaluate these behaviors using over-the-air captures rather than treating this as a purely synthetic classification problem.
+
+The dataset spans three protocol families: WiFi, Bluetooth, and Zigbee. For each protocol, we generate and capture the same five Preliminary Action behaviors—Scan, Burst, Sustain, Hop, and Replay.
+
+That distinction is important. The label we're trying to recognize is the behavior, not the protocol itself. A Burst expressed through WiFi and a Burst expressed through Zigbee are different RF signals, but they represent the same behavioral class.
+
+On the capture side, we transmit and receive using two USRP N210 software-defined radios at 2.437 gigahertz. Each classifier input is a 32-millisecond over-the-air RF window containing 400,000 complex IQ samples at 12.5 mega-samples per second.
+
+So the open-set problem we're about to evaluate is grounded in captured RF across multiple protocol families rather than in a single waveform family.
+
+With that dataset in place, the next question is how to decide when the classifier's prediction should actually be trusted.
+
+## Delivery notes
+
+- Stress **behavior, not protocol**.
+- Keep hardware narration short; the point is OTA credibility, not acquisition-system detail.
+- Use **USRP N210 software-defined radios**. Do not say "Ettus N210."
+- Pause briefly on the 3 × 5 matrix so the audience registers that every protocol spans the same five behaviors.
+- The final sentence transitions directly into the OSR decision-layer motivation.
+
+---
+
+# Slide 5
 
 **TBD — write only after the slide concept is reviewed and locked.**
