@@ -176,6 +176,46 @@ Render/export this authoritative s22 source to a PowerPoint-safe vector asset. D
 
 ---
 
-# Slide 7
+# Slide 7 — A surrogate unknown shapes the DQN; the true unknown remains unseen until test
+
+## Target speaking time
+
+Approximately **70-80 seconds**.
+
+## Script
+
+There is one remaining problem with open-set calibration: if a behavior is genuinely unknown at deployment, then we cannot use labeled examples of that exact behavior to tune the detector ahead of time.
+
+Our surrogate-open design handles that by withholding two behaviors from the backbone instead of one.
+
+Here is a concrete example. Suppose Scan is the surrogate and Sustain is the true target unknown. The PA backbone is trained only on Burst, Hop, and Replay, so its output taxonomy contains just those three classes. Scan and Sustain are both completely absent from backbone training.
+
+During OSR calibration, we pass Scan through that same three-class backbone. The backbone cannot predict Scan—it has never been trained to do that. Instead, Scan is forced into one of the known labels, and the resulting confidence states become surrogate-open evidence.
+
+Those Scan-derived states are combined with known calibration states to fit the DQN confidence head.
+
+The other DQNGuard pieces remain known-only: the predicted-class guard bands are fitted from known calibration, and the final five-percent operating threshold is selected from known calibration scores.
+
+Only after that calibration do we evaluate on Sustain. Sustain has never been used for backbone training or OSR calibration, and Scan is not included in the final test metrics.
+
+So the transfer question is: can open-set behavior learned from one withheld PA help us reject a different PA that remained genuinely unseen?
+
+For the main comparison, Scan stays fixed as the surrogate while Burst, Sustain, Hop, and Replay each take a turn as the target unknown.
+
+With that fixed-surrogate design, we can now ask whether DQNGuard gives us a better usable operating point than the existing OSR heads.
+
+## Delivery notes
+
+- Emphasize **one leave-two-out backbone**, not two models.
+- When showing the concrete example, make clear that the backbone output space is only Burst / Hop / Replay.
+- Stress that Scan is not expected to be classified correctly; its forced known-class confidence behavior is what makes it useful as surrogate-open evidence.
+- State explicitly that the surrogate affects **DQN fitting**.
+- State explicitly that guard bands and the 5% threshold are known-only in the current implementation.
+- State explicitly that Scan is absent from the final evaluation.
+- The final sentence transitions directly into Slide 8.
+
+---
+
+# Slide 8
 
 **TBD — write only after the slide concept is reviewed and locked.**
