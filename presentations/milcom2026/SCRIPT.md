@@ -216,6 +216,42 @@ With that fixed-surrogate design, we can now ask whether DQNGuard gives us a bet
 
 ---
 
-# Slide 8
+# Slide 8 — DQNGuard gives the strongest usable operating point at low known rejection
+
+## Target speaking time
+
+Approximately **80-90 seconds**.
+
+## Script
+
+Now we can look at the main comparison.
+
+For this experiment, Scan is fixed as the surrogate condition, and Burst, Sustain, Hop, and Replay each take a turn as the genuinely unseen target. The numbers here are the mean and standard deviation across those four target folds, not across repeated random runs.
+
+The horizontal axis is the operational cost we care about: how many legitimate known samples get incorrectly rejected as unknown. Lower is better. The vertical axis is Unknown F1, so higher is better. The ideal operating region is therefore the upper-left.
+
+DQNGuard reaches an average Unknown F1 of 0.865 while rejecting approximately five percent of known samples. The DQN-IDS-style head reaches 0.701 Unknown F1 at 6.3 percent known rejection. VarMax reaches 0.745 Unknown F1, but at a substantially higher 12.8 percent known rejection.
+
+DQNGuard also produces the highest OSR macro F1 at 0.881, which matters because that metric includes both the known classes and the unknown class.
+
+There is an important caveat here. VarMax actually has the highest AUROC: 0.951 compared with 0.891 for DQNGuard. So VarMax is very good at ranking samples by unknownness.
+
+But ranking quality and the quality of a deployed threshold are not the same thing. At the actual operating point, DQNGuard gives us the strongest combination of unknown detection and preservation of known PA evidence.
+
+But that 0.865 average hides substantial target-to-target variation.
+
+## Delivery notes
+
+- Start with the experiment condition before discussing any number.
+- Explicitly define both axes.
+- Point out that the desirable operating region is **upper-left**.
+- Credit VarMax for the highest AUROC.
+- Do not say “DQNGuard wins everything.”
+- State that the ± values are across **held-out target PAs**, not repeated seeds.
+- Let the final sentence set up the target-dependent analysis on the next slide.
+
+---
+
+# Slide 9
 
 **TBD — write only after the slide concept is reviewed and locked.**
