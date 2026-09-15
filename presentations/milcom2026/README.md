@@ -114,9 +114,42 @@ The current target is approximately 11-12 main slides plus backups. Exact slide 
 - Slide 9: **concept locked; Figure 2 Target-Surrogate Matrix centered, provenance distinction preserved, and consolidated speaker script retained in full**
 - Slide 10: **concept locked; target-blind surrogate-selection diagnostics, negative-result framing, and consolidated speaker script retained in full**
 - Slide 11: **concept locked; VarMax surrogate-all mechanism, DQNGuard architectural mismatch, future architecture options, and consolidated speaker script retained in full**
-- Remaining slides: **to be designed one by one**
-- Final PowerPoint: **not yet built**
-- Final spoken script: **not yet complete**
+- Slide 12: **concept locked; three-column closing synthesis, scope footer, SVG grouping guidance, and consolidated speaker script retained in full**
+- Slide 1: **still TBD**
+- Slides 2–12: **concept narrative complete**
+- Final PowerPoint / SVG slide assets: **not yet built**
+- Spoken script: **complete for Slides 2–12; title-slide opening still TBD**
+
+
+## SVG-production handoff objective
+
+The next production phase is intended for a **ChatGPT Work** session that will construct the slides as SVG assets and later assemble them into the final presentation.
+
+Because that production session is expensive, this package should minimize design invention during rendering. The Work session should be able to treat the planning package as an implementation specification rather than a brainstorming prompt.
+
+Before starting SVG production, perform one final **design-specification pass** over every main slide. For each slide, preserve or add:
+
+- exact 16:9 composition and intended visual hierarchy;
+- title and supporting-line placement;
+- approximate percentage allocation of the canvas to each major region;
+- alignment relationships and whitespace requirements;
+- element grouping / SVG object hierarchy;
+- which elements are real text versus imported vector assets;
+- exact audience-facing labels and numbers;
+- callout and annotation placement;
+- arrow direction and semantic meaning;
+- which elements should dominate visually and which should recede;
+- any required source asset path and whether it is canonical, generated, or must be rendered;
+- explicit forbidden substitutions or claim-sensitive wording;
+- speaker-script cues that affect visual sequencing;
+- whether progressive reveal would help, while keeping the static SVG independently understandable.
+
+The SVG builder should **not** silently redesign a locked slide into a generic corporate template. Visual styling may be normalized across the deck, but the information architecture, scientific meaning, and intended reading order must remain unchanged.
+
+Where a slide relies on a paper figure or repository asset, use the canonical source identified in the plan. Do not redraw scientific data from memory when a source asset can be rendered or regenerated from reviewed provenance.
+
+A final production-ready pass should also establish one deck-wide visual system before SVG generation begins: canvas size, grid, margins, type hierarchy, color semantics, stroke weights, corner radii, icon treatment, figure-caption treatment, and reusable components. Those global choices should then be applied consistently without changing slide-specific hierarchy.
+
 
 ## Handoff rule for another ChatGPT
 
