@@ -1,5 +1,15 @@
 # MILCOM 2026 SVG sources
 
+Bounded correction to the `e93f11b` deck (Slides 7, 8, and 10 only):
+Slide 7 carries the fitted DQN, guard bands, and threshold into neutral final
+evaluation with separately colored known-test and target-unknown components.
+Slide 8 distinguishes Scan-surrogate DQN methods from VarMax surrogate-all and
+uses directional guidance instead of a shaded operating box. Slide 10 scopes
+its title to the diagnostics tested and labels the analysis exploratory.
+These user-requested corrections supersede the corresponding original wording
+and diagram details in the production spec; results and all other slides remain
+unchanged.
+
 Twelve standalone 1920×1080 slides implement `../SVG_PRODUCTION_SPEC.md`.
 The planning documents and canonical scientific assets are unchanged.
 

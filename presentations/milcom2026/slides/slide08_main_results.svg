@@ -19,74 +19,79 @@
 </g>
 <g id="experiment_strip">
 <rect  x="96" y="225" width="1728" height="92" rx="18" fill="#EEF3F7" stroke="none" stroke-width="2"/>
-<text id="text_2" x="120" y="261" font-family="Arial, Helvetica, sans-serif" font-size="26" font-weight="700" fill="#102235" text-anchor="start">
-<tspan x="120" y="261.0">Fixed-surrogate comparison • Scan surrogate • targets: Burst / Sustain / Hop / Replay</tspan>
+<text id="text_2" x="120" y="252" font-family="Arial, Helvetica, sans-serif" font-size="26" font-weight="700" fill="#102235" text-anchor="start">
+<tspan x="120" y="252.0">MAIN OSR METHOD COMPARISON</tspan>
 </text>
-<text id="text_3" x="120" y="296" font-family="Arial, Helvetica, sans-serif" font-size="24" font-weight="400" fill="#5D6C7B" text-anchor="start">
-<tspan x="120" y="296.0">mean ± SD across four held-out target folds</tspan>
+<text id="text_3" x="120" y="282" font-family="Arial, Helvetica, sans-serif" font-size="22" font-weight="400" fill="#102235" text-anchor="start">
+<tspan x="120" y="282.0">DQNGuard / DQN-IDS-style: Scan surrogate • VarMax: surrogate-all • targets: Burst / Sustain / Hop / Replay</tspan>
+</text>
+<text id="text_4" x="120" y="309" font-family="Arial, Helvetica, sans-serif" font-size="22" font-weight="400" fill="#5D6C7B" text-anchor="start">
+<tspan x="120" y="309.0">mean ± SD across four held-out target folds</tspan>
 </text>
 </g>
 <g id="operating_plot">
-<rect id="desirable_region" x="225.0" y="405.0" width="341.25" height="160.3636363636365" rx="0" fill="#EDF7F0" stroke="none" stroke-width="2"/>
-<text id="text_4" x="225" y="367" font-family="Arial, Helvetica, sans-serif" font-size="27" font-weight="700" fill="#102235" text-anchor="start">
+<text id="operating_direction" x="840" y="367" font-family="Arial, Helvetica, sans-serif" font-size="22" font-weight="400" fill="#5D6C7B" text-anchor="start">
+<tspan x="840" y="367.0">better operating point ↖</tspan>
+</text>
+<text id="text_6" x="225" y="367" font-family="Arial, Helvetica, sans-serif" font-size="27" font-weight="700" fill="#102235" text-anchor="start">
 <tspan x="225" y="367.0">Unknown F1 → higher is better</tspan>
 </text>
 <g id="axes">
 <line x1="225" y1="809.7272727272727" x2="1170" y2="809.7272727272727" stroke="#D8E1EA" stroke-width="1"/>
-<text id="text_5" x="205" y="816.7272727272727" font-family="Arial, Helvetica, sans-serif" font-size="22" font-weight="400" fill="#5D6C7B" text-anchor="end">
+<text id="text_7" x="205" y="816.7272727272727" font-family="Arial, Helvetica, sans-serif" font-size="22" font-weight="400" fill="#5D6C7B" text-anchor="end">
 <tspan x="205" y="816.7272727272727">0.50</tspan>
 </text>
 <line x1="225" y1="733.3636363636364" x2="1170" y2="733.3636363636364" stroke="#D8E1EA" stroke-width="1"/>
-<text id="text_6" x="205" y="740.3636363636364" font-family="Arial, Helvetica, sans-serif" font-size="22" font-weight="400" fill="#5D6C7B" text-anchor="end">
+<text id="text_8" x="205" y="740.3636363636364" font-family="Arial, Helvetica, sans-serif" font-size="22" font-weight="400" fill="#5D6C7B" text-anchor="end">
 <tspan x="205" y="740.3636363636364">0.60</tspan>
 </text>
 <line x1="225" y1="657.0" x2="1170" y2="657.0" stroke="#D8E1EA" stroke-width="1"/>
-<text id="text_7" x="205" y="664.0" font-family="Arial, Helvetica, sans-serif" font-size="22" font-weight="400" fill="#5D6C7B" text-anchor="end">
+<text id="text_9" x="205" y="664.0" font-family="Arial, Helvetica, sans-serif" font-size="22" font-weight="400" fill="#5D6C7B" text-anchor="end">
 <tspan x="205" y="664.0">0.70</tspan>
 </text>
 <line x1="225" y1="580.6363636363636" x2="1170" y2="580.6363636363636" stroke="#D8E1EA" stroke-width="1"/>
-<text id="text_8" x="205" y="587.6363636363636" font-family="Arial, Helvetica, sans-serif" font-size="22" font-weight="400" fill="#5D6C7B" text-anchor="end">
+<text id="text_10" x="205" y="587.6363636363636" font-family="Arial, Helvetica, sans-serif" font-size="22" font-weight="400" fill="#5D6C7B" text-anchor="end">
 <tspan x="205" y="587.6363636363636">0.80</tspan>
 </text>
 <line x1="225" y1="504.27272727272725" x2="1170" y2="504.27272727272725" stroke="#D8E1EA" stroke-width="1"/>
-<text id="text_9" x="205" y="511.27272727272725" font-family="Arial, Helvetica, sans-serif" font-size="22" font-weight="400" fill="#5D6C7B" text-anchor="end">
+<text id="text_11" x="205" y="511.27272727272725" font-family="Arial, Helvetica, sans-serif" font-size="22" font-weight="400" fill="#5D6C7B" text-anchor="end">
 <tspan x="205" y="511.27272727272725">0.90</tspan>
 </text>
 <line x1="225" y1="427.90909090909093" x2="1170" y2="427.90909090909093" stroke="#D8E1EA" stroke-width="1"/>
-<text id="text_10" x="205" y="434.90909090909093" font-family="Arial, Helvetica, sans-serif" font-size="22" font-weight="400" fill="#5D6C7B" text-anchor="end">
+<text id="text_12" x="205" y="434.90909090909093" font-family="Arial, Helvetica, sans-serif" font-size="22" font-weight="400" fill="#5D6C7B" text-anchor="end">
 <tspan x="205" y="434.90909090909093">1.00</tspan>
 </text>
 <line x1="225.0" y1="825" x2="225.0" y2="833" stroke="#102235" stroke-width="2"/>
-<text id="text_11" x="225.0" y="858" font-family="Arial, Helvetica, sans-serif" font-size="22" font-weight="400" fill="#5D6C7B" text-anchor="middle">
+<text id="text_13" x="225.0" y="858" font-family="Arial, Helvetica, sans-serif" font-size="22" font-weight="400" fill="#5D6C7B" text-anchor="middle">
 <tspan x="225.0" y="858.0">0.00</tspan>
 </text>
 <line x1="382.5" y1="825" x2="382.5" y2="833" stroke="#102235" stroke-width="2"/>
-<text id="text_12" x="382.5" y="858" font-family="Arial, Helvetica, sans-serif" font-size="22" font-weight="400" fill="#5D6C7B" text-anchor="middle">
+<text id="text_14" x="382.5" y="858" font-family="Arial, Helvetica, sans-serif" font-size="22" font-weight="400" fill="#5D6C7B" text-anchor="middle">
 <tspan x="382.5" y="858.0">0.03</tspan>
 </text>
 <line x1="540.0" y1="825" x2="540.0" y2="833" stroke="#102235" stroke-width="2"/>
-<text id="text_13" x="540.0" y="858" font-family="Arial, Helvetica, sans-serif" font-size="22" font-weight="400" fill="#5D6C7B" text-anchor="middle">
+<text id="text_15" x="540.0" y="858" font-family="Arial, Helvetica, sans-serif" font-size="22" font-weight="400" fill="#5D6C7B" text-anchor="middle">
 <tspan x="540.0" y="858.0">0.06</tspan>
 </text>
 <line x1="697.5" y1="825" x2="697.5" y2="833" stroke="#102235" stroke-width="2"/>
-<text id="text_14" x="697.5" y="858" font-family="Arial, Helvetica, sans-serif" font-size="22" font-weight="400" fill="#5D6C7B" text-anchor="middle">
+<text id="text_16" x="697.5" y="858" font-family="Arial, Helvetica, sans-serif" font-size="22" font-weight="400" fill="#5D6C7B" text-anchor="middle">
 <tspan x="697.5" y="858.0">0.09</tspan>
 </text>
 <line x1="855.0" y1="825" x2="855.0" y2="833" stroke="#102235" stroke-width="2"/>
-<text id="text_15" x="855.0" y="858" font-family="Arial, Helvetica, sans-serif" font-size="22" font-weight="400" fill="#5D6C7B" text-anchor="middle">
+<text id="text_17" x="855.0" y="858" font-family="Arial, Helvetica, sans-serif" font-size="22" font-weight="400" fill="#5D6C7B" text-anchor="middle">
 <tspan x="855.0" y="858.0">0.12</tspan>
 </text>
 <line x1="1012.5" y1="825" x2="1012.5" y2="833" stroke="#102235" stroke-width="2"/>
-<text id="text_16" x="1012.5" y="858" font-family="Arial, Helvetica, sans-serif" font-size="22" font-weight="400" fill="#5D6C7B" text-anchor="middle">
+<text id="text_18" x="1012.5" y="858" font-family="Arial, Helvetica, sans-serif" font-size="22" font-weight="400" fill="#5D6C7B" text-anchor="middle">
 <tspan x="1012.5" y="858.0">0.15</tspan>
 </text>
 <line x1="1170.0" y1="825" x2="1170.0" y2="833" stroke="#102235" stroke-width="2"/>
-<text id="text_17" x="1170.0" y="858" font-family="Arial, Helvetica, sans-serif" font-size="22" font-weight="400" fill="#5D6C7B" text-anchor="middle">
+<text id="text_19" x="1170.0" y="858" font-family="Arial, Helvetica, sans-serif" font-size="22" font-weight="400" fill="#5D6C7B" text-anchor="middle">
 <tspan x="1170.0" y="858.0">0.18</tspan>
 </text>
 <line x1="225" y1="405.0" x2="225" y2="825" stroke="#102235" stroke-width="2"/>
 <line x1="225" y1="825" x2="1170" y2="825" stroke="#102235" stroke-width="2"/>
-<text id="text_18" x="697" y="908" font-family="Arial, Helvetica, sans-serif" font-size="27" font-weight="700" fill="#102235" text-anchor="middle">
+<text id="text_20" x="697" y="908" font-family="Arial, Helvetica, sans-serif" font-size="27" font-weight="700" fill="#102235" text-anchor="middle">
 <tspan x="697" y="908.0">Known rejection → lower is better</tspan>
 </text>
 </g>
@@ -112,57 +117,57 @@
 </g>
 <g id="dqnguard_point">
 <circle cx="487.5" cy="531.0" r="12" fill="#1F6FEB" stroke="white" stroke-width="3"/>
-<text id="text_19" x="570" y="485" font-family="Arial, Helvetica, sans-serif" font-size="26" font-weight="700" fill="#1F6FEB" text-anchor="start">
+<text id="text_21" x="570" y="485" font-family="Arial, Helvetica, sans-serif" font-size="26" font-weight="700" fill="#1F6FEB" text-anchor="start">
 <tspan x="570" y="485.0">DQNGuard</tspan>
 </text>
-<text id="text_20" x="570" y="514" font-family="Arial, Helvetica, sans-serif" font-size="22" font-weight="400" fill="#5D6C7B" text-anchor="start">
+<text id="text_22" x="570" y="514" font-family="Arial, Helvetica, sans-serif" font-size="22" font-weight="400" fill="#5D6C7B" text-anchor="start">
 <tspan x="570" y="514.0">0.865 F1 · 5.0% known rejection</tspan>
 </text>
 </g>
 <g id="dqn_ids_point">
 <circle cx="555.75" cy="656.2363636363636" r="9" fill="#8A98A8" stroke="white" stroke-width="3"/>
-<text id="text_21" x="600" y="740" font-family="Arial, Helvetica, sans-serif" font-size="26" font-weight="700" fill="#102235" text-anchor="start">
+<text id="text_23" x="600" y="740" font-family="Arial, Helvetica, sans-serif" font-size="26" font-weight="700" fill="#102235" text-anchor="start">
 <tspan x="600" y="740.0">DQN-IDS-style head</tspan>
 </text>
-<text id="text_22" x="600" y="769" font-family="Arial, Helvetica, sans-serif" font-size="22" font-weight="400" fill="#5D6C7B" text-anchor="start">
+<text id="text_24" x="600" y="769" font-family="Arial, Helvetica, sans-serif" font-size="22" font-weight="400" fill="#5D6C7B" text-anchor="start">
 <tspan x="600" y="769.0">0.701 F1 · 6.3% known rejection</tspan>
 </text>
 </g>
 <g id="varmax_point">
 <circle cx="897.0" cy="622.6363636363636" r="9" fill="#8A98A8" stroke="white" stroke-width="3"/>
-<text id="text_23" x="850" y="654" font-family="Arial, Helvetica, sans-serif" font-size="26" font-weight="700" fill="#102235" text-anchor="start">
+<text id="text_25" x="850" y="654" font-family="Arial, Helvetica, sans-serif" font-size="26" font-weight="700" fill="#102235" text-anchor="start">
 <tspan x="850" y="654.0">VarMax surrogate-all</tspan>
 </text>
-<text id="text_24" x="850" y="683" font-family="Arial, Helvetica, sans-serif" font-size="22" font-weight="400" fill="#5D6C7B" text-anchor="start">
+<text id="text_26" x="850" y="683" font-family="Arial, Helvetica, sans-serif" font-size="22" font-weight="400" fill="#5D6C7B" text-anchor="start">
 <tspan x="850" y="683.0">0.745 F1 · 12.8% known rejection</tspan>
 </text>
 </g>
-<text id="text_25" x="120" y="965" font-family="Arial, Helvetica, sans-serif" font-size="22" font-weight="400" fill="#5D6C7B" text-anchor="start">
+<text id="text_27" x="120" y="965" font-family="Arial, Helvetica, sans-serif" font-size="22" font-weight="400" fill="#5D6C7B" text-anchor="start">
 <tspan x="120" y="965.0">Error bars = SD across held-out target folds, not rerun variance.</tspan>
 </text>
 </g>
 <g id="interpretation_rail">
 <g id="auroc_card">
 <rect  x="1300" y="345" width="524" height="245" rx="18" fill="white" stroke="#D8E1EA" stroke-width="2"/>
-<text id="text_26" x="1330" y="389" font-family="Arial, Helvetica, sans-serif" font-size="29" font-weight="700" fill="#102235" text-anchor="start">
+<text id="text_28" x="1330" y="389" font-family="Arial, Helvetica, sans-serif" font-size="29" font-weight="700" fill="#102235" text-anchor="start">
 <tspan x="1330" y="389.0">AUROC / RANKING</tspan>
 </text>
-<text id="text_27" x="1330" y="447" font-family="Arial, Helvetica, sans-serif" font-size="27" font-weight="400" fill="#102235" text-anchor="start">
+<text id="text_29" x="1330" y="447" font-family="Arial, Helvetica, sans-serif" font-size="27" font-weight="400" fill="#102235" text-anchor="start">
 <tspan x="1330" y="447.0">VarMax</tspan>
 </text>
-<text id="text_28" x="1790" y="447" font-family="Arial, Helvetica, sans-serif" font-size="30" font-weight="700" fill="#102235" text-anchor="end">
+<text id="text_30" x="1790" y="447" font-family="Arial, Helvetica, sans-serif" font-size="30" font-weight="700" fill="#102235" text-anchor="end">
 <tspan x="1790" y="447.0">0.951</tspan>
 </text>
-<text id="text_29" x="1330" y="500" font-family="Arial, Helvetica, sans-serif" font-size="27" font-weight="400" fill="#102235" text-anchor="start">
+<text id="text_31" x="1330" y="500" font-family="Arial, Helvetica, sans-serif" font-size="27" font-weight="400" fill="#102235" text-anchor="start">
 <tspan x="1330" y="500.0">DQNGuard</tspan>
 </text>
-<text id="text_30" x="1790" y="500" font-family="Arial, Helvetica, sans-serif" font-size="30" font-weight="700" fill="#102235" text-anchor="end">
+<text id="text_32" x="1790" y="500" font-family="Arial, Helvetica, sans-serif" font-size="30" font-weight="700" fill="#102235" text-anchor="end">
 <tspan x="1790" y="500.0">0.891</tspan>
 </text>
-<text id="text_31" x="1330" y="553" font-family="Arial, Helvetica, sans-serif" font-size="27" font-weight="400" fill="#102235" text-anchor="start">
+<text id="text_33" x="1330" y="553" font-family="Arial, Helvetica, sans-serif" font-size="27" font-weight="400" fill="#102235" text-anchor="start">
 <tspan x="1330" y="553.0">DQN-IDS-style</tspan>
 </text>
-<text id="text_32" x="1790" y="553" font-family="Arial, Helvetica, sans-serif" font-size="30" font-weight="700" fill="#102235" text-anchor="end">
+<text id="text_34" x="1790" y="553" font-family="Arial, Helvetica, sans-serif" font-size="30" font-weight="700" fill="#102235" text-anchor="end">
 <tspan x="1790" y="553.0">0.829</tspan>
 </text>
 </g>
@@ -171,13 +176,13 @@
 <tspan x="1320" y="683.6">thresholded decision</tspan>
 </text>
 <g id="osr_f1_card">
-<text id="text_35" x="1320" y="761" font-family="Arial, Helvetica, sans-serif" font-size="29" font-weight="700" fill="#1F6FEB" text-anchor="start">
+<text id="text_37" x="1320" y="761" font-family="Arial, Helvetica, sans-serif" font-size="29" font-weight="700" fill="#1F6FEB" text-anchor="start">
 <tspan x="1320" y="761.0">OSR macro F1:</tspan>
 </text>
-<text id="text_36" x="1320" y="808" font-family="Arial, Helvetica, sans-serif" font-size="40" font-weight="700" fill="#1F6FEB" text-anchor="start">
+<text id="text_38" x="1320" y="808" font-family="Arial, Helvetica, sans-serif" font-size="40" font-weight="700" fill="#1F6FEB" text-anchor="start">
 <tspan x="1320" y="808.0">0.881 ± 0.109</tspan>
 </text>
-<text id="text_37" x="1320" y="855" font-family="Arial, Helvetica, sans-serif" font-size="25" font-weight="400" fill="#102235" text-anchor="start">
+<text id="text_39" x="1320" y="855" font-family="Arial, Helvetica, sans-serif" font-size="25" font-weight="400" fill="#102235" text-anchor="start">
 <tspan x="1320" y="855">DQNGuard combines the highest mean</tspan>
 <tspan x="1320" y="886">Unknown F1 with the lowest mean known</tspan>
 <tspan x="1320" y="917">rejection in the main comparison.</tspan>

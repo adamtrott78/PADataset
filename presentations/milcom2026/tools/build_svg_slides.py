@@ -32,7 +32,7 @@ TITLES = [
  'A surrogate unknown shapes the DQN; the true unknown remains unseen until test',
  'DQNGuard gives the strongest usable operating point at low known rejection',
  'Surrogate usefulness depends strongly on the unseen target',
- 'No simple target-blind rule reliably predicts the best surrogate',
+ 'The target-blind diagnostics we tested do not reliably predict the best surrogate',
  'VarMax can search across surrogates; DQNGuard must learn how to combine them',
  'DQNGuard improves the operating point—but surrogate transfer remains the next challenge',
 ]
@@ -286,13 +286,21 @@ def slide07():
         s.arrow([(585,605),(585,765),(1285,765),(1285,785)],GREEN)
         s.arrow([(635,885),(635,899),(800,899),(800,905)],GREEN)
         s.arrow([(1285,885),(1285,899),(1120,899),(1120,905)],GREEN)
+        # Carry the fitted head around the known-only fitting paths without
+        # crossing them or implying surrogate input to bands/threshold fitting.
+        s.arrow([(1190,697),(1640,697),(1640,950),(1425,950)],BLUE,id='fitted_dqn_to_evaluation')
+        s.text(1395,680,'fitted DQN',22,True,BLUE)
     s.node('backbone_node',730,320,460,110,'3-class PA backbone\nBurst | Hop | Replay',size=29)
     s.node('known_calibration_node',350,485,470,120,'KNOWN CALIBRATION\nBurst • Hop • Replay',GREEN,26)
     s.node('surrogate_calibration_node',1100,485,470,120,'SCAN SURROGATE\nwithheld from backbone training',AMBER,25)
     s.node('dqn_fit_node',730,645,460,105,'FIT DQN CONFIDENCE HEAD\nknown + surrogate states',BLUE,25)
     s.node('known_guard_fit_node',385,790,500,95,'FIT GUARD BANDS ON KNOWN ONLY',GREEN,25)
     s.node('known_threshold_node',1035,790,500,95,'SET 5% THRESHOLD ON KNOWN ONLY',GREEN,25)
-    s.node('final_evaluation_node',570,910,780,90,'FINAL EVALUATION:\nknown test + Sustain target unknown',RED,26)
+    with s.group('final_evaluation_node'):
+        s.rect(500,910,920,90)
+        s.text(960,943,'FINAL EVALUATION',26,True,anchor='middle')
+        s.text(530,978,'Known test: Burst / Hop / Replay',24,True,GREEN,id='known_test_component')
+        s.text(1060,978,'Target unknown: Sustain',24,True,RED,id='target_unknown_component')
     s.text(960,1027,'Scan surrogate is not included in final test metrics.',21,color=SECOND,anchor='middle')
     s.save()
 
@@ -300,14 +308,15 @@ def slide08():
     s=Slide(8)
     with s.group('experiment_strip'):
         s.rect(96,225,1728,92,PANEL,stroke='none')
-        s.text(120,261,'Fixed-surrogate comparison • Scan surrogate • targets: Burst / Sustain / Hop / Replay',26,True)
-        s.text(120,296,'mean ± SD across four held-out target folds',24,color=SECOND)
+        s.text(120,252,'MAIN OSR METHOD COMPARISON',26,True)
+        s.text(120,282,'DQNGuard / DQN-IDS-style: Scan surrogate • VarMax: surrogate-all • targets: Burst / Sustain / Hop / Replay',22)
+        s.text(120,309,'mean ± SD across four held-out target folds',22,color=SECOND)
     # Domain expanded slightly from the suggested range to show every full SD bar.
     x0,y0,pw,ph=225,825,945,420
     X=lambda v:x0+v/.18*pw
     Y=lambda v:y0-(v-.48)/.55*ph
     with s.group('operating_plot'):
-        s.rect(X(0),Y(1.03),X(.065)-X(0),Y(.82)-Y(1.03),TINT[GREEN],stroke='none',r=0,id='desirable_region')
+        s.text(840,367,'better operating point ↖',22,color=SECOND,id='operating_direction')
         s.text(225,367,'Unknown F1 → higher is better',27,True)
         with s.group('axes'):
             for v in [.5,.6,.7,.8,.9,1.0]:
@@ -369,6 +378,9 @@ def slide09():
 
 def slide10():
     s=Slide(10,'Can we choose a good surrogate before the true unknown has ever been observed?')
+    with s.group('exploratory_analysis_tag'):
+        s.rect(96,220,460,36,PANEL,BORDER,r=12)
+        s.text(112,245,'EXPLORATORY DIAGNOSTIC ANALYSIS',20,True,SECOND)
     for x,id in [(96,'calibration_performance_card'),(680,'confidence_geometry_card'),(1264,'feature_geometry_card')]:
         with s.group(id):
             s.rect(x,275,560,560)
