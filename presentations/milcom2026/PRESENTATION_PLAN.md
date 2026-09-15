@@ -25,7 +25,7 @@ Statuses:
 | 9 | Surrogate usefulness depends strongly on the unseen target | Make Figure 2 the central diagnostic result and explain target-surrogate dependence | **CONCEPT LOCKED** |
 | 10 | No simple target-blind rule reliably predicts the best surrogate | Explain failed surrogate-selection diagnostics and the remaining deployment problem | **CONCEPT LOCKED** |
 | 11 | VarMax can search across surrogates; DQNGuard must learn how to combine them | Explain surrogate-all, the architectural mismatch, and the multi-surrogate DQNGuard research direction | **CONCEPT LOCKED** |
-| 12 | Takeaways | Leave three memorable conclusions and transition to Q&A | TBD |
+| 12 | DQNGuard improves the operating point—but surrogate transfer remains the next challenge | Leave three memorable conclusions, reinforce scope, and transition to Q&A | **CONCEPT LOCKED** |
 
 The intellectual climax should remain:
 
@@ -1738,6 +1738,196 @@ Then move to the final takeaway slide.
 - Do not claim multi-surrogate DQNGuard has been implemented or evaluated.
 - Pooled DQN, DQN ensemble, and hybrid guard designs are **candidate future architectures**.
 - Preserve the explicit goal of retaining DQNGuard's strong thresholded performance and 5% known-rejection operating constraint.
+
+
+---
+
+# Slide 12 — DQNGuard improves the operating point—but surrogate transfer remains the next challenge
+
+## Status
+
+**CONCEPT LOCKED**
+
+## Audience takeaway
+
+> Open-world RF recognition is feasible under a controlled known-sample cost, but calibration must become less dependent on one favorable surrogate.
+
+This is the closing slide. After the density of Slide 11, it should be deliberately simple, spacious, and visually calm.
+
+The audience should be able to recover the entire paper from three conclusions.
+
+## Slide title
+
+**DQNGuard improves the operating point—but surrogate transfer remains the next challenge**
+
+## Visual structure
+
+Use three equal-width takeaway columns across the slide.
+
+Each column should have:
+
+1. one large headline or metric cluster;
+2. one very small supporting visual;
+3. one short interpretation sentence.
+
+Do not introduce any new technical mechanism here.
+
+### Column 1 — Usable open-world operating point
+
+Headline numbers:
+
+- **0.865** — Unknown F1
+- **0.881** — OSR macro F1
+- **0.050** — known rejection
+
+Supporting label:
+
+**Best thresholded operating point in the main comparison**
+
+Interpretation:
+
+> **Preserve known PA evidence while exposing unfamiliar RF behavior.**
+
+This reconnects directly to the operational requirement introduced on Slide 5.
+
+### Column 2 — Surrogate transfer remains target-dependent
+
+Use a small thumbnail of the Target–Surrogate Matrix or an abstract 5×5 heatmap icon derived from Figure 2.
+
+Headline:
+
+**20 ordered target–surrogate pairs**
+
+Supporting statements:
+
+- best surrogate changes with the target;
+- several mismatched pairs approach **F1 ≈ 0**;
+- no simple target-blind selector was reliable.
+
+Interpretation:
+
+> **Calibration transfer is directional and behavior dependent.**
+
+Do not overload this column with individual matrix values. Slide 9 already provided those.
+
+### Column 3 — Multi-surrogate DQNGuard is the next research problem
+
+Use a compact visual:
+
+```text
+VarMax surrogate-all
+        +
+DQNGuard's budgeted decision layer
+        ↓
+MULTI-SURROGATE DQNGUARD?
+```
+
+Supporting line:
+
+**Future work — architectural redesign required**
+
+Interpretation:
+
+> **Goal: retain DQNGuard's strong Unknown F1, OSR F1, and explicit known-rejection budget while reducing single-surrogate dependence.**
+
+Do not imply that multi-surrogate DQNGuard has already been implemented or shown to improve performance.
+
+## Scope footer
+
+Across the bottom of the slide, use one restrained sentence:
+
+> **Preliminary Actions are RF precursor evidence. DQNGuard routes evidence; it does not make the final attack attribution or response decision.**
+
+This is the final scope boundary the audience should remember.
+
+Place **Questions?** beneath or beside the footer with enough whitespace that the slide can remain on screen during Q&A.
+
+## Rough visual mockup
+
+```text
+┌──────────────────────────────────────────────────────────────────────────────────┐
+│ DQNGuard improves the operating point—but surrogate transfer remains the next   │
+│ challenge                                                                         │
+│                                                                                  │
+│      1. USABLE OSR                2. SURROGATE DEPENDENCE     3. NEXT STEP       │
+│                                                                                  │
+│        0.865                         [matrix thumbnail]         VarMax surrogate-  │
+│      UNKNOWN F1                                               all philosophy      │
+│                                                                 +                │
+│        0.881                       20 ordered pairs            DQNGuard's strong  │
+│      OSR MACRO F1                                              operating point    │
+│                                    Best surrogate                     │           │
+│        0.050                       changes by target                   ▼           │
+│    KNOWN REJECTION                                             MULTI-SURROGATE    │
+│                                    Some F1 ≈ 0                    DQNGUARD?        │
+│                                                                                  │
+│  Preserve known evidence        No reliable simple            Preserve 5% budget │
+│  while exposing unknowns        target-blind selector         + reduce sensitivity│
+│                                                                                  │
+│ ──────────────────────────────────────────────────────────────────────────────── │
+│ Preliminary Actions are RF precursor evidence — DQNGuard routes evidence;       │
+│ it does not make the final attack attribution or response decision.             │
+│                                                                                  │
+│                                      Questions?                                  │
+└──────────────────────────────────────────────────────────────────────────────────┘
+```
+
+## SVG-production guidance
+
+This slide should be especially easy to reconstruct as SVG.
+
+Recommended grouping hierarchy:
+
+```text
+slide12
+├── title_group
+├── takeaway_1_group
+│   ├── heading
+│   ├── metric_unknown_f1
+│   ├── metric_osr_f1
+│   ├── metric_known_reject
+│   └── interpretation
+├── takeaway_2_group
+│   ├── heading
+│   ├── matrix_thumbnail
+│   ├── pair_count
+│   └── interpretation
+├── takeaway_3_group
+│   ├── heading
+│   ├── varmax_node
+│   ├── dqnguard_node
+│   ├── merge_arrow
+│   ├── future_node
+│   └── interpretation
+├── scope_footer
+└── questions_label
+```
+
+The SVG should use real text elements wherever practical rather than converting all text to paths. The matrix thumbnail may be embedded as vector artwork or reconstructed from the accepted Figure 2 source, but do not manually invent new matrix values.
+
+Keep the three columns aligned to the same top and bottom baselines. Make Column 1's metric numerals the most visually dominant elements, Column 2's matrix thumbnail the second strongest visual, and Column 3's future-work node the third.
+
+Use whitespace generously. The closing slide should feel lighter than Slides 8–11.
+
+## Speaker script
+
+See [SCRIPT.md](SCRIPT.md#slide-12--dqnguard-improves-the-operating-pointbut-surrogate-transfer-remains-the-next-challenge).
+
+## Closing transition
+
+End verbally with:
+
+> **“Thank you.”**
+
+Then leave the slide displayed for Q&A.
+
+## Terminology / claim constraints
+
+- DQNGuard's reported mean metrics are across held-out target folds, not repeated seeds.
+- Do not state or imply that DQNGuard is the best method on every metric; VarMax surrogate-all has higher AUROC.
+- Do not imply that multi-surrogate DQNGuard has been implemented or experimentally validated.
+- DQNGuard is an RF sensing / triage layer, not a complete attack-chain attribution or EW response system.
+- Preliminary Actions are observable RF precursor behaviors, not final MITRE ATT&CK technique labels.
 
 ---
 
