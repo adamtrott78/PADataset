@@ -405,7 +405,7 @@ def slide10():
     with s.group('shared_conclusion'):
         for x in [376,960,1544]:s.arrow([(x,839),(x,870)])
         s.rect(300,875,1320,105,INK,stroke=INK)
-        s.text(960,917,'NO RELIABLE SINGLE-SURROGATE SELECTION RULE',34,True,'white',anchor='middle')
+        s.text(960,917,'NO TESTED DIAGNOSTIC RELIABLY SELECTS THE BEST SURROGATE',34,True,'white',anchor='middle')
         s.text(960,956,'Good surrogate performance does not imply good target transfer.',26,color='white',anchor='middle')
     s.save()
 

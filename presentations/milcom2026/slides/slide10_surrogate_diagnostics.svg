@@ -93,7 +93,7 @@
 <polyline points="1544,839 1544,870" fill="none" stroke="#102235" stroke-width="4" stroke-linecap="round" stroke-linejoin="round" marker-end="url(#arrow102235)"/>
 <rect  x="300" y="875" width="1320" height="105" rx="18" fill="#102235" stroke="#102235" stroke-width="2"/>
 <text id="text_24" x="960" y="917" font-family="Arial, Helvetica, sans-serif" font-size="34" font-weight="700" fill="white" text-anchor="middle">
-<tspan x="960" y="917.0">NO RELIABLE SINGLE-SURROGATE SELECTION RULE</tspan>
+<tspan x="960" y="917.0">NO TESTED DIAGNOSTIC RELIABLY SELECTS THE BEST SURROGATE</tspan>
 </text>
 <text id="text_25" x="960" y="956" font-family="Arial, Helvetica, sans-serif" font-size="26" font-weight="400" fill="white" text-anchor="middle">
 <tspan x="960" y="956.0">Good surrogate performance does not imply good target transfer.</tspan>
