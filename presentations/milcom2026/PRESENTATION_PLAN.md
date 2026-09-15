@@ -24,7 +24,7 @@ Statuses:
 | 8 | DQNGuard gives the strongest usable operating point at low known rejection | Present the main method comparison | **CONCEPT LOCKED** |
 | 9 | Surrogate usefulness depends strongly on the unseen target | Make Figure 2 the central diagnostic result and explain target-surrogate dependence | **CONCEPT LOCKED** |
 | 10 | No simple target-blind rule reliably predicts the best surrogate | Explain failed surrogate-selection diagnostics and the remaining deployment problem | **CONCEPT LOCKED** |
-| 11 | Multi-surrogate calibration may reduce target-surrogate sensitivity | Future work and broader implications | TBD |
+| 11 | VarMax can search across surrogates; DQNGuard must learn how to combine them | Explain surrogate-all, the architectural mismatch, and the multi-surrogate DQNGuard research direction | **CONCEPT LOCKED** |
 | 12 | Takeaways | Leave three memorable conclusions and transition to Q&A | TBD |
 
 The intellectual climax should remain:
@@ -1478,6 +1478,266 @@ This transitions directly into the multi-surrogate future-work direction.
 - Correlation does not establish a causal mechanism.
 - The weak positive feature-space signal is insufficient to claim reliable surrogate prediction.
 - Preserve the distinction between retrospective matrix analysis and a deployable target-blind selection policy.
+
+
+---
+
+# Slide 11 — VarMax can search across surrogates; DQNGuard must learn how to combine them
+
+## Status
+
+**CONCEPT LOCKED**
+
+## Audience takeaway
+
+> VarMax surrogate-all can compare many pseudo-unknown calibration candidates inside one fixed decision architecture. DQNGuard cannot import that procedure unchanged because changing the surrogate changes the learned DQN score function itself.
+
+This slide serves three purposes:
+
+1. explain **VarMax surrogate-all** as an original methodological contribution;
+2. explain the concrete architectural reason it does not transfer directly into current DQNGuard;
+3. turn that limitation into a specific future research direction.
+
+## Slide title
+
+**VarMax can search across surrogates; DQNGuard must learn how to combine them**
+
+## Supporting sentence
+
+**In VarMax, surrogates change calibration parameters; in DQNGuard, the surrogate changes the learned open-set decision function itself.**
+
+Use a visible label near the VarMax section:
+
+**ORIGINAL CONTRIBUTION — VARMAX SURROGATE-ALL**
+
+Use a visible label near the future-work section:
+
+**FUTURE WORK — NOT YET EVALUATED**
+
+## Part 1 — How VarMax surrogate-all works
+
+VarMax surrogate-all operates on **one frozen backbone**.
+
+The backbone's known classes remain part of the classifier taxonomy. During validation/calibration, each known class takes a turn as a **pseudo-unknown** in a held-out score subset.
+
+For each pseudo-unknown choice, VarMax sweeps candidate decision parameters:
+
+- global top-two probability-gap threshold;
+- predicted-class variance percentile bands;
+- predicted-class energy percentile bands.
+
+The validation data are partitioned so that the calibration search has separate known fitting, known guard, and pseudo-open score roles.
+
+Each surrogate-specific threshold candidate is tested against known-retention / per-class-recall requirements plus a minimum pseudo-open recall requirement.
+
+Candidates from **all available surrogate specifications compete in the same search**. The selected result becomes one final VarMax decision rule.
+
+Key point:
+
+> **Surrogate-all is not an ensemble. It searches across surrogate-specific calibration candidates and selects one final rule.**
+
+The same trained backbone and same deterministic VarMax score/acceptance architecture are used for every candidate. Only the calibration parameters differ.
+
+## Part 2 — Why the same procedure does not port directly to DQNGuard
+
+Current DQNGuard is architecturally different in two important ways.
+
+### A. The surrogate changes the learned score function
+
+Current DQNGuard fitting uses:
+
+```text
+known confidence states
+        +
+surrogate-open confidence states
+        ↓
+      fit DQN
+        ↓
+Q_unknown(x) - Q_known(x)
+        +
+known-only band distance
+        ↓
+combined unknown score
+```
+
+Therefore:
+
+- Scan surrogate → one fitted DQN;
+- Burst surrogate → a different fitted DQN;
+- Hop surrogate → another fitted DQN.
+
+These are **different learned nonlinear score functions**, not merely different scalar threshold values.
+
+The final 5% score threshold is selected from known calibration **after** that DQN has been fitted. A numeric cutoff belonging to DQN A is therefore not automatically meaningful in DQN B's score space.
+
+This makes the VarMax operation:
+
+> “Generate many parameter candidates, compare them directly, select one.”
+
+non-portable as a trivial DQNGuard calibration switch.
+
+### B. DQNGuard's external surrogate is outside the backbone taxonomy
+
+In the main DQNGuard Target–Surrogate regime, both the target and the surrogate are withheld from backbone training.
+
+VarMax surrogate-all is different: its pseudo-unknowns are **backbone-known classes** temporarily repurposed during calibration.
+
+Trying to preserve DQNGuard's current external-surrogate philosophy while withholding many surrogates at once would progressively shrink the known-class taxonomy. With only five PA classes, a literal leave-many-out version quickly stops being a useful closed-set recognition problem.
+
+## Part 3 — Future architectural question
+
+The research question is therefore not:
+
+> “Can we turn on surrogate-all in DQNGuard?”
+
+It is:
+
+> **How should DQNGuard combine multiple surrogate signals while preserving one coherent score space and its explicit known-rejection budget?**
+
+Three concrete candidate architectures are worth testing.
+
+### Option A — pooled multi-surrogate DQN
+
+```text
+surrogate A ─┐
+surrogate B ─┼→ pooled open-state set → ONE DQN → one score space
+surrogate C ─┘
+```
+
+Potential advantage:
+
+- simplest route to one unified DQN score;
+- existing known-only 5% thresholding can remain conceptually intact.
+
+Research risk:
+
+- heterogeneous surrogate geometries may blur the strong unknown signal learned from a favorable single surrogate.
+
+### Option B — surrogate-specific DQN ensemble
+
+```text
+surrogate A → DQN A ─┐
+surrogate B → DQN B ─┼→ normalize / aggregate → unified unknown score
+surrogate C → DQN C ─┘
+```
+
+Potential advantage:
+
+- preserves specialized surrogate-specific unknown signals.
+
+Research problems:
+
+- normalize incompatible DQN score spaces;
+- determine aggregation rule;
+- recalibrate one global known-rejection budget after aggregation.
+
+### Option C — hybrid VarMax / DQNGuard multi-surrogate design
+
+```text
+multiple pseudo-unknowns
+        ↓
+VarMax-style multi-surrogate
+guard / calibration evidence
+        +
+single learned DQN confidence signal
+        ↓
+budgeted combined score
+```
+
+Potential advantage:
+
+- place multi-surrogate reasoning in the deterministic calibration/guard portion, where candidate evidence is naturally comparable;
+- preserve a single learned DQN confidence signal and DQNGuard's known-budget operating constraint.
+
+This option is especially natural given DQNGuard's historical synthesis of DQN confidence evidence with VarMax-derived predicted-class guards.
+
+## Result motivation
+
+VarMax surrogate-all achieved the highest AUROC in the main comparison:
+
+**AUROC = 0.951 ± 0.060**
+
+DQNGuard achieved the better thresholded operating point:
+
+- Unknown F1: **0.865 ± 0.142**
+- OSR macro F1: **0.881 ± 0.109**
+- known rejection: **0.050 ± 0.004**
+
+Do not claim that surrogate-all caused VarMax's AUROC advantage or that any proposed multi-surrogate DQNGuard architecture will improve results.
+
+The motivating research objective is:
+
+> **Can we combine VarMax's multi-surrogate calibration philosophy with DQNGuard's strong thresholded operating point and explicit known-rejection budget?**
+
+## Rough visual mockup
+
+```text
+┌────────────────────────────────────────────────────────────────────────────────────────┐
+│ VarMax can search across surrogates; DQNGuard must learn how to combine them           │
+│ In VarMax, surrogates change parameters; in DQNGuard, they change the learned scorer.  │
+│                                                                                        │
+│ ORIGINAL CONTRIBUTION                     WHY IT DOESN'T PORT DIRECTLY                 │
+│ VARMAX SURROGATE-ALL                                                                  │
+│                                                                                        │
+│       ONE FROZEN BACKBONE                  Scan surrogate  → DQN A                     │
+│              │                             Burst surrogate → DQN B                     │
+│   ┌──────────┼──────────┐                  Hop surrogate   → DQN C                     │
+│   ▼          ▼          ▼                         │                                   │
+│ Scan      Burst        Hop                         ▼                                   │
+│ pseudo-   pseudo-      pseudo-              DIFFERENT LEARNED                         │
+│ unknown   unknown      unknown                SCORE SPACES                             │
+│   │          │          │                         │                                   │
+│   └──── threshold / band candidates ───┐          │ thresholds are not               │
+│                                        │          │ directly interchangeable         │
+│                                        ▼          │                                   │
+│                              ALL CANDIDATES       │                                   │
+│                                  COMPETE           │                                   │
+│                                        │          │                                   │
+│                                        ▼          │                                   │
+│                              SELECT ONE RULE      │                                   │
+│                                                                                        │
+│ ────────────────────────────────────────────────────────────────────────────────────── │
+│ FUTURE WORK — HOW DO WE COMBINE MULTIPLE SURROGATES IN DQNGUARD?                      │
+│                                                                                        │
+│ POOLED DQN                    DQN ENSEMBLE                 HYBRID GUARD                 │
+│ A ─┐                          A → DQN A ─┐                 A ─┐                         │
+│ B ─┼→ ONE DQN                 B → DQN B ─┼→ aggregate     B ─┼→ VarMax-style evidence │
+│ C ─┘                          C → DQN C ─┘                 C ─┘       + ONE DQN         │
+│                                                                                        │
+│ GOAL: preserve DQNGuard's strong Unknown F1 / OSR F1 / 5% known-budget operating point│
+│       while reducing dependence on a favorable single surrogate.                       │
+└────────────────────────────────────────────────────────────────────────────────────────┘
+```
+
+This is intentionally a denser slide than the rest of the deck. During final PowerPoint construction, use progressive emphasis or staged appearance if reliable so the audience sees:
+
+1. VarMax surrogate-all;
+2. architectural mismatch;
+3. future architectures;
+
+in sequence rather than all at once.
+
+## Speaker script
+
+See [SCRIPT.md](SCRIPT.md#slide-11--varmax-can-search-across-surrogates-dqnguard-must-learn-how-to-combine-them).
+
+## Transition
+
+End with:
+
+> **“So the paper leaves us with both a working open-world detector and a concrete architectural question: how do we retain DQNGuard's operating-point advantage while learning from more than one kind of unknown?”**
+
+Then move to the final takeaway slide.
+
+## Terminology / claim constraints
+
+- VarMax surrogate-all is a **multi-surrogate calibration search**, not an ensemble of deployed VarMax detectors.
+- VarMax pseudo-unknown classes remain backbone-known classes; they are temporarily treated as open only in the calibration score subset.
+- Current DQNGuard's surrogate is excluded from backbone training and affects **DQN fitting**.
+- Do not describe different DQNGuard thresholds as directly transferable between separately fitted DQNs.
+- Do not claim multi-surrogate DQNGuard has been implemented or evaluated.
+- Pooled DQN, DQN ensemble, and hybrid guard designs are **candidate future architectures**.
+- Preserve the explicit goal of retaining DQNGuard's strong thresholded performance and 5% known-rejection operating constraint.
 
 ---
 
