@@ -112,6 +112,7 @@ The current target is approximately 11-12 main slides plus backups. Exact slide 
 - Slide 7: **concept locked; leave-two-out surrogate-open calibration design, one-backbone mechanics, and script retained in full**
 - Slide 8: **concept locked; fixed-surrogate operating-point comparison, AUROC caveat, plot mockup, and script retained in full**
 - Slide 9: **concept locked; Figure 2 Target-Surrogate Matrix centered, provenance distinction preserved, and consolidated speaker script retained in full**
+- Slide 10: **concept locked; target-blind surrogate-selection diagnostics, negative-result framing, and consolidated speaker script retained in full**
 - Remaining slides: **to be designed one by one**
 - Final PowerPoint: **not yet built**
 - Final spoken script: **not yet complete**
