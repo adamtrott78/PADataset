@@ -44,18 +44,49 @@ Use the same communication heuristics that guided the paper, tightened for a spo
 9. **Do not make the audience remember implementation details that are not required to understand the scientific claim.**
 10. **Use the script to add nuance; do not overload the slide itself.**
 
-## Canonical planning files
+## Canonical production files
 
-Read in this order:
+A rendering session should read these in this order:
 
-1. [PRESENTATION_PLAN.md](PRESENTATION_PLAN.md) — canonical slide-by-slide concept and visual plan.
-2. [SCRIPT.md](SCRIPT.md) — spoken script for slides whose concepts are sufficiently stable.
-3. [../../papers/CONTEXT.md](../../papers/CONTEXT.md) — paper-writing and evidence discipline.
-4. [../../papers/milcom2026/CONTEXT.md](../../papers/milcom2026/CONTEXT.md) — MILCOM paper tooling and provenance.
-5. [../../experiments/context/DQNGUARD.md](../../experiments/context/DQNGUARD.md) — DQNGuard lineage and claim boundaries.
-6. [../../experiments/context/RESULTS.md](../../experiments/context/RESULTS.md) — final result interpretation and provenance.
+1. [SVG_PRODUCTION_SPEC.md](SVG_PRODUCTION_SPEC.md) — **production authority for SVG geometry, typography, palette, object hierarchy, asset use, and exact slide composition.**
+2. [PRESENTATION_PLAN.md](PRESENTATION_PLAN.md) — canonical scientific/design provenance: audience takeaway, rationale, claims, numbers, and forbidden interpretations.
+3. [SCRIPT.md](SCRIPT.md) — spoken script for Slides 2–12. The Slide 1 opening script is currently embedded in `SVG_PRODUCTION_SPEC.md`.
+
+Read the broader repository only if a scientific ambiguity remains:
+
+4. [../../papers/CONTEXT.md](../../papers/CONTEXT.md) — paper-writing and evidence discipline.
+5. [../../papers/milcom2026/CONTEXT.md](../../papers/milcom2026/CONTEXT.md) — MILCOM paper tooling and provenance.
+6. [../../experiments/context/DQNGUARD.md](../../experiments/context/DQNGUARD.md) — DQNGuard lineage and claim boundaries.
+7. [../../experiments/context/RESULTS.md](../../experiments/context/RESULTS.md) — final result interpretation and provenance.
 
 Do not read the repository recursively. Follow these routes only as needed.
+
+## Source-of-truth precedence
+
+For production work:
+
+1. scientific claim / numerical conflict -> `PRESENTATION_PLAN.md` and reviewed result provenance win;
+2. SVG/layout/rendering conflict -> `SVG_PRODUCTION_SPEC.md` wins;
+3. narration wording -> `SCRIPT.md` wins except for Slide 1, whose opening script is in `SVG_PRODUCTION_SPEC.md`;
+4. camera-ready paper title/author/affiliation block is authoritative for Slide 1.
+
+An older `PRESENTATION_PLAN.md` status may still call Slide 1 `TBD`; that marker is stale. Slide 1 is now concept locked in `SVG_PRODUCTION_SPEC.md`.
+
+## Camera-ready title-page identity
+
+Use the submitted camera-ready paper identity:
+
+**DQNGuard: Towards Open-World RF Preliminary-Action Detection**
+
+Authors:
+
+- Adam Trott — University of Massachusetts Dartmouth
+- Cameron Popillo — University of Massachusetts Dartmouth
+- Nathaniel D. Bastian — Johns Hopkins University
+- Roulin Zhou — University of Massachusetts Dartmouth
+- Gokhan Kul — University of Massachusetts Dartmouth
+
+Do not infer author affiliations from older presentation material.
 
 ## Scientific interpretation that must not be lost
 
@@ -87,7 +118,13 @@ Goal:
 
 > aggregate calibration evidence from multiple surrogate behaviors so DQNGuard is less dependent on a fortunate single surrogate-target pairing.
 
-Possible future architectures include pooled surrogate calibration, per-surrogate guard ensembles, robust envelopes, or learned weighting. These are **proposed future work**, not demonstrated results.
+Candidate architectures currently retained for the presentation are:
+
+- pooled multi-surrogate DQN,
+- surrogate-specific DQN ensemble with score normalization/aggregation,
+- hybrid VarMax/DQNGuard design that places multi-surrogate evidence in the deterministic guard portion while preserving one learned DQN signal.
+
+These are **proposed future work**, not demonstrated results.
 
 ### Claim boundary
 
@@ -95,66 +132,99 @@ DQNGuard is a sensing / triage layer for open-world RF behavior. It is not the c
 
 ## Current deck-level narrative
 
-The current intended story is:
+The locked main-deck story is:
 
-> why open-world PA recognition matters -> what a PA is -> what data/system was built -> why existing OSR heads are insufficient -> what DQNGuard does -> how it was evaluated -> what it improves -> why performance varies -> what the Target-Surrogate Matrix reveals -> what should come next.
+> closed-set classifiers cannot reject novelty -> define the five Preliminary Actions -> establish the OTA three-protocol dataset -> motivate an explicit known-rejection operating constraint -> introduce DQNGuard -> explain surrogate-open calibration -> show the fixed-surrogate operating-point result -> expose target/surrogate dependence -> show why simple target-blind surrogate selection fails -> motivate multi-surrogate DQNGuard -> close with three takeaways.
 
-The current target is approximately 11-12 main slides plus backups. Exact slide count remains adjustable to the MILCOM speaking slot.
+The intellectual climax remains:
+
+> DQNGuard improves the operating point -> performance still varies by target -> the Target-Surrogate Matrix reveals strong surrogate-target dependence -> target-blind selection is unreliable -> multi-surrogate calibration becomes the natural next research direction.
 
 ## Current status
 
-- Deck skeleton: **provisional but strong**
-- Slide 2: **concept locked; visual composition revised once and retained in full**
-- Slide 3: **concept locked; Preliminary Action framing and five-behavior visual retained in full**
-- Slide 4: **concept locked; OTA 3×5 protocol/behavior matrix and N210 capture overview retained in full**
-- Slide 5: **concept locked; OSR predecessor comparison and corrected DQN-style confidence diagram retained in full**
-- Slide 6: **concept locked; final s22 DQNGuard hero-figure source path, mockup, and speaker script retained in full**
-- Slide 7: **concept locked; leave-two-out surrogate-open calibration design, one-backbone mechanics, and script retained in full**
-- Slide 8: **concept locked; fixed-surrogate operating-point comparison, AUROC caveat, plot mockup, and script retained in full**
-- Slide 9: **concept locked; Figure 2 Target-Surrogate Matrix centered, provenance distinction preserved, and consolidated speaker script retained in full**
-- Slide 10: **concept locked; target-blind surrogate-selection diagnostics, negative-result framing, and consolidated speaker script retained in full**
-- Slide 11: **concept locked; VarMax surrogate-all mechanism, DQNGuard architectural mismatch, future architecture options, and consolidated speaker script retained in full**
-- Slide 12: **concept locked; three-column closing synthesis, scope footer, SVG grouping guidance, and consolidated speaker script retained in full**
-- Slide 1: **still TBD**
-- Slides 2–12: **concept narrative complete**
-- Final PowerPoint / SVG slide assets: **not yet built**
-- Spoken script: **complete for Slides 2–12; title-slide opening still TBD**
+- Slide 1: **concept locked; camera-ready title/author identity, 58/42 title layout, hero preview, and opening script are specified**
+- Slides 2–12: **concept locked**
+- Deck-wide visual system: **locked in `SVG_PRODUCTION_SPEC.md`**
+- Per-slide 16:9 SVG geometry/object hierarchy: **locked in `SVG_PRODUCTION_SPEC.md`**
+- Spoken script: **complete for Slides 2–12; Slide 1 opening retained in the SVG spec**
+- Camera-ready DQNGuard hero asset: **available**
+- Target-Surrogate Matrix presentation asset: **available**
+- OTA image directories: **reserved; final imagery still pending**
+- Final SVG slides: **not yet built**
+- Final PowerPoint: **not yet assembled**
 
+## Presentation assets
 
-## SVG-production handoff objective
+Current presentation asset tree:
 
-The next production phase is intended for a **ChatGPT Work** session that will construct the slides as SVG assets and later assemble them into the final presentation.
+```text
+presentations/milcom2026/assets/
+├── figures/
+│   ├── hero_dqnguard_pipeline_s23_tikz.pdf
+│   └── target_surrogate_unknown_f1_matrix.png
+├── ota/
+│   ├── wifi/
+│   ├── bluetooth/
+│   └── zigbee/
+└── README.md
+```
 
-Because that production session is expensive, this package should minimize design invention during rendering. The Work session should be able to treat the planning package as an implementation specification rather than a brainstorming prompt.
+Asset rules are defined in `SVG_PRODUCTION_SPEC.md`.
 
-Before starting SVG production, perform one final **design-specification pass** over every main slide. For each slide, preserve or add:
+Important constraints:
 
-- exact 16:9 composition and intended visual hierarchy;
-- title and supporting-line placement;
-- approximate percentage allocation of the canvas to each major region;
-- alignment relationships and whitespace requirements;
-- element grouping / SVG object hierarchy;
-- which elements are real text versus imported vector assets;
-- exact audience-facing labels and numbers;
-- callout and annotation placement;
-- arrow direction and semantic meaning;
-- which elements should dominate visually and which should recede;
-- any required source asset path and whether it is canonical, generated, or must be rendered;
-- explicit forbidden substitutions or claim-sensitive wording;
-- speaker-script cues that affect visual sequencing;
-- whether progressive reveal would help, while keeping the static SVG independently understandable.
+- use the committed **s23** camera-ready hero PDF, not older hero revisions;
+- use the reviewed Target-Surrogate Matrix asset or intentionally regenerate it from reviewed provenance;
+- never fabricate OTA scientific imagery for Slides 3–4;
+- Slides 3–4 may be built with fixed neutral image slots and populated when the real OTA images are generated.
 
-The SVG builder should **not** silently redesign a locked slide into a generic corporate template. Visual styling may be normalized across the deck, but the information architecture, scientific meaning, and intended reading order must remain unchanged.
+## SVG-production handoff
 
-Where a slide relies on a paper figure or repository asset, use the canonical source identified in the plan. Do not redraw scientific data from memory when a source asset can be rendered or regenerated from reviewed provenance.
+A ChatGPT Work / artifact-building session should treat `SVG_PRODUCTION_SPEC.md` as an implementation specification, not a brainstorming prompt.
 
-A final production-ready pass should also establish one deck-wide visual system before SVG generation begins: canvas size, grid, margins, type hierarchy, color semantics, stroke weights, corner radii, icon treatment, figure-caption treatment, and reusable components. Those global choices should then be applied consistently without changing slide-specific hierarchy.
+The builder should not silently redesign a locked slide into a generic corporate template. Styling is already normalized across the deck; preserve:
 
+- information hierarchy,
+- reading order,
+- exact audience-facing labels/numbers,
+- semantic colors,
+- source assets,
+- claim-sensitive wording,
+- arrow semantics,
+- static-slide comprehensibility.
+
+The production spec fixes:
+
+- 1920×1080 SVG canvas,
+- safe areas and grid,
+- type hierarchy,
+- palette and semantic colors,
+- stroke/corner-radius grammar,
+- object hierarchy for every slide,
+- per-slide geometry,
+- scientific-asset rules,
+- forbidden substitutions,
+- rendering/QA checklist.
+
+## Recommended production order
+
+1. Slide 1 — validate global style.
+2. Slide 2 — validate two-panel grammar.
+3. Slide 5 — validate three-panel grammar.
+4. Slide 6 — validate imported vector figure treatment.
+5. Slide 8 — validate chart/metric treatment.
+6. Slide 9 — validate scientific-result asset treatment.
+7. Slides 7, 10, 11, 12.
+8. Slides 3–4 after OTA imagery is available, or build their fixed frames now and populate imagery later.
+
+After every SVG, render it to 1920×1080 PNG and visually QA clipping, readability, alignment, and scientific fidelity before assembling PowerPoint.
 
 ## Handoff rule for another ChatGPT
 
-Start from this file, then read `PRESENTATION_PLAN.md`.
+Start from this file, then read `SVG_PRODUCTION_SPEC.md`.
 
-Treat any slide marked **CONCEPT LOCKED** as authoritative unless the user explicitly requests a redesign.
+Consult `PRESENTATION_PLAN.md` for scientific rationale or claim boundaries rather than re-deriving the research story.
 
-Do not silently replace a locked visual with a generic template. Preserve the intended audience takeaway, information hierarchy, and transition even if the final graphic treatment changes.
+Treat all twelve main-slide concepts as locked unless the user explicitly requests a redesign.
+
+Do not silently replace a locked visual with a generic template.
