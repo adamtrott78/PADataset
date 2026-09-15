@@ -375,6 +375,35 @@ So the paper leaves us with both a working open-world detector and a concrete ar
 
 ---
 
-# Slide 12
+# Slide 12 — DQNGuard improves the operating point—but surrogate transfer remains the next challenge
 
-**TBD — write only after the slide concept is reviewed and locked.**
+## Target speaking time
+
+Approximately **50-60 seconds**.
+
+## Consolidated script
+
+To close, there are three results I want you to take away from this work.
+
+First, DQNGuard gives us a useful open-world operating point. Under the main fixed-surrogate experiment, it achieved an average Unknown F1 of 0.865 and an OSR macro F1 of 0.881 while keeping known rejection at approximately five percent. So we can expose unfamiliar RF behavior without solving the problem by throwing away the known evidence stream.
+
+Second, the calibration problem is not solved. Across the twenty Target–Surrogate combinations, surrogate usefulness was strongly dependent on the actual unseen behavior. Some pairings worked very well, others nearly failed completely, and the simple target-blind selection rules we tested could not reliably predict the best surrogate.
+
+Third, that gives us a concrete next research problem. VarMax surrogate-all shows how multiple pseudo-unknown behaviors can contribute to calibration when the decision architecture is fixed. DQNGuard gives us the stronger thresholded operating point, but its learned DQN makes multi-surrogate calibration an architectural problem rather than a simple threshold search.
+
+Our next goal is therefore to combine those strengths: preserve DQNGuard's explicit known-rejection budget and strong unknown signal while learning from more than one kind of surrogate behavior.
+
+And throughout this work, DQNGuard should be understood as an RF sensing and triage layer. It preserves known Preliminary Action evidence or routes unfamiliar behavior for downstream analysis; it does not make the final attack attribution or response decision.
+
+Thank you.
+
+## Delivery notes
+
+- Slow down. This slide should feel simpler than Slides 8–11.
+- Use the three visible columns as the speaking structure.
+- On Column 1, point to the three metrics but do not re-explain the full comparison.
+- On Column 2, summarize the Target–Surrogate conclusion rather than revisiting individual cells.
+- On Column 3, frame multi-surrogate DQNGuard as a concrete research direction, not a completed result.
+- Reinforce the system boundary once, clearly.
+- End with **“Thank you.”** and leave the slide displayed for Q&A.
+
