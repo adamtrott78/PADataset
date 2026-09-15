@@ -23,7 +23,7 @@ Statuses:
 | 7 | A surrogate unknown shapes the DQN; the true unknown remains unseen until test | Explain target unknown, surrogate unknown, and fair comparison | **CONCEPT LOCKED** |
 | 8 | DQNGuard gives the strongest usable operating point at low known rejection | Present the main method comparison | **CONCEPT LOCKED** |
 | 9 | Surrogate usefulness depends strongly on the unseen target | Make Figure 2 the central diagnostic result and explain target-surrogate dependence | **CONCEPT LOCKED** |
-| 10 | No simple rule reliably predicts the best surrogate | Explain failed surrogate-selection diagnostics and the remaining deployment problem | TBD |
+| 10 | No simple target-blind rule reliably predicts the best surrogate | Explain failed surrogate-selection diagnostics and the remaining deployment problem | **CONCEPT LOCKED** |
 | 11 | Multi-surrogate calibration may reduce target-surrogate sensitivity | Future work and broader implications | TBD |
 | 12 | Takeaways | Leave three memorable conclusions and transition to Q&A | TBD |
 
@@ -1325,6 +1325,159 @@ The next slide should address the attempted surrogate-selection diagnostics and 
 - Do not interpret Slide 8's ±0.142 as repeated-seed or repeated-identical-run variability.
 - Do not claim Figure 2's Scan column is the exact source of Slide 8's four fixed-surrogate values; preserve the distinct result provenance.
 - Near-zero cells support the claim that some surrogate evidence is badly mismatched to some targets; they do not prove the underlying backbone is universally incapable of representing those targets.
+
+
+---
+
+# Slide 10 — No simple target-blind rule reliably predicts the best surrogate
+
+## Status
+
+**CONCEPT LOCKED**
+
+## Audience takeaway
+
+> The Target–Surrogate Matrix contains clear structure, but the obvious target-blind diagnostics we tested do not reliably predict which surrogate will transfer best to a future unknown.
+
+This slide should remain part of the experimental-results story. It is not a generic limitations slide.
+
+## Slide title
+
+**No simple target-blind rule reliably predicts the best surrogate**
+
+## Guiding question
+
+**Can we choose a good surrogate before the true unknown has ever been observed?**
+
+## Supporting sentence
+
+**Calibration success on the surrogate itself does not reliably predict transfer to a different unseen behavior.**
+
+## Diagnostic experiment framing
+
+Slide 9 establishes that surrogate choice matters substantially. Slide 10 asks whether that dependence can be solved with a simple target-blind rule.
+
+Test three intuitive families of surrogate-selection diagnostics:
+
+1. surrogate calibration performance;
+2. confidence-space geometry;
+3. learned feature-space geometry.
+
+These are exploratory surrogate-selection diagnostics, not a separately validated production selection algorithm.
+
+## Main visual
+
+Use three equal-width diagnostic columns that all flow into one shared conclusion.
+
+### 1. Surrogate calibration performance
+
+Question:
+
+**“If I reject the surrogate well, will I reject the true unknown well?”**
+
+Observed diagnostic:
+
+- Spearman correlation with eventual target Unknown F1: **ρ ≈ −0.075**
+- Pearson correlation: **r ≈ −0.047**
+- selected the actual best surrogate for **2 of 5 targets**
+
+Interpretation:
+
+> **Rejecting the surrogate well does not imply that its calibration transfers.**
+
+### 2. Confidence geometry
+
+Question:
+
+**“Does confidence-space behavior tell us which surrogate will transfer?”**
+
+Candidate signals included:
+
+- maximum softmax probability,
+- top-two probability gap,
+- entropy.
+
+Observed combined confidence-geometry diagnostic:
+
+- **ρ ≈ −0.552**
+
+Interpretation:
+
+> **The intuitive confidence-space rule pointed in the wrong direction overall.**
+
+### 3. Feature geometry
+
+Question:
+
+**“Can representation-space distance identify a useful surrogate?”**
+
+Observed best simple positive feature diagnostic:
+
+- approximately **ρ ≈ +0.406**
+- selected the actual best surrogate for **1 of 5 targets**
+
+Interpretation:
+
+> **Some positive signal exists, but feature proximity alone was not a reliable selector.**
+
+## Rough visual mockup
+
+```text
+┌──────────────────────────────────────────────────────────────────────────────────┐
+│ No simple target-blind rule reliably predicts the best surrogate                │
+│ Can we choose a good surrogate before the true unknown has ever been observed?  │
+│                                                                                  │
+│  CALIBRATION PERFORMANCE      CONFIDENCE GEOMETRY        FEATURE GEOMETRY       │
+│                                                                                  │
+│  “Reject surrogate well?”     “Looks informative in      “Close in learned      │
+│                                confidence space?”          feature space?”       │
+│            │                           │                         │                │
+│            ▼                           ▼                         ▼                │
+│     ρ ≈ −0.075                  ρ ≈ −0.552                best +ρ ≈ +0.406       │
+│     best: 2 / 5                wrong direction           best: 1 / 5             │
+│            │                           │                         │                │
+│            └───────────────────────────┴─────────────────────────┘                │
+│                                      ▼                                           │
+│                                                                                  │
+│                         NO RELIABLE SINGLE-SURROGATE                              │
+│                               SELECTION RULE                                      │
+│                                                                                  │
+│          Good surrogate performance does not imply good target transfer.         │
+└──────────────────────────────────────────────────────────────────────────────────┘
+```
+
+The bottom conclusion should be the strongest visual element after the title.
+
+## Why this visual is structured this way
+
+The experimental progression is:
+
+1. **Slide 8:** DQNGuard gives a strong fixed-surrogate operating point.
+2. **Slide 9:** surrogate choice materially changes performance.
+3. **Slide 10:** obvious target-blind diagnostics do not reliably solve the surrogate-selection problem.
+
+This is scientifically stronger than presenting the Target–Surrogate Matrix as an isolated curiosity. The follow-up experiment asks whether its structure can be exploited prospectively and documents that the simple rules tested were insufficient.
+
+## Speaker script
+
+See [SCRIPT.md](SCRIPT.md#slide-10--no-simple-target-blind-rule-reliably-predicts-the-best-surrogate).
+
+## Transition
+
+End with:
+
+> **“If choosing one surrogate is fragile, and we cannot reliably know which one will transfer, the next step is to stop betting on a single surrogate.”**
+
+This transitions directly into the multi-surrogate future-work direction.
+
+## Terminology / claim constraints
+
+- These are **exploratory surrogate-selection diagnostics**, not a validated automatic selection algorithm.
+- Do not claim that the Target–Surrogate Matrix is random; it is structured but not captured reliably by the simple target-blind diagnostics tested.
+- Do not imply access to the true target unknown when making the selection. The point is to evaluate target-blind proxies.
+- Correlation does not establish a causal mechanism.
+- The weak positive feature-space signal is insufficient to claim reliable surrogate prediction.
+- Preserve the distinction between retrospective matrix analysis and a deployable target-blind selection policy.
 
 ---
 
