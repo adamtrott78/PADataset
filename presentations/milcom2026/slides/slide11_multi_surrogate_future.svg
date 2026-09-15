@@ -1,0 +1,171 @@
+<svg xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" width="1920" height="1080" viewBox="0 0 1920 1080" version="1.1" id="slide11" role="img" aria-labelledby="slide_title">
+<title id="slide_title">VarMax can search across surrogates; DQNGuard must learn how to combine them</title>
+<desc>Implementation of SVG_PRODUCTION_SPEC.md. Canonical scientific assets retain their original artwork.</desc>
+<defs>
+<marker id="arrow102235" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="3" markerHeight="3" orient="auto-start-reverse"><path d="M 0 0 L 10 5 L 0 10 z" fill="#102235"/></marker>
+<marker id="arrow1F6FEB" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="3" markerHeight="3" orient="auto-start-reverse"><path d="M 0 0 L 10 5 L 0 10 z" fill="#1F6FEB"/></marker>
+<marker id="arrow2E8B57" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="3" markerHeight="3" orient="auto-start-reverse"><path d="M 0 0 L 10 5 L 0 10 z" fill="#2E8B57"/></marker>
+<marker id="arrowC63D4F" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="3" markerHeight="3" orient="auto-start-reverse"><path d="M 0 0 L 10 5 L 0 10 z" fill="#C63D4F"/></marker>
+<marker id="arrowE39A27" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="3" markerHeight="3" orient="auto-start-reverse"><path d="M 0 0 L 10 5 L 0 10 z" fill="#E39A27"/></marker>
+<marker id="arrow8A98A8" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="3" markerHeight="3" orient="auto-start-reverse"><path d="M 0 0 L 10 5 L 0 10 z" fill="#8A98A8"/></marker>
+<marker id="arrow6C5CE7" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="3" markerHeight="3" orient="auto-start-reverse"><path d="M 0 0 L 10 5 L 0 10 z" fill="#6C5CE7"/></marker>
+</defs>
+<rect id="background" x="0" y="0" width="1920" height="1080" rx="0" fill="#F7F9FC" stroke="none" stroke-width="2"/>
+<g id="title_group">
+<text id="text_0" x="96" y="103" font-family="Arial, Helvetica, sans-serif" font-size="52" font-weight="700" fill="#102235" text-anchor="start">
+<tspan x="96" y="103">VarMax can search across surrogates; DQNGuard must learn how to</tspan>
+<tspan x="96" y="157">combine them</tspan>
+</text>
+</g>
+<g id="supporting_sentence">
+<text id="text_2" x="96" y="193" font-family="Arial, Helvetica, sans-serif" font-size="29" font-weight="400" fill="#5D6C7B" text-anchor="start">
+<tspan x="96" y="193">In VarMax, surrogates change calibration parameters; in DQNGuard, the surrogate changes the learned open-set decision function</tspan>
+<tspan x="96" y="224">itself.</tspan>
+</text>
+</g>
+<line x1="933" y1="245" x2="933" y2="730" stroke="#D8E1EA" stroke-width="2"/>
+<g id="varmax_surrogate_all_group">
+<text id="text_4" x="96" y="277" font-family="Arial, Helvetica, sans-serif" font-size="24" font-weight="700" fill="#102235" text-anchor="start">
+<tspan x="96" y="277.0">ORIGINAL CONTRIBUTION — VARMAX SURROGATE-ALL</tspan>
+</text>
+<g id="frozen_backbone">
+<rect  x="280" y="304" width="452" height="60" rx="18" fill="white" stroke="#D8E1EA" stroke-width="2"/>
+<text id="text_5" x="506.0" y="342.84" font-family="Arial, Helvetica, sans-serif" font-size="26" font-weight="700" fill="#102235" text-anchor="middle">
+<tspan x="506.0" y="342.84">ONE FROZEN BACKBONE</tspan>
+</text>
+</g>
+<polyline points="506,365 506,386 246,386 246,410" fill="none" stroke="#102235" stroke-width="4" stroke-linecap="round" stroke-linejoin="round" marker-end="url(#arrow102235)"/>
+<g id="pseudo_scan">
+<rect  x="156" y="418" width="180" height="77" rx="18" fill="#FFF6E8" stroke="#E39A27" stroke-width="2"/>
+<text id="text_6" x="246.0" y="450.02000000000004" font-family="Arial, Helvetica, sans-serif" font-size="24" font-weight="700" fill="#E39A27" text-anchor="middle">
+<tspan x="246.0" y="450.02000000000004">Scan</tspan>
+<tspan x="246.0" y="479.30000000000007">pseudo open</tspan>
+</text>
+</g>
+<polyline points="246,496 246,519 506,519 506,537" fill="none" stroke="#E39A27" stroke-width="4" stroke-linecap="round" stroke-linejoin="round" marker-end="url(#arrowE39A27)"/>
+<polyline points="506,365 506,386 506,386 506,410" fill="none" stroke="#102235" stroke-width="4" stroke-linecap="round" stroke-linejoin="round" marker-end="url(#arrow102235)"/>
+<g id="pseudo_burst">
+<rect  x="416" y="418" width="180" height="77" rx="18" fill="#FFF6E8" stroke="#E39A27" stroke-width="2"/>
+<text id="text_8" x="506.0" y="450.02000000000004" font-family="Arial, Helvetica, sans-serif" font-size="24" font-weight="700" fill="#E39A27" text-anchor="middle">
+<tspan x="506.0" y="450.02000000000004">Burst</tspan>
+<tspan x="506.0" y="479.30000000000007">pseudo open</tspan>
+</text>
+</g>
+<polyline points="506,496 506,519 506,519 506,537" fill="none" stroke="#E39A27" stroke-width="4" stroke-linecap="round" stroke-linejoin="round" marker-end="url(#arrowE39A27)"/>
+<polyline points="506,365 506,386 766,386 766,410" fill="none" stroke="#102235" stroke-width="4" stroke-linecap="round" stroke-linejoin="round" marker-end="url(#arrow102235)"/>
+<g id="pseudo_hop">
+<rect  x="676" y="418" width="180" height="77" rx="18" fill="#FFF6E8" stroke="#E39A27" stroke-width="2"/>
+<text id="text_10" x="766.0" y="450.02000000000004" font-family="Arial, Helvetica, sans-serif" font-size="24" font-weight="700" fill="#E39A27" text-anchor="middle">
+<tspan x="766.0" y="450.02000000000004">Hop …</tspan>
+<tspan x="766.0" y="479.30000000000007">pseudo open</tspan>
+</text>
+</g>
+<polyline points="766,496 766,519 506,519 506,537" fill="none" stroke="#E39A27" stroke-width="4" stroke-linecap="round" stroke-linejoin="round" marker-end="url(#arrowE39A27)"/>
+<text id="text_12" x="506" y="564" font-family="Arial, Helvetica, sans-serif" font-size="26" font-weight="400" fill="#102235" text-anchor="middle">
+<tspan x="506" y="564.0">threshold / band candidates</tspan>
+</text>
+<polyline points="506,576 506,602" fill="none" stroke="#102235" stroke-width="4" stroke-linecap="round" stroke-linejoin="round" marker-end="url(#arrow102235)"/>
+<text id="text_13" x="506" y="631" font-family="Arial, Helvetica, sans-serif" font-size="28" font-weight="700" fill="#102235" text-anchor="middle">
+<tspan x="506" y="631.0">ALL CANDIDATES COMPETE</tspan>
+</text>
+<polyline points="506,642 506,664" fill="none" stroke="#102235" stroke-width="4" stroke-linecap="round" stroke-linejoin="round" marker-end="url(#arrow102235)"/>
+<text id="text_14" x="506" y="693" font-family="Arial, Helvetica, sans-serif" font-size="28" font-weight="700" fill="#102235" text-anchor="middle">
+<tspan x="506" y="693.0">SELECT ONE RULE</tspan>
+</text>
+<text id="text_15" x="96" y="734" font-family="Arial, Helvetica, sans-serif" font-size="23" font-weight="700" fill="#102235" text-anchor="start">
+<tspan x="96" y="734.0">Surrogate-all is a calibration search, not a deployed ensemble.</tspan>
+</text>
+</g>
+<g id="dqnguard_mismatch_group">
+<g id="surrogate_A">
+<rect  x="980" y="295" width="330" height="70" rx="18" fill="#FFF6E8" stroke="#E39A27" stroke-width="2"/>
+<text id="text_16" x="1145.0" y="339.18" font-family="Arial, Helvetica, sans-serif" font-size="27" font-weight="700" fill="#E39A27" text-anchor="middle">
+<tspan x="1145.0" y="339.18">Scan surrogate</tspan>
+</text>
+</g>
+<polyline points="1320,330 1400,330" fill="none" stroke="#102235" stroke-width="4" stroke-linecap="round" stroke-linejoin="round" marker-end="url(#arrow102235)"/>
+<g id="dqn_A">
+<rect  x="1410" y="295" width="250" height="70" rx="18" fill="#EAF2FF" stroke="#1F6FEB" stroke-width="2"/>
+<text id="text_17" x="1535.0" y="339.86" font-family="Arial, Helvetica, sans-serif" font-size="29" font-weight="700" fill="#1F6FEB" text-anchor="middle">
+<tspan x="1535.0" y="339.86">DQN A</tspan>
+</text>
+</g>
+<g id="surrogate_B">
+<rect  x="980" y="395" width="330" height="70" rx="18" fill="#FFF6E8" stroke="#E39A27" stroke-width="2"/>
+<text id="text_18" x="1145.0" y="439.18" font-family="Arial, Helvetica, sans-serif" font-size="27" font-weight="700" fill="#E39A27" text-anchor="middle">
+<tspan x="1145.0" y="439.18">Burst surrogate</tspan>
+</text>
+</g>
+<polyline points="1320,430 1400,430" fill="none" stroke="#102235" stroke-width="4" stroke-linecap="round" stroke-linejoin="round" marker-end="url(#arrow102235)"/>
+<g id="dqn_B">
+<rect  x="1410" y="395" width="250" height="70" rx="18" fill="#EAF2FF" stroke="#1F6FEB" stroke-width="2"/>
+<text id="text_19" x="1535.0" y="439.86" font-family="Arial, Helvetica, sans-serif" font-size="29" font-weight="700" fill="#1F6FEB" text-anchor="middle">
+<tspan x="1535.0" y="439.86">DQN B</tspan>
+</text>
+</g>
+<g id="surrogate_C">
+<rect  x="980" y="495" width="330" height="70" rx="18" fill="#FFF6E8" stroke="#E39A27" stroke-width="2"/>
+<text id="text_20" x="1145.0" y="539.18" font-family="Arial, Helvetica, sans-serif" font-size="27" font-weight="700" fill="#E39A27" text-anchor="middle">
+<tspan x="1145.0" y="539.18">Hop surrogate</tspan>
+</text>
+</g>
+<polyline points="1320,530 1400,530" fill="none" stroke="#102235" stroke-width="4" stroke-linecap="round" stroke-linejoin="round" marker-end="url(#arrow102235)"/>
+<g id="dqn_C">
+<rect  x="1410" y="495" width="250" height="70" rx="18" fill="#EAF2FF" stroke="#1F6FEB" stroke-width="2"/>
+<text id="text_21" x="1535.0" y="539.86" font-family="Arial, Helvetica, sans-serif" font-size="29" font-weight="700" fill="#1F6FEB" text-anchor="middle">
+<tspan x="1535.0" y="539.86">DQN C</tspan>
+</text>
+</g>
+<polyline points="1680,330 1710,330 1710,593 1420,593 1420,612" fill="none" stroke="#1F6FEB" stroke-width="4" stroke-linecap="round" stroke-linejoin="round" marker-end="url(#arrow1F6FEB)"/>
+<line x1="1660" y1="430" x2="1710" y2="430" stroke="#1F6FEB" stroke-width="4"/>
+<line x1="1660" y1="530" x2="1710" y2="530" stroke="#1F6FEB" stroke-width="4"/>
+<text id="text_22" x="980" y="644" font-family="Arial, Helvetica, sans-serif" font-size="28" font-weight="700" fill="#1F6FEB" text-anchor="start">
+<tspan x="980" y="644.0">DIFFERENT LEARNED SCORE SPACES</tspan>
+</text>
+<text id="text_23" x="980" y="678" font-family="Arial, Helvetica, sans-serif" font-size="24" font-weight="700" fill="#102235" text-anchor="start">
+<tspan x="980" y="678">Thresholds are not directly interchangeable across separately fitted</tspan>
+<tspan x="980" y="706">DQNs.</tspan>
+</text>
+<text id="text_25" x="980" y="735" font-family="Arial, Helvetica, sans-serif" font-size="21" font-weight="400" fill="#102235" text-anchor="start">
+<tspan x="980" y="735">Current DQNGuard also withholds its external surrogate from the backbone taxonomy.</tspan>
+</text>
+</g>
+<text id="future_work_tag" x="96" y="797" font-family="Arial, Helvetica, sans-serif" font-size="23" font-weight="700" fill="#6C5CE7" text-anchor="start">
+<tspan x="96" y="797.0">FUTURE WORK — NOT YET EVALUATED</tspan>
+</text>
+<g id="future_architectures">
+<g id="pooled_dqn_card">
+<rect  x="96" y="805" width="552" height="175" rx="18" fill="#F2EFFF" stroke="#6C5CE7" stroke-width="2"/>
+<text id="text_27" x="120" y="850" font-family="Arial, Helvetica, sans-serif" font-size="24" font-weight="700" fill="#6C5CE7" text-anchor="start">
+<tspan x="120" y="850">POOLED MULTI-SURROGATE DQN</tspan>
+</text>
+<text id="text_28" x="120" y="918" font-family="Arial, Helvetica, sans-serif" font-size="25" font-weight="400" fill="#102235" text-anchor="start">
+<tspan x="120" y="918">A + B + C surrogate states</tspan>
+<tspan x="120" y="948">→ ONE DQN → one score space</tspan>
+</text>
+</g>
+<g id="dqn_ensemble_card">
+<rect  x="684" y="805" width="552" height="175" rx="18" fill="#F2EFFF" stroke="#6C5CE7" stroke-width="2"/>
+<text id="text_30" x="708" y="850" font-family="Arial, Helvetica, sans-serif" font-size="24" font-weight="700" fill="#6C5CE7" text-anchor="start">
+<tspan x="708" y="850">SURROGATE-SPECIFIC DQN ENSEMBLE</tspan>
+</text>
+<text id="text_31" x="708" y="918" font-family="Arial, Helvetica, sans-serif" font-size="25" font-weight="400" fill="#102235" text-anchor="start">
+<tspan x="708" y="918">DQN A + DQN B + DQN C</tspan>
+<tspan x="708" y="948">→ normalize / aggregate</tspan>
+</text>
+</g>
+<g id="hybrid_guard_card">
+<rect  x="1272" y="805" width="552" height="175" rx="18" fill="#F2EFFF" stroke="#6C5CE7" stroke-width="2"/>
+<text id="text_33" x="1296" y="850" font-family="Arial, Helvetica, sans-serif" font-size="24" font-weight="700" fill="#6C5CE7" text-anchor="start">
+<tspan x="1296" y="850">HYBRID VARMAX / DQNGUARD</tspan>
+</text>
+<text id="text_34" x="1296" y="918" font-family="Arial, Helvetica, sans-serif" font-size="25" font-weight="400" fill="#102235" text-anchor="start">
+<tspan x="1296" y="918">multi-surrogate deterministic guard evidence</tspan>
+<tspan x="1296" y="948">+ one DQN signal</tspan>
+</text>
+</g>
+</g>
+<text id="text_36" x="96" y="1008" font-family="Arial, Helvetica, sans-serif" font-size="21" font-weight="400" fill="#102235" text-anchor="start">
+<tspan x="96" y="1008">Goal: reduce dependence on a favorable single surrogate while preserving DQNGuard&#x27;s strong thresholded operating point and explicit 5% known-rejection budget.</tspan>
+</text>
+</svg>

@@ -1,0 +1,150 @@
+<svg xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" width="1920" height="1080" viewBox="0 0 1920 1080" version="1.1" id="slide02" role="img" aria-labelledby="slide_title">
+<title id="slide_title">Closed-set RF classifiers cannot say “I don&#x27;t know”</title>
+<desc>Implementation of SVG_PRODUCTION_SPEC.md. Canonical scientific assets retain their original artwork.</desc>
+<defs>
+<marker id="arrow102235" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="3" markerHeight="3" orient="auto-start-reverse"><path d="M 0 0 L 10 5 L 0 10 z" fill="#102235"/></marker>
+<marker id="arrow1F6FEB" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="3" markerHeight="3" orient="auto-start-reverse"><path d="M 0 0 L 10 5 L 0 10 z" fill="#1F6FEB"/></marker>
+<marker id="arrow2E8B57" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="3" markerHeight="3" orient="auto-start-reverse"><path d="M 0 0 L 10 5 L 0 10 z" fill="#2E8B57"/></marker>
+<marker id="arrowC63D4F" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="3" markerHeight="3" orient="auto-start-reverse"><path d="M 0 0 L 10 5 L 0 10 z" fill="#C63D4F"/></marker>
+<marker id="arrowE39A27" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="3" markerHeight="3" orient="auto-start-reverse"><path d="M 0 0 L 10 5 L 0 10 z" fill="#E39A27"/></marker>
+<marker id="arrow8A98A8" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="3" markerHeight="3" orient="auto-start-reverse"><path d="M 0 0 L 10 5 L 0 10 z" fill="#8A98A8"/></marker>
+<marker id="arrow6C5CE7" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="3" markerHeight="3" orient="auto-start-reverse"><path d="M 0 0 L 10 5 L 0 10 z" fill="#6C5CE7"/></marker>
+</defs>
+<rect id="background" x="0" y="0" width="1920" height="1080" rx="0" fill="#F7F9FC" stroke="none" stroke-width="2"/>
+<g id="title_group">
+<text id="text_0" x="96" y="116" font-family="Arial, Helvetica, sans-serif" font-size="60" font-weight="700" fill="#102235" text-anchor="start">
+<tspan x="96" y="116">Closed-set RF classifiers cannot say “I don&#x27;t know”</tspan>
+</text>
+</g>
+<g id="supporting_sentence">
+<text id="text_1" x="96" y="186" font-family="Arial, Helvetica, sans-serif" font-size="29" font-weight="400" fill="#5D6C7B" text-anchor="start">
+<tspan x="96" y="186">Unseen behavior is forced into a known label, even when the prediction is wrong.</tspan>
+</text>
+</g>
+<g id="closed_set_panel">
+<rect  x="96" y="235" width="840" height="710" rx="18" fill="white" stroke="#D8E1EA" stroke-width="2"/>
+<text id="text_2" x="128" y="285" font-family="Arial, Helvetica, sans-serif" font-size="32" font-weight="700" fill="#102235" text-anchor="start">
+<tspan x="128" y="285.0">CLOSED-SET CLASSIFIER</tspan>
+</text>
+<text id="text_3" x="128" y="345" font-family="Arial, Helvetica, sans-serif" font-size="26" font-weight="400" fill="#102235" text-anchor="start">
+<tspan x="128" y="345.0">Allowed outputs: Scan | Burst | Hop</tspan>
+</text>
+<g id="closed_known_case">
+<rect  x="120" y="395" width="792" height="205" rx="12" fill="#EEF3F7" stroke="none" stroke-width="2"/>
+<g id="closed_known_input">
+<rect  x="138" y="451" width="214" height="92" rx="18" fill="#EDF7F0" stroke="#2E8B57" stroke-width="2"/>
+<text id="text_4" x="245.0" y="490.25" font-family="Arial, Helvetica, sans-serif" font-size="25" font-weight="400" fill="#2E8B57" text-anchor="middle">
+<tspan x="245.0" y="490.25">Known Burst</tspan>
+<tspan x="245.0" y="520.75">behavior</tspan>
+</text>
+</g>
+<polyline points="361,497 396,497" fill="none" stroke="#102235" stroke-width="4" stroke-linecap="round" stroke-linejoin="round" marker-end="url(#arrow102235)"/>
+<g id="closed_known_decision">
+<rect  x="406" y="451" width="205" height="92" rx="18" fill="white" stroke="#D8E1EA" stroke-width="2"/>
+<text id="text_6" x="508.5" y="505.5" font-family="Arial, Helvetica, sans-serif" font-size="25" font-weight="700" fill="#102235" text-anchor="middle">
+<tspan x="508.5" y="505.5">RF classifier</tspan>
+</text>
+</g>
+<polyline points="621,497 657,497" fill="none" stroke="#102235" stroke-width="4" stroke-linecap="round" stroke-linejoin="round" marker-end="url(#arrow102235)"/>
+<g id="closed_known_output">
+<rect  x="669" y="470" width="218" height="58" rx="18" fill="#EDF7F0" stroke="#2E8B57" stroke-width="2"/>
+<text id="text_7" x="778.0" y="507.84" font-family="Arial, Helvetica, sans-serif" font-size="26" font-weight="700" fill="#2E8B57" text-anchor="middle">
+<tspan x="778.0" y="507.84">Burst ✓</tspan>
+</text>
+</g>
+</g>
+<g id="closed_novel_case">
+<rect  x="120" y="635" width="792" height="220" rx="12" fill="#EEF3F7" stroke="none" stroke-width="2"/>
+<g id="closed_novel_input">
+<rect  x="138" y="691" width="214" height="92" rx="18" fill="#FBEFF1" stroke="#C63D4F" stroke-width="2"/>
+<text id="text_8" x="245.0" y="730.25" font-family="Arial, Helvetica, sans-serif" font-size="25" font-weight="400" fill="#C63D4F" text-anchor="middle">
+<tspan x="245.0" y="730.25">Novel RF</tspan>
+<tspan x="245.0" y="760.75">behavior</tspan>
+</text>
+</g>
+<polyline points="361,737 396,737" fill="none" stroke="#102235" stroke-width="4" stroke-linecap="round" stroke-linejoin="round" marker-end="url(#arrow102235)"/>
+<g id="closed_novel_decision">
+<rect  x="406" y="691" width="205" height="92" rx="18" fill="white" stroke="#D8E1EA" stroke-width="2"/>
+<text id="text_10" x="508.5" y="745.5" font-family="Arial, Helvetica, sans-serif" font-size="25" font-weight="700" fill="#102235" text-anchor="middle">
+<tspan x="508.5" y="745.5">RF classifier</tspan>
+</text>
+</g>
+<polyline points="621,737 657,737" fill="none" stroke="#102235" stroke-width="4" stroke-linecap="round" stroke-linejoin="round" marker-end="url(#arrow102235)"/>
+<text id="text_11" x="785" y="693" font-family="Arial, Helvetica, sans-serif" font-size="20" font-weight="400" fill="#5D6C7B" text-anchor="middle">
+<tspan x="785" y="693.0">forced known prediction:</tspan>
+</text>
+<g id="closed_novel_output">
+<rect  x="669" y="710" width="218" height="58" rx="18" fill="#FBEFF1" stroke="#C63D4F" stroke-width="2"/>
+<text id="text_12" x="778.0" y="747.84" font-family="Arial, Helvetica, sans-serif" font-size="26" font-weight="700" fill="#C63D4F" text-anchor="middle">
+<tspan x="778.0" y="747.84">Hop ✕</tspan>
+</text>
+</g>
+</g>
+<text id="text_13" x="128" y="898" font-family="Arial, Helvetica, sans-serif" font-size="26" font-weight="700" fill="#102235" text-anchor="start">
+<tspan x="128" y="898">“Unknown” is not an available output.</tspan>
+</text>
+</g>
+<g id="open_world_panel">
+<rect  x="984" y="235" width="840" height="710" rx="18" fill="white" stroke="#D8E1EA" stroke-width="2"/>
+<text id="text_14" x="1016" y="285" font-family="Arial, Helvetica, sans-serif" font-size="32" font-weight="700" fill="#102235" text-anchor="start">
+<tspan x="1016" y="285.0">OPEN-WORLD REQUIREMENT</tspan>
+</text>
+<text id="text_15" x="1016" y="345" font-family="Arial, Helvetica, sans-serif" font-size="26" font-weight="400" fill="#102235" text-anchor="start">
+<tspan x="1016" y="345.0">Allowed outputs: Scan | Burst | Hop | UNKNOWN</tspan>
+</text>
+<g id="open_known_case">
+<rect  x="1008" y="395" width="792" height="205" rx="12" fill="#EEF3F7" stroke="none" stroke-width="2"/>
+<g id="open_known_input">
+<rect  x="1026" y="451" width="214" height="92" rx="18" fill="#EDF7F0" stroke="#2E8B57" stroke-width="2"/>
+<text id="text_16" x="1133.0" y="490.25" font-family="Arial, Helvetica, sans-serif" font-size="25" font-weight="400" fill="#2E8B57" text-anchor="middle">
+<tspan x="1133.0" y="490.25">Known Burst</tspan>
+<tspan x="1133.0" y="520.75">behavior</tspan>
+</text>
+</g>
+<polyline points="1249,497 1284,497" fill="none" stroke="#102235" stroke-width="4" stroke-linecap="round" stroke-linejoin="round" marker-end="url(#arrow102235)"/>
+<g id="open_known_decision">
+<rect  x="1294" y="451" width="205" height="92" rx="18" fill="white" stroke="#D8E1EA" stroke-width="2"/>
+<text id="text_18" x="1396.5" y="490.25" font-family="Arial, Helvetica, sans-serif" font-size="25" font-weight="700" fill="#102235" text-anchor="middle">
+<tspan x="1396.5" y="490.25">open-world</tspan>
+<tspan x="1396.5" y="520.75">decision</tspan>
+</text>
+</g>
+<polyline points="1509,497 1545,497" fill="none" stroke="#102235" stroke-width="4" stroke-linecap="round" stroke-linejoin="round" marker-end="url(#arrow102235)"/>
+<g id="open_known_output">
+<rect  x="1557" y="470" width="218" height="58" rx="18" fill="#EDF7F0" stroke="#2E8B57" stroke-width="2"/>
+<text id="text_20" x="1666.0" y="507.84" font-family="Arial, Helvetica, sans-serif" font-size="26" font-weight="700" fill="#2E8B57" text-anchor="middle">
+<tspan x="1666.0" y="507.84">Burst ✓</tspan>
+</text>
+</g>
+</g>
+<g id="open_novel_case">
+<rect  x="1008" y="635" width="792" height="220" rx="12" fill="#EEF3F7" stroke="none" stroke-width="2"/>
+<g id="open_novel_input">
+<rect  x="1026" y="691" width="214" height="92" rx="18" fill="#FBEFF1" stroke="#C63D4F" stroke-width="2"/>
+<text id="text_21" x="1133.0" y="730.25" font-family="Arial, Helvetica, sans-serif" font-size="25" font-weight="400" fill="#C63D4F" text-anchor="middle">
+<tspan x="1133.0" y="730.25">Novel RF</tspan>
+<tspan x="1133.0" y="760.75">behavior</tspan>
+</text>
+</g>
+<polyline points="1249,737 1284,737" fill="none" stroke="#102235" stroke-width="4" stroke-linecap="round" stroke-linejoin="round" marker-end="url(#arrow102235)"/>
+<g id="open_novel_decision">
+<rect  x="1294" y="691" width="205" height="92" rx="18" fill="white" stroke="#D8E1EA" stroke-width="2"/>
+<text id="text_23" x="1396.5" y="730.25" font-family="Arial, Helvetica, sans-serif" font-size="25" font-weight="700" fill="#102235" text-anchor="middle">
+<tspan x="1396.5" y="730.25">open-world</tspan>
+<tspan x="1396.5" y="760.75">decision</tspan>
+</text>
+</g>
+<polyline points="1509,737 1545,737" fill="none" stroke="#102235" stroke-width="4" stroke-linecap="round" stroke-linejoin="round" marker-end="url(#arrow102235)"/>
+<g id="open_novel_output">
+<rect  x="1557" y="710" width="218" height="58" rx="18" fill="#FBEFF1" stroke="#C63D4F" stroke-width="2"/>
+<text id="text_25" x="1666.0" y="747.84" font-family="Arial, Helvetica, sans-serif" font-size="26" font-weight="700" fill="#C63D4F" text-anchor="middle">
+<tspan x="1666.0" y="747.84">UNKNOWN ✓</tspan>
+</text>
+</g>
+</g>
+<text id="text_26" x="1016" y="898" font-family="Arial, Helvetica, sans-serif" font-size="26" font-weight="700" fill="#102235" text-anchor="start">
+<tspan x="1016" y="898">Preserve known evidence.</tspan>
+<tspan x="1016" y="929">Isolate unfamiliar behavior.</tspan>
+</text>
+</g>
+</svg>

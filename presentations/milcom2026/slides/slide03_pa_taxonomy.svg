@@ -1,0 +1,121 @@
+<svg xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" width="1920" height="1080" viewBox="0 0 1920 1080" version="1.1" id="slide03" role="img" aria-labelledby="slide_title">
+<title id="slide_title">Preliminary Actions capture RF behavior, not final attack labels</title>
+<desc>Implementation of SVG_PRODUCTION_SPEC.md. Canonical scientific assets retain their original artwork.</desc>
+<defs>
+<marker id="arrow102235" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="3" markerHeight="3" orient="auto-start-reverse"><path d="M 0 0 L 10 5 L 0 10 z" fill="#102235"/></marker>
+<marker id="arrow1F6FEB" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="3" markerHeight="3" orient="auto-start-reverse"><path d="M 0 0 L 10 5 L 0 10 z" fill="#1F6FEB"/></marker>
+<marker id="arrow2E8B57" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="3" markerHeight="3" orient="auto-start-reverse"><path d="M 0 0 L 10 5 L 0 10 z" fill="#2E8B57"/></marker>
+<marker id="arrowC63D4F" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="3" markerHeight="3" orient="auto-start-reverse"><path d="M 0 0 L 10 5 L 0 10 z" fill="#C63D4F"/></marker>
+<marker id="arrowE39A27" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="3" markerHeight="3" orient="auto-start-reverse"><path d="M 0 0 L 10 5 L 0 10 z" fill="#E39A27"/></marker>
+<marker id="arrow8A98A8" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="3" markerHeight="3" orient="auto-start-reverse"><path d="M 0 0 L 10 5 L 0 10 z" fill="#8A98A8"/></marker>
+<marker id="arrow6C5CE7" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="3" markerHeight="3" orient="auto-start-reverse"><path d="M 0 0 L 10 5 L 0 10 z" fill="#6C5CE7"/></marker>
+</defs>
+<rect id="background" x="0" y="0" width="1920" height="1080" rx="0" fill="#F7F9FC" stroke="none" stroke-width="2"/>
+<g id="title_group">
+<text id="text_0" x="96" y="116" font-family="Arial, Helvetica, sans-serif" font-size="52" font-weight="700" fill="#102235" text-anchor="start">
+<tspan x="96" y="116">Preliminary Actions capture RF behavior, not final attack labels</tspan>
+</text>
+</g>
+<g id="supporting_sentence">
+<text id="text_1" x="96" y="186" font-family="Arial, Helvetica, sans-serif" font-size="29" font-weight="400" fill="#5D6C7B" text-anchor="start">
+<tspan x="96" y="186">Preliminary Actions are observable RF behaviors, not final attack-technique labels.</tspan>
+</text>
+</g>
+<g id="behavior_cards">
+<g id="scan_card">
+<rect  x="96" y="255" width="326" height="545" rx="18" fill="white" stroke="#D8E1EA" stroke-width="2"/>
+<text id="text_2" x="259" y="307" font-family="Arial, Helvetica, sans-serif" font-size="32" font-weight="700" fill="#102235" text-anchor="middle">
+<tspan x="259" y="307.0">Scan</tspan>
+</text>
+<rect id="scan_ota_slot" x="114" y="340" width="290" height="300" rx="12" fill="#EEF3F7" stroke="#D8E1EA" stroke-width="2"/>
+<text id="text_3" x="259" y="480" font-family="Arial, Helvetica, sans-serif" font-size="24" font-weight="400" fill="#5D6C7B" text-anchor="middle">
+<tspan x="259" y="480.0">OTA RF example</tspan>
+<tspan x="259" y="509.28">pending</tspan>
+</text>
+<text id="text_5" x="122" y="690" font-family="Arial, Helvetica, sans-serif" font-size="26" font-weight="400" fill="#102235" text-anchor="start">
+<tspan x="122" y="690.0">Discovery-like activity</tspan>
+</text>
+</g>
+<g id="burst_card">
+<rect  x="446" y="255" width="326" height="545" rx="18" fill="white" stroke="#D8E1EA" stroke-width="2"/>
+<text id="text_6" x="609" y="307" font-family="Arial, Helvetica, sans-serif" font-size="32" font-weight="700" fill="#102235" text-anchor="middle">
+<tspan x="609" y="307.0">Burst</tspan>
+</text>
+<rect id="burst_ota_slot" x="464" y="340" width="290" height="300" rx="12" fill="#EEF3F7" stroke="#D8E1EA" stroke-width="2"/>
+<text id="text_7" x="609" y="480" font-family="Arial, Helvetica, sans-serif" font-size="24" font-weight="400" fill="#5D6C7B" text-anchor="middle">
+<tspan x="609" y="480.0">OTA RF example</tspan>
+<tspan x="609" y="509.28">pending</tspan>
+</text>
+<text id="text_9" x="472" y="690" font-family="Arial, Helvetica, sans-serif" font-size="26" font-weight="400" fill="#102235" text-anchor="start">
+<tspan x="472" y="690.0">Short transmissions +</tspan>
+<tspan x="472" y="721.72">quiet gaps</tspan>
+</text>
+</g>
+<g id="sustain_card">
+<rect  x="796" y="255" width="326" height="545" rx="18" fill="white" stroke="#D8E1EA" stroke-width="2"/>
+<text id="text_11" x="959" y="307" font-family="Arial, Helvetica, sans-serif" font-size="32" font-weight="700" fill="#102235" text-anchor="middle">
+<tspan x="959" y="307.0">Sustain</tspan>
+</text>
+<rect id="sustain_ota_slot" x="814" y="340" width="290" height="300" rx="12" fill="#EEF3F7" stroke="#D8E1EA" stroke-width="2"/>
+<text id="text_12" x="959" y="480" font-family="Arial, Helvetica, sans-serif" font-size="24" font-weight="400" fill="#5D6C7B" text-anchor="middle">
+<tspan x="959" y="480.0">OTA RF example</tspan>
+<tspan x="959" y="509.28">pending</tspan>
+</text>
+<text id="text_14" x="822" y="690" font-family="Arial, Helvetica, sans-serif" font-size="26" font-weight="400" fill="#102235" text-anchor="start">
+<tspan x="822" y="690.0">Persistent channel</tspan>
+<tspan x="822" y="721.72">occupancy</tspan>
+</text>
+</g>
+<g id="hop_card">
+<rect  x="1146" y="255" width="326" height="545" rx="18" fill="white" stroke="#D8E1EA" stroke-width="2"/>
+<text id="text_16" x="1309" y="307" font-family="Arial, Helvetica, sans-serif" font-size="32" font-weight="700" fill="#102235" text-anchor="middle">
+<tspan x="1309" y="307.0">Hop</tspan>
+</text>
+<rect id="hop_ota_slot" x="1164" y="340" width="290" height="300" rx="12" fill="#EEF3F7" stroke="#D8E1EA" stroke-width="2"/>
+<text id="text_17" x="1309" y="480" font-family="Arial, Helvetica, sans-serif" font-size="24" font-weight="400" fill="#5D6C7B" text-anchor="middle">
+<tspan x="1309" y="480.0">OTA RF example</tspan>
+<tspan x="1309" y="509.28">pending</tspan>
+</text>
+<text id="text_19" x="1172" y="690" font-family="Arial, Helvetica, sans-serif" font-size="26" font-weight="400" fill="#102235" text-anchor="start">
+<tspan x="1172" y="690.0">Frequency dwell +</tspan>
+<tspan x="1172" y="721.72">revisits</tspan>
+</text>
+</g>
+<g id="replay_card">
+<rect  x="1496" y="255" width="326" height="545" rx="18" fill="white" stroke="#D8E1EA" stroke-width="2"/>
+<text id="text_21" x="1659" y="307" font-family="Arial, Helvetica, sans-serif" font-size="32" font-weight="700" fill="#102235" text-anchor="middle">
+<tspan x="1659" y="307.0">Replay</tspan>
+</text>
+<rect id="replay_ota_slot" x="1514" y="340" width="290" height="300" rx="12" fill="#EEF3F7" stroke="#D8E1EA" stroke-width="2"/>
+<text id="text_22" x="1659" y="480" font-family="Arial, Helvetica, sans-serif" font-size="24" font-weight="400" fill="#5D6C7B" text-anchor="middle">
+<tspan x="1659" y="480.0">OTA RF example</tspan>
+<tspan x="1659" y="509.28">pending</tspan>
+</text>
+<text id="text_24" x="1522" y="690" font-family="Arial, Helvetica, sans-serif" font-size="26" font-weight="400" fill="#102235" text-anchor="start">
+<tspan x="1522" y="690.0">Repeated waveform /</tspan>
+<tspan x="1522" y="721.72">template</tspan>
+</text>
+</g>
+</g>
+<g id="tells_us_box">
+<rect  x="96" y="835" width="840" height="115" rx="18" fill="#EEF3F7" stroke="none" stroke-width="2"/>
+<text id="text_26" x="124" y="876" font-family="Arial, Helvetica, sans-serif" font-size="24" font-weight="700" fill="#102235" text-anchor="start">
+<tspan x="124" y="876.0">WHAT IT TELLS US</tspan>
+</text>
+<text id="text_27" x="124" y="920" font-family="Arial, Helvetica, sans-serif" font-size="29" font-weight="400" fill="#102235" text-anchor="start">
+<tspan x="124" y="920.0">Observable RF behavior</tspan>
+</text>
+</g>
+<g id="does_not_claim_box">
+<rect  x="984" y="835" width="840" height="115" rx="18" fill="#EEF3F7" stroke="none" stroke-width="2"/>
+<text id="text_28" x="1012" y="876" font-family="Arial, Helvetica, sans-serif" font-size="24" font-weight="700" fill="#102235" text-anchor="start">
+<tspan x="1012" y="876.0">WHAT IT DOES NOT CLAIM</tspan>
+</text>
+<text id="text_29" x="1012" y="920" font-family="Arial, Helvetica, sans-serif" font-size="29" font-weight="400" fill="#102235" text-anchor="start">
+<tspan x="1012" y="920.0">Final attack-technique attribution</tspan>
+</text>
+</g>
+<text id="optional_protocol_footer" x="96" y="995" font-family="Arial, Helvetica, sans-serif" font-size="21" font-weight="400" fill="#5D6C7B" text-anchor="start">
+<tspan x="96" y="995.0">Same behavioral taxonomy evaluated across WiFi, Bluetooth, and Zigbee.</tspan>
+</text>
+</svg>

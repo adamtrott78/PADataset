@@ -1,0 +1,203 @@
+<svg xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" width="1920" height="1080" viewBox="0 0 1920 1080" version="1.1" id="slide04" role="img" aria-labelledby="slide_title">
+<title id="slide_title">We evaluate the same five behaviors over-the-air across three protocol families</title>
+<desc>Implementation of SVG_PRODUCTION_SPEC.md. Canonical scientific assets retain their original artwork.</desc>
+<defs>
+<marker id="arrow102235" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="3" markerHeight="3" orient="auto-start-reverse"><path d="M 0 0 L 10 5 L 0 10 z" fill="#102235"/></marker>
+<marker id="arrow1F6FEB" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="3" markerHeight="3" orient="auto-start-reverse"><path d="M 0 0 L 10 5 L 0 10 z" fill="#1F6FEB"/></marker>
+<marker id="arrow2E8B57" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="3" markerHeight="3" orient="auto-start-reverse"><path d="M 0 0 L 10 5 L 0 10 z" fill="#2E8B57"/></marker>
+<marker id="arrowC63D4F" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="3" markerHeight="3" orient="auto-start-reverse"><path d="M 0 0 L 10 5 L 0 10 z" fill="#C63D4F"/></marker>
+<marker id="arrowE39A27" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="3" markerHeight="3" orient="auto-start-reverse"><path d="M 0 0 L 10 5 L 0 10 z" fill="#E39A27"/></marker>
+<marker id="arrow8A98A8" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="3" markerHeight="3" orient="auto-start-reverse"><path d="M 0 0 L 10 5 L 0 10 z" fill="#8A98A8"/></marker>
+<marker id="arrow6C5CE7" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="3" markerHeight="3" orient="auto-start-reverse"><path d="M 0 0 L 10 5 L 0 10 z" fill="#6C5CE7"/></marker>
+</defs>
+<rect id="background" x="0" y="0" width="1920" height="1080" rx="0" fill="#F7F9FC" stroke="none" stroke-width="2"/>
+<g id="title_group">
+<text id="text_0" x="96" y="103" font-family="Arial, Helvetica, sans-serif" font-size="52" font-weight="700" fill="#102235" text-anchor="start">
+<tspan x="96" y="103">We evaluate the same five behaviors over-the-air across three</tspan>
+<tspan x="96" y="157">protocol families</tspan>
+</text>
+</g>
+<g id="supporting_sentence">
+<text id="text_2" x="96" y="193" font-family="Arial, Helvetica, sans-serif" font-size="29" font-weight="400" fill="#5D6C7B" text-anchor="start">
+<tspan x="96" y="193">WiFi, Bluetooth, and Zigbee each express Scan, Burst, Sustain, Hop, and Replay behavior in captured RF.</tspan>
+</text>
+</g>
+<g id="dataset_matrix">
+<text id="matrix_heading" x="663" y="275" font-family="Arial, Helvetica, sans-serif" font-size="30" font-weight="700" fill="#102235" text-anchor="middle">
+<tspan x="663" y="275.0">5 BEHAVIORS × 3 PROTOCOLS</tspan>
+</text>
+<text id="text_4" x="315" y="325" font-family="Arial, Helvetica, sans-serif" font-size="26" font-weight="700" fill="#102235" text-anchor="middle">
+<tspan x="315" y="325.0">Scan</tspan>
+</text>
+<text id="text_5" x="513" y="325" font-family="Arial, Helvetica, sans-serif" font-size="26" font-weight="700" fill="#102235" text-anchor="middle">
+<tspan x="513" y="325.0">Burst</tspan>
+</text>
+<text id="text_6" x="711" y="325" font-family="Arial, Helvetica, sans-serif" font-size="26" font-weight="700" fill="#102235" text-anchor="middle">
+<tspan x="711" y="325.0">Sustain</tspan>
+</text>
+<text id="text_7" x="909" y="325" font-family="Arial, Helvetica, sans-serif" font-size="26" font-weight="700" fill="#102235" text-anchor="middle">
+<tspan x="909" y="325.0">Hop</tspan>
+</text>
+<text id="text_8" x="1107" y="325" font-family="Arial, Helvetica, sans-serif" font-size="26" font-weight="700" fill="#102235" text-anchor="middle">
+<tspan x="1107" y="325.0">Replay</tspan>
+</text>
+<text id="text_9" x="96" y="438" font-family="Arial, Helvetica, sans-serif" font-size="23" font-weight="700" fill="#102235" text-anchor="start">
+<tspan x="96" y="438.0">WiFi</tspan>
+</text>
+<g id="wifi_scan_ota_slot">
+<rect  x="225" y="350" width="180" height="160" rx="12" fill="#EEF3F7" stroke="#D8E1EA" stroke-width="2"/>
+<text id="text_10" x="315" y="423" font-family="Arial, Helvetica, sans-serif" font-size="22" font-weight="400" fill="#5D6C7B" text-anchor="middle">
+<tspan x="315" y="423.0">WiFi</tspan>
+<tspan x="315" y="449.84">Scan</tspan>
+</text>
+</g>
+<g id="wifi_burst_ota_slot">
+<rect  x="423" y="350" width="180" height="160" rx="12" fill="#EEF3F7" stroke="#D8E1EA" stroke-width="2"/>
+<text id="text_12" x="513" y="423" font-family="Arial, Helvetica, sans-serif" font-size="22" font-weight="400" fill="#5D6C7B" text-anchor="middle">
+<tspan x="513" y="423.0">WiFi</tspan>
+<tspan x="513" y="449.84">Burst</tspan>
+</text>
+</g>
+<g id="wifi_sustain_ota_slot">
+<rect  x="621" y="350" width="180" height="160" rx="12" fill="#EEF3F7" stroke="#D8E1EA" stroke-width="2"/>
+<text id="text_14" x="711" y="423" font-family="Arial, Helvetica, sans-serif" font-size="22" font-weight="400" fill="#5D6C7B" text-anchor="middle">
+<tspan x="711" y="423.0">WiFi</tspan>
+<tspan x="711" y="449.84">Sustain</tspan>
+</text>
+</g>
+<g id="wifi_hop_ota_slot">
+<rect  x="819" y="350" width="180" height="160" rx="12" fill="#EEF3F7" stroke="#D8E1EA" stroke-width="2"/>
+<text id="text_16" x="909" y="423" font-family="Arial, Helvetica, sans-serif" font-size="22" font-weight="400" fill="#5D6C7B" text-anchor="middle">
+<tspan x="909" y="423.0">WiFi</tspan>
+<tspan x="909" y="449.84">Hop</tspan>
+</text>
+</g>
+<g id="wifi_replay_ota_slot">
+<rect  x="1017" y="350" width="180" height="160" rx="12" fill="#EEF3F7" stroke="#D8E1EA" stroke-width="2"/>
+<text id="text_18" x="1107" y="423" font-family="Arial, Helvetica, sans-serif" font-size="22" font-weight="400" fill="#5D6C7B" text-anchor="middle">
+<tspan x="1107" y="423.0">WiFi</tspan>
+<tspan x="1107" y="449.84">Replay</tspan>
+</text>
+</g>
+<text id="text_20" x="96" y="614" font-family="Arial, Helvetica, sans-serif" font-size="23" font-weight="700" fill="#102235" text-anchor="start">
+<tspan x="96" y="614.0">Bluetooth</tspan>
+</text>
+<g id="bluetooth_scan_ota_slot">
+<rect  x="225" y="526" width="180" height="160" rx="12" fill="#EEF3F7" stroke="#D8E1EA" stroke-width="2"/>
+<text id="text_21" x="315" y="599" font-family="Arial, Helvetica, sans-serif" font-size="22" font-weight="400" fill="#5D6C7B" text-anchor="middle">
+<tspan x="315" y="599.0">Bluetooth</tspan>
+<tspan x="315" y="625.84">Scan</tspan>
+</text>
+</g>
+<g id="bluetooth_burst_ota_slot">
+<rect  x="423" y="526" width="180" height="160" rx="12" fill="#EEF3F7" stroke="#D8E1EA" stroke-width="2"/>
+<text id="text_23" x="513" y="599" font-family="Arial, Helvetica, sans-serif" font-size="22" font-weight="400" fill="#5D6C7B" text-anchor="middle">
+<tspan x="513" y="599.0">Bluetooth</tspan>
+<tspan x="513" y="625.84">Burst</tspan>
+</text>
+</g>
+<g id="bluetooth_sustain_ota_slot">
+<rect  x="621" y="526" width="180" height="160" rx="12" fill="#EEF3F7" stroke="#D8E1EA" stroke-width="2"/>
+<text id="text_25" x="711" y="599" font-family="Arial, Helvetica, sans-serif" font-size="22" font-weight="400" fill="#5D6C7B" text-anchor="middle">
+<tspan x="711" y="599.0">Bluetooth</tspan>
+<tspan x="711" y="625.84">Sustain</tspan>
+</text>
+</g>
+<g id="bluetooth_hop_ota_slot">
+<rect  x="819" y="526" width="180" height="160" rx="12" fill="#EEF3F7" stroke="#D8E1EA" stroke-width="2"/>
+<text id="text_27" x="909" y="599" font-family="Arial, Helvetica, sans-serif" font-size="22" font-weight="400" fill="#5D6C7B" text-anchor="middle">
+<tspan x="909" y="599.0">Bluetooth</tspan>
+<tspan x="909" y="625.84">Hop</tspan>
+</text>
+</g>
+<g id="bluetooth_replay_ota_slot">
+<rect  x="1017" y="526" width="180" height="160" rx="12" fill="#EEF3F7" stroke="#D8E1EA" stroke-width="2"/>
+<text id="text_29" x="1107" y="599" font-family="Arial, Helvetica, sans-serif" font-size="22" font-weight="400" fill="#5D6C7B" text-anchor="middle">
+<tspan x="1107" y="599.0">Bluetooth</tspan>
+<tspan x="1107" y="625.84">Replay</tspan>
+</text>
+</g>
+<text id="text_31" x="96" y="790" font-family="Arial, Helvetica, sans-serif" font-size="23" font-weight="700" fill="#102235" text-anchor="start">
+<tspan x="96" y="790.0">Zigbee</tspan>
+</text>
+<g id="zigbee_scan_ota_slot">
+<rect  x="225" y="702" width="180" height="160" rx="12" fill="#EEF3F7" stroke="#D8E1EA" stroke-width="2"/>
+<text id="text_32" x="315" y="775" font-family="Arial, Helvetica, sans-serif" font-size="22" font-weight="400" fill="#5D6C7B" text-anchor="middle">
+<tspan x="315" y="775.0">Zigbee</tspan>
+<tspan x="315" y="801.84">Scan</tspan>
+</text>
+</g>
+<g id="zigbee_burst_ota_slot">
+<rect  x="423" y="702" width="180" height="160" rx="12" fill="#EEF3F7" stroke="#D8E1EA" stroke-width="2"/>
+<text id="text_34" x="513" y="775" font-family="Arial, Helvetica, sans-serif" font-size="22" font-weight="400" fill="#5D6C7B" text-anchor="middle">
+<tspan x="513" y="775.0">Zigbee</tspan>
+<tspan x="513" y="801.84">Burst</tspan>
+</text>
+</g>
+<g id="zigbee_sustain_ota_slot">
+<rect  x="621" y="702" width="180" height="160" rx="12" fill="#EEF3F7" stroke="#D8E1EA" stroke-width="2"/>
+<text id="text_36" x="711" y="775" font-family="Arial, Helvetica, sans-serif" font-size="22" font-weight="400" fill="#5D6C7B" text-anchor="middle">
+<tspan x="711" y="775.0">Zigbee</tspan>
+<tspan x="711" y="801.84">Sustain</tspan>
+</text>
+</g>
+<g id="zigbee_hop_ota_slot">
+<rect  x="819" y="702" width="180" height="160" rx="12" fill="#EEF3F7" stroke="#D8E1EA" stroke-width="2"/>
+<text id="text_38" x="909" y="775" font-family="Arial, Helvetica, sans-serif" font-size="22" font-weight="400" fill="#5D6C7B" text-anchor="middle">
+<tspan x="909" y="775.0">Zigbee</tspan>
+<tspan x="909" y="801.84">Hop</tspan>
+</text>
+</g>
+<g id="zigbee_replay_ota_slot">
+<rect  x="1017" y="702" width="180" height="160" rx="12" fill="#EEF3F7" stroke="#D8E1EA" stroke-width="2"/>
+<text id="text_40" x="1107" y="775" font-family="Arial, Helvetica, sans-serif" font-size="22" font-weight="400" fill="#5D6C7B" text-anchor="middle">
+<tspan x="1107" y="775.0">Zigbee</tspan>
+<tspan x="1107" y="801.84">Replay</tspan>
+</text>
+</g>
+</g>
+<g id="ota_capture_panel">
+<rect  x="1275" y="245" width="549" height="670" rx="18" fill="white" stroke="#D8E1EA" stroke-width="2"/>
+<text id="text_42" x="1549" y="289" font-family="Arial, Helvetica, sans-serif" font-size="30" font-weight="700" fill="#102235" text-anchor="middle">
+<tspan x="1549" y="289.0">OTA CAPTURE</tspan>
+</text>
+<g id="tx_node">
+<rect  x="1374" y="318" width="350" height="64" rx="18" fill="white" stroke="#D8E1EA" stroke-width="2"/>
+<text id="text_43" x="1549.0" y="359.18" font-family="Arial, Helvetica, sans-serif" font-size="27" font-weight="700" fill="#102235" text-anchor="middle">
+<tspan x="1549.0" y="359.18">USRP N210 TX</tspan>
+</text>
+</g>
+<polyline points="1549,383 1549,447" fill="none" stroke="#102235" stroke-width="4" stroke-linecap="round" stroke-linejoin="round" marker-end="url(#arrow102235)"/>
+<rect  x="1569" y="393" width="161" height="36" rx="0" fill="white" stroke="none" stroke-width="2"/>
+<text id="text_44" x="1574" y="419" font-family="Arial, Helvetica, sans-serif" font-size="22" font-weight="400" fill="#5D6C7B" text-anchor="start">
+<tspan x="1574" y="419.0">over the air</tspan>
+</text>
+<g id="rx_node">
+<rect  x="1374" y="453" width="350" height="64" rx="18" fill="white" stroke="#D8E1EA" stroke-width="2"/>
+<text id="text_45" x="1549.0" y="494.18" font-family="Arial, Helvetica, sans-serif" font-size="27" font-weight="700" fill="#102235" text-anchor="middle">
+<tspan x="1549.0" y="494.18">USRP N210 RX</tspan>
+</text>
+</g>
+<polyline points="1549,518 1549,552" fill="none" stroke="#102235" stroke-width="4" stroke-linecap="round" stroke-linejoin="round" marker-end="url(#arrow102235)"/>
+<g id="window_node">
+<rect  x="1374" y="558" width="350" height="64" rx="18" fill="white" stroke="#D8E1EA" stroke-width="2"/>
+<text id="text_46" x="1549.0" y="599.18" font-family="Arial, Helvetica, sans-serif" font-size="27" font-weight="700" fill="#102235" text-anchor="middle">
+<tspan x="1549.0" y="599.18">32 ms RF window</tspan>
+</text>
+</g>
+<polyline points="1549,623 1549,657" fill="none" stroke="#102235" stroke-width="4" stroke-linecap="round" stroke-linejoin="round" marker-end="url(#arrow102235)"/>
+<g id="classifier_input_node">
+<rect  x="1374" y="663" width="350" height="64" rx="18" fill="white" stroke="#D8E1EA" stroke-width="2"/>
+<text id="text_47" x="1549.0" y="704.18" font-family="Arial, Helvetica, sans-serif" font-size="27" font-weight="700" fill="#102235" text-anchor="middle">
+<tspan x="1549.0" y="704.18">classifier input</tspan>
+</text>
+</g>
+<line x1="1303" y1="750" x2="1796" y2="750" stroke="#D8E1EA" stroke-width="2"/>
+<text id="capture_facts" x="1303" y="787" font-family="Arial, Helvetica, sans-serif" font-size="24" font-weight="400" fill="#102235" text-anchor="start">
+<tspan x="1303" y="787">12.5 MS/s</tspan>
+<tspan x="1303" y="819">400,000 complex IQ samples / window</tspan>
+<tspan x="1303" y="851">2.437 GHz</tspan>
+<tspan x="1303" y="883">2× USRP N210 SDRs</tspan>
+</text>
+</g>
+</svg>

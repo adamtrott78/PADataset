@@ -1,0 +1,83 @@
+<svg xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" width="1920" height="1080" viewBox="0 0 1920 1080" version="1.1" id="slide01" role="img" aria-labelledby="slide_title">
+<title id="slide_title">DQNGuard: Towards Open-World RF Preliminary-Action Detection</title>
+<desc>Implementation of SVG_PRODUCTION_SPEC.md. Canonical scientific assets retain their original artwork.</desc>
+<defs>
+<marker id="arrow102235" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="3" markerHeight="3" orient="auto-start-reverse"><path d="M 0 0 L 10 5 L 0 10 z" fill="#102235"/></marker>
+<marker id="arrow1F6FEB" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="3" markerHeight="3" orient="auto-start-reverse"><path d="M 0 0 L 10 5 L 0 10 z" fill="#1F6FEB"/></marker>
+<marker id="arrow2E8B57" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="3" markerHeight="3" orient="auto-start-reverse"><path d="M 0 0 L 10 5 L 0 10 z" fill="#2E8B57"/></marker>
+<marker id="arrowC63D4F" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="3" markerHeight="3" orient="auto-start-reverse"><path d="M 0 0 L 10 5 L 0 10 z" fill="#C63D4F"/></marker>
+<marker id="arrowE39A27" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="3" markerHeight="3" orient="auto-start-reverse"><path d="M 0 0 L 10 5 L 0 10 z" fill="#E39A27"/></marker>
+<marker id="arrow8A98A8" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="3" markerHeight="3" orient="auto-start-reverse"><path d="M 0 0 L 10 5 L 0 10 z" fill="#8A98A8"/></marker>
+<marker id="arrow6C5CE7" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="3" markerHeight="3" orient="auto-start-reverse"><path d="M 0 0 L 10 5 L 0 10 z" fill="#6C5CE7"/></marker>
+</defs>
+<rect id="background" x="0" y="0" width="1920" height="1080" rx="0" fill="#F7F9FC" stroke="none" stroke-width="2"/>
+<text id="conference_tag" x="100" y="100" font-family="Arial, Helvetica, sans-serif" font-size="22" font-weight="700" fill="#102235" text-anchor="start">
+<tspan x="100" y="100.0">MILCOM 2026</tspan>
+</text>
+<g id="title_group">
+<text id="title_dqnguard" x="96" y="230" font-family="Arial, Helvetica, sans-serif" font-size="72" font-weight="700" fill="#1F6FEB" text-anchor="start">
+<tspan x="96" y="230.0">DQNGuard</tspan>
+</text>
+<text id="text_2" x="468.15625" y="230" font-family="Arial, Helvetica, sans-serif" font-size="72" font-weight="700" fill="#102235" text-anchor="start">
+<tspan x="468.15625" y="230.0">: Towards</tspan>
+</text>
+<text id="title_remaining_lines" x="96" y="305" font-family="Arial, Helvetica, sans-serif" font-size="72" font-weight="700" fill="#102235" text-anchor="start">
+<tspan x="96" y="305">Open-World RF</tspan>
+<tspan x="96" y="380">Preliminary-Action Detection</tspan>
+</text>
+<text id="subtitle" x="96" y="455" font-family="Arial, Helvetica, sans-serif" font-size="30" font-weight="400" fill="#5D6C7B" text-anchor="start">
+<tspan x="96" y="455.0">Open-set recognition for over-the-air RF behavioral evidence</tspan>
+</text>
+</g>
+<g id="author_group">
+<text id="presenter" x="96" y="825" font-family="Arial, Helvetica, sans-serif" font-size="30" font-weight="700" fill="#102235" text-anchor="start">
+<tspan x="96" y="825.0">Adam Trott</tspan>
+</text>
+<text id="coauthors" x="96" y="870" font-family="Arial, Helvetica, sans-serif" font-size="23" font-weight="400" fill="#102235" text-anchor="start">
+<tspan x="96" y="870.0">Cameron Popillo • Nathaniel D. Bastian • Roulin Zhou • Gokhan Kul</tspan>
+</text>
+<text id="affiliations" x="96" y="910" font-family="Arial, Helvetica, sans-serif" font-size="22" font-weight="400" fill="#5D6C7B" text-anchor="start">
+<tspan x="96" y="910.0">University of Massachusetts Dartmouth • Johns Hopkins University</tspan>
+</text>
+</g>
+<g id="hero_group">
+<g id="rf_observation_card">
+<rect  x="1260" y="235" width="480" height="150" rx="18" fill="white" stroke="#D8E1EA" stroke-width="2"/>
+<text id="text_9" x="1500" y="276" font-family="Arial, Helvetica, sans-serif" font-size="29" font-weight="700" fill="#102235" text-anchor="middle">
+<tspan x="1500" y="276.0">RF observation</tspan>
+</text>
+<polyline id="decorative_trace" points="1290,336 1310,336 1320,322 1331,352 1342,302 1353,362 1364,320 1375,336 1410,336 1422,326 1434,347 1446,314 1458,357 1470,323 1482,336 1520,336 1530,310 1540,362 1550,319 1560,344 1570,336 1610,336 1620,322 1630,350 1640,308 1650,360 1660,326 1670,336 1710,336" fill="none" stroke="#5D6C7B" stroke-width="3"/>
+</g>
+<polyline id="arrow_rf_to_classifier" points="1500,385 1500,440" fill="none" stroke="#102235" stroke-width="4" stroke-linecap="round" stroke-linejoin="round" marker-end="url(#arrow102235)"/>
+<g id="classifier_node">
+<rect  x="1330" y="445" width="340" height="100" rx="18" fill="#EEF3F7" stroke="#D8E1EA" stroke-width="2"/>
+<text id="text_10" x="1500.0" y="505.2" font-family="Arial, Helvetica, sans-serif" font-size="30" font-weight="700" fill="#102235" text-anchor="middle">
+<tspan x="1500.0" y="505.2">PA classifier</tspan>
+</text>
+</g>
+<polyline id="arrow_classifier_to_guard" points="1500,545 1500,610" fill="none" stroke="#102235" stroke-width="4" stroke-linecap="round" stroke-linejoin="round" marker-end="url(#arrow102235)"/>
+<g id="dqnguard_node">
+<rect  x="1300" y="615" width="400" height="120" rx="18" fill="#EAF2FF" stroke="#1F6FEB" stroke-width="2"/>
+<text id="text_11" x="1500.0" y="687.24" font-family="Arial, Helvetica, sans-serif" font-size="36" font-weight="700" fill="#1F6FEB" text-anchor="middle">
+<tspan x="1500.0" y="687.24">DQNGuard</tspan>
+</text>
+</g>
+<g id="branch_connector">
+<line x1="1500" y1="735" x2="1500" y2="785" stroke="#102235" stroke-width="4"/>
+<polyline points="1500,785 1340,785 1340,820" fill="none" stroke="#2E8B57" stroke-width="4" stroke-linecap="round" stroke-linejoin="round" marker-end="url(#arrow2E8B57)"/>
+<polyline points="1500,785 1660,785 1660,820" fill="none" stroke="#C63D4F" stroke-width="4" stroke-linecap="round" stroke-linejoin="round" marker-end="url(#arrowC63D4F)"/>
+</g>
+<g id="known_node">
+<rect  x="1205" y="825" width="270" height="105" rx="18" fill="#EDF7F0" stroke="#2E8B57" stroke-width="2"/>
+<text id="text_12" x="1340.0" y="886.68" font-family="Arial, Helvetica, sans-serif" font-size="27" font-weight="700" fill="#2E8B57" text-anchor="middle">
+<tspan x="1340.0" y="886.68">KNOWN PA ✓</tspan>
+</text>
+</g>
+<g id="unknown_node">
+<rect  x="1525" y="825" width="270" height="105" rx="18" fill="#FBEFF1" stroke="#C63D4F" stroke-width="2"/>
+<text id="text_13" x="1660.0" y="886.68" font-family="Arial, Helvetica, sans-serif" font-size="27" font-weight="700" fill="#C63D4F" text-anchor="middle">
+<tspan x="1660.0" y="886.68">UNKNOWN ?</tspan>
+</text>
+</g>
+</g>
+</svg>

@@ -1,0 +1,125 @@
+<svg xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" width="1920" height="1080" viewBox="0 0 1920 1080" version="1.1" id="slide05" role="img" aria-labelledby="slide_title">
+<title id="slide_title">Unknown detection is only useful if known behavior stays usable</title>
+<desc>Implementation of SVG_PRODUCTION_SPEC.md. Canonical scientific assets retain their original artwork.</desc>
+<defs>
+<marker id="arrow102235" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="3" markerHeight="3" orient="auto-start-reverse"><path d="M 0 0 L 10 5 L 0 10 z" fill="#102235"/></marker>
+<marker id="arrow1F6FEB" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="3" markerHeight="3" orient="auto-start-reverse"><path d="M 0 0 L 10 5 L 0 10 z" fill="#1F6FEB"/></marker>
+<marker id="arrow2E8B57" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="3" markerHeight="3" orient="auto-start-reverse"><path d="M 0 0 L 10 5 L 0 10 z" fill="#2E8B57"/></marker>
+<marker id="arrowC63D4F" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="3" markerHeight="3" orient="auto-start-reverse"><path d="M 0 0 L 10 5 L 0 10 z" fill="#C63D4F"/></marker>
+<marker id="arrowE39A27" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="3" markerHeight="3" orient="auto-start-reverse"><path d="M 0 0 L 10 5 L 0 10 z" fill="#E39A27"/></marker>
+<marker id="arrow8A98A8" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="3" markerHeight="3" orient="auto-start-reverse"><path d="M 0 0 L 10 5 L 0 10 z" fill="#8A98A8"/></marker>
+<marker id="arrow6C5CE7" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="3" markerHeight="3" orient="auto-start-reverse"><path d="M 0 0 L 10 5 L 0 10 z" fill="#6C5CE7"/></marker>
+</defs>
+<rect id="background" x="0" y="0" width="1920" height="1080" rx="0" fill="#F7F9FC" stroke="none" stroke-width="2"/>
+<g id="title_group">
+<text id="text_0" x="96" y="116" font-family="Arial, Helvetica, sans-serif" font-size="52" font-weight="700" fill="#102235" text-anchor="start">
+<tspan x="96" y="116">Unknown detection is only useful if known behavior stays usable</tspan>
+</text>
+</g>
+<g id="supporting_sentence">
+<text id="text_1" x="96" y="186" font-family="Arial, Helvetica, sans-serif" font-size="29" font-weight="400" fill="#5D6C7B" text-anchor="start">
+<tspan x="96" y="186">The OSR decision must detect unfamiliar behavior without solving the problem by rejecting too much known data.</tspan>
+</text>
+</g>
+<g id="varmax_panel">
+<rect  x="96" y="250" width="560" height="675" rx="18" fill="white" stroke="#D8E1EA" stroke-width="2"/>
+<text id="text_2" x="124" y="300" font-family="Arial, Helvetica, sans-serif" font-size="29" font-weight="700" fill="#102235" text-anchor="start">
+<tspan x="124" y="300.0">VARMAX — SCORE-BASED</tspan>
+<tspan x="124" y="335.38">REJECTION</tspan>
+</text>
+<g id="varmax_0">
+<rect  x="176" y="392" width="400" height="60" rx="18" fill="white" stroke="#D8E1EA" stroke-width="2"/>
+<text id="text_4" x="376.0" y="430.84" font-family="Arial, Helvetica, sans-serif" font-size="26" font-weight="400" fill="#102235" text-anchor="middle">
+<tspan x="376.0" y="430.84">classifier evidence</tspan>
+</text>
+</g>
+<polyline points="376,453 376,477" fill="none" stroke="#102235" stroke-width="4" stroke-linecap="round" stroke-linejoin="round" marker-end="url(#arrow102235)"/>
+<g id="varmax_1">
+<rect  x="176" y="484" width="400" height="60" rx="18" fill="white" stroke="#D8E1EA" stroke-width="2"/>
+<text id="text_5" x="376.0" y="522.84" font-family="Arial, Helvetica, sans-serif" font-size="26" font-weight="400" fill="#102235" text-anchor="middle">
+<tspan x="376.0" y="522.84">unknownness score</tspan>
+</text>
+</g>
+<polyline points="376,545 376,569" fill="none" stroke="#102235" stroke-width="4" stroke-linecap="round" stroke-linejoin="round" marker-end="url(#arrow102235)"/>
+<g id="varmax_2">
+<rect  x="176" y="576" width="400" height="60" rx="18" fill="white" stroke="#D8E1EA" stroke-width="2"/>
+<text id="text_6" x="376.0" y="614.84" font-family="Arial, Helvetica, sans-serif" font-size="26" font-weight="400" fill="#102235" text-anchor="middle">
+<tspan x="376.0" y="614.84">threshold</tspan>
+</text>
+</g>
+<polyline points="376,637 376,661" fill="none" stroke="#102235" stroke-width="4" stroke-linecap="round" stroke-linejoin="round" marker-end="url(#arrow102235)"/>
+<g id="varmax_3">
+<rect  x="176" y="668" width="400" height="60" rx="18" fill="white" stroke="#D8E1EA" stroke-width="2"/>
+<text id="text_7" x="376.0" y="706.84" font-family="Arial, Helvetica, sans-serif" font-size="26" font-weight="400" fill="#102235" text-anchor="middle">
+<tspan x="376.0" y="706.84">known / unknown</tspan>
+</text>
+</g>
+<text id="text_8" x="126" y="817" font-family="Arial, Helvetica, sans-serif" font-size="24" font-weight="400" fill="#2E8B57" text-anchor="start">
+<tspan x="126" y="817.0">✓ useful unknownness evidence</tspan>
+</text>
+<text id="text_9" x="126" y="860" font-family="Arial, Helvetica, sans-serif" font-size="24" font-weight="400" fill="#5D6C7B" text-anchor="start">
+<tspan x="126" y="860.0">✕ threshold choice can sacrifice known samples</tspan>
+</text>
+</g>
+<g id="dqn_style_panel">
+<rect  x="680" y="250" width="560" height="675" rx="18" fill="white" stroke="#D8E1EA" stroke-width="2"/>
+<text id="text_10" x="708" y="300" font-family="Arial, Helvetica, sans-serif" font-size="29" font-weight="700" fill="#102235" text-anchor="start">
+<tspan x="708" y="300.0">DQN-STYLE CONFIDENCE</tspan>
+<tspan x="708" y="335.38">HEAD</tspan>
+</text>
+<g id="confidence_state">
+<rect  x="810" y="390" width="300" height="135" rx="18" fill="white" stroke="#D8E1EA" stroke-width="2"/>
+<text id="text_12" x="960.0" y="434.61999999999995" font-family="Arial, Helvetica, sans-serif" font-size="26" font-weight="400" fill="#102235" text-anchor="middle">
+<tspan x="960.0" y="434.61999999999995">P1</tspan>
+<tspan x="960.0" y="466.3399999999999">P1 − P2</tspan>
+<tspan x="960.0" y="498.05999999999995">H(p)</tspan>
+</text>
+</g>
+<polyline points="960,526 960,566" fill="none" stroke="#102235" stroke-width="4" stroke-linecap="round" stroke-linejoin="round" marker-end="url(#arrow102235)"/>
+<g id="learned_decision">
+<rect  x="760" y="575" width="400" height="66" rx="18" fill="white" stroke="#D8E1EA" stroke-width="2"/>
+<text id="text_15" x="960.0" y="616.84" font-family="Arial, Helvetica, sans-serif" font-size="26" font-weight="700" fill="#102235" text-anchor="middle">
+<tspan x="960.0" y="616.84">learned decision</tspan>
+</text>
+</g>
+<polyline points="960,642 960,688" fill="none" stroke="#102235" stroke-width="4" stroke-linecap="round" stroke-linejoin="round" marker-end="url(#arrow102235)"/>
+<text id="text_16" x="960" y="727" font-family="Arial, Helvetica, sans-serif" font-size="27" font-weight="400" fill="#102235" text-anchor="middle">
+<tspan x="960" y="727.0">known / unknown</tspan>
+</text>
+<text id="text_17" x="710" y="817" font-family="Arial, Helvetica, sans-serif" font-size="24" font-weight="400" fill="#2E8B57" text-anchor="start">
+<tspan x="710" y="817.0">✓ learned decision boundary</tspan>
+</text>
+<text id="text_18" x="710" y="860" font-family="Arial, Helvetica, sans-serif" font-size="24" font-weight="400" fill="#5D6C7B" text-anchor="start">
+<tspan x="710" y="860.0">✕ no explicit guarantee on known rejection</tspan>
+</text>
+</g>
+<g id="operating_requirement_panel">
+<rect  x="1264" y="250" width="560" height="675" rx="18" fill="white" stroke="#1F6FEB" stroke-width="4"/>
+<text id="text_19" x="1292" y="300" font-family="Arial, Helvetica, sans-serif" font-size="29" font-weight="700" fill="#102235" text-anchor="start">
+<tspan x="1292" y="300.0">WHAT DEPLOYMENT</tspan>
+<tspan x="1292" y="335.38">ACTUALLY NEEDS</tspan>
+</text>
+<text id="text_21" x="1544" y="440" font-family="Arial, Helvetica, sans-serif" font-size="31" font-weight="700" fill="#102235" text-anchor="middle">
+<tspan x="1544" y="440.0">Detect unknowns</tspan>
+</text>
+<text id="text_22" x="1544" y="492" font-family="Arial, Helvetica, sans-serif" font-size="36" font-weight="400" fill="#102235" text-anchor="middle">
+<tspan x="1544" y="492.0">+</tspan>
+</text>
+<text id="text_23" x="1544" y="548" font-family="Arial, Helvetica, sans-serif" font-size="28" font-weight="400" fill="#102235" text-anchor="middle">
+<tspan x="1544" y="548.0">Preserve known classifications</tspan>
+</text>
+<polyline points="1544,573 1544,624" fill="none" stroke="#1F6FEB" stroke-width="4" stroke-linecap="round" stroke-linejoin="round" marker-end="url(#arrow1F6FEB)"/>
+<g id="explicit_budget">
+<rect  x="1300" y="639" width="488" height="111" rx="18" fill="#EAF2FF" stroke="#1F6FEB" stroke-width="2"/>
+<text id="text_24" x="1544.0" y="687.2099999999999" font-family="Arial, Helvetica, sans-serif" font-size="27" font-weight="700" fill="#1F6FEB" text-anchor="middle">
+<tspan x="1544.0" y="687.2099999999999">EXPLICIT KNOWN-REJECTION</tspan>
+<tspan x="1544.0" y="720.1499999999999">BUDGET</tspan>
+</text>
+</g>
+<text id="text_26" x="1300" y="815" font-family="Arial, Helvetica, sans-serif" font-size="27" font-weight="700" fill="#102235" text-anchor="start">
+<tspan x="1300" y="815">Reject unfamiliar behavior — but only</tspan>
+<tspan x="1300" y="849">within a controlled known-sample</tspan>
+<tspan x="1300" y="883">cost.</tspan>
+</text>
+</g>
+</svg>

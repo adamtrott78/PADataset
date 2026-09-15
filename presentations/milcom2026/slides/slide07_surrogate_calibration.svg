@@ -1,0 +1,101 @@
+<svg xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" width="1920" height="1080" viewBox="0 0 1920 1080" version="1.1" id="slide07" role="img" aria-labelledby="slide_title">
+<title id="slide_title">A surrogate unknown shapes the DQN; the true unknown remains unseen until test</title>
+<desc>Implementation of SVG_PRODUCTION_SPEC.md. Canonical scientific assets retain their original artwork.</desc>
+<defs>
+<marker id="arrow102235" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="3" markerHeight="3" orient="auto-start-reverse"><path d="M 0 0 L 10 5 L 0 10 z" fill="#102235"/></marker>
+<marker id="arrow1F6FEB" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="3" markerHeight="3" orient="auto-start-reverse"><path d="M 0 0 L 10 5 L 0 10 z" fill="#1F6FEB"/></marker>
+<marker id="arrow2E8B57" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="3" markerHeight="3" orient="auto-start-reverse"><path d="M 0 0 L 10 5 L 0 10 z" fill="#2E8B57"/></marker>
+<marker id="arrowC63D4F" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="3" markerHeight="3" orient="auto-start-reverse"><path d="M 0 0 L 10 5 L 0 10 z" fill="#C63D4F"/></marker>
+<marker id="arrowE39A27" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="3" markerHeight="3" orient="auto-start-reverse"><path d="M 0 0 L 10 5 L 0 10 z" fill="#E39A27"/></marker>
+<marker id="arrow8A98A8" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="3" markerHeight="3" orient="auto-start-reverse"><path d="M 0 0 L 10 5 L 0 10 z" fill="#8A98A8"/></marker>
+<marker id="arrow6C5CE7" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="3" markerHeight="3" orient="auto-start-reverse"><path d="M 0 0 L 10 5 L 0 10 z" fill="#6C5CE7"/></marker>
+</defs>
+<rect id="background" x="0" y="0" width="1920" height="1080" rx="0" fill="#F7F9FC" stroke="none" stroke-width="2"/>
+<g id="title_group">
+<text id="text_0" x="96" y="103" font-family="Arial, Helvetica, sans-serif" font-size="52" font-weight="700" fill="#102235" text-anchor="start">
+<tspan x="96" y="103">A surrogate unknown shapes the DQN; the true unknown remains</tspan>
+<tspan x="96" y="157">unseen until test</tspan>
+</text>
+</g>
+<g id="role_strip">
+<g id="surrogate_role">
+<rect  x="350" y="238" width="325" height="62" rx="18" fill="#FFF6E8" stroke="#E39A27" stroke-width="2"/>
+<text id="text_2" x="512.5" y="277.5" font-family="Arial, Helvetica, sans-serif" font-size="25" font-weight="700" fill="#E39A27" text-anchor="middle">
+<tspan x="512.5" y="277.5">Surrogate: Scan</tspan>
+</text>
+</g>
+<g id="target_role">
+<rect  x="699" y="238" width="310" height="62" rx="18" fill="#FBEFF1" stroke="#C63D4F" stroke-width="2"/>
+<text id="text_3" x="854.0" y="277.5" font-family="Arial, Helvetica, sans-serif" font-size="25" font-weight="700" fill="#C63D4F" text-anchor="middle">
+<tspan x="854.0" y="277.5">Target: Sustain</tspan>
+</text>
+</g>
+<g id="known_role">
+<rect  x="1033" y="238" width="537" height="62" rx="18" fill="#EDF7F0" stroke="#2E8B57" stroke-width="2"/>
+<text id="text_4" x="1301.5" y="277.5" font-family="Arial, Helvetica, sans-serif" font-size="25" font-weight="700" fill="#2E8B57" text-anchor="middle">
+<tspan x="1301.5" y="277.5">Known: Burst / Hop / Replay</tspan>
+</text>
+</g>
+</g>
+<g id="role_connectors">
+<polyline points="960,430 960,455 585,455 585,480" fill="none" stroke="#102235" stroke-width="4" stroke-linecap="round" stroke-linejoin="round" marker-end="url(#arrow102235)"/>
+<polyline points="960,455 1335,455 1335,480" fill="none" stroke="#102235" stroke-width="4" stroke-linecap="round" stroke-linejoin="round" marker-end="url(#arrow102235)"/>
+<polyline points="585,605 585,628 850,628 850,640" fill="none" stroke="#2E8B57" stroke-width="4" stroke-linecap="round" stroke-linejoin="round" marker-end="url(#arrow2E8B57)"/>
+<polyline points="1335,605 1335,628 1070,628 1070,640" fill="none" stroke="#E39A27" stroke-width="4" stroke-linecap="round" stroke-linejoin="round" marker-end="url(#arrowE39A27)"/>
+<polyline points="350,545 315,545 315,837 380,837" fill="none" stroke="#2E8B57" stroke-width="4" stroke-linecap="round" stroke-linejoin="round" marker-end="url(#arrow2E8B57)"/>
+<polyline points="585,605 585,765 1285,765 1285,785" fill="none" stroke="#2E8B57" stroke-width="4" stroke-linecap="round" stroke-linejoin="round" marker-end="url(#arrow2E8B57)"/>
+<polyline points="635,885 635,899 800,899 800,905" fill="none" stroke="#2E8B57" stroke-width="4" stroke-linecap="round" stroke-linejoin="round" marker-end="url(#arrow2E8B57)"/>
+<polyline points="1285,885 1285,899 1120,899 1120,905" fill="none" stroke="#2E8B57" stroke-width="4" stroke-linecap="round" stroke-linejoin="round" marker-end="url(#arrow2E8B57)"/>
+</g>
+<g id="backbone_node">
+<rect  x="730" y="320" width="460" height="110" rx="18" fill="white" stroke="#D8E1EA" stroke-width="2"/>
+<text id="text_5" x="960.0" y="367.17" font-family="Arial, Helvetica, sans-serif" font-size="29" font-weight="700" fill="#102235" text-anchor="middle">
+<tspan x="960.0" y="367.17">3-class PA backbone</tspan>
+<tspan x="960.0" y="402.55">Burst | Hop | Replay</tspan>
+</text>
+</g>
+<g id="known_calibration_node">
+<rect  x="350" y="485" width="470" height="120" rx="18" fill="#EDF7F0" stroke="#2E8B57" stroke-width="2"/>
+<text id="text_7" x="585.0" y="537.98" font-family="Arial, Helvetica, sans-serif" font-size="26" font-weight="700" fill="#2E8B57" text-anchor="middle">
+<tspan x="585.0" y="537.98">KNOWN CALIBRATION</tspan>
+<tspan x="585.0" y="569.7">Burst • Hop • Replay</tspan>
+</text>
+</g>
+<g id="surrogate_calibration_node">
+<rect  x="1100" y="485" width="470" height="120" rx="18" fill="#FFF6E8" stroke="#E39A27" stroke-width="2"/>
+<text id="text_9" x="1335.0" y="538.25" font-family="Arial, Helvetica, sans-serif" font-size="25" font-weight="700" fill="#E39A27" text-anchor="middle">
+<tspan x="1335.0" y="538.25">SCAN SURROGATE</tspan>
+<tspan x="1335.0" y="568.75">withheld from backbone training</tspan>
+</text>
+</g>
+<g id="dqn_fit_node">
+<rect  x="730" y="645" width="460" height="105" rx="18" fill="#EAF2FF" stroke="#1F6FEB" stroke-width="2"/>
+<text id="text_11" x="960.0" y="690.75" font-family="Arial, Helvetica, sans-serif" font-size="25" font-weight="700" fill="#1F6FEB" text-anchor="middle">
+<tspan x="960.0" y="690.75">FIT DQN CONFIDENCE HEAD</tspan>
+<tspan x="960.0" y="721.25">known + surrogate states</tspan>
+</text>
+</g>
+<g id="known_guard_fit_node">
+<rect  x="385" y="790" width="500" height="95" rx="18" fill="#EDF7F0" stroke="#2E8B57" stroke-width="2"/>
+<text id="text_13" x="635.0" y="846.0" font-family="Arial, Helvetica, sans-serif" font-size="25" font-weight="700" fill="#2E8B57" text-anchor="middle">
+<tspan x="635.0" y="846.0">FIT GUARD BANDS ON KNOWN ONLY</tspan>
+</text>
+</g>
+<g id="known_threshold_node">
+<rect  x="1035" y="790" width="500" height="95" rx="18" fill="#EDF7F0" stroke="#2E8B57" stroke-width="2"/>
+<text id="text_14" x="1285.0" y="830.75" font-family="Arial, Helvetica, sans-serif" font-size="25" font-weight="700" fill="#2E8B57" text-anchor="middle">
+<tspan x="1285.0" y="830.75">SET 5% THRESHOLD ON KNOWN</tspan>
+<tspan x="1285.0" y="861.25">ONLY</tspan>
+</text>
+</g>
+<g id="final_evaluation_node">
+<rect  x="570" y="910" width="780" height="90" rx="18" fill="#FBEFF1" stroke="#C63D4F" stroke-width="2"/>
+<text id="text_16" x="960.0" y="947.98" font-family="Arial, Helvetica, sans-serif" font-size="26" font-weight="700" fill="#C63D4F" text-anchor="middle">
+<tspan x="960.0" y="947.98">FINAL EVALUATION:</tspan>
+<tspan x="960.0" y="979.7">known test + Sustain target unknown</tspan>
+</text>
+</g>
+<text id="text_18" x="960" y="1027" font-family="Arial, Helvetica, sans-serif" font-size="21" font-weight="400" fill="#5D6C7B" text-anchor="middle">
+<tspan x="960" y="1027.0">Scan surrogate is not included in final test metrics.</tspan>
+</text>
+</svg>

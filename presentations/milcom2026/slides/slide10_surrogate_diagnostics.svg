@@ -1,0 +1,95 @@
+<svg xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" width="1920" height="1080" viewBox="0 0 1920 1080" version="1.1" id="slide10" role="img" aria-labelledby="slide_title">
+<title id="slide_title">No simple target-blind rule reliably predicts the best surrogate</title>
+<desc>Implementation of SVG_PRODUCTION_SPEC.md. Canonical scientific assets retain their original artwork.</desc>
+<defs>
+<marker id="arrow102235" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="3" markerHeight="3" orient="auto-start-reverse"><path d="M 0 0 L 10 5 L 0 10 z" fill="#102235"/></marker>
+<marker id="arrow1F6FEB" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="3" markerHeight="3" orient="auto-start-reverse"><path d="M 0 0 L 10 5 L 0 10 z" fill="#1F6FEB"/></marker>
+<marker id="arrow2E8B57" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="3" markerHeight="3" orient="auto-start-reverse"><path d="M 0 0 L 10 5 L 0 10 z" fill="#2E8B57"/></marker>
+<marker id="arrowC63D4F" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="3" markerHeight="3" orient="auto-start-reverse"><path d="M 0 0 L 10 5 L 0 10 z" fill="#C63D4F"/></marker>
+<marker id="arrowE39A27" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="3" markerHeight="3" orient="auto-start-reverse"><path d="M 0 0 L 10 5 L 0 10 z" fill="#E39A27"/></marker>
+<marker id="arrow8A98A8" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="3" markerHeight="3" orient="auto-start-reverse"><path d="M 0 0 L 10 5 L 0 10 z" fill="#8A98A8"/></marker>
+<marker id="arrow6C5CE7" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="3" markerHeight="3" orient="auto-start-reverse"><path d="M 0 0 L 10 5 L 0 10 z" fill="#6C5CE7"/></marker>
+</defs>
+<rect id="background" x="0" y="0" width="1920" height="1080" rx="0" fill="#F7F9FC" stroke="none" stroke-width="2"/>
+<g id="title_group">
+<text id="text_0" x="96" y="116" font-family="Arial, Helvetica, sans-serif" font-size="52" font-weight="700" fill="#102235" text-anchor="start">
+<tspan x="96" y="116">No simple target-blind rule reliably predicts the best surrogate</tspan>
+</text>
+</g>
+<g id="supporting_sentence">
+<text id="text_1" x="96" y="186" font-family="Arial, Helvetica, sans-serif" font-size="29" font-weight="400" fill="#5D6C7B" text-anchor="start">
+<tspan x="96" y="186">Can we choose a good surrogate before the true unknown has ever been observed?</tspan>
+</text>
+</g>
+<g id="calibration_performance_card">
+<rect  x="96" y="275" width="560" height="560" rx="18" fill="white" stroke="#D8E1EA" stroke-width="2"/>
+<text id="text_2" x="124" y="320" font-family="Arial, Helvetica, sans-serif" font-size="29" font-weight="700" fill="#102235" text-anchor="start">
+<tspan x="124" y="320.0">SURROGATE CALIBRATION</tspan>
+<tspan x="124" y="355.38">PERFORMANCE</tspan>
+</text>
+<text id="text_4" x="124" y="418" font-family="Arial, Helvetica, sans-serif" font-size="26" font-weight="400" fill="#102235" text-anchor="start">
+<tspan x="124" y="418.0">“If I reject the surrogate well, will I reject the</tspan>
+<tspan x="124" y="449.72">true unknown well?”</tspan>
+</text>
+<text id="text_6" x="124" y="575" font-family="Arial, Helvetica, sans-serif" font-size="70" font-weight="700" fill="#102235" text-anchor="start">
+<tspan x="124" y="575.0">ρ ≈ −0.075</tspan>
+</text>
+<text id="text_7" x="124" y="625" font-family="Arial, Helvetica, sans-serif" font-size="26" font-weight="400" fill="#102235" text-anchor="start">
+<tspan x="124" y="625.0">Pearson r ≈ −0.047</tspan>
+</text>
+<text id="text_8" x="124" y="672" font-family="Arial, Helvetica, sans-serif" font-size="25" font-weight="400" fill="#102235" text-anchor="start">
+<tspan x="124" y="672.0">Best surrogate selected: 2 / 5 targets</tspan>
+</text>
+<text id="text_9" x="124" y="744" font-family="Arial, Helvetica, sans-serif" font-size="27" font-weight="700" fill="#102235" text-anchor="start">
+<tspan x="124" y="744.0">Rejecting the surrogate well does not</tspan>
+<tspan x="124" y="776.94">imply transfer.</tspan>
+</text>
+</g>
+<g id="confidence_geometry_card">
+<rect  x="680" y="275" width="560" height="560" rx="18" fill="white" stroke="#D8E1EA" stroke-width="2"/>
+<text id="text_11" x="708" y="320" font-family="Arial, Helvetica, sans-serif" font-size="29" font-weight="700" fill="#102235" text-anchor="start">
+<tspan x="708" y="320.0">CONFIDENCE GEOMETRY</tspan>
+</text>
+<text id="text_12" x="708" y="418" font-family="Arial, Helvetica, sans-serif" font-size="26" font-weight="400" fill="#5D6C7B" text-anchor="start">
+<tspan x="708" y="418.0">P1 • P1−P2 • entropy</tspan>
+</text>
+<text id="text_13" x="708" y="575" font-family="Arial, Helvetica, sans-serif" font-size="70" font-weight="700" fill="#102235" text-anchor="start">
+<tspan x="708" y="575.0">ρ ≈ −0.552</tspan>
+</text>
+<text id="text_14" x="708" y="710" font-family="Arial, Helvetica, sans-serif" font-size="27" font-weight="700" fill="#102235" text-anchor="start">
+<tspan x="708" y="710.0">The intuitive confidence-space rule</tspan>
+<tspan x="708" y="742.94">pointed in the wrong direction overall.</tspan>
+</text>
+</g>
+<g id="feature_geometry_card">
+<rect  x="1264" y="275" width="560" height="560" rx="18" fill="white" stroke="#D8E1EA" stroke-width="2"/>
+<text id="text_16" x="1292" y="320" font-family="Arial, Helvetica, sans-serif" font-size="29" font-weight="700" fill="#102235" text-anchor="start">
+<tspan x="1292" y="320.0">FEATURE GEOMETRY</tspan>
+</text>
+<text id="text_17" x="1292" y="500" font-family="Arial, Helvetica, sans-serif" font-size="30" font-weight="700" fill="#102235" text-anchor="start">
+<tspan x="1292" y="500.0">best simple +ρ ≈</tspan>
+</text>
+<text id="text_18" x="1292" y="575" font-family="Arial, Helvetica, sans-serif" font-size="78" font-weight="700" fill="#102235" text-anchor="start">
+<tspan x="1292" y="575.0">+0.406</tspan>
+</text>
+<text id="text_19" x="1292" y="672" font-family="Arial, Helvetica, sans-serif" font-size="25" font-weight="400" fill="#102235" text-anchor="start">
+<tspan x="1292" y="672.0">Best surrogate selected: 1 / 5 targets</tspan>
+</text>
+<text id="text_20" x="1292" y="744" font-family="Arial, Helvetica, sans-serif" font-size="27" font-weight="700" fill="#102235" text-anchor="start">
+<tspan x="1292" y="744.0">Some positive signal exists, but</tspan>
+<tspan x="1292" y="776.94">proximity alone is not reliable.</tspan>
+</text>
+</g>
+<g id="shared_conclusion">
+<polyline points="376,839 376,870" fill="none" stroke="#102235" stroke-width="4" stroke-linecap="round" stroke-linejoin="round" marker-end="url(#arrow102235)"/>
+<polyline points="960,839 960,870" fill="none" stroke="#102235" stroke-width="4" stroke-linecap="round" stroke-linejoin="round" marker-end="url(#arrow102235)"/>
+<polyline points="1544,839 1544,870" fill="none" stroke="#102235" stroke-width="4" stroke-linecap="round" stroke-linejoin="round" marker-end="url(#arrow102235)"/>
+<rect  x="300" y="875" width="1320" height="105" rx="18" fill="#102235" stroke="#102235" stroke-width="2"/>
+<text id="text_22" x="960" y="917" font-family="Arial, Helvetica, sans-serif" font-size="34" font-weight="700" fill="white" text-anchor="middle">
+<tspan x="960" y="917.0">NO RELIABLE SINGLE-SURROGATE SELECTION RULE</tspan>
+</text>
+<text id="text_23" x="960" y="956" font-family="Arial, Helvetica, sans-serif" font-size="26" font-weight="400" fill="white" text-anchor="middle">
+<tspan x="960" y="956.0">Good surrogate performance does not imply good target transfer.</tspan>
+</text>
+</g>
+</svg>
