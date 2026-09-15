@@ -22,8 +22,8 @@ Statuses:
 | 6 | DQNGuard adds a budgeted open-world decision layer to the PA classifier | Explain the proposed decision layer | **CONCEPT LOCKED** |
 | 7 | A surrogate unknown shapes the DQN; the true unknown remains unseen until test | Explain target unknown, surrogate unknown, and fair comparison | **CONCEPT LOCKED** |
 | 8 | DQNGuard gives the strongest usable operating point at low known rejection | Present the main method comparison | **CONCEPT LOCKED** |
-| 9 | Performance still depends strongly on the unseen behavior | Explain the across-fold standard deviation correctly | TBD |
-| 10 | Surrogate usefulness depends on the target unknown | Present and interpret the Target-Surrogate Matrix | TBD |
+| 9 | Surrogate usefulness depends strongly on the unseen target | Make Figure 2 the central diagnostic result and explain target-surrogate dependence | **CONCEPT LOCKED** |
+| 10 | No simple rule reliably predicts the best surrogate | Explain failed surrogate-selection diagnostics and the remaining deployment problem | TBD |
 | 11 | Multi-surrogate calibration may reduce target-surrogate sensitivity | Future work and broader implications | TBD |
 | 12 | Takeaways | Leave three memorable conclusions and transition to Q&A | TBD |
 
@@ -1152,6 +1152,179 @@ The next result slide should unpack the dependence on which PA is actually unsee
 - Known rejection is the fraction of legitimate known test samples incorrectly routed as unknown.
 - Unknown F1 is binary detection performance for the held-out target PA.
 - OSR macro F1 includes the known classes plus the unknown class and therefore penalizes methods that gain unknown detection by sacrificing known classification.
+
+
+---
+
+# Slide 9 — Surrogate usefulness depends strongly on the unseen target
+
+## Status
+
+**CONCEPT LOCKED**
+
+## Audience takeaway
+
+> The surrogate-open assumption transfers unevenly: a surrogate that is highly useful for one unseen PA can be nearly useless for another.
+
+Figure 2 is the centerpiece of this slide. The purpose is to explain **why the target-surrogate relationship matters**, not merely to show another result graphic.
+
+## Slide title
+
+**Surrogate usefulness depends strongly on the unseen target**
+
+## Supporting sentence
+
+**Rotating both the target unknown and surrogate-open class reveals strong, directional calibration dependence.**
+
+## Experiment connection to Slide 8
+
+Slide 8 used the fixed-Scan-surrogate comparison and reported:
+
+**DQNGuard Unknown F1 = 0.865 ± 0.142 across the four held-out target folds.**
+
+That standard deviation reflects **target-to-target heterogeneity**, not repeated stochastic reruns.
+
+Slide 9 broadens the question. Instead of holding the surrogate fixed, rotate both roles:
+
+- 5 possible target PAs
+- 4 distinct surrogate choices for each target
+- **20 ordered target-surrogate cells**
+
+This tests whether surrogate-open calibration transfers uniformly across PA behaviors.
+
+### Important provenance distinction
+
+Do **not** claim that the Scan column in Figure 2 is numerically identical to the four fixed-Scan folds summarized on Slide 8.
+
+The fixed-surrogate comparison and the final Target-Surrogate Matrix come from distinct reviewed result chains. Use Slide 8's `0.865 ± 0.142` to establish that target difficulty varies, then use Figure 2 as the broader experiment showing that **surrogate choice also changes performance**.
+
+## Main visual
+
+Make the accepted paper's **Figure 2 Target-Surrogate Matrix** approximately 70–75% of the usable slide area.
+
+Paper include path:
+
+`papers/milcom2026/figures/target_surrogate_matrix/target_surrogate_unknown_f1_matrix.pdf`
+
+The compiled PDF/PNG/CSV are generated artifacts and may not be tracked in GitHub. The authoritative tracked generator is:
+
+`papers/milcom2026/figures/target_surrogate_matrix/make_target_surrogate_matrix.py`
+
+For presentation construction, prefer the actual accepted-paper Figure 2 asset when available. If regeneration is required, use the reviewed matrix source/provenance chain documented in `experiments/context/RESULTS.md`; do not reconstruct the matrix by manually typing values into a new graphic.
+
+## How to read Figure 2
+
+- **Rows:** true held-out target unknown
+- **Columns:** surrogate-open calibration class
+- **Cell value:** Unknown F1
+- **Diagonal:** invalid / masked because the target cannot simultaneously be its own surrogate
+- **Bold cell in each row:** best surrogate for that target in the plotted matrix
+
+The accepted-paper matrix values are:
+
+| Target ↓ / Surrogate → | Scan | Burst | Sustain | Hop | Replay |
+|---|---:|---:|---:|---:|---:|
+| Scan | — | 0.32 | 0.00 | **0.71** | 0.04 |
+| Burst | 0.58 | — | 0.01 | 0.15 | **0.61** |
+| Sustain | **0.90** | 0.00 | — | 0.79 | 0.01 |
+| Hop | **0.84** | 0.10 | 0.11 | — | 0.49 |
+| Replay | **0.85** | 0.77 | 0.19 | 0.76 | — |
+
+## Bottom interpretation strip
+
+Use three compact conclusions below the figure.
+
+### 1. Target difficulty is real
+
+**Slide 8: 0.865 ± 0.142 across held-out targets**
+
+Caption:
+
+**Variation is across target PAs — not repeated runs.**
+
+### 2. The best surrogate changes with the target
+
+- Scan target → **Hop**
+- Burst target → **Replay**
+- Sustain target → **Scan**
+- Hop target → **Scan**
+- Replay target → **Scan**
+
+Headline:
+
+**No universally best surrogate**
+
+### 3. Some pairings nearly fail
+
+Several cells are at or near zero Unknown F1.
+
+Headline:
+
+**Mismatched calibration evidence may not transfer at all**
+
+The near-zero cells are more informative than a generic statement that performance “varies.” They show that the wrong surrogate can provide calibration evidence that is fundamentally unhelpful for the actual unseen behavior.
+
+## Rough visual mockup
+
+```text
+┌────────────────────────────────────────────────────────────────────────────────┐
+│ Surrogate usefulness depends strongly on the unseen target                    │
+│ Rotating both target and surrogate reveals directional calibration dependence. │
+│                                                                                │
+│                     TARGET–SURROGATE MATRIX                                    │
+│                                                                                │
+│                           Surrogate →                                          │
+│                    Scan   Burst  Sustain   Hop   Replay                         │
+│            Scan      —     .32     .00     .71    .04                          │
+│ Target     Burst    .58     —      .01     .15    .61                          │
+│   ↓        Sustain  .90    .00      —      .79    .01                          │
+│            Hop      .84    .10     .11      —     .49                          │
+│            Replay   .85    .77     .19     .76     —                           │
+│                                                                                │
+│                 [USE ACTUAL ACCEPTED-PAPER FIGURE 2]                           │
+│                                                                                │
+│ ────────────────────────────────────────────────────────────────────────────── │
+│ TARGET VARIATION            BEST SURROGATE CHANGES        SOME PAIRS FAIL      │
+│ Slide 8: 0.865 ± 0.142      Scan → Hop                    F1 ≈ 0 in several     │
+│ across target PAs           Burst → Replay                cells                │
+│                             Others → Scan                                       │
+│ NOT repeated-run variance   No universal surrogate        Calibration mismatch │
+└────────────────────────────────────────────────────────────────────────────────┘
+```
+
+The actual figure should remain the visual focal point. The bottom strip interprets it; it should not compete with it.
+
+## Why this visual is structured this way
+
+The experimental story is:
+
+1. Slide 8 establishes that DQNGuard has a strong average operating point under a fixed surrogate.
+2. The large across-target SD tells us that the average is hiding heterogeneous target difficulty.
+3. Figure 2 asks the broader diagnostic question: what happens when the surrogate changes too?
+4. The answer is that calibration transfer is **target dependent and directional**.
+
+This is stronger than showing a separate “variation” chart followed by the matrix on another slide. Figure 2 directly explains the broader calibration-transfer problem and keeps the experimental narrative compact.
+
+## Speaker script
+
+See [SCRIPT.md](SCRIPT.md#slide-9--surrogate-usefulness-depends-strongly-on-the-unseen-target).
+
+## Transition
+
+End with:
+
+> **“So the remaining deployment problem is not just finding a surrogate — it is knowing whether that surrogate will transfer to the unknown we have not seen yet.”**
+
+The next slide should address the attempted surrogate-selection diagnostics and why no simple target-blind rule was reliable.
+
+## Terminology / claim constraints
+
+- Figure 2 reports **Unknown F1**, not AUROC or OSR macro F1.
+- Target and surrogate roles are directional; `Target=A, Surrogate=B` is not equivalent to the reverse.
+- The diagonal is invalid because a PA cannot serve simultaneously as the true target unknown and its surrogate.
+- Do not interpret Slide 8's ±0.142 as repeated-seed or repeated-identical-run variability.
+- Do not claim Figure 2's Scan column is the exact source of Slide 8's four fixed-surrogate values; preserve the distinct result provenance.
+- Near-zero cells support the claim that some surrogate evidence is badly mismatched to some targets; they do not prove the underlying backbone is universally incapable of representing those targets.
 
 ---
 
