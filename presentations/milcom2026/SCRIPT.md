@@ -252,6 +252,45 @@ But that 0.865 average hides substantial target-to-target variation.
 
 ---
 
-# Slide 9
+# Slide 9 — Surrogate usefulness depends strongly on the unseen target
+
+## Target speaking time
+
+Approximately **85-95 seconds**.
+
+## Consolidated script
+
+The previous slide gave us the main operating-point result: with Scan fixed as the surrogate, DQNGuard achieved an average Unknown F1 of 0.865 with a standard deviation of 0.142 across the four held-out target behaviors.
+
+That variation is important. It is not instability from rerunning the same experiment. It means some target unknowns are simply much easier for this calibration scheme than others.
+
+Figure 2 asks the broader question: what happens if we change the surrogate too?
+
+Here, each row is the true target unknown, each column is the surrogate-open behavior used during calibration, and each cell reports Unknown F1. Because target and surrogate must be different behaviors, the diagonal is omitted.
+
+The first thing to notice is that the best surrogate changes depending on the target. If Scan is the true unknown, Hop is the best surrogate at about 0.71 Unknown F1. If Burst is the target, Replay is best at about 0.61. For Sustain, Hop, and Replay targets, Scan is the strongest surrogate in this matrix.
+
+The second thing to notice is how severe the mismatch can be. Several target-surrogate combinations fall to approximately zero Unknown F1. So this is not just a small tuning effect. A surrogate that gives useful open-set evidence for one target can provide almost no useful transfer for another.
+
+That is the central result of this experiment: surrogate-open calibration is directional and target dependent. There is no universally best surrogate across all five Preliminary Actions.
+
+One provenance detail is worth keeping straight. The fixed-Scan comparison on the previous slide and this full twenty-cell matrix come from distinct reviewed result chains, so I am not claiming that the Scan column here is numerically identical to the four folds used to compute 0.865 plus or minus 0.142. The previous slide establishes target-to-target variation under a fixed surrogate; this figure independently shows that changing the surrogate also materially changes performance.
+
+So the remaining deployment problem is not just finding a surrogate — it is knowing whether that surrogate will transfer to the unknown we have not seen yet.
+
+## Delivery notes
+
+- Start by tying the slide directly to the **0.865 ± 0.142** result from Slide 8.
+- Explicitly say that the SD is **across target PAs**, not repeated runs.
+- Explain matrix orientation before interpreting any cell: rows are target unknowns, columns are surrogate-open classes.
+- Use only a few representative cells verbally; do not read the entire matrix.
+- Emphasize both conclusions: **best surrogate changes by target** and **some mismatched pairs nearly fail**.
+- Preserve the provenance distinction between the fixed-Scan comparison and the final Target-Surrogate Matrix.
+- Do not imply that near-zero cells prove the backbone itself is unusable; the claim is that the surrogate calibration evidence does not transfer well for those pairings.
+- End on the deployment problem so Slide 10 can address whether the best surrogate can be predicted automatically.
+
+---
+
+# Slide 10
 
 **TBD — write only after the slide concept is reviewed and locked.**
