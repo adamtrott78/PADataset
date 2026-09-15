@@ -291,6 +291,41 @@ So the remaining deployment problem is not just finding a surrogate — it is kn
 
 ---
 
-# Slide 10
+# Slide 10 — No simple target-blind rule reliably predicts the best surrogate
+
+## Target speaking time
+
+Approximately **75-90 seconds**.
+
+## Consolidated script
+
+The matrix raises an obvious deployment question. If surrogate choice matters this much, can we predict which surrogate will transfer best before the real unknown ever appears?
+
+We tested several plausible target-blind diagnostics.
+
+The first was simply surrogate calibration performance. The intuition is straightforward: if DQNGuard does a good job rejecting a behavior while it is acting as the surrogate, maybe that behavior is a useful source of generic unknownness evidence.
+
+It was not. The relationship with eventual target Unknown F1 was essentially zero, with a Spearman correlation of about negative 0.075 and a Pearson correlation of about negative 0.047. This rule selected the actual best surrogate for only two of the five targets.
+
+We then looked at confidence geometry: changes in maximum softmax probability, the top-two probability gap, and entropy. Those relationships were negative overall. Our combined confidence-geometry score had a Spearman correlation of about negative 0.55 with target performance.
+
+We also tested simple feature-space geometry. There were some positive signals, but even the best simple positive rule was weak—about 0.41 correlation—and selected the actual best surrogate for only one of the five targets.
+
+So the important result is not that the matrix is random. It clearly is not. The result is that the structure was not captured reliably by these simple target-blind selection rules.
+
+That leaves us with a deployment problem: if choosing one surrogate is fragile, and we cannot reliably know which one will transfer, the next step is to stop betting on a single surrogate.
+
+## Delivery notes
+
+- Frame this as a direct follow-up experiment to the Target–Surrogate Matrix.
+- Explain each diagnostic as a simple deployment intuition before giving its result.
+- Do not read every statistic mechanically; the important pattern is **no reliable target-blind selector**.
+- State that these are exploratory diagnostics, not a production surrogate-selection algorithm.
+- Do not claim the matrix is random or unstructured.
+- End by motivating multi-surrogate calibration rather than dwelling on the negative result.
+
+---
+
+# Slide 11
 
 **TBD — write only after the slide concept is reviewed and locked.**
