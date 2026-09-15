@@ -21,7 +21,7 @@ Statuses:
 | 5 | Unknown detection is only useful if known behavior stays usable | Motivate DQNGuard from VarMax and DQN-IDS | **CONCEPT LOCKED** |
 | 6 | DQNGuard adds a budgeted open-world decision layer to the PA classifier | Explain the proposed decision layer | **CONCEPT LOCKED** |
 | 7 | A surrogate unknown shapes the DQN; the true unknown remains unseen until test | Explain target unknown, surrogate unknown, and fair comparison | **CONCEPT LOCKED** |
-| 8 | DQNGuard improves the usable fixed-budget operating point | Present the main method comparison | TBD |
+| 8 | DQNGuard gives the strongest usable operating point at low known rejection | Present the main method comparison | **CONCEPT LOCKED** |
 | 9 | Performance still depends strongly on the unseen behavior | Explain the across-fold standard deviation correctly | TBD |
 | 10 | Surrogate usefulness depends on the target unknown | Present and interpret the Target-Surrogate Matrix | TBD |
 | 11 | Multi-surrogate calibration may reduce target-surrogate sensitivity | Future work and broader implications | TBD |
@@ -1012,6 +1012,146 @@ This transitions directly into Slide 8.
 - Guard bands and the final known-budget threshold are fitted from **known calibration** only in the current implementation.
 - The target unknown is never used during backbone training or surrogate-open OSR calibration.
 - The surrogate is excluded from final evaluation metrics.
+
+
+---
+
+# Slide 8 — DQNGuard gives the strongest usable operating point at low known rejection
+
+## Status
+
+**CONCEPT LOCKED**
+
+## Audience takeaway
+
+> Under the main fixed-Scan-surrogate comparison, DQNGuard achieves the best thresholded operating tradeoff: the highest Unknown F1 and OSR macro F1 while keeping known rejection near the intended 5% budget.
+
+Do **not** summarize this as “DQNGuard wins every metric.” VarMax has the highest AUROC. The scientific claim is about the usable thresholded operating point under known-sample cost.
+
+## Slide title
+
+**DQNGuard gives the strongest usable operating point at low known rejection**
+
+## Guiding question
+
+**At a practical rejection operating point, which OSR head best detects unseen PAs without sacrificing known classifications?**
+
+## Experiment strip
+
+Use a narrow strip at the top of the result area to restate the experimental condition:
+
+**Fixed-surrogate comparison**
+
+- Surrogate: **Scan**
+- Targets: **Burst, Sustain, Hop, Replay**
+- Reported values: **mean ± sample SD across four held-out target folds**
+
+The ± values are **not repeated-seed variability**.
+
+Do not claim that all three methods receive identical calibration information. The recovered comparison provenance shows that the VarMax `surrogate-all` row uses a different internal pseudo-unknown calibration scheme. Present the rows as the three evaluated OSR approaches under their reported comparison configurations.
+
+## Main visual
+
+Use a two-dimensional operating-point plot rather than pasting the paper table as the primary visual.
+
+- **x-axis:** Known rejection rate — lower is better
+- **y-axis:** Unknown F1 — higher is better
+- desirable region: **upper-left**
+
+Plot the paper means, and add error bars only if they remain visually clean and readable at presentation scale.
+
+### Values
+
+| Method | Known rejection | Unknown F1 | OSR macro F1 | AUROC |
+|---|---:|---:|---:|---:|
+| DQNGuard | **0.050 ± 0.004** | **0.865 ± 0.142** | **0.881 ± 0.109** | 0.891 ± 0.129 |
+| DQN-IDS-style / Shreyash CNN head | 0.063 ± 0.017 | 0.701 ± 0.197 | 0.764 ± 0.119 | 0.829 ± 0.092 |
+| VarMax surrogate-all | 0.128 ± 0.043 | 0.745 ± 0.146 | 0.778 ± 0.104 | **0.951 ± 0.060** |
+
+For audience-facing wording, prefer **DQN-IDS-style head** unless provenance requires the exact tracked table label.
+
+## AUROC caveat
+
+Use a compact secondary callout on the right:
+
+**VARMAX RANKS UNKNOWNS BEST**
+
+- VarMax AUROC: **0.951**
+- DQNGuard AUROC: **0.891**
+- DQN-IDS-style: **0.829**
+
+Then state:
+
+> **Ranking quality ≠ usable thresholded decision**
+
+This is a central interpretation, not an embarrassment to hide. VarMax provides strong aggregate ranking separation, but at its selected operating point it rejects more known samples and achieves lower Unknown F1 than DQNGuard.
+
+## Rough visual mockup
+
+```text
+┌─────────────────────────────────────────────────────────────────────────────────┐
+│ DQNGuard gives the strongest usable operating point at low known rejection     │
+│ Which OSR head best detects unseen PAs without sacrificing known evidence?      │
+│                                                                                 │
+│ FIXED-SURROGATE EXPERIMENT                                                      │
+│ Scan surrogate • targets: Burst / Sustain / Hop / Replay                        │
+│ mean ± SD across four held-out target folds                                     │
+│                                                                                 │
+│       UNKNOWN F1 ↑                                      AUROC / RANKING         │
+│   1.0 ┤                                                                         │
+│       │                                                                         │
+│  .865 ┤    ● DQNGuard                                  VarMax        0.951       │
+│       │      0.865 F1                                  DQNGuard      0.891       │
+│       │      5.0% known reject                         DQN-style     0.829       │
+│  .745 ┤                          ● VarMax                                       │
+│       │                            0.745 F1             ───────────────────      │
+│  .701 ┤       ● DQN-style          12.8% reject                                 │
+│       │         0.701 F1                                                       │
+│       │         6.3% reject                            Ranking quality ≠         │
+│       └──────────────────────────────────────→          usable thresholded       │
+│             5%      6.3%             12.8%             decision                 │
+│                   KNOWN REJECTION →                                             │
+│                      lower is better                                             │
+│                                                                                 │
+│        DQNGuard: highest Unknown F1 + lowest known rejection                    │
+│        OSR macro F1: 0.881 ± 0.109                                              │
+└─────────────────────────────────────────────────────────────────────────────────┘
+```
+
+The final plot should be cleaner than the ASCII sketch. The key visual encoding is the upper-left operating region.
+
+## Why this visual is structured this way
+
+The experiment asks about an operational tradeoff, not just independent metric maxima.
+
+A table forces the audience to mentally combine known rejection and Unknown F1. The 2D plot makes that tradeoff spatial:
+
+- moving **left** preserves more known behavior;
+- moving **up** rejects the true unknown more effectively.
+
+DQNGuard occupies the strongest mean operating point. The AUROC callout prevents overclaiming by showing that VarMax wins the ranking metric while still losing at the selected thresholded operating point.
+
+## Speaker script
+
+See [SCRIPT.md](SCRIPT.md#slide-8--dqnguard-gives-the-strongest-usable-operating-point-at-low-known-rejection).
+
+## Transition
+
+End with:
+
+> **“But that 0.865 average hides substantial target-to-target variation.”**
+
+The next result slide should unpack the dependence on which PA is actually unseen.
+
+## Terminology / claim constraints
+
+- Mean ± SD values are across **four held-out target folds**, not repeated seeds.
+- DQNGuard has the strongest **thresholded operating point**, not the highest value on every metric.
+- VarMax has the highest AUROC and should be credited for it.
+- Do not claim all methods use scientifically identical surrogate calibration; the VarMax comparison row has different internal calibration provenance.
+- Known rejection is the fraction of legitimate known test samples incorrectly routed as unknown.
+- Unknown F1 is binary detection performance for the held-out target PA.
+- OSR macro F1 includes the known classes plus the unknown class and therefore penalizes methods that gain unknown detection by sacrificing known classification.
 
 ---
 
