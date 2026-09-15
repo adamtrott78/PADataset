@@ -326,6 +326,55 @@ That leaves us with a deployment problem: if choosing one surrogate is fragile, 
 
 ---
 
-# Slide 11
+# Slide 11 — VarMax can search across surrogates; DQNGuard must learn how to combine them
+
+## Target speaking time
+
+Approximately **95-110 seconds**.
+
+## Consolidated script
+
+There is one more contribution that is important to this story because it directly motivates where we want to take DQNGuard next: VarMax surrogate-all.
+
+VarMax surrogate-all uses one frozen backbone. During validation, each known class takes a turn acting as a pseudo-unknown. For each of those surrogate choices, VarMax searches candidate settings for the top-two probability-gap threshold and the predicted-class variance and energy bands. Those candidates also have to preserve the known-class performance constraints.
+
+The key idea is that we do not choose one pseudo-unknown ahead of time. Candidates generated from all available surrogate classes compete in the same calibration search, and one final VarMax rule is selected.
+
+That works naturally in VarMax because every candidate lives inside the same fixed decision architecture. The surrogate changes numerical thresholds and bands; it does not change the scoring function itself.
+
+DQNGuard is different.
+
+In DQNGuard, the surrogate-open confidence states are used to fit the DQN. So if I calibrate with Scan, I get one learned DQN score function. If I calibrate with Burst, I get a different one. If I calibrate with Hop, I get another one. The final five-percent threshold is then selected inside the score space produced by that fitted DQN.
+
+So we cannot simply generate several DQNGuard thresholds and let them compete the way VarMax does. Those thresholds belong to different learned score spaces and are not directly interchangeable.
+
+There is also a second difference. VarMax surrogate-all can temporarily repurpose classes the backbone already knows. In our current DQNGuard surrogate-open design, the surrogate itself is excluded from backbone training. If we tried to withhold several external surrogates at once, we would progressively shrink the known taxonomy—and with only five PAs, we very quickly stop having a useful closed-set classification problem.
+
+That turns the future-work question into an architectural one: how do we combine several surrogate signals while retaining one coherent unknown score and the explicit known-rejection budget?
+
+There are at least three directions worth testing. We could pool several surrogate-open state sets and train one DQN. We could train surrogate-specific DQNs and develop a principled normalization and aggregation rule. Or we could put the multi-surrogate logic into the VarMax-derived deterministic guard side while keeping one learned DQN confidence signal.
+
+This is particularly interesting because VarMax surrogate-all gave us the strongest AUROC in the comparison, while DQNGuard gave us the stronger thresholded operating point.
+
+So the goal is not to copy surrogate-all mechanically. The goal is to combine VarMax's multi-surrogate calibration philosophy with DQNGuard's strong Unknown F1, strong OSR F1, and explicit control over known rejection.
+
+So the paper leaves us with both a working open-world detector and a concrete architectural question: how do we retain DQNGuard's operating-point advantage while learning from more than one kind of unknown?
+
+## Delivery notes
+
+- Treat **VarMax surrogate-all** as an original methodological contribution, not merely a baseline name.
+- Explain the VarMax mechanism before introducing the DQNGuard incompatibility.
+- Emphasize that surrogate-all selects **one final VarMax rule**; it is not an ensemble.
+- The central architectural contrast is:
+  - VarMax surrogate → different calibration parameters in one fixed scorer.
+  - DQNGuard surrogate → different learned DQN scorer.
+- State the second barrier: current DQNGuard external surrogates are withheld from backbone training, unlike VarMax's backbone-known pseudo-unknowns.
+- Present pooled DQN, DQN ensemble, and hybrid guard designs explicitly as **future work — not evaluated**.
+- Do not promise that multi-surrogate DQNGuard will reduce target dependence; frame that as the research hypothesis.
+- End on the architectural question, then simplify aggressively on the final takeaway slide.
+
+---
+
+# Slide 12
 
 **TBD — write only after the slide concept is reviewed and locked.**
