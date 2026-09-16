@@ -8,11 +8,12 @@ from pathlib import Path
 from contextlib import contextmanager
 from html import escape
 import base64
+import io
 import re
 import subprocess
 import tempfile
 import xml.etree.ElementTree as ET
-from PIL import ImageFont
+from PIL import Image, ImageChops, ImageFont
 
 ROOT = Path(__file__).resolve().parents[1]
 OUT = ROOT / 'slides'
@@ -122,6 +123,82 @@ class Slide:
 
 MATRIX=base64.b64encode((ROOT/'assets/figures/target_surrogate_unknown_f1_matrix.png').read_bytes()).decode()
 
+
+OTA_DIR = ROOT / 'assets' / 'ota'
+_OTA_EMBED_CACHE = {}
+
+def ota_png(protocol, behavior):
+    """Return losslessly indexed PNG data URI plus original dimensions."""
+    path = OTA_DIR / protocol / f'{behavior}.png'
+    key = str(path)
+
+    if key in _OTA_EMBED_CACHE:
+        return _OTA_EMBED_CACHE[key]
+
+    with Image.open(path) as src:
+        rgb = src.convert('RGB')
+        iw, ih = rgb.size
+
+        # Spectrograms are rendered from the finite Turbo colormap.
+        # Require <=256 actual RGB colors so indexed conversion is exact.
+        colors = rgb.getcolors(maxcolors=257)
+        if colors is None:
+            raise RuntimeError(
+                f'{path} has more than 256 RGB colors; refusing lossy embedding'
+            )
+
+        indexed = rgb.quantize(
+            colors=256,
+            method=Image.Quantize.MEDIANCUT,
+            dither=Image.Dither.NONE,
+        )
+
+        # Prove that palette conversion did not alter a single RGB pixel.
+        roundtrip = indexed.convert('RGB')
+        if ImageChops.difference(rgb, roundtrip).getbbox() is not None:
+            raise RuntimeError(
+                f'Indexed conversion was not pixel-exact for {path}'
+            )
+
+        buf = io.BytesIO()
+        indexed.save(
+            buf,
+            format='PNG',
+            optimize=True,
+            compress_level=9,
+        )
+        payload = buf.getvalue()
+
+    uri = 'data:image/png;base64,' + base64.b64encode(payload).decode()
+    result = (uri, iw, ih, len(payload))
+    _OTA_EMBED_CACHE[key] = result
+
+    print(
+        f'OTA embed {protocol}/{behavior}: '
+        f'{iw}x{ih}, indexed PNG {len(payload)/1024/1024:.2f} MiB'
+    )
+
+    return result
+
+
+def fitted_ota_image(slide, image_id, x, y, w, h, protocol, behavior):
+    """Fit the COMPLETE spectrogram frame inside a well without distortion."""
+    uri, iw, ih, _ = ota_png(protocol, behavior)
+
+    scale = min(w / iw, h / ih)
+    dw = iw * scale
+    dh = ih * scale
+    xx = x + (w - dw) / 2
+    yy = y + (h - dh) / 2
+
+    slide.add(
+        f'<image id="{image_id}" '
+        f'x="{xx:.3f}" y="{yy:.3f}" '
+        f'width="{dw:.3f}" height="{dh:.3f}" '
+        f'preserveAspectRatio="none" '
+        f'xlink:href="{uri}"/>'
+    )
+
 def slide01():
     s=Slide(1)
     s.text(100,100,'MILCOM 2026',22,True,id='conference_tag')
@@ -175,37 +252,98 @@ def slide02():
 def slide03():
     s=Slide(3,'Preliminary Actions are observable RF behaviors, not final attack-technique labels.')
     with s.group('behavior_cards'):
-        for x,name,desc in zip([96,446,796,1146,1496],['Scan','Burst','Sustain','Hop','Replay'],['Discovery-like activity','Short transmissions + quiet gaps','Persistent channel occupancy','Frequency dwell + revisits','Repeated waveform / template']):
+        specs=[
+            (96,'Scan','Discovery-like activity','scan'),
+            (446,'Burst','Short transmissions + quiet gaps','burst'),
+            (796,'Sustain','Persistent channel occupancy','sustain'),
+            (1146,'Hop','Frequency dwell + revisits','hop'),
+            (1496,'Replay','Repeated waveform / template','replay'),
+        ]
+        for x,name,desc,asset in specs:
             with s.group(name.lower()+'_card'):
                 s.rect(x,255,326,545)
                 s.text(x+163,307,name,32,True,anchor='middle')
-                s.rect(x+18,340,290,300,PANEL,r=12,id=name.lower()+'_ota_slot')
-                s.text(x+163,480,['OTA RF example','pending'],24,color=SECOND,anchor='middle')
+
+                # Keep the existing image-well geometry.
+                s.rect(
+                    x+18,340,290,300,
+                    PANEL,r=12,
+                    id=name.lower()+'_ota_slot'
+                )
+
+                # Use WiFi consistently across all five behavior examples.
+                # Full spectrogram frame is fitted rather than cropped.
+                fitted_ota_image(
+                    s,
+                    name.lower()+'_ota_image',
+                    x+18,340,290,300,
+                    'wifi',asset
+                )
+
                 s.text(x+26,690,desc,26,maxw=276)
-    for x,id,heading,body in [(96,'tells_us_box','WHAT IT TELLS US','Observable RF behavior'),(984,'does_not_claim_box','WHAT IT DOES NOT CLAIM','Final attack-technique attribution')]:
+
+    for x,id,heading,body in [
+        (96,'tells_us_box','WHAT IT TELLS US','Observable RF behavior'),
+        (984,'does_not_claim_box','WHAT IT DOES NOT CLAIM','Final attack-technique attribution')
+    ]:
         with s.group(id):
             s.rect(x,835,840,115,PANEL,stroke='none')
             s.text(x+28,876,heading,24,True)
             s.text(x+28,920,body,29)
-    s.text(96,995,'Same behavioral taxonomy evaluated across WiFi, Bluetooth, and Zigbee.',21,color=SECOND,id='optional_protocol_footer')
+
+    s.text(
+        96,995,
+        'Same behavioral taxonomy evaluated across WiFi, Bluetooth, and Zigbee.',
+        21,color=SECOND,
+        id='optional_protocol_footer'
+    )
     s.save()
 
 def slide04():
     s=Slide(4,'WiFi, Bluetooth, and Zigbee each express Scan, Burst, Sustain, Hop, and Replay behavior in captured RF.')
+
     with s.group('dataset_matrix'):
         s.text(663,275,'5 BEHAVIORS × 3 PROTOCOLS',30,True,anchor='middle',id='matrix_heading')
-        behaviors=['Scan','Burst','Sustain','Hop','Replay']
-        for j,name in enumerate(behaviors):
+
+        behaviors=[
+            ('Scan','scan'),
+            ('Burst','burst'),
+            ('Sustain','sustain'),
+            ('Hop','hop'),
+            ('Replay','replay'),
+        ]
+
+        for j,(name,_) in enumerate(behaviors):
             x=225+j*198
             s.text(x+90,325,name,26,True,anchor='middle')
-        for i,protocol in enumerate(['WiFi','Bluetooth','Zigbee']):
+
+        protocols=[
+            ('WiFi','wifi'),
+            ('Bluetooth','bluetooth'),
+            ('Zigbee','zigbee'),
+        ]
+
+        for i,(protocol,proto_asset) in enumerate(protocols):
             y=350+i*176
             s.text(96,y+88,protocol,23,True)
-            for j,name in enumerate(behaviors):
+
+            for j,(name,behavior_asset) in enumerate(behaviors):
                 x=225+j*198
-                with s.group(f'{protocol.lower()}_{name.lower()}_ota_slot'):
+
+                with s.group(
+                    f'{protocol.lower()}_{name.lower()}_ota_slot'
+                ):
+                    # Existing cell remains the visual well/background.
                     s.rect(x,y,180,160,PANEL,r=12)
-                    s.text(x+90,y+73,[protocol,name],22,color=SECOND,anchor='middle')
+
+                    # Preserve the entire spectrogram time span and aspect ratio.
+                    fitted_ota_image(
+                        s,
+                        f'{proto_asset}_{behavior_asset}_ota_image',
+                        x,y,180,160,
+                        proto_asset,behavior_asset
+                    )
+
     with s.group('ota_capture_panel'):
         s.rect(1275,245,549,670)
         s.text(1549,289,'OTA CAPTURE',30,True,anchor='middle')
@@ -219,7 +357,16 @@ def slide04():
         s.arrow([(1549,623),(1549,657)])
         s.node('classifier_input_node',1374,663,350,64,'classifier input',size=27)
         s.line(1303,750,1796,750)
-        s.text(1303,787,['12.5 MS/s','400,000 complex IQ samples / window','2.437 GHz','2× USRP N210 SDRs'],24,leading=32,id='capture_facts')
+        s.text(
+            1303,787,
+            ['12.5 MS/s',
+             '400,000 complex IQ samples / window',
+             '2.437 GHz',
+             '2× USRP N210 SDRs'],
+            24,leading=32,
+            id='capture_facts'
+        )
+
     s.save()
 
 def slide05():
