@@ -368,7 +368,7 @@ def slide09():
                     s.text(x+18,929,'Slide 8: 0.865 ± 0.142',27,True)
                     s.text(x+18,965,'Across target PAs — not repeated runs',22)
                 elif id=='best_surrogate_changes':
-                    s.text(x+18,917,'Scan → Hop    Burst → Replay',22)
+                    s.text(x+18,917,'Scan → Hop • Burst → Replay',22)
                     s.text(x+18,944,'Sustain / Hop / Replay → Scan',22)
                     s.text(x+18,972,'No universal surrogate',22,True)
                 else:
