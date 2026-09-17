@@ -113,6 +113,7 @@ automatically current runbooks.
 | Begin a new paper from experiment results or revise its argument | [Paper methodology](papers/CONTEXT.md) | [MILCOM paper tools](papers/milcom2026/CONTEXT.md) for reusable operations |
 | Edit LaTeX/figures, compile, review sources or prepare an Overleaf package | [MILCOM paper tools](papers/milcom2026/CONTEXT.md) | [Paper methodology](papers/CONTEXT.md) for analysis and composition |
 | Design or add a new context-backed workflow/tool | [Context-backed tool authoring](docs/context_tools/CONTEXT.md) | The new tool's scoped entry context, implementation owners, artifacts, and QA as needed |
+| Build or tailor a resume for a job, internship, fellowship, or research opportunity | [Resume workflow](resumes/CONTEXT.md) | The target under `resumes/applications/` and candidate evidence as routed by that context |
 | Inspect ignored/local-only files, preserve source, or recover historical evidence | [Repository maintenance](docs/cleanup/CONTEXT.md) | The relevant subsystem context |
 
 For a complete WiFi Burst capture, follow generation → capture; continue through

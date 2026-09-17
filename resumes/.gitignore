@@ -1,0 +1,4 @@
+# Resume-private material must not enter the public repository.
+private/
+applications/*/private/
+applications/*/resume/private/
