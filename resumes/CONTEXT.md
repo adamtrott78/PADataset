@@ -147,7 +147,9 @@ For a new target:
 10. update this workflow when the implementation demonstrates a genuinely
    reusable rule.
 
-The NREIP 2027 application is currently entering phase 1. Phases 2–4 remain pending.
+The NREIP 2027 application has completed the initial public-source phase 1
+capture and is now in phase 2 candidate-evidence reconciliation. Target-specific
+evidence mapping and resume planning remain pending.
 
 ## Maturity boundary
 

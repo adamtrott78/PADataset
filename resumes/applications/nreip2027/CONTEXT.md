@@ -25,7 +25,8 @@ content-locked.
 ## Current state
 
 - resume workflow skeleton: established;
-- candidate evidence ledger: not yet populated;
+- candidate evidence ledger: initial public-safe baseline populated;
+  target-specific verification ongoing;
 - NREIP 2027 public-source opportunity research: captured;
 - authenticated portal resume/document constraints: unresolved;
 - target laboratory choices: not yet locked;
