@@ -28,7 +28,9 @@ content-locked.
 - candidate evidence ledger: initial public-safe baseline populated;
   target-specific verification ongoing;
 - NREIP 2027 public-source opportunity research: captured;
-- authenticated portal resume/document constraints: unresolved;
+- authenticated portal résumé guidance: captured;
+- PDF and `< 1 MB` resume artifact constraints: established;
+- portal-upload requiredness: not explicitly established by supplied guideline;
 - target laboratory choices: not yet locked;
 - resume content architecture: not yet locked;
 - SVG production specification: not yet created;

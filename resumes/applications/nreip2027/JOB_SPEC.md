@@ -1,6 +1,6 @@
 # NREIP 2027 job/application specification
 
-Status: **PUBLIC-SOURCE FACTS CAPTURED — PORTAL CONSTRAINTS UNRESOLVED**
+Status: **PUBLIC-SOURCE FACTS + AUTHENTICATED RESUME GUIDANCE CAPTURED**
 
 This file owns authoritative facts about the 2027 Naval Research Enterprise
 Internship Program (NREIP) that matter to resume tailoring.
@@ -28,8 +28,12 @@ Primary current public sources:
 Individual laboratory descriptions on the current labs page are authoritative for
 the lab-specific facts recorded below.
 
-The authenticated Connect application is a separate source. Public pages do not
-expose all application fields or document-upload constraints.
+The authenticated Connect application is a separate source. Its 2027 résumé
+guidelines were inspected directly and establish the resume-format, upload,
+verification, content-guidance, and privacy constraints recorded below.
+
+The public pages remain useful for program-level facts, while authenticated
+portal guidance controls the resume-upload contract where the two differ.
 
 ## Program and application facts
 
@@ -134,33 +138,108 @@ preferences without stronger evidence.
 
 ## Resume/document constraints
 
-### Established from current public sources
+### Authenticated 2027 portal source
+
+The authenticated NREIP application provides a résumé-guidelines page with an
+upload workflow and explicit artifact constraints.
+
+This is stronger evidence for resume production than the public program pages.
+
+### Hard artifact constraints
+
+The portal guidance states:
+
+- save the résumé in **PDF format**;
+- the file must be **less than 1 MB**;
+- files larger than 1 MB will not be accepted;
+- select the résumé with the portal's file chooser;
+- use **Upload and Save** to send it to the server;
+- after upload, verify receipt by downloading the résumé from its portal link;
+- resubmitting the résumé overwrites the previous uploaded version.
+
+These are production and submission-QA requirements.
+
+A successful local PDF build is therefore not sufficient evidence of a valid
+submission. Final QA must include:
+
+1. PDF-format validation;
+2. file-size validation with a strict `< 1 MB` acceptance threshold;
+3. portal upload;
+4. server-side receipt verification by downloading the uploaded file; and
+5. visual/content inspection of the downloaded server copy when practical.
+
+### Portal content guidance
+
+Under "What your résumé should contain," the portal provides a **general
+outline** that includes:
+
+- name;
+- research and work experience, including past internships;
+- academic experience;
+- honors and awards;
+- skills and certifications, including computer competencies;
+- memberships and extracurricular activities, including offices held and dates;
+- hobbies and interests; and
+- volunteerism.
+
+Because the portal itself describes this as a **general outline**, treat these as
+recommended content categories rather than a requirement that every category
+must appear as a dedicated section.
+
+Resume planning should still allocate space based on relevance, evidence
+strength, and the NREIP selection mechanism.
+
+Do not create weak filler merely to instantiate every category in the outline.
+
+### Portal privacy prohibition
+
+The portal explicitly says **not** to include:
+
+- Social Security number;
+- birth date;
+- ethnicity;
+- race;
+- sex; or
+- other personal information
+
+in the résumé.
+
+The phrase "other personal information" is broader than the specifically named
+fields and is not further defined in the provided guideline.
+
+Therefore:
+
+- never include the specifically prohibited fields;
+- continue to apply the repository's public/private evidence boundary;
+- do not assume that unrelated sensitive application information belongs in the
+  résumé merely because it exists elsewhere in the application;
+- decide ordinary professional contact fields separately during resume planning
+  rather than treating them as automatically required.
+
+### Resume-upload requiredness
+
+The authenticated page clearly establishes a résumé-upload workflow and résumé
+artifact requirements.
+
+The supplied guideline text does **not**, by itself, explicitly state whether the
+overall NREIP application can be submitted without a résumé or whether the
+upload field is marked required.
+
+Do not upgrade that distinction without direct portal evidence.
+
+For resume-generation purposes, however, a valid NREIP résumé artifact is now an
+established application deliverable.
+
+### Other application artifacts established elsewhere
+
+Current public program sources also establish that:
 
 - a current transcript is required;
 - personal statements are part of the reviewed application;
-- recommendations are part of the reviewed application;
+- recommendations are part of the reviewed application; and
 - accurate contact information is required in the application.
 
-### NOT established from current public sources
-
-The current public NREIP pages reviewed on 2026-09-17 do **not** establish:
-
-- whether a resume upload is required or optional;
-- resume page limits;
-- resume file-format requirements;
-- resume file-size requirements;
-- whether the portal supplies a resume template;
-- whether laboratory reviewers receive the resume exactly as uploaded;
-- whether the resume is visible to laboratories outside the applicant's top
-  choices.
-
-The public Apply link leads to the authenticated Connect student portal, whose
-public login page does not expose these application fields.
-
-These items must remain **UNRESOLVED** until the authenticated 2027 application
-is inspected directly.
-
-Do not copy requirements from an older NREIP cycle to fill this gap.
+These artifacts have separate roles and should not be collapsed into the résumé.
 
 ## Initial laboratory screening
 
