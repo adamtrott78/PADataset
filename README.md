@@ -3,7 +3,9 @@
 PADataset supports RF preliminary-action research: deterministic waveform
 generation, over-the-air (OTA) capture, resplicing, feature caching, closed-set
 training, open-set recognition (OSR), result analysis, and evidence-grounded paper
-composition. Work on `research-framework` unless the task names another branch.
+composition. `main` is the canonical stable repository tree. Branch specialized
+or experimental work from a reviewed `main` unless the task names another
+existing branch.
 
 ## Start here
 
@@ -24,7 +26,7 @@ The research machine has historically used
 `~/adamArchives/Adam/varMax/PADataset`. A dirty or differently branched Lambda
 checkout needs inspection before integration; see
 [repository maintenance](docs/cleanup/CONTEXT.md). Do not switch it automatically
-just because this page describes `research-framework`.
+merely to match canonical `main`.
 
 
 ## AI-assisted terminal and Git workflow
@@ -110,6 +112,7 @@ automatically current runbooks.
 | Regenerate the Target–Surrogate Matrix or comparison table; trace a result | [Results and analysis](experiments/context/RESULTS.md) | [MILCOM paper tools](papers/milcom2026/CONTEXT.md) |
 | Begin a new paper from experiment results or revise its argument | [Paper methodology](papers/CONTEXT.md) | [MILCOM paper tools](papers/milcom2026/CONTEXT.md) for reusable operations |
 | Edit LaTeX/figures, compile, review sources or prepare an Overleaf package | [MILCOM paper tools](papers/milcom2026/CONTEXT.md) | [Paper methodology](papers/CONTEXT.md) for analysis and composition |
+| Design or add a new context-backed workflow/tool | [Context-backed tool authoring](docs/context_tools/CONTEXT.md) | The new tool's scoped entry context, implementation owners, artifacts, and QA as needed |
 | Inspect ignored/local-only files, preserve source, or recover historical evidence | [Repository maintenance](docs/cleanup/CONTEXT.md) | The relevant subsystem context |
 
 For a complete WiFi Burst capture, follow generation → capture; continue through
