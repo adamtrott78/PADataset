@@ -26,7 +26,8 @@ content-locked.
 
 - resume workflow skeleton: established;
 - candidate evidence ledger: not yet populated;
-- NREIP 2027 opportunity research: not yet locked;
+- NREIP 2027 public-source opportunity research: captured;
+- authenticated portal resume/document constraints: unresolved;
 - target laboratory choices: not yet locked;
 - resume content architecture: not yet locked;
 - SVG production specification: not yet created;
