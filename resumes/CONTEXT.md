@@ -64,6 +64,7 @@ For ordinary resume work, read only what the task requires:
 | Work on NREIP 2027 | `applications/nreip2027/CONTEXT.md` |
 | Understand the NREIP opportunity and selection signals | `applications/nreip2027/JOB_SPEC.md` |
 | Decide what the NREIP resume should contain | `applications/nreip2027/RESUME_PLAN.md` |
+| Regenerate or inspect the current NREIP artifact | `applications/nreip2027/resume/README.md` |
 
 Do not recursively ingest the repository.
 
