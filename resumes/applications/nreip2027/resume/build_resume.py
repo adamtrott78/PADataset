@@ -331,6 +331,18 @@ def norm_locked_source(text: str) -> str:
     return norm(text)
 
 
+def string_leaves(value):
+    """Yield every renderer-owned string from a nested content structure."""
+    if isinstance(value, str):
+        yield value
+    elif isinstance(value, dict):
+        for child in value.values():
+            yield from string_leaves(child)
+    elif isinstance(value, (list, tuple)):
+        for child in value:
+            yield from string_leaves(child)
+
+
 def verify_locked_sources() -> None:
     plan = PLAN_PATH.read_text(encoding="utf-8")
     spec = SPEC_PATH.read_text(encoding="utf-8")
@@ -342,17 +354,6 @@ def verify_locked_sources() -> None:
         raise RuntimeError("SVG_PRODUCTION_SPEC.md is not production locked.")
 
     plan_n = norm_locked_source(plan)
-
-    def string_leaves(value):
-        if isinstance(value, str):
-            yield value
-        elif isinstance(value, dict):
-            for child in value.values():
-                yield from string_leaves(child)
-        elif isinstance(value, (list, tuple)):
-            for child in value:
-                yield from string_leaves(child)
-
     required = list(string_leaves(CONTENT))
 
     for item in required:
@@ -843,15 +844,10 @@ def validate_pdf(path: Path, *, private: bool) -> str:
                 f"required extracted text missing: {token}"
             )
 
-    required_content = [
-        CONTENT["research"]["ra_bullet"],
-        *CONTENT["research"]["dqn_bullets"],
-        *CONTENT["research"]["hicss_bullets"],
-        *CONTENT["publications"],
-        CONTENT["experience"]["capstone_bullet"],
-        *CONTENT["experience"]["cyber_bullets"],
-        CONTENT["experience"]["forensics_bullet"],
-    ]
+    # Every renderer-owned content string must survive into extracted PDF text.
+    # This catches missing headings, metadata, education/coursework, skills,
+    # publications, bullets, titles, dates, and quantitative claims.
+    required_content = list(string_leaves(CONTENT))
 
     for item in required_content:
         if norm(item) not in extracted_n:

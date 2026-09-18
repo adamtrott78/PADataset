@@ -604,10 +604,16 @@ Public build QA must verify that exact private values are absent.
 
 ### Content integrity
 
-Compare the rendered/extracted résumé against the locked content.
+Automated extracted-text QA must verify that every renderer-owned résumé content
+string survives into the PDF, including education, metadata, coursework, skills,
+research, publications, and technical/teaching experience.
 
-Any missing bullet, duplicated block, changed number, changed publication title,
-or altered status is a build failure.
+Human semantic/visual review must additionally inspect structure and repetition
+that simple substring-presence checks cannot establish reliably, including
+duplicated blocks and incorrect ordering.
+
+Any missing content, duplicated block, changed number, changed publication title,
+or altered status is a QA failure.
 
 ### Font/text behavior
 

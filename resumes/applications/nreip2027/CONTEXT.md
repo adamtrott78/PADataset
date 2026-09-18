@@ -1,6 +1,6 @@
 # NREIP 2027 resume package
 
-Status: **EXPERIMENTAL — first live resume-tool case**
+Status: **COLD-START READY — first live resume-tool case**
 
 This directory owns the first implemented use of the resume-generation workflow:
 a tailored resume for the 2027 Naval Research Enterprise Internship Program
@@ -38,7 +38,7 @@ production specification is production-locked.
 - SVG production specification: production-locked and explicitly revised to a one-page contract after first visual QA;
 - builder: one-page SVG/PDF implementation operational and visually reviewed;
 - SVG/PDF/PNG artifacts: one-page public and private builds pass structural, semantic, privacy, dual-render existence/dimension sanity checks, and first visual QA;
-- cold-start validation: first independent audit completed; public regeneration route was successfully reconstructed from repository context and identified hardening issues; corrective validation cycle remains open;
+- cold-start validation: two independent fresh-reader audits completed; the first exposed hardening defects, and the second concluded the public workflow is cold-start ready with only nonblocking limitations;
 
 ## First implementation result
 

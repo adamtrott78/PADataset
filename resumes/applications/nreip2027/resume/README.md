@@ -39,9 +39,12 @@ The current implementation requires:
 
 ### Python
 
-- Python 3;
+- Python 3.9 or newer;
 - `fontTools`;
 - Pillow (`PIL`).
+
+The Python 3.9 floor follows from the executable source's use of built-in generic
+type syntax such as `list[str]`.
 
 ### System commands
 
@@ -72,6 +75,11 @@ The repository currently does **not** pin operating-system package versions,
 Inkscape/Ghostscript/Poppler versions, or Python package versions for this tool.
 A prepared machine must therefore preflight these dependencies before claiming
 cross-machine reproduction.
+
+Inkscape/Cairo also writes PDF creation metadata at render time. Two otherwise
+equivalent regenerated PDFs may therefore differ byte-for-byte solely because
+their `CreationDate` metadata differs. Validate PDF structure, extracted text,
+and rendered output rather than treating an identical PDF hash as a requirement.
 
 Do not silently install or upgrade packages in a prepared research environment
 merely because a dependency is missing.

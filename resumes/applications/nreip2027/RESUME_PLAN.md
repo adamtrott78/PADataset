@@ -388,7 +388,7 @@ Working groups:
 - MongoDB;
 - Nginx.
 
-This list will need pruning during content lock.
+This candidate skills inventory was pruned during content lock; the exact locked skills copy later in this file governs production.
 
 Do not include Java or C as current strengths without candidate confirmation.
 
@@ -541,7 +541,7 @@ Before changing this file to `CONTENT LOCKED`, verify:
 - the working page budget is realistic;
 - production has not yet been allowed to rewrite content for fit.
 
-## Exact résumé content — candidate for content lock
+## Exact résumé content — content locked
 
 Status: **CONTENT LOCKED — PRIVATE OVERLAY REQUIRED FOR FINAL SUBMISSION**
 

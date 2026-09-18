@@ -1,6 +1,6 @@
 # Resume-generation workflow
 
-Status: **EXPERIMENTAL**
+Status: **COLD-START READY**
 
 This is the scoped entry context for creating and tailoring resumes in PADataset.
 
@@ -153,12 +153,14 @@ For a new target:
 10. update this workflow when the implementation demonstrates a genuinely
    reusable rule.
 
-The NREIP 2027 application has now exercised phases 1–6 through authoritative
-application research, candidate-evidence reconciliation, target mapping, content
-planning, user content lock, and a production-locked rendering specification.
+The NREIP 2027 application has now exercised the full repository-production
+cycle: authoritative application research, candidate-evidence reconciliation,
+target mapping, content planning, content lock, production lock, source
+generation, PDF/PNG rendering, semantic and visual QA, bounded revision, Git
+synchronization, operator documentation, and independent cold-start validation.
 
-The first NREIP SVG/PDF artifact has now been built, rendered, visually
-inspected, and revised once.
+The NREIP SVG/PDF artifact has been built, rendered, visually inspected, revised,
+and independently audited from a fresh-reader perspective.
 
 That implementation produced one reusable workflow lesson:
 
@@ -180,11 +182,23 @@ implementation evidence rather than speculation.
 
 ## Maturity boundary
 
-This workflow is **EXPERIMENTAL**.
+This workflow is **COLD-START READY**.
 
-It is not yet cold-start validated and should not be presented as a mature
-repository reference implementation.
+Two independent fresh-reader audits successfully reconstructed the public NREIP
+workflow from repository context. The first audit exposed real documentation and
+production-contract defects; those defects were corrected. The second audit found
+no issue that materially prevents safe public regeneration.
 
-The first revision trigger is completion of the NREIP 2027 resume through actual
-source generation, PDF rendering, visual QA, and at least one realistic revision
-cycle.
+Known nonblocking limitations remain:
+
+- system/Python-package renderer versions are not hermetically pinned;
+- final visual correctness still requires human review;
+- final portal receipt requires portal-side upload/download verification; and
+- the private submission artifact intentionally requires ignored local inputs and
+  cannot be reproduced from the public repository alone.
+
+Those are explicit operating boundaries rather than cold-start blockers.
+
+Promote this workflow to **STABLE** only after it has been reused successfully for
+additional materially different resume targets and the reusable abstractions have
+survived that reuse without target-specific leakage.
