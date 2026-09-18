@@ -124,9 +124,14 @@ the user explicitly decides otherwise include:
 Local private inputs belong under ignored `resumes/private/` or an
 application-specific ignored `private/` directory.
 
-A future builder may distinguish a tracked **public review** artifact from a
-local **private submission** artifact. That behavior is not yet implemented and
-must not be assumed until the production workflow establishes it.
+The NREIP implementation now demonstrates the public/private artifact pattern:
+
+- tracked **public review** artifacts contain only public-safe placeholders; and
+- local **private submission** artifacts resolve approved private values from
+  ignored application-specific inputs and remain ignored by Git.
+
+Future application builders may reuse this pattern only when their own production
+contract establishes the same privacy boundary.
 
 If a cold-start reader needs a private field that is not available in tracked
 context, ask the user for it rather than inventing or recovering it indirectly.

@@ -35,7 +35,7 @@ content-locked.
 - resume content architecture and exact résumé copy: content-locked; page budget revised to one page after first visual build;
 - SVG production specification: production-locked and explicitly revised to a one-page contract after first visual QA;
 - builder: one-page SVG/PDF implementation operational and visually reviewed;
-- SVG/PDF/PNG artifacts: one-page public and private builds pass structural, semantic, privacy, renderer-parity, and first visual QA;
+- SVG/PDF/PNG artifacts: one-page public and private builds pass structural, semantic, privacy, dual-render existence/dimension sanity checks, and first visual QA;
 - cold-start validation: not yet performed.
 
 ## First implementation result
@@ -53,7 +53,7 @@ The revised one-page build:
 - preserves the locked semantic content;
 - preserves selectable/extractable PDF text;
 - fits within the established minimum typography constraints;
-- passes independent Poppler/Ghostscript rendering checks;
+- renders successfully through both Poppler and Ghostscript with matching page dimensions;
 - keeps private submission fields confined to the ignored private build; and
 - is visually dense but readable, with research remaining the dominant section.
 

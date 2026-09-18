@@ -155,21 +155,22 @@ The rendered document should still read correctly if all formatting is stripped.
 Use a professional sans-serif font with reliable PDF embedding and text
 extraction.
 
-Preferred family:
+Required family for the current implementation:
 
 `Liberation Sans`
 
-Accepted fallback only if font preflight establishes availability and stable
-metrics:
-
-`Arial`
+The current builder does **not** implement a fallback font.
 
 Do not use a custom downloaded font or commit font files to the repository.
 
-The builder must verify that the selected production font is available before
-rendering.
+The builder must verify that Fontconfig resolves the requested production family
+to **Liberation Sans** before rendering.
 
-Do not silently substitute a materially different font.
+If Liberation Sans is unavailable, fail the build rather than accepting a
+Fontconfig nearest-match substitution.
+
+A future fallback font requires an explicit production-spec revision and metric /
+visual validation before use.
 
 ### Minimum sizes
 
@@ -641,13 +642,17 @@ Inspect for:
 
 A successful script exit is not evidence of visual correctness.
 
-For the final private PDF, perform a secondary-renderer sanity check when a
-second independent PDF renderer is available. The objective is to catch
-renderer-specific clipping, glyph substitution, font behavior, or layout
-differences before submission.
+The builder should render the PDF independently with Poppler and Ghostscript.
 
-A renderer disagreement that materially changes text or layout is a QA failure
-until understood.
+Automated secondary-renderer QA may verify that both renderers successfully
+produce the expected page dimensions. That check is a **sanity check**, not pixel
+or layout equivalence.
+
+Human visual QA remains responsible for identifying clipping, glyph
+substitution, font behavior, or layout defects that a dimension-only automated
+check cannot detect.
+
+Any visually material renderer disagreement is a QA failure until understood.
 
 ## Public/private parity QA
 

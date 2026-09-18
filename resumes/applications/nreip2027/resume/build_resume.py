@@ -28,7 +28,7 @@ FONT_FAMILY = "Liberation Sans"
 NAME_SIZE = 18.8
 CONTACT_SIZE = 9.0
 SECTION_SIZE = 10.4
-HEADING_SIZE = 9.6
+HEADING_SIZE = 9.8
 BODY_SIZE = 9.1
 META_SIZE = 8.8
 PUB_SIZE = 8.9
@@ -224,17 +224,29 @@ def require_command(name: str) -> None:
 
 
 def fc_file(pattern: str) -> Path:
+    if shutil.which("fc-match") is None:
+        raise RuntimeError("required command not found: fc-match")
+
     result = run(
-        ["fc-match", "-f", "%{file}\n", pattern],
+        ["fc-match", "-f", "%{family}\n%{file}\n", pattern],
         capture=True,
     ).strip().splitlines()
 
-    if not result:
+    if len(result) < 2:
         raise RuntimeError(f"font not found: {pattern}")
 
-    path = Path(result[0])
+    families = [item.strip() for item in result[0].split(",")]
+
+    if FONT_FAMILY not in families:
+        raise RuntimeError(
+            f"Fontconfig substituted {result[0]!r} for required "
+            f"family {FONT_FAMILY!r}"
+        )
+
+    path = Path(result[1])
     if not path.is_file():
         raise RuntimeError(f"font path does not exist: {path}")
+
     return path
 
 
@@ -331,27 +343,17 @@ def verify_locked_sources() -> None:
 
     plan_n = norm_locked_source(plan)
 
-    required = [
-        CONTENT["education"]["institution_grad"],
-        CONTENT["education"]["degree_grad"],
-        CONTENT["education"]["grad_meta"],
-        CONTENT["education"]["institution_bs"],
-        CONTENT["education"]["degree_bs"],
-        CONTENT["education"]["bs_meta"],
-        CONTENT["research"]["dqn_title"],
-        CONTENT["research"]["dqn_meta"],
-        CONTENT["research"]["hicss_title"],
-        CONTENT["research"]["hicss_meta"],
-        *CONTENT["research"]["dqn_bullets"],
-        *CONTENT["research"]["hicss_bullets"],
-        *CONTENT["publications"],
-        CONTENT["experience"]["capstone_bullet"],
-        *CONTENT["experience"]["cyber_bullets"],
-        CONTENT["experience"]["forensics_bullet"],
-    ]
+    def string_leaves(value):
+        if isinstance(value, str):
+            yield value
+        elif isinstance(value, dict):
+            for child in value.values():
+                yield from string_leaves(child)
+        elif isinstance(value, (list, tuple)):
+            for child in value:
+                yield from string_leaves(child)
 
-    for label, body in CONTENT["skills"]:
-        required.extend([label, body])
+    required = list(string_leaves(CONTENT))
 
     for item in required:
         if norm(item) not in plan_n:
@@ -679,7 +681,7 @@ def build_page(contact: str, credential: str) -> Page:
         page,
         CONTENT["education"]["coursework_label"],
         CONTENT["education"]["coursework"],
-        size=8.9,
+        size=9.0,
         leading=10.0,
         gap=1.3,
     )
@@ -725,7 +727,7 @@ def build_page(contact: str, credential: str) -> Page:
             page,
             label,
             body,
-            size=8.9,
+            size=9.0,
             leading=9.95,
             gap=0.0 if idx == 0 else 1.8,
         )
@@ -771,23 +773,6 @@ def render_svg_to_pdf(svg_path: Path, pdf_path: Path) -> None:
             str(svg_path),
             "--export-area-page",
             f"--export-filename={pdf_path}",
-        ]
-    )
-
-
-def merge_pdf(page1: Path, page2: Path, output: Path) -> None:
-    run(
-        [
-            "gs",
-            "-q",
-            "-dSAFER",
-            "-dBATCH",
-            "-dNOPAUSE",
-            "-sDEVICE=pdfwrite",
-            "-dCompatibilityLevel=1.6",
-            f"-sOutputFile={output}",
-            str(page1),
-            str(page2),
         ]
     )
 
@@ -932,44 +917,6 @@ def render_ghostscript(pdf: Path, temp_dir: Path) -> list[Path]:
         raise RuntimeError("Ghostscript secondary render failed.")
 
     return [page]
-
-def create_contact_sheet(
-    page1: Path,
-    page2: Path,
-    output: Path,
-) -> None:
-    images = [
-        Image.open(page1).convert("RGB"),
-        Image.open(page2).convert("RGB"),
-    ]
-
-    target_h = 1100
-    thumbs = []
-
-    for image in images:
-        scale = target_h / image.height
-        target_w = round(image.width * scale)
-        thumbs.append(
-            image.resize(
-                (target_w, target_h),
-                Image.Resampling.LANCZOS,
-            )
-        )
-
-    gap = 24
-    margin = 18
-    width = sum(img.width for img in thumbs) + gap + margin * 2
-    height = target_h + margin * 2
-
-    sheet = Image.new("RGB", (width, height), "white")
-
-    x = margin
-    for image in thumbs:
-        sheet.paste(image, (x, margin))
-        x += image.width + gap
-
-    sheet.save(output, "PNG")
-
 
 def check_renderer_dimensions(
     poppler_pages: list[Path],

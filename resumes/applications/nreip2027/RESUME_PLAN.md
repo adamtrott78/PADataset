@@ -5,13 +5,15 @@ Status: **CONTENT LOCKED**
 This file is the application-specific content-selection plan for the NREIP 2027
 résumé.
 
-It is not yet authorized for final rendering.
+This plan is content-locked and authorized for production under the separate
+production contract in `SVG_PRODUCTION_SPEC.md`.
 
 Candidate factual claims are governed by `../../context/EVIDENCE.md`.
 NREIP requirements and selection signals are governed by `JOB_SPEC.md`.
 
-When this file is eventually marked `CONTENT LOCKED`, production/layout code may
-render its decisions but must not silently rewrite them.
+Production/layout code may render these locked decisions but must not silently
+rewrite them. Any substantive résumé wording change requires explicitly reopening
+this plan, reviewing the change, and locking it again.
 
 ## Audience and purpose
 
