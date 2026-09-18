@@ -32,8 +32,8 @@ content-locked.
 - PDF and `< 1 MB` resume artifact constraints: established;
 - portal-upload requiredness: not explicitly established by supplied guideline;
 - target laboratory choices: not yet locked;
-- resume content architecture: draft created; not content-locked;
-- SVG production specification: not yet created;
+- resume content architecture and exact résumé copy: content-locked;
+- SVG production specification: next required production step;
 - builder: not yet created;
 - SVG/PDF/PNG artifacts: not yet created;
 - cold-start validation: not yet performed.

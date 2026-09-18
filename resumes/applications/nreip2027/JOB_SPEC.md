@@ -315,18 +315,37 @@ disciplines relevant to interns.
 
 ## Laboratory-selection status
 
-**NOT LOCKED.**
+**PORTAL PREFERENCES SELECTED.**
 
-The three laboratories above are an initial high-relevance comparison set only.
+The candidate selected the following three NREIP laboratory preferences in the
+authenticated application portal:
 
-Before selecting the applicant's actual top-three preferences:
+- NUWC Newport — Newport, Rhode Island;
+- Naval Research Laboratory — Washington, District of Columbia; and
+- NSWC Crane — Crane, Indiana.
 
-1. screen additional current labs with strong computer science, cybersecurity,
-   RF/communications, AI/ML, autonomy, or information-systems work;
-2. compare those lab signals against verified candidate evidence;
-3. account for laboratory-specific eligibility requirements;
-4. consider the type of research the applicant actually wants to pursue; and
-5. obtain explicit user approval of the final preference order.
+These are application-portal preferences, not fields that need to appear on the
+résumé itself.
+
+For résumé tailoring, they provide useful technical context:
+
+- NUWC Newport: cybersecurity, computer science, programming, communications,
+  signal/information processing, detection/classification, neural networks,
+  time-frequency analysis, decision support, and systems engineering;
+- NRL Washington: RF sensing through the Radar Division and AI, high-assurance
+  systems, modeling/simulation, computer/communication networks,
+  communications, and high-performance computing through the Information
+  Technology Division;
+- NSWC Crane: sensors, electronics, electronic warfare, signals intelligence,
+  information operations, cybersecurity, communications, and electromagnetic-
+  spectrum-focused engineering.
+
+The résumé should remain a broadly strong NREIP research/technical résumé rather
+than naming or overfitting itself to these three laboratories.
+
+NUWC Newport is the candidate's primary intended destination, but this preference
+does not change the requirement that every résumé claim remain independently
+supported by candidate evidence.
 
 ## Technical and research signals established so far
 

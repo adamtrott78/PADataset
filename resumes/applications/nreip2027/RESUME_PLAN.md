@@ -1,6 +1,6 @@
 # NREIP 2027 resume plan
 
-Status: **DRAFT — NOT CONTENT-LOCKED**
+Status: **CONTENT LOCKED**
 
 This file is the application-specific content-selection plan for the NREIP 2027
 résumé.
@@ -37,31 +37,35 @@ The résumé should establish, quickly:
 
 ## Target-laboratory status
 
-Final NREIP laboratory preferences are **not yet locked**.
-
-The current unranked screening set is:
+The NREIP portal preferences have been selected separately from the résumé:
 
 - NUWC Newport;
-- NRL Washington; and
-- NSWC Dahlgren.
+- Naval Research Laboratory — Washington, DC; and
+- NSWC Crane.
 
-The résumé should initially emphasize evidence that transfers well across this
-screening set rather than overfitting to one laboratory before preferences are
-finalized.
+NUWC Newport is the candidate's primary intended destination.
 
-Cross-lab themes currently include:
+These selections are **context for relevance**, not résumé fields and not a
+prerequisite for content lock.
+
+The résumé should work across the selected laboratories by emphasizing the
+supported intersection of:
 
 - cybersecurity;
-- AI and machine learning;
-- RF sensing and signal/information processing;
+- artificial intelligence and machine learning;
+- RF and signal/information processing;
+- detection and classification;
 - software and computer science;
+- communications and networked systems;
 - modeling, simulation, and autonomy;
-- communications/networked systems;
 - experimental research; and
 - technical communication.
 
-Once laboratory preferences are locked, wording can be checked for legitimate
-terminology alignment, but unsupported keywords must not be introduced.
+Do not name the preferred laboratories in the résumé merely because they were
+selected in the portal.
+
+The existing NUWC Newport client relationship may appear because it is verified
+candidate project evidence, not because Newport is the preferred laboratory.
 
 ## Artifact contract
 
@@ -76,7 +80,7 @@ The portal does not establish a résumé page limit.
 
 ### Working page budget
 
-**Working target: two pages.**
+**Content target: two pages.**
 
 This is a content-planning decision, not an NREIP requirement.
 
@@ -133,15 +137,19 @@ Use:
 
 ### Final private submission artifact
 
-Professional contact fields will be decided separately before final rendering.
+The candidate approved use of:
 
-Current planning assumption:
+- university professional email; and
+- cell phone.
 
-- name: include;
-- professional email: likely include if candidate approves;
-- phone number: not necessary unless candidate chooses to include it;
-- street address: omit;
-- sensitive demographic/application information: omit.
+The final private submission artifact will omit:
+
+- street address;
+- ZIP code;
+- personal email; and
+- sensitive demographic/application information.
+
+Exact contact values are owned by the ignored private overlay.
 
 Do not place private contact values in tracked SVG, Markdown, PDF, or preview
 artifacts.
@@ -187,17 +195,17 @@ through target relevance.
 | HICSS paper | Research communication/publication | CORE | Publications section | Verified published |
 | NUWC-client senior design capstone | Navy context; software; systems; project leadership | CORE | Selected technical experience | Verified historical |
 | Cyber Defense & Operations TA | Cybersecurity depth; technical communication | INCLUDE | One or two compact bullets | Verified historical |
-| Digital Forensics TA | Cybersecurity; tooling; communication | INCLUDE IF SPACE | One compact bullet | Verified historical |
+| Digital Forensics TA | Cybersecurity; tooling; communication | INCLUDE | One compact bullet | Verified historical |
 | Python/PyTorch/ML pipeline skills | AI/ML/software | CORE | Technical Skills | Verified current |
 | RF/IQ/FFT/DCT/polar skills | RF/signal processing | CORE | Technical Skills | Verified current |
 | Docker/Linux/networking/security tools | Systems/cybersecurity | CORE, SELECTIVE | Technical Skills | Verified current |
 | ROS2/Gazebo | Autonomy/modeling/simulation | INCLUDE | Technical Skills and/or operational-AI entry | Verified current |
 | Flask/MongoDB/Nginx | Software/systems | CONDITIONAL | Include where space permits, especially with KMS | Verified current |
-| NFPA IT internship | General IT/systems experience | CONDITIONAL | At most compact additional-experience line | Verified historical |
+| NFPA IT internship | General IT/systems experience | OMIT | Strong historical evidence, but lower relevance than current research/teaching within the two-page budget | Verified historical |
 | WBMSHS IT support | General IT experience | OMIT BY DEFAULT | Restore only if target-specific need emerges | Verified historical |
 | iD Tech instructor | Teaching/communication | OMIT BY DEFAULT | Teaching evidence already stronger elsewhere | Verified historical |
 | Maintenance technician | General employment | OMIT | Low target relevance | Verified historical |
-| Java/C historical experience | Software | CONDITIONAL | Include only after current-use confirmation | Verified historical |
+| Java/C historical experience | Software | OMIT | Not needed for the current NREIP résumé; historical evidence only | Verified historical |
 | Private government-application credential | Government internship context | MANDATORY IN PRIVATE SUBMISSION | Resolve from ignored private overlay; represent only generically in tracked review artifacts | Private candidate-confirmed evidence |
 
 ## Education content plan
@@ -214,16 +222,16 @@ Include:
 
 Use a compact selected-coursework line rather than a long course inventory.
 
-Initial coursework candidates:
+Selected coursework for the NREIP résumé:
 
-- Scientific Machine Learning — identify as in progress if used;
-- Mathematics of Deep Learning;
-- Fundamentals of Deep Learning;
 - Network Security & Data Assurance;
 - Secure Software Development;
-- Large Language Models.
+- Fundamentals of Deep Learning;
+- Mathematics of Deep Learning; and
+- Scientific Machine Learning — **in progress, Fall 2026**.
 
-The final subset should be chosen for relevance and page density.
+This subset is chosen for direct relevance to cybersecurity, AI/ML, software,
+and quantitative research across the selected NREIP laboratories.
 
 Do not represent Fall 2026 coursework as completed.
 
@@ -409,16 +417,14 @@ Do not reproduce the federal résumé's full duty inventory.
 
 ### Digital Forensics TA
 
-Include if the two-page budget supports it.
+Include as a compact one-bullet entry because it supplies distinct applied
+cybersecurity/tooling evidence:
 
-Possible content:
+- created Autopsy disk-image and Docker-based macOS log-analysis labs and guided
+  query construction, visualization, and incident-style reporting.
 
-- created Autopsy disk-image and Docker-based log-analysis labs;
-- guided incident-style analysis/reporting;
-- classroom instruction and technical feedback.
-
-If space becomes constrained, this entry is lower priority than DQNGuard,
-HICSS, the NUWC capstone, and the Cyber Defense TA role.
+It remains lower priority than DQNGuard, HICSS, the NUWC capstone, and the Cyber
+Defense and Operations TA role if a later explicit content revision is required.
 
 ## Portal-outline categories not currently planned as standalone sections
 
@@ -473,8 +479,8 @@ Do not infer that "private" means "omit from the final résumé."
 WBMSHS IT support, maintenance work, and other low-relevance history are omitted
 from the working NREIP content budget.
 
-NFPA remains conditional because it is the strongest older conventional IT
-internship.
+NFPA is also omitted from the NREIP two-page content budget. It remains in the
+candidate evidence ledger for future applications.
 
 ### Generic objective statement
 
@@ -483,22 +489,23 @@ Omit.
 The application already has personal-statement fields, and résumé space should
 be used for evidence rather than a generic objective.
 
-## Content-lock questions still open
+## Content-lock status
 
-Before this plan can become `CONTENT LOCKED`, resolve:
+**CONTENT LOCKED.**
 
-1. final top NREIP laboratory preferences;
-2. whether any additional laboratory-specific signal materially changes content;
-3. final two-page versus one-page judgment during the pre-render
-   content-density review;
-4. exact selected-coursework subset;
-5. whether Digital Forensics TA earns space;
-6. whether NFPA earns a compact line;
-7. whether Java or C remain current enough to include;
-8. final private professional contact fields;
-9. exact placement and wording of mandatory private government-application
-   evidence;
-10. exact bullet wording and bullet count for DQNGuard and HICSS.
+The candidate has approved the résumé content architecture, exact public-safe
+copy, two-page content target, private professional contact-field policy, and
+mandatory private government-application credential treatment.
+
+The exact private values remain owned by the ignored private overlay and must be
+substituted only when generating the final private submission artifact.
+
+Any later substantive wording change requires explicitly reopening this plan,
+reviewing the changed content, and content-locking it again.
+
+Production/layout code may control typography, spacing, wrapping, pagination,
+and other presentation details, but it may not silently add, delete, or rewrite
+résumé content.
 
 ## Content-lock checklist
 
@@ -518,3 +525,136 @@ Before changing this file to `CONTENT LOCKED`, verify:
   submission plan;
 - the working page budget is realistic;
 - production has not yet been allowed to rewrite content for fit.
+
+## Exact résumé content — candidate for content lock
+
+Status: **CONTENT LOCKED — PRIVATE OVERLAY REQUIRED FOR FINAL SUBMISSION**
+
+The text below is the exact content intended for the NREIP résumé before visual
+production.
+
+Square-bracketed private placeholders are not literal final résumé text. They
+must be resolved from ignored private inputs for the private submission artifact.
+
+### Header
+
+**ADAM TROTT**
+
+`[PRIVATE PROFESSIONAL CONTACT FIELDS, IF APPROVED]`
+
+### EDUCATION
+
+**University of Massachusetts Dartmouth**
+**Ph.D. in Engineering and Applied Science (EAS), Computer Science and
+Information Science (CSIS) Curriculum Option**
+Expected May 2030 | Graduate GPA: 4.0/4.0
+
+`[MANDATORY PRIVATE GOVERNMENT-APPLICATION CREDENTIAL]`
+
+**Selected Graduate Coursework:** Network Security & Data Assurance; Secure
+Software Development; Fundamentals of Deep Learning; Mathematics of Deep
+Learning; Scientific Machine Learning *(in progress, Fall 2026)*
+
+**University of Massachusetts Dartmouth**
+**B.S. in Computer Science, Cybersecurity concentration** | May 2025
+GPA: 3.379/4.0 | Cum Laude
+
+### RESEARCH EXPERIENCE
+
+**Research Assistant — University of Massachusetts Dartmouth** | Dartmouth, MA
+Jun–Aug 2025; Jun–Aug 2026
+
+- Developed and tested an operational-AI red-teaming framework on an autonomous
+  vehicle with cybersecurity, computer science, and electrical-engineering
+  researchers using ROS2 and Gazebo.
+
+**DQNGuard: Towards Open-World RF Preliminary-Action Detection**
+First author | IEEE MILCOM 2026, accepted/to appear
+
+- Designed and implemented the end-to-end DQNGuard pipeline for open-world RF
+  preliminary-action detection, including a multi-domain CNN and open-set
+  decision layer; benchmarked against VarMax and a DQN-IDS-style baseline.
+- Built an over-the-air SDR capture, preprocessing, and dataset pipeline for
+  WiFi, Bluetooth, and Zigbee RF signals; designed, trained, and evaluated
+  experiments across five preliminary actions: Scan, Burst, Sustain, Hop, and
+  Replay.
+- Achieved 0.865 mean unknown-class F1 under a 5% known-rejection calibration
+  budget, compared with 0.745 for VarMax and 0.701 for the DQN-IDS-style
+  comparison head; designed and analyzed a 20-condition Target-Surrogate Matrix.
+
+**Model Evaluation for Radio-Frequency Signal Modulation Classifiers in the
+Existence of Novel Samples**
+First author | HICSS-59, published 2026; presented Jan. 8, 2026
+
+- Developed and evaluated a class-conditioned RF open-set-recognition pipeline
+  using an eight-channel CNN over raw I/Q, FFT, DCT, and polar
+  representations.
+- Evaluated nine open-set folds on RadioML 2018.01A, withholding one selected
+  modulation as unknown per fold and running 30 runs per fold.
+
+### SELECTED PUBLICATIONS
+
+Trott, A., Popillo, C., Bastian, N. D., Zhou, R., and Kul, G. **"DQNGuard:
+Towards Open-World RF Preliminary-Action Detection."** IEEE MILCOM 2026,
+accepted/to appear.
+
+Trott, A., Thompson, H., and Kul, G. **"Model Evaluation for Radio-Frequency
+Signal Modulation Classifiers in the Existence of Novel Samples."** Proceedings
+of the 59th Hawaii International Conference on System Sciences (HICSS-59), 2026.
+
+### TECHNICAL SKILLS
+
+**AI / Machine Learning:** Python, PyTorch, Hugging Face, Jupyter; CNNs,
+transformers, open-set recognition, novelty/OOD detection, model calibration,
+experimental design, quantitative/statistical evaluation
+
+**RF / Signal Processing:** software-defined radio (SDR), RF signal analysis,
+complex I/Q, FFT, DCT, and polar representations; over-the-air WiFi, Bluetooth,
+and Zigbee data workflows
+
+**Cybersecurity / Systems / Software:** Linux/WSL, Docker/Docker Compose,
+networking, OpenSSL, Autopsy, Burp Suite, Flask, MongoDB, Nginx, ROS2, Gazebo
+
+### SELECTED TECHNICAL AND TEACHING EXPERIENCE
+
+**Lead Backend Developer & Project Manager — UMass Dartmouth Senior Design
+Capstone**
+Client: NUWC Newport | Sep. 2024–May 2025
+
+- Led backend development and project management for a university team building
+  a file-storage, viewing, and search system for a NUWC Newport client;
+  coordinated technical work and delivery with the client.
+
+**Teaching Assistant — Cyber Defense and Operations — University of
+Massachusetts Dartmouth** | Jan.–May 2026
+
+- Designed and graded practical cybersecurity assignments involving risk
+  analysis, cryptography, WebGoat SQL injection, and Burp Suite
+  access-control/authentication attacks.
+- Authored a Caesar Cipher/DES/3DES cryptanalysis project requiring
+  candidate-key generation, brute-force search, plaintext verification,
+  performance measurement, analytical reporting, and a recorded demonstration.
+
+**Teaching Assistant — Digital Forensics — University of Massachusetts
+Dartmouth** | Sep.–Dec. 2025
+
+- Created Autopsy disk-image and Docker-based macOS log-analysis labs and guided
+  students through query construction, visualization, and incident-style
+  reporting.
+
+### Explicit omissions from this NREIP version
+
+The following verified evidence is deliberately omitted from the current
+two-page content target:
+
+- NFPA Help Desk / IT internship;
+- WBMSHS IT support;
+- iD Tech instruction;
+- maintenance employment;
+- Java and C historical skill claims;
+- exhaustive Dean's/Chancellor's List terms;
+- federal-resume hours/week metadata;
+- generic objective/summary paragraph.
+
+These omissions are application-specific and do not remove the underlying facts
+from the candidate evidence ledger.
