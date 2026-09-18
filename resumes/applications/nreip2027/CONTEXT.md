@@ -33,7 +33,7 @@ content-locked.
 - portal-upload requiredness: not explicitly established by supplied guideline;
 - target laboratory choices: selected in portal and captured in application context;
 - resume content architecture and exact résumé copy: content-locked;
-- SVG production specification: next required production step;
+- SVG production specification: production-locked; builder is next;
 - builder: not yet created;
 - SVG/PDF/PNG artifacts: not yet created;
 - cold-start validation: not yet performed.

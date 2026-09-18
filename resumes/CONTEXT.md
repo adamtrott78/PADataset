@@ -147,9 +147,15 @@ For a new target:
 10. update this workflow when the implementation demonstrates a genuinely
    reusable rule.
 
-The NREIP 2027 application has completed the initial public-source phase 1
-capture and is now in phase 2 candidate-evidence reconciliation. Target-specific
-evidence mapping and resume planning remain pending.
+The NREIP 2027 application has now exercised phases 1–6 through authoritative
+application research, candidate-evidence reconciliation, target mapping, content
+planning, user content lock, and a production-locked rendering specification.
+
+It is entering phase 7: the first reproducible SVG/PDF implementation.
+
+Do not generalize additional production rules into this parent workflow until the
+first artifact has been built, rendered, inspected, and revised from actual
+implementation evidence.
 
 ## Maturity boundary
 
