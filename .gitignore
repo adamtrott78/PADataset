@@ -41,6 +41,9 @@ env/
 # ---------- Generated images / plots ----------
 *.png
 
+# Public-safe rendered NREIP resume used for visual QA.
+!resumes/applications/nreip2027/resume/public/page1.png
+
 # ---------- Archives ----------
 *.zip
 *.tar

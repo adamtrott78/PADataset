@@ -33,7 +33,7 @@ and then rebuild.
 
 ## Artifact objective
 
-Produce a professional two-page research/technical résumé optimized for review
+Produce a professional one-page research/technical résumé optimized for review
 by Department of Navy laboratory research staff.
 
 The visual design should communicate:
@@ -76,16 +76,21 @@ page coordinate system.
 
 ### Page count
 
-Exactly **two pages**.
+Exactly **one page**.
 
 The portal does not impose this limit; it is the content-locked NREIP résumé
-design decision.
+design decision revised after inspection of the first rendered two-page
+prototype.
+
+The first prototype showed that the locked content was substantially under-filled
+when divided between two sheets. The one-page revision therefore reflects actual
+rendering evidence rather than a generic résumé convention.
 
 Do not create:
 
-- a third page;
-- an artificially compressed one-page version; or
-- blank/filler space merely to reach two pages.
+- a second page merely to preserve the superseded prototype structure;
+- an artificially sparse page; or
+- a compressed layout that violates the minimum typography requirements.
 
 ### Margins
 
@@ -99,13 +104,9 @@ Target content margins:
 
 No visible text or rules may enter the margin safety area.
 
-## Deterministic page ownership
+## Deterministic content order
 
-Pagination is semantic, not automatic.
-
-### Page 1
-
-In this order:
+The one-page résumé uses one continuous semantic reading order:
 
 1. Header
 2. Education
@@ -113,26 +114,19 @@ In this order:
    - Research Assistant / operational-AI research
    - DQNGuard
    - HICSS-59 RF open-set-recognition research
-
-### Page 2
-
-In this order:
-
-1. Selected Publications
-2. Technical Skills
-3. Selected Technical and Teaching Experience
+4. Selected Publications
+5. Technical Skills
+6. Selected Technical and Teaching Experience
    - NUWC-client Senior Design capstone
    - Cyber Defense and Operations TA
    - Digital Forensics TA
 
-Do not split an individual bullet across pages.
+Do not split content into artificial columns or relocate sections merely to make
+the page appear fuller.
 
-Do not move an entire locked section to a different page solely because a
-builder finds automatic pagination easier.
-
-If either page cannot accommodate its assigned content under the minimum
-typographic constraints in this specification, report a fit failure rather than
-altering content.
+If the locked content cannot fit on one page under the minimum typographic
+constraints in this specification, report a fit failure rather than altering
+résumé wording.
 
 ## Layout model
 
@@ -498,24 +492,18 @@ Expected tracked public-review outputs:
 
 ```text
 resumes/applications/nreip2027/resume/public/
-  nreip2027_resume_public_page1.svg
-  nreip2027_resume_public_page2.svg
+  nreip2027_resume_public.svg
   nreip2027_resume_public.pdf
   page1.png
-  page2.png
-  contact_sheet.png
 ```
 
 Expected ignored private outputs:
 
 ```text
 resumes/applications/nreip2027/resume/private/
-  nreip2027_resume_page1.svg
-  nreip2027_resume_page2.svg
+  nreip2027_resume.svg
   nreip2027_resume.pdf
   page1.png
-  page2.png
-  contact_sheet.png
 ```
 
 The existing repository ignore rule for:
@@ -556,13 +544,11 @@ validated against it during build/QA.
 
 Preferred conversion path:
 
-1. generate page 1 SVG;
-2. generate page 2 SVG;
-3. convert each SVG to PDF with a renderer that preserves selectable text;
-4. combine the two pages into one PDF;
-5. verify final page size and page count;
-6. verify text extraction;
-7. render PDF pages to PNG for visual QA.
+1. generate the one-page SVG;
+2. convert the SVG to PDF with a renderer that preserves selectable text;
+3. verify final page size and page count;
+4. verify text extraction;
+5. render the PDF page to PNG for visual QA.
 
 Do not accept an SVG-to-PDF route merely because it looks correct.
 
@@ -572,7 +558,7 @@ The resulting PDF must retain extractable text.
 
 Private submission PDF must be:
 
-- exactly 2 pages;
+- exactly 1 page;
 - U.S. Letter on both pages;
 - less than **1 MB**;
 - free of passwords/encryption;
@@ -592,8 +578,8 @@ The build/QA workflow must verify at minimum:
 
 ### Page structure
 
-- exactly two PDF pages;
-- page dimensions approximately 612 × 792 pt each.
+- exactly one PDF page;
+- page dimensions approximately 612 × 792 pt.
 
 ### Text extraction
 
@@ -636,11 +622,7 @@ Verify that:
 
 Render the final PDF at a minimum of approximately 150–200 DPI.
 
-Create:
-
-- page 1 PNG;
-- page 2 PNG; and
-- a two-page contact sheet.
+Create a page 1 PNG at the required review resolution.
 
 Inspect for:
 
@@ -718,7 +700,7 @@ The local build alone does not establish successful portal receipt.
 
 Stop and report rather than silently compensating if any of the following occur:
 
-- locked content does not fit the assigned two-page structure;
+- locked content does not fit the assigned one-page structure;
 - body text would need to fall below the minimum size;
 - a page overflows;
 - PDF text extraction is materially broken;
@@ -733,19 +715,19 @@ rewrite the résumé.
 
 ## First-build success criteria
 
-The first implementation is successful when:
+The revised implementation is successful when:
 
-- public two-page SVG source exists;
-- public PDF exists;
-- public page renders/contact sheet exist;
-- private two-page SVG source exists locally and remains ignored;
-- private PDF exists locally and remains ignored;
+- public one-page SVG source exists;
+- public one-page PDF exists;
+- public page render exists;
+- private one-page SVG source exists locally and remains ignored;
+- private one-page PDF exists locally and remains ignored;
 - private contact and credential substitutions are correct;
-- page assignment matches this specification;
+- content order matches this specification;
 - PDF text remains extractable;
-- no locked content has changed;
-- visual review finds no clipping or overlap;
-- final private PDF is less than 1 MB; and
+- no locked résumé content has changed;
+- visual review finds no clipping, overlap, or unprofessional compression;
+- the final private PDF is less than 1 MB; and
 - Git status demonstrates that no private artifact is tracked.
 
 Only after those conditions are demonstrated should the NREIP résumé production

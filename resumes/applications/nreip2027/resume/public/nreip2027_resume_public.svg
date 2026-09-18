@@ -1,0 +1,83 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<svg xmlns="http://www.w3.org/2000/svg"
+     width="8.5in"
+     height="11in"
+     viewBox="0 0 612 792">
+  <rect x="0" y="0" width="612" height="792" fill="#ffffff"/>
+  <text x="306.00" y="40.00" font-family="Liberation Sans" font-size="18.80" font-weight="700" font-style="normal" fill="#111111" text-anchor="middle">ADAM TROTT</text>
+  <text x="306.00" y="54.00" font-family="Liberation Sans" font-size="9.00" font-weight="400" font-style="normal" fill="#303030" text-anchor="middle">[private phone] | [university email]</text>
+  <text x="38.00" y="61.50" font-family="Liberation Sans" font-size="10.40" font-weight="700" font-style="normal" fill="#111111" text-anchor="start" letter-spacing="0.35">EDUCATION</text>
+  <line x1="38.00" y1="64.60" x2="574.00" y2="64.60" stroke="#202020" stroke-width="0.75"/>
+  <text x="38.00" y="75.30" font-family="Liberation Sans" font-size="9.60" font-weight="700" font-style="normal" fill="#111111" text-anchor="start">University of Massachusetts Dartmouth</text>
+  <text x="38.00" y="86.95" font-family="Liberation Sans" font-size="9.60" font-weight="700" font-style="normal" fill="#111111" text-anchor="start">Ph.D. in Engineering and Applied Science (EAS), Computer Science and Information Science (CSIS) Curriculum</text>
+  <text x="38.00" y="97.80" font-family="Liberation Sans" font-size="9.60" font-weight="700" font-style="normal" fill="#111111" text-anchor="start">Option</text>
+  <text x="38.00" y="109.05" font-family="Liberation Sans" font-size="8.80" font-weight="400" font-style="normal" fill="#333333" text-anchor="start">Expected May 2030 | Graduate GPA: 4.0/4.0</text>
+  <text x="38.00" y="119.70" font-family="Liberation Sans" font-size="9.00" font-weight="700" font-style="normal" fill="#111111" text-anchor="start">[private government application credential - withheld] | Jan. 2026-Present</text>
+  <text x="38.00" y="131.20" font-family="Liberation Sans" font-size="8.90" font-weight="700" font-style="normal" fill="#111111" text-anchor="start">Selected Graduate Coursework:</text>
+  <text x="175.50" y="131.20" font-family="Liberation Sans" font-size="8.90" font-weight="400" font-style="normal" fill="#111111" text-anchor="start">Network Security &amp; Data Assurance; Secure Software Development; Fundamentals of Deep</text>
+  <text x="38.00" y="141.20" font-family="Liberation Sans" font-size="8.90" font-weight="400" font-style="normal" fill="#111111" text-anchor="start">Learning; Mathematics of Deep Learning; Scientific Machine Learning (in progress, Fall 2026)</text>
+  <text x="38.00" y="155.00" font-family="Liberation Sans" font-size="9.60" font-weight="700" font-style="normal" fill="#111111" text-anchor="start">University of Massachusetts Dartmouth</text>
+  <text x="38.00" y="166.45" font-family="Liberation Sans" font-size="9.60" font-weight="700" font-style="normal" fill="#111111" text-anchor="start">B.S. in Computer Science, Cybersecurity concentration | May 2025</text>
+  <text x="38.00" y="177.60" font-family="Liberation Sans" font-size="8.80" font-weight="400" font-style="normal" fill="#333333" text-anchor="start">GPA: 3.379/4.0 | Cum Laude</text>
+  <text x="38.00" y="193.35" font-family="Liberation Sans" font-size="10.40" font-weight="700" font-style="normal" fill="#111111" text-anchor="start" letter-spacing="0.35">RESEARCH EXPERIENCE</text>
+  <line x1="38.00" y1="196.45" x2="574.00" y2="196.45" stroke="#202020" stroke-width="0.75"/>
+  <text x="38.00" y="207.15" font-family="Liberation Sans" font-size="9.60" font-weight="700" font-style="normal" fill="#111111" text-anchor="start">Research Assistant - University of Massachusetts Dartmouth | Dartmouth, MA</text>
+  <text x="38.00" y="218.40" font-family="Liberation Sans" font-size="8.80" font-weight="400" font-style="normal" fill="#333333" text-anchor="start">Jun-Aug 2025; Jun-Aug 2026</text>
+  <circle cx="44.00" cy="227.45" r="1.65" fill="#111111"/>
+  <text x="55.00" y="230.15" font-family="Liberation Sans" font-size="9.10" font-weight="400" font-style="normal" fill="#111111" text-anchor="start">Developed and tested an operational-AI red-teaming framework on an autonomous vehicle with cybersecurity, computer science,</text>
+  <text x="55.00" y="240.60" font-family="Liberation Sans" font-size="9.10" font-weight="400" font-style="normal" fill="#111111" text-anchor="start">and electrical-engineering researchers using ROS2 and Gazebo.</text>
+  <text x="38.00" y="254.85" font-family="Liberation Sans" font-size="9.60" font-weight="700" font-style="normal" fill="#111111" text-anchor="start">DQNGuard: Towards Open-World RF Preliminary-Action Detection</text>
+  <text x="38.00" y="266.10" font-family="Liberation Sans" font-size="8.80" font-weight="400" font-style="normal" fill="#333333" text-anchor="start">First author | IEEE MILCOM 2026, accepted/to appear</text>
+  <circle cx="44.00" cy="275.15" r="1.65" fill="#111111"/>
+  <text x="55.00" y="277.85" font-family="Liberation Sans" font-size="9.10" font-weight="400" font-style="normal" fill="#111111" text-anchor="start">Designed and implemented the end-to-end DQNGuard pipeline for open-world RF preliminary-action detection, including a</text>
+  <text x="55.00" y="288.30" font-family="Liberation Sans" font-size="9.10" font-weight="400" font-style="normal" fill="#111111" text-anchor="start">multi-domain CNN and open-set decision layer; benchmarked against VarMax and a DQN-IDS-style baseline.</text>
+  <circle cx="44.00" cy="297.85" r="1.65" fill="#111111"/>
+  <text x="55.00" y="300.55" font-family="Liberation Sans" font-size="9.10" font-weight="400" font-style="normal" fill="#111111" text-anchor="start">Built an over-the-air SDR capture, preprocessing, and dataset pipeline for WiFi, Bluetooth, and Zigbee RF signals; designed,</text>
+  <text x="55.00" y="311.00" font-family="Liberation Sans" font-size="9.10" font-weight="400" font-style="normal" fill="#111111" text-anchor="start">trained, and evaluated experiments across five preliminary actions: Scan, Burst, Sustain, Hop, and Replay.</text>
+  <circle cx="44.00" cy="320.55" r="1.65" fill="#111111"/>
+  <text x="55.00" y="323.25" font-family="Liberation Sans" font-size="9.10" font-weight="400" font-style="normal" fill="#111111" text-anchor="start">Achieved 0.865 mean unknown-class F1 under a 5% known-rejection calibration budget, compared with 0.745 for VarMax and</text>
+  <text x="55.00" y="333.70" font-family="Liberation Sans" font-size="9.10" font-weight="400" font-style="normal" fill="#111111" text-anchor="start">0.701 for the DQN-IDS-style comparison head; designed and analyzed a 20-condition Target-Surrogate Matrix.</text>
+  <text x="38.00" y="347.95" font-family="Liberation Sans" font-size="9.60" font-weight="700" font-style="normal" fill="#111111" text-anchor="start">Model Evaluation for Radio-Frequency Signal Modulation Classifiers in the Existence of Novel Samples</text>
+  <text x="38.00" y="359.20" font-family="Liberation Sans" font-size="8.80" font-weight="400" font-style="normal" fill="#333333" text-anchor="start">First author | HICSS-59, published 2026; presented Jan. 8, 2026</text>
+  <circle cx="44.00" cy="368.25" r="1.65" fill="#111111"/>
+  <text x="55.00" y="370.95" font-family="Liberation Sans" font-size="9.10" font-weight="400" font-style="normal" fill="#111111" text-anchor="start">Developed and evaluated a class-conditioned RF open-set-recognition pipeline using an eight-channel CNN over raw I/Q, FFT,</text>
+  <text x="55.00" y="381.40" font-family="Liberation Sans" font-size="9.10" font-weight="400" font-style="normal" fill="#111111" text-anchor="start">DCT, and polar representations.</text>
+  <circle cx="44.00" cy="390.95" r="1.65" fill="#111111"/>
+  <text x="55.00" y="393.65" font-family="Liberation Sans" font-size="9.10" font-weight="400" font-style="normal" fill="#111111" text-anchor="start">Evaluated nine open-set folds on RadioML 2018.01A, withholding one selected modulation as unknown per fold and running 30</text>
+  <text x="55.00" y="404.10" font-family="Liberation Sans" font-size="9.10" font-weight="400" font-style="normal" fill="#111111" text-anchor="start">runs per fold.</text>
+  <text x="38.00" y="420.25" font-family="Liberation Sans" font-size="10.40" font-weight="700" font-style="normal" fill="#111111" text-anchor="start" letter-spacing="0.35">SELECTED PUBLICATIONS</text>
+  <line x1="38.00" y1="423.35" x2="574.00" y2="423.35" stroke="#202020" stroke-width="0.75"/>
+  <text x="38.00" y="434.25" font-family="Liberation Sans" font-size="8.90" font-weight="400" font-style="normal" fill="#111111" text-anchor="start">Trott, A., Popillo, C., Bastian, N. D., Zhou, R., and Kul, G. &quot;DQNGuard: Towards Open-World RF Preliminary-Action Detection.&quot; IEEE</text>
+  <text x="50.00" y="444.20" font-family="Liberation Sans" font-size="8.90" font-weight="400" font-style="normal" fill="#111111" text-anchor="start">MILCOM 2026, accepted/to appear.</text>
+  <text x="38.00" y="456.95" font-family="Liberation Sans" font-size="8.90" font-weight="400" font-style="normal" fill="#111111" text-anchor="start">Trott, A., Thompson, H., and Kul, G. &quot;Model Evaluation for Radio-Frequency Signal Modulation Classifiers in the Existence of Novel</text>
+  <text x="50.00" y="466.90" font-family="Liberation Sans" font-size="8.90" font-weight="400" font-style="normal" fill="#111111" text-anchor="start">Samples.&quot; Proceedings of the 59th Hawaii International Conference on System Sciences (HICSS-59), 2026.</text>
+  <text x="38.00" y="482.35" font-family="Liberation Sans" font-size="10.40" font-weight="700" font-style="normal" fill="#111111" text-anchor="start" letter-spacing="0.35">TECHNICAL SKILLS</text>
+  <line x1="38.00" y1="485.45" x2="574.00" y2="485.45" stroke="#202020" stroke-width="0.75"/>
+  <text x="38.00" y="496.15" font-family="Liberation Sans" font-size="8.90" font-weight="700" font-style="normal" fill="#111111" text-anchor="start">AI / Machine Learning:</text>
+  <text x="135.42" y="496.15" font-family="Liberation Sans" font-size="8.90" font-weight="400" font-style="normal" fill="#111111" text-anchor="start">Python, PyTorch, Hugging Face, Jupyter; CNNs, transformers, open-set recognition, novelty/OOD detection,</text>
+  <text x="38.00" y="506.10" font-family="Liberation Sans" font-size="8.90" font-weight="400" font-style="normal" fill="#111111" text-anchor="start">model calibration, experimental design, quantitative/statistical evaluation</text>
+  <text x="38.00" y="517.85" font-family="Liberation Sans" font-size="8.90" font-weight="700" font-style="normal" fill="#111111" text-anchor="start">RF / Signal Processing:</text>
+  <text x="139.88" y="517.85" font-family="Liberation Sans" font-size="8.90" font-weight="400" font-style="normal" fill="#111111" text-anchor="start">software-defined radio (SDR), RF signal analysis, complex I/Q, FFT, DCT, and polar representations;</text>
+  <text x="38.00" y="527.80" font-family="Liberation Sans" font-size="8.90" font-weight="400" font-style="normal" fill="#111111" text-anchor="start">over-the-air WiFi, Bluetooth, and Zigbee data workflows</text>
+  <text x="38.00" y="539.55" font-family="Liberation Sans" font-size="8.90" font-weight="700" font-style="normal" fill="#111111" text-anchor="start">Cybersecurity / Systems / Software:</text>
+  <text x="191.83" y="539.55" font-family="Liberation Sans" font-size="8.90" font-weight="400" font-style="normal" fill="#111111" text-anchor="start">Linux/WSL, Docker/Docker Compose, networking, OpenSSL, Autopsy, Burp Suite, Flask,</text>
+  <text x="38.00" y="549.50" font-family="Liberation Sans" font-size="8.90" font-weight="400" font-style="normal" fill="#111111" text-anchor="start">MongoDB, Nginx, ROS2, Gazebo</text>
+  <text x="38.00" y="565.05" font-family="Liberation Sans" font-size="10.40" font-weight="700" font-style="normal" fill="#111111" text-anchor="start" letter-spacing="0.35">SELECTED TECHNICAL AND TEACHING EXPERIENCE</text>
+  <line x1="38.00" y1="568.15" x2="574.00" y2="568.15" stroke="#202020" stroke-width="0.75"/>
+  <text x="38.00" y="578.85" font-family="Liberation Sans" font-size="9.60" font-weight="700" font-style="normal" fill="#111111" text-anchor="start">Lead Backend Developer &amp; Project Manager - UMass Dartmouth Senior Design Capstone</text>
+  <text x="38.00" y="590.10" font-family="Liberation Sans" font-size="8.80" font-weight="400" font-style="normal" fill="#333333" text-anchor="start">Client: NUWC Newport | Sep. 2024-May 2025</text>
+  <circle cx="44.00" cy="599.15" r="1.65" fill="#111111"/>
+  <text x="55.00" y="601.85" font-family="Liberation Sans" font-size="9.10" font-weight="400" font-style="normal" fill="#111111" text-anchor="start">Led backend development and project management for a university team building a file-storage, viewing, and search system for</text>
+  <text x="55.00" y="612.30" font-family="Liberation Sans" font-size="9.10" font-weight="400" font-style="normal" fill="#111111" text-anchor="start">a NUWC Newport client; coordinated technical work and delivery with the client.</text>
+  <text x="38.00" y="626.55" font-family="Liberation Sans" font-size="9.60" font-weight="700" font-style="normal" fill="#111111" text-anchor="start">Teaching Assistant - Cyber Defense and Operations - University of Massachusetts Dartmouth | Jan.-May 2026</text>
+  <circle cx="44.00" cy="636.50" r="1.65" fill="#111111"/>
+  <text x="55.00" y="639.20" font-family="Liberation Sans" font-size="9.10" font-weight="400" font-style="normal" fill="#111111" text-anchor="start">Designed and graded practical cybersecurity assignments involving risk analysis, cryptography, WebGoat SQL injection, and</text>
+  <text x="55.00" y="649.65" font-family="Liberation Sans" font-size="9.10" font-weight="400" font-style="normal" fill="#111111" text-anchor="start">Burp Suite access-control/authentication attacks.</text>
+  <circle cx="44.00" cy="659.20" r="1.65" fill="#111111"/>
+  <text x="55.00" y="661.90" font-family="Liberation Sans" font-size="9.10" font-weight="400" font-style="normal" fill="#111111" text-anchor="start">Authored a Caesar Cipher/DES/3DES cryptanalysis project requiring candidate-key generation, brute-force search, plaintext</text>
+  <text x="55.00" y="672.35" font-family="Liberation Sans" font-size="9.10" font-weight="400" font-style="normal" fill="#111111" text-anchor="start">verification, performance measurement, analytical reporting, and a recorded demonstration.</text>
+  <text x="38.00" y="686.60" font-family="Liberation Sans" font-size="9.60" font-weight="700" font-style="normal" fill="#111111" text-anchor="start">Teaching Assistant - Digital Forensics - University of Massachusetts Dartmouth | Sep.-Dec. 2025</text>
+  <circle cx="44.00" cy="696.55" r="1.65" fill="#111111"/>
+  <text x="55.00" y="699.25" font-family="Liberation Sans" font-size="9.10" font-weight="400" font-style="normal" fill="#111111" text-anchor="start">Created Autopsy disk-image and Docker-based macOS log-analysis labs and guided students through query construction,</text>
+  <text x="55.00" y="709.70" font-family="Liberation Sans" font-size="9.10" font-weight="400" font-style="normal" fill="#111111" text-anchor="start">visualization, and incident-style reporting.</text>
+</svg>

@@ -32,11 +32,33 @@ content-locked.
 - PDF and `< 1 MB` resume artifact constraints: established;
 - portal-upload requiredness: not explicitly established by supplied guideline;
 - target laboratory choices: selected in portal and captured in application context;
-- resume content architecture and exact résumé copy: content-locked;
-- SVG production specification: production-locked; builder is next;
-- builder: not yet created;
-- SVG/PDF/PNG artifacts: not yet created;
+- resume content architecture and exact résumé copy: content-locked; page budget revised to one page after first visual build;
+- SVG production specification: production-locked and explicitly revised to a one-page contract after first visual QA;
+- builder: one-page SVG/PDF implementation operational and visually reviewed;
+- SVG/PDF/PNG artifacts: one-page public and private builds pass structural, semantic, privacy, renderer-parity, and first visual QA;
 - cold-start validation: not yet performed.
+
+## First implementation result
+
+The first rendered prototype used the originally planned two-page structure.
+Visual inspection showed that the locked content occupied only approximately the
+upper half of each sheet, producing the appearance of a one-page résumé
+artificially split across two pages.
+
+The page budget and production specification were therefore explicitly revised
+to one U.S.-Letter page without changing the locked résumé claims or bullets.
+
+The revised one-page build:
+
+- preserves the locked semantic content;
+- preserves selectable/extractable PDF text;
+- fits within the established minimum typography constraints;
+- passes independent Poppler/Ghostscript rendering checks;
+- keeps private submission fields confined to the ignored private build; and
+- is visually dense but readable, with research remaining the dominant section.
+
+This completes the first real build-and-revision cycle. Cold-start validation of
+the workflow remains separate.
 
 ## Intended implementation sequence
 

@@ -151,11 +151,26 @@ The NREIP 2027 application has now exercised phases 1–6 through authoritative
 application research, candidate-evidence reconciliation, target mapping, content
 planning, user content lock, and a production-locked rendering specification.
 
-It is entering phase 7: the first reproducible SVG/PDF implementation.
+The first NREIP SVG/PDF artifact has now been built, rendered, visually
+inspected, and revised once.
 
-Do not generalize additional production rules into this parent workflow until the
-first artifact has been built, rendered, inspected, and revised from actual
-implementation evidence.
+That implementation produced one reusable workflow lesson:
+
+**page count is a production hypothesis until the first real render is visually
+inspected.**
+
+The original NREIP two-page target was reasonable during content planning but
+proved substantially under-filled when rendered. The page budget and production
+specification were explicitly revised to one page while the locked résumé claims
+and bullets remained unchanged.
+
+Therefore, when future résumé visual QA shows that pagination or page density is
+wrong, revise the owning page-budget/production decision explicitly. Do not
+silently rewrite résumé content merely to satisfy the original page-count
+assumption.
+
+Further production rules should still be generalized only from demonstrated
+implementation evidence rather than speculation.
 
 ## Maturity boundary
 

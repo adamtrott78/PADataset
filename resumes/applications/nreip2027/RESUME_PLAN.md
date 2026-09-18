@@ -80,9 +80,20 @@ The portal does not establish a résumé page limit.
 
 ### Working page budget
 
-**Content target: two pages.**
+**Content target: one page.**
 
 This is a content-planning decision, not an NREIP requirement.
+
+The initial production specification tested a two-page layout. The first rendered
+artifact demonstrated that the locked content occupied only roughly the upper
+half of each page and therefore behaved visually like a one-page résumé split
+artificially across two sheets.
+
+Based on that implementation evidence, the candidate explicitly revised the
+page-budget decision to **one page**.
+
+This revision changes pagination and layout only. It does not remove, shorten,
+rewrite, or add résumé content.
 
 A two-page target is justified at this stage because the candidate has:
 
@@ -201,7 +212,7 @@ through target relevance.
 | Docker/Linux/networking/security tools | Systems/cybersecurity | CORE, SELECTIVE | Technical Skills | Verified current |
 | ROS2/Gazebo | Autonomy/modeling/simulation | INCLUDE | Technical Skills and/or operational-AI entry | Verified current |
 | Flask/MongoDB/Nginx | Software/systems | CONDITIONAL | Include where space permits, especially with KMS | Verified current |
-| NFPA IT internship | General IT/systems experience | OMIT | Strong historical evidence, but lower relevance than current research/teaching within the two-page budget | Verified historical |
+| NFPA IT internship | General IT/systems experience | OMIT | Strong historical evidence, but lower relevance than current research/teaching within the one-page budget | Verified historical |
 | WBMSHS IT support | General IT experience | OMIT BY DEFAULT | Restore only if target-specific need emerges | Verified historical |
 | iD Tech instructor | Teaching/communication | OMIT BY DEFAULT | Teaching evidence already stronger elsewhere | Verified historical |
 | Maintenance technician | General employment | OMIT | Low target relevance | Verified historical |
@@ -479,7 +490,7 @@ Do not infer that "private" means "omit from the final résumé."
 WBMSHS IT support, maintenance work, and other low-relevance history are omitted
 from the working NREIP content budget.
 
-NFPA is also omitted from the NREIP two-page content budget. It remains in the
+NFPA is also omitted from the NREIP one-page content budget. It remains in the
 candidate evidence ledger for future applications.
 
 ### Generic objective statement
@@ -494,7 +505,7 @@ be used for evidence rather than a generic objective.
 **CONTENT LOCKED.**
 
 The candidate has approved the résumé content architecture, exact public-safe
-copy, two-page content target, private professional contact-field policy, and
+copy, one-page content target, private professional contact-field policy, and
 mandatory private government-application credential treatment.
 
 The exact private values remain owned by the ignored private overlay and must be
@@ -645,7 +656,7 @@ Dartmouth** | Sep.–Dec. 2025
 ### Explicit omissions from this NREIP version
 
 The following verified evidence is deliberately omitted from the current
-two-page content target:
+one-page content target:
 
 - NFPA Help Desk / IT internship;
 - WBMSHS IT support;
