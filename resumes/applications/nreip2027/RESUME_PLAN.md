@@ -95,7 +95,9 @@ page-budget decision to **one page**.
 This revision changes pagination and layout only. It does not remove, shorten,
 rewrite, or add résumé content.
 
-A two-page target is justified at this stage because the candidate has:
+The one-page target is now supported by implementation evidence: the locked
+content fits on one U.S.-Letter page while preserving the established minimum
+typography and retaining:
 
 - current Ph.D.-level academic work;
 - two first-author research papers;
@@ -104,10 +106,10 @@ A two-page target is justified at this stage because the candidate has:
 - cybersecurity and digital-forensics teaching experience; and
 - technical skills that directly map to the screened laboratories.
 
-Do not expand content merely to fill two pages.
+Do not expand content or restore lower-priority evidence merely to fill space.
 
-Before initial content lock, perform a content-density review against the
-two-page target using the planned sections and bullet budget.
+Future page-density decisions must be based on an actual rendered artifact rather
+than an assumed page count.
 
 After content lock, production may render the artifact. If the rendered result
 reveals a real density, hierarchy, or fit problem, explicitly reopen this plan,

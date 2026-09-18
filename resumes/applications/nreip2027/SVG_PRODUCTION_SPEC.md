@@ -98,8 +98,7 @@ Target content margins:
 
 - left: 38 pt;
 - right: 38 pt;
-- top: 32 pt on page 1;
-- top: 34 pt on page 2;
+- top: 32 pt;
 - bottom: minimum 30 pt.
 
 No visible text or rules may enter the margin safety area.
@@ -559,7 +558,7 @@ The resulting PDF must retain extractable text.
 Private submission PDF must be:
 
 - exactly 1 page;
-- U.S. Letter on both pages;
+- U.S. Letter page size;
 - less than **1 MB**;
 - free of passwords/encryption;
 - visually intact;
