@@ -31,7 +31,7 @@ content-locked.
 - authenticated portal résumé guidance: captured;
 - PDF and `< 1 MB` resume artifact constraints: established;
 - portal-upload requiredness: not explicitly established by supplied guideline;
-- target laboratory choices: not yet locked;
+- target laboratory choices: selected in portal and captured in application context;
 - resume content architecture and exact résumé copy: content-locked;
 - SVG production specification: next required production step;
 - builder: not yet created;
