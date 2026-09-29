@@ -55,10 +55,10 @@ A rendering session should read these in this order:
 
 Read the broader repository only if a scientific ambiguity remains:
 
-4. [../../papers/CONTEXT.md](../../papers/CONTEXT.md) — paper-writing and evidence discipline.
-5. [../../papers/milcom2026/CONTEXT.md](../../papers/milcom2026/CONTEXT.md) — MILCOM paper tooling and provenance.
-6. [../../experiments/context/DQNGUARD.md](../../experiments/context/DQNGUARD.md) — DQNGuard lineage and claim boundaries.
-7. [../../experiments/context/RESULTS.md](../../experiments/context/RESULTS.md) — final result interpretation and provenance.
+5. [../../papers/CONTEXT.md](../../papers/CONTEXT.md) — paper-writing and evidence discipline.
+6. [../../papers/milcom2026/CONTEXT.md](../../papers/milcom2026/CONTEXT.md) — MILCOM paper tooling and provenance.
+7. [../../experiments/context/DQNGUARD.md](../../experiments/context/DQNGUARD.md) — DQNGuard lineage and claim boundaries.
+8. [../../experiments/context/RESULTS.md](../../experiments/context/RESULTS.md) — final result interpretation and provenance.
 
 Do not read the repository recursively. Follow these routes only as needed.
 
