@@ -1,5 +1,13 @@
 # MILCOM 2026 SVG sources
 
+## Official MILCOM 2026 template integration
+
+The conference-provided PDF/PPTX template now owns the final slide background, content header, logos, and footer.
+
+The scientific/body SVG builder remains unchanged. The canonical rebuild wrapper first regenerates those SVGs and then applies the official template deterministically.
+
+The SVG files currently committed at the migration source checkpoint predate that final template pass until the wrapper is executed and the generated slides are reviewed/committed.
+
 Bounded correction to the `e93f11b` deck (Slides 7, 8, and 10 only):
 Slide 7 carries the fitted DQN, guard bands, and threshold into neutral final
 evaluation with separately colored known-test and target-unknown components.
@@ -33,14 +41,13 @@ The planning documents and canonical scientific assets are unchanged.
 From the repository root:
 
 ```sh
-python presentations/milcom2026/tools/build_svg_slides.py
+python presentations/milcom2026/tools/build_milcom26_svg_slides.py
 ```
 
+The wrapper runs the locked scientific/body builder and then `apply_milcom26_template.py`, which renders the committed official template PDF and applies page 1 to Slide 1 and page 2 to Slides 2–12.
+
 Dependencies: Python 3 with Pillow, fontconfig (`fc-match`), and Poppler
-(`pdftocairo`). The builder uses the local Arial fallback for text measurement;
-slide text declares `Arial, Helvetica, sans-serif` and has no external font or CSS
-dependency. It builds slides in numerical order, checks XML, unique IDs, text
-sizes and estimated text bounds, and writes only the twelve slide SVGs.
+(`pdftocairo`). The scientific/body builder continues to use the local Arial fallback for validated body-text measurement. The MILCOM header title uses Calibri when available, with a metrics-compatible fallback such as Carlito. The final slides remain standalone 1920×1080 SVGs.
 
 Slide 6 is converted directly from
 `../assets/figures/hero_dqnguard_pipeline_s23_tikz.pdf`; its full vector artwork,

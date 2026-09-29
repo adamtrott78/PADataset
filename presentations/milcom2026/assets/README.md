@@ -21,6 +21,10 @@ assets/
 │   ├── wifi/
 │   ├── bluetooth/
 │   └── zigbee/
+├── template/
+│   ├── milcom26-ppt-template_v1_25feb26_jb.pdf
+│   ├── milcom26-ppt-template_v1_25feb26_jb.pptx
+│   └── template.md
 └── README.md
 ```
 
@@ -41,6 +45,18 @@ Use:
 `figures/target_surrogate_unknown_f1_matrix.png`
 
 This is the reviewed presentation asset for Slide 9. Do not manually reconstruct its scientific values from memory. If a vector version is later required, regenerate it from the reviewed paper/result provenance rather than retyping cells.
+
+## Official MILCOM 2026 template
+
+Use the committed conference files under `template/`.
+
+- the PDF is the deterministic visual source for SVG background/header/footer integration;
+- the PPTX is the conference template source for final PowerPoint assembly;
+- PDF page 1 is the blank title background;
+- PDF page 2 is the blank content background;
+- PDF pages 3–4 are populated examples and are not used as production backgrounds.
+
+Do not modify the official template files in place. The integration contract is `../MILCOM_TEMPLATE_INTEGRATION.md`.
 
 ## OTA imagery
 

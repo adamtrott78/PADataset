@@ -48,9 +48,10 @@ Use the same communication heuristics that guided the paper, tightened for a spo
 
 A rendering session should read these in this order:
 
-1. [SVG_PRODUCTION_SPEC.md](SVG_PRODUCTION_SPEC.md) — **production authority for SVG geometry, typography, palette, object hierarchy, asset use, and exact slide composition.**
-2. [PRESENTATION_PLAN.md](PRESENTATION_PLAN.md) — canonical scientific/design provenance: audience takeaway, rationale, claims, numbers, and forbidden interpretations.
-3. [SCRIPT.md](SCRIPT.md) — spoken script for Slides 2–12. The Slide 1 opening script is currently embedded in `SVG_PRODUCTION_SPEC.md`.
+1. [MILCOM_TEMPLATE_INTEGRATION.md](MILCOM_TEMPLATE_INTEGRATION.md) — **official MILCOM 2026 branding/frame authority; supersedes the older custom background/title treatment.**
+2. [SVG_PRODUCTION_SPEC.md](SVG_PRODUCTION_SPEC.md) — **scientific/body SVG geometry, typography, palette, object hierarchy, asset use, and exact slide composition.**
+3. [PRESENTATION_PLAN.md](PRESENTATION_PLAN.md) — canonical scientific/design provenance: audience takeaway, rationale, claims, numbers, and forbidden interpretations.
+4. [SCRIPT.md](SCRIPT.md) — spoken script for Slides 2–12. The Slide 1 opening script is currently embedded in `SVG_PRODUCTION_SPEC.md`.
 
 Read the broader repository only if a scientific ambiguity remains:
 
@@ -66,9 +67,10 @@ Do not read the repository recursively. Follow these routes only as needed.
 For production work:
 
 1. scientific claim / numerical conflict -> `PRESENTATION_PLAN.md` and reviewed result provenance win;
-2. SVG/layout/rendering conflict -> `SVG_PRODUCTION_SPEC.md` wins;
-3. narration wording -> `SCRIPT.md` wins except for Slide 1, whose opening script is in `SVG_PRODUCTION_SPEC.md`;
-4. camera-ready paper title/author/affiliation block is authoritative for Slide 1.
+2. official conference background/header/footer/title-frame conflict -> `MILCOM_TEMPLATE_INTEGRATION.md` wins;
+3. scientific/body SVG geometry conflict -> `SVG_PRODUCTION_SPEC.md` wins;
+4. narration wording -> `SCRIPT.md` wins except for Slide 1, whose opening script is in `SVG_PRODUCTION_SPEC.md`;
+5. camera-ready paper title/author/affiliation block is authoritative for Slide 1.
 
 An older `PRESENTATION_PLAN.md` status may still call Slide 1 `TBD`; that marker is stale. Slide 1 is now concept locked in `SVG_PRODUCTION_SPEC.md`.
 
@@ -144,14 +146,15 @@ The intellectual climax remains:
 
 - Slide 1: **concept locked; camera-ready title/author identity, 58/42 title layout, hero preview, and opening script are specified**
 - Slides 2–12: **concept locked**
-- Deck-wide visual system: **locked in `SVG_PRODUCTION_SPEC.md`**
+- Official MILCOM 2026 conference template: **committed and required via `MILCOM_TEMPLATE_INTEGRATION.md`**
+- Scientific/body visual system: **locked in `SVG_PRODUCTION_SPEC.md`**
 - Per-slide 16:9 SVG geometry/object hierarchy: **locked in `SVG_PRODUCTION_SPEC.md`**
 - Spoken script: **complete for Slides 2–12; Slide 1 opening retained in the SVG spec**
 - Camera-ready DQNGuard hero asset: **available**
 - Target-Surrogate Matrix presentation asset: **available**
 - OTA image directories: **reserved; final imagery still pending**
-- Final SVG slides: **not yet built**
-- Final PowerPoint: **not yet assembled**
+- Final SVG slides: **pre-template SVGs exist; rebuild through `tools/build_milcom26_svg_slides.py` before final QA**
+- Final PowerPoint: **not yet assembled from the official conference PPTX**
 
 ## Presentation assets
 
@@ -166,6 +169,10 @@ presentations/milcom2026/assets/
 │   ├── wifi/
 │   ├── bluetooth/
 │   └── zigbee/
+├── template/
+│   ├── milcom26-ppt-template_v1_25feb26_jb.pdf
+│   ├── milcom26-ppt-template_v1_25feb26_jb.pptx
+│   └── template.md
 └── README.md
 ```
 
@@ -173,6 +180,7 @@ Asset rules are defined in `SVG_PRODUCTION_SPEC.md`.
 
 Important constraints:
 
+- use the committed official MILCOM 2026 template backgrounds for every final slide;
 - use the committed **s23** camera-ready hero PDF, not older hero revisions;
 - use the reviewed Target-Surrogate Matrix asset or intentionally regenerate it from reviewed provenance;
 - never fabricate OTA scientific imagery for Slides 3–4;
@@ -180,7 +188,7 @@ Important constraints:
 
 ## SVG-production handoff
 
-A ChatGPT Work / artifact-building session should treat `SVG_PRODUCTION_SPEC.md` as an implementation specification, not a brainstorming prompt.
+A ChatGPT Work / artifact-building session should read `MILCOM_TEMPLATE_INTEGRATION.md` first, then treat `SVG_PRODUCTION_SPEC.md` as the scientific/body implementation specification rather than a brainstorming prompt.
 
 The builder should not silently redesign a locked slide into a generic corporate template. Styling is already normalized across the deck; preserve:
 
@@ -221,7 +229,7 @@ After every SVG, render it to 1920×1080 PNG and visually QA clipping, readabili
 
 ## Handoff rule for another ChatGPT
 
-Start from this file, then read `SVG_PRODUCTION_SPEC.md`.
+Start from this file, then read `MILCOM_TEMPLATE_INTEGRATION.md`, followed by `SVG_PRODUCTION_SPEC.md`.
 
 Consult `PRESENTATION_PLAN.md` for scientific rationale or claim boundaries rather than re-deriving the research story.
 
