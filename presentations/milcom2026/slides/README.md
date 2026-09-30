@@ -1,5 +1,14 @@
 # MILCOM 2026 SVG sources
 
+Bounded visual correction after official-template QA:
+Slide 5 uses explicit shaft/base arrow geometry for its short vertical connectors
+so no center stroke protrudes through the arrowhead, restores the rounded
+known/unknown output node in the DQN-style panel, and restores rounded nodes for
+Detect unknowns and Preserve known classifications in the deployment panel.
+Slide 12 restores rounded nodes around VarMax surrogate-all philosophy and
+DQNGuard budgeted decision layer. No scientific values, narrative claims,
+template branding, or other slide layouts change.
+
 ## Official MILCOM 2026 template integration
 
 The conference-provided PDF/PPTX template now owns the final slide background, content header, logos, and footer.

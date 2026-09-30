@@ -95,6 +95,19 @@ class Slide:
     def arrow(self,pts,color=INK,id=None):
         attr=f' id="{id}"' if id else ''
         self.add(f'<polyline{attr} points="'+ ' '.join(f'{x},{y}' for x,y in pts)+f'" fill="none" stroke="{color}" stroke-width="4" stroke-linecap="round" stroke-linejoin="round" marker-end="url(#arrow{color[1:]})"/>')
+    def down_arrow(self,x,y1,tip_y,color=INK,id=None,head=12):
+        """Vertical arrow whose shaft terminates at the arrowhead base.
+
+        Use for short vertical connectors where an SVG marker can leave the
+        center stroke visibly protruding through the triangular point.
+        """
+        base=tip_y-head
+        half=head*0.62
+        attr=f' id="{id}"' if id else ''
+        self.add(f'<g{attr}>')
+        self.add(f'<line x1="{x}" y1="{y1}" x2="{x}" y2="{base}" stroke="{color}" stroke-width="4" stroke-linecap="butt"/>')
+        self.add(f'<polygon points="{x-half},{base} {x+half},{base} {x},{tip_y}" fill="{color}"/>')
+        self.add('</g>')
     def node(self,id,x,y,w,h,label,color=INK,size=26,bold=True,fill=None):
         with self.group(id):
             self.rect(x,y,w,h,fill or TINT.get(color,'white'),color if color!=INK else BORDER)
@@ -377,26 +390,26 @@ def slide05():
         for i,label in enumerate(['classifier evidence','unknownness score','threshold','known / unknown']):
             y=392+i*92
             s.node('varmax_'+str(i),176,y,400,60,label,size=26,bold=False)
-            if i<3:s.arrow([(376,y+61),(376,y+85)])
+            if i<3:s.down_arrow(376,y+61,y+85)
         s.text(126,817,'✓ useful unknownness evidence',24,color=GREEN)
         s.text(126,860,'✕ threshold choice can sacrifice known samples',24,color=SECOND,maxw=500)
     with s.group('dqn_style_panel'):
         s.rect(680,250,560,675)
         s.text(708,300,['DQN-STYLE CONFIDENCE','HEAD'],29,True)
         s.node('confidence_state',810,390,300,135,'P1\nP1 − P2\nH(p)',size=26,bold=False)
-        s.arrow([(960,526),(960,566)])
+        s.down_arrow(960,526,566)
         s.node('learned_decision',760,575,400,66,'learned decision',size=26)
-        s.arrow([(960,642),(960,688)])
-        s.text(960,727,'known / unknown',27,anchor='middle')
+        s.down_arrow(960,642,684)
+        s.node('dqn_output',760,690,400,60,'known / unknown',size=26,bold=False)
         s.text(710,817,'✓ learned decision boundary',24,color=GREEN)
         s.text(710,860,'✕ no explicit guarantee on known rejection',24,color=SECOND,maxw=500)
     with s.group('operating_requirement_panel'):
         s.rect(1264,250,560,675,stroke=BLUE,sw=4)
         s.text(1292,300,['WHAT DEPLOYMENT','ACTUALLY NEEDS'],29,True)
-        s.text(1544,440,'Detect unknowns',31,True,anchor='middle')
-        s.text(1544,492,'+',36,anchor='middle')
-        s.text(1544,548,'Preserve known classifications',28,anchor='middle')
-        s.arrow([(1544,573),(1544,624)],BLUE)
+        s.node('detect_unknowns',1320,394,448,64,'Detect unknowns',size=29)
+        s.text(1544,493,'+',36,anchor='middle')
+        s.node('preserve_known',1320,510,448,64,'Preserve known classifications',size=26,bold=False)
+        s.down_arrow(1544,578,624,BLUE)
         s.node('explicit_budget',1300,639,488,111,'EXPLICIT KNOWN-REJECTION\nBUDGET',BLUE,27)
         s.text(1300,815,'Reject unfamiliar behavior — but only within a controlled known-sample cost.',27,True,maxw=488,leading=34)
     s.save()
@@ -611,10 +624,10 @@ def slide12():
                 s.text(x+28,660,['Best surrogate changes with the target','Several mismatched pairs approach F1 ≈ 0','No simple target-blind selector was reliable'],23,leading=34)
                 s.text(x+28,793,'Calibration transfer is directional and behavior dependent.',26,True,maxw=504,leading=32)
             else:
-                s.text(x+280,402,'VarMax surrogate-all philosophy',25,anchor='middle',id='varmax_node')
-                s.text(x+280,446,'+',32,anchor='middle')
-                s.text(x+280,490,'DQNGuard budgeted decision layer',25,anchor='middle',id='dqnguard_node')
-                s.arrow([(x+280,510),(x+280,548)],PURPLE,id='merge_arrow')
+                s.node('varmax_node',x+52,350,456,66,'VarMax surrogate-all philosophy',size=24,bold=False)
+                s.text(x+280,454,'+',32,anchor='middle')
+                s.node('dqnguard_node',x+52,470,456,66,'DQNGuard budgeted decision layer',size=24,bold=False)
+                s.down_arrow(x+280,538,554,PURPLE,id='merge_arrow',head=10)
                 s.node('future_node',x+28,563,504,83,'MULTI-SURROGATE DQNGUARD?',PURPLE,27)
                 s.text(x+28,686,'FUTURE WORK — ARCHITECTURAL REDESIGN REQUIRED',21,True,PURPLE,maxw=504,leading=26)
                 s.text(x+28,753,"Goal: retain DQNGuard's Unknown F1, OSR macro F1, and explicit known-rejection budget while reducing single-surrogate dependence.",24,maxw=504,leading=29)
