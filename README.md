@@ -12,6 +12,25 @@ additional sources it names. Each context explains the model, executable owners,
 inputs, commands, expected outputs, and verification limits. Inspect the relevant
 code/configuration before changing a command or interpreting a default.
 
+### Shared operator and control-plane route
+
+PADataset remains authoritative for its scientific model, executable behavior,
+datasets, experiments, results, papers, project-specific contexts, and
+project-specific validation. For repository mutation, Git synchronization,
+runtime coordination, executor handoff, or durable task-capsule work, also enter
+the shared control plane through the
+[workspace-control root route](https://github.com/adamtrott78/workspace-control)
+and follow its routed
+[Shared Operator Workflow](https://github.com/adamtrott78/workspace-control/blob/main/policies/OPERATOR_WORKFLOW.md).
+
+If a durable task capsule pins an exact workspace-control workflow/checkpoint,
+use that pinned identity rather than silently substituting a newer shared
+contract. Keep generic operator semantics in workspace-control; PADataset's
+README and scoped `CONTEXT.md` files continue to own only project/domain
+routing, scientific truth, executable ownership, and project-specific
+verification.
+
+
 Before modifying an existing checkout, establish its state:
 
 ```bash
