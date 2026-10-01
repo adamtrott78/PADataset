@@ -608,9 +608,9 @@ Automated extracted-text QA must verify that every renderer-owned résumé conte
 string survives into the PDF, including education, metadata, coursework, skills,
 research, publications, and technical/teaching experience.
 
-Human semantic/visual review must additionally inspect structure and repetition
-that simple substring-presence checks cannot establish reliably, including
-duplicated blocks and incorrect ordering.
+A capable executor or human reviewer must additionally inspect structure and
+repetition that simple substring-presence checks cannot establish reliably,
+including duplicated blocks and incorrect ordering.
 
 Any missing content, duplicated block, changed number, changed publication title,
 or altered status is a QA failure.
@@ -654,9 +654,11 @@ Automated secondary-renderer QA may verify that both renderers successfully
 produce the expected page dimensions. That check is a **sanity check**, not pixel
 or layout equivalence.
 
-Human visual QA remains responsible for identifying clipping, glyph
-substitution, font behavior, or layout defects that a dimension-only automated
-check cannot detect.
+Visual QA remains mandatory for clipping, glyph substitution, font behavior,
+and layout defects that a dimension-only automated check cannot detect. A
+capable executor with access to the rendered page may satisfy this inspection;
+require a human gate only when the owning application or delivery decision
+explicitly requires substantive judgment or approval.
 
 Any visually material renderer disagreement is a QA failure until understood.
 

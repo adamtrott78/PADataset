@@ -8,6 +8,25 @@ The first live implementation case is **NREIP 2027**. The workflow should be
 allowed to evolve from that real implementation rather than having a complete
 resume architecture invented in advance.
 
+## Shared document-artifact mechanics binding
+
+The resume/application domain reuses the executor-neutral document-artifact
+mechanics pinned in the repository-root `workspace-control.lock.json`.
+
+That binding is mechanics-only. workspace-control may define the reusable
+source -> build -> structural validation -> render -> visual QA -> bounded
+revision -> delivery lifecycle, but PADataset remains authoritative for
+candidate evidence, target/application evidence, content plans, production
+specifications, private/public boundaries, deterministic application commands,
+and submission semantics.
+
+Do not substitute a newer shared workflow merely because one exists. Changing
+the pinned workflow identity is an explicit migration that must be validated
+against this domain before use.
+
+The current repository-separation decision and lifecycle mapping are documented
+in `WORKFLOW_INTEGRATION.md`.
+
 ## Purpose and artifact contract
 
 The workflow turns:
@@ -58,6 +77,7 @@ For ordinary resume work, read only what the task requires:
 | Need | Read |
 |---|---|
 | Understand the resume workflow and authority model | this file |
+| Understand the shared document-build binding, lifecycle mapping, or repository-separation decision | `WORKFLOW_INTEGRATION.md` |
 | Understand the candidate's public-safe professional history | `context/PROFILE.md` |
 | Verify whether a candidate claim is supported | `context/EVIDENCE.md` |
 | Decide how to analyze and tailor for a target | `context/TAILORING.md` |
@@ -192,7 +212,7 @@ no issue that materially prevents safe public regeneration.
 Known nonblocking limitations remain:
 
 - system/Python-package renderer versions are not hermetically pinned;
-- final visual correctness still requires human review;
+- rendered visual inspection remains mandatory; a capable executor may satisfy it, while substantive human judgment is required only when the owning application or delivery decision explicitly needs it;
 - final portal receipt requires portal-side upload/download verification; and
 - the private submission artifact intentionally requires ignored local inputs and
   cannot be reproduced from the public repository alone.

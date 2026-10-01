@@ -1,0 +1,18 @@
+{
+  "schema_version": 1,
+  "workspace_control": {
+    "repository": "adamtrott78/workspace-control",
+    "checkpoint_sha": "0bb8705e7a416bb064f3cd6c877e9d3fe559c8b9",
+    "bindings": [
+      {
+        "scope": "resumes/**",
+        "workflow": {
+          "workflow_id": "document-artifact-build-v1",
+          "path": "workflows/document-artifact-build.v1.json",
+          "content_sha": "0d66b919acdd2e51c08d2e8496c41dc22aed47c4"
+        },
+        "authority": "shared artifact mechanics only; resume/application domain truth remains project-owned"
+      }
+    ]
+  }
+}

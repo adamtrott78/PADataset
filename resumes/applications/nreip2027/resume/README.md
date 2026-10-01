@@ -150,7 +150,10 @@ A successful public build validates, among other things:
 The dual-render automated check is a dimension/existence sanity check, not
 pixel-equivalence or complete visual QA.
 
-Human inspection of `page1.png` remains required.
+Inspection of `page1.png` remains required. A capable executor with rendered
+image-inspection tooling may satisfy this gate; require human review only when
+the owning application or delivery decision explicitly needs substantive
+judgment or approval.
 
 ## Private build
 
@@ -252,7 +255,9 @@ Check the criteria in `../SVG_PRODUCTION_SPEC.md`, including:
 - excessive whitespace;
 - unprofessional compression.
 
-The private artifact governs submission readiness.
+The private artifact governs submission readiness. Visual inspection may be
+performed by a capable executor or a human reviewer; the criterion is adequate
+inspection of the owning visual contract, not a particular executor identity.
 
 ## Portal-specific final QA
 
