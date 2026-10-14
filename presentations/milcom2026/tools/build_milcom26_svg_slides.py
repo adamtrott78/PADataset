@@ -14,6 +14,7 @@ def run(script: str) -> None:
 
 def main() -> None:
     run("build_svg_slides.py")
+    run("refine_pa_taxonomy_slide.py")
     run("apply_milcom26_template.py")
     print("Built 12 MILCOM-template SVG slides.")
 
