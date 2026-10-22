@@ -1,0 +1,335 @@
+name: PADataset Lambda CI GPU Canary
+
+on:
+  issue_comment:
+    types: [created]
+
+permissions:
+  contents: read
+  pull-requests: read
+
+jobs:
+  padataset-gpu:
+    name: "${{ format('wc-admission-v1|workload=gpu-ci|pr={0}|request={1}', github.event.issue.number, github.event.comment.body) }}"
+    if: >-
+      github.event.issue.pull_request &&
+      github.actor == 'adamtrott78' &&
+      github.event.comment.author_association == 'OWNER' &&
+      startsWith(github.event.comment.body, '/lambda-ci-gpu ')
+    runs-on: lambda-padataset-gpu
+    timeout-minutes: 10
+
+    steps:
+      - name: Verify exact PR head
+        id: gate
+        env:
+          COMMENT_BODY: ${{ github.event.comment.body }}
+          PR_NUMBER: ${{ github.event.issue.number }}
+          REPOSITORY: ${{ github.repository }}
+          GH_TOKEN: ${{ github.token }}
+        shell: bash
+        run: |
+          set -Eeuo pipefail
+
+          expected_sha="$(printf '%s\n' "$COMMENT_BODY" | awk '{print $2}')"
+          [[ "$expected_sha" =~ ^[0-9a-f]{40}$ ]] || {
+            echo "Invalid /lambda-ci-gpu SHA" >&2
+            exit 20
+          }
+
+          pr_json="$(
+            curl -fsSL \
+              -H "Accept: application/vnd.github+json" \
+              -H "Authorization: Bearer $GH_TOKEN" \
+              -H "X-GitHub-Api-Version: 2022-11-28" \
+              "https://api.github.com/repos/$REPOSITORY/pulls/$PR_NUMBER"
+          )"
+
+          actual_sha="$(
+            python3 -c 'import json,sys; print(json.load(sys.stdin)["head"]["sha"])' \
+              <<<"$pr_json"
+          )"
+
+          [[ "$actual_sha" == "$expected_sha" ]] || {
+            echo "Requested SHA does not match current PR head" >&2
+            exit 21
+          }
+
+          echo "expected_sha=$expected_sha" >> "$GITHUB_OUTPUT"
+
+      - name: Prove bounded PADataset GPU runner
+        id: preflight
+        env:
+          EXPECTED_SHA: ${{ steps.gate.outputs.expected_sha }}
+        shell: bash
+        run: |
+          set -Eeuo pipefail
+
+          [[ "$(id -un)" == "ci-padataset" ]]
+          [[ -n "${RUNNER_NAME:-}" ]]
+          [[ -n "${RUNNER_TEMP:-}" ]]
+          [[ -n "${XDG_CACHE_HOME:-}" ]]
+          [[ -n "${P5_GPU_TARGET_UUID:-}" ]]
+          [[ -n "${P5_GPU_SELECTED_DEVICE:-}" ]]
+          [[ -n "${P5_GPU_DENIED_DEVICES:-}" ]]
+          [[ "${CUDA_VISIBLE_DEVICES:-}" == "$P5_GPU_TARGET_UUID" ]]
+          [[ "$P5_GPU_TARGET_UUID" == "GPU-a333e68b-d1dc-6d25-1678-97b527bf55ea" ]]
+
+          runner_dir="$(dirname "$(dirname "$RUNNER_TEMP")")"
+          job_dir="$(dirname "$runner_dir")"
+          job_root="/srv/workspace-ci/padataset/jobs"
+          staging_root="/srv/workspace-ci/padataset/staging-cache"
+          staging_dir="$(dirname "$XDG_CACHE_HOME")"
+
+          [[ "$job_dir" == "$job_root"/p5-* ]]
+          [[ "$staging_dir" == "$staging_root"/p5-* ]]
+          [[ -d "$job_dir" ]]
+          [[ -d "$staging_dir" ]]
+
+          mapfile -t job_dirs < <(
+            find "$job_root" -mindepth 1 -maxdepth 1 -type d -name 'p5-*' -printf '%f\n' | sort
+          )
+          mapfile -t staging_dirs < <(
+            find "$staging_root" -mindepth 1 -maxdepth 1 -type d -name 'p5-*' -printf '%f\n' | sort
+          )
+
+          [[ "${#job_dirs[@]}" -eq 1 ]]
+          [[ "${#staging_dirs[@]}" -eq 1 ]]
+          [[ "${job_dirs[0]}" == "$(basename "$job_dir")" ]]
+          [[ "${staging_dirs[0]}" == "$(basename "$staging_dir")" ]]
+
+          if find "$job_root" "$staging_root" -name '.padataset-run4-gpu-marker-*' -print -quit | grep -q .; then
+            echo "Stale PADataset GPU marker survived prior cleanup" >&2
+            exit 30
+          fi
+
+          [[ ! -r /home/atrott ]]
+          [[ ! -r /home/atrott/.ssh ]]
+          [[ ! -r /home/atrott/adamArchives/Adam/workspace-control ]]
+          [[ ! -r /srv/workspace-ci/research-engine ]]
+          [[ ! -r /var/lib/workspace-ci/provisioner ]]
+          [[ ! -r /run/workspace-ci ]]
+
+          if [[ -e /var/run/docker.sock ]]; then
+            [[ ! -r /var/run/docker.sock ]]
+            [[ ! -w /var/run/docker.sock ]]
+          fi
+
+          if timeout 2 bash -c '</dev/tcp/127.0.0.1/5432' 2>/dev/null; then
+            echo "Production PostgreSQL reachable from PADataset GPU job" >&2
+            exit 31
+          fi
+
+          marker=".padataset-run4-gpu-marker-${GITHUB_RUN_ID}"
+          printf '%s\n' "$EXPECTED_SHA" > "$job_dir/$marker"
+          printf '%s\n' "$EXPECTED_SHA" > "$staging_dir/$marker"
+
+          {
+            echo "runner_name=$RUNNER_NAME"
+            echo "job_dir_id=$(basename "$job_dir")"
+            echo "staging_dir_id=$(basename "$staging_dir")"
+          } >> "$GITHUB_OUTPUT"
+
+      - name: Checkout exact candidate SHA
+        uses: actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683 # v4.2.2
+        with:
+          repository: ${{ github.repository }}
+          ref: ${{ steps.gate.outputs.expected_sha }}
+          fetch-depth: 1
+          persist-credentials: false
+          clean: true
+
+      - name: Execute non-scientific GPU canary
+        env:
+          EXPECTED_SHA: ${{ steps.gate.outputs.expected_sha }}
+          PR_NUMBER: ${{ github.event.issue.number }}
+          ACTOR: ${{ github.actor }}
+          RUNNER_NAME_VALUE: ${{ steps.preflight.outputs.runner_name }}
+          JOB_DIR_ID: ${{ steps.preflight.outputs.job_dir_id }}
+          STAGING_DIR_ID: ${{ steps.preflight.outputs.staging_dir_id }}
+        shell: bash
+        run: |
+          set -Eeuo pipefail
+
+          [[ "$(git rev-parse HEAD)" == "$EXPECTED_SHA" ]]
+
+          if git config --local --get-regexp '^http\..*\.extraheader$' >/dev/null 2>&1; then
+            echo "Checkout credentials remained in candidate git config" >&2
+            exit 40
+          fi
+
+          python3 - <<'PY'
+          import ctypes
+          import ctypes.util
+          import json
+          import os
+          import pathlib
+          import subprocess
+          import traceback
+
+          receipt_path = pathlib.Path(os.environ["RUNNER_TEMP"]) / "padataset-lambda-ci-gpu-receipt.json"
+          expected_uuid = os.environ["P5_GPU_TARGET_UUID"]
+          selected_device = os.environ["P5_GPU_SELECTED_DEVICE"]
+          denied_devices = [
+              item for item in os.environ["P5_GPU_DENIED_DEVICES"].split(",") if item
+          ]
+          support_devices = [
+              item for item in os.environ.get("P5_GPU_SUPPORT_DEVICES", "").split(",") if item
+          ]
+
+          receipt = {
+              "schema_version": 1,
+              "phase": "PADataset-Run4-GPU-canary",
+              "decision": "FAIL",
+              "failure_stage": "device-boundary",
+              "expected_sha": os.environ["EXPECTED_SHA"],
+              "actual_sha": subprocess.check_output(
+                  ["git", "rev-parse", "HEAD"], text=True
+              ).strip(),
+              "pr_number": int(os.environ["PR_NUMBER"]),
+              "actor": os.environ["ACTOR"],
+              "runner_name": os.environ["RUNNER_NAME_VALUE"],
+              "runner_user": os.environ.get("USER"),
+              "uid": os.getuid(),
+              "gid": os.getgid(),
+              "job_dir_id": os.environ["JOB_DIR_ID"],
+              "staging_dir_id": os.environ["STAGING_DIR_ID"],
+              "cuda_visible_devices": os.environ.get("CUDA_VISIBLE_DEVICES"),
+              "target_gpu_uuid": expected_uuid,
+              "selected_gpu_device": selected_device,
+              "denied_gpu_devices": denied_devices,
+              "gpu_support_devices": support_devices,
+              "scale_set_target": "lambda-padataset-gpu",
+              "profile_expected": "gpu-small",
+              "research_engine_root_readable": False,
+              "personal_home_readable": False,
+              "workspace_control_readable": False,
+              "provisioner_state_readable": False,
+              "workspace_ci_socket_directory_readable": False,
+              "docker_access": False,
+              "production_postgres_reachable": False,
+              "checkout_credentials_persisted": False,
+              "scientific_state_materialized": False,
+              "dataset_materialized": False,
+              "training_performed": False,
+              "evaluation_performed": False,
+              "model_server_started": False,
+          }
+
+          def write_receipt():
+              receipt_path.write_text(
+                  json.dumps(receipt, indent=2, sort_keys=True) + "\n",
+                  encoding="utf-8",
+              )
+              print(json.dumps(receipt, indent=2, sort_keys=True))
+
+          try:
+              fd = os.open(selected_device, os.O_RDWR)
+              os.close(fd)
+
+              denied_results = {}
+              for path in denied_devices:
+                  try:
+                      fd = os.open(path, os.O_RDWR)
+                  except OSError as exc:
+                      denied_results[path] = {"denied": True, "errno": exc.errno}
+                  else:
+                      os.close(fd)
+                      denied_results[path] = {"denied": False, "errno": None}
+
+              if not denied_results or not all(row["denied"] for row in denied_results.values()):
+                  raise RuntimeError(
+                      f"non-selected GPU device unexpectedly openable: {denied_results}"
+                  )
+
+              receipt["selected_gpu_device_open"] = True
+              receipt["denied_gpu_device_results"] = denied_results
+              receipt["failure_stage"] = "cuda-init"
+
+              libname = ctypes.util.find_library("cuda") or "libcuda.so.1"
+              cuda = ctypes.CDLL(libname)
+
+              CUdevice = ctypes.c_int
+              CUcontext = ctypes.c_void_p
+              CUdeviceptr = ctypes.c_uint64
+
+              cuda.cuInit.argtypes = [ctypes.c_uint]
+              cuda.cuInit.restype = ctypes.c_int
+              cuda.cuDeviceGetCount.argtypes = [ctypes.POINTER(ctypes.c_int)]
+              cuda.cuDeviceGetCount.restype = ctypes.c_int
+              cuda.cuDeviceGet.argtypes = [ctypes.POINTER(CUdevice), ctypes.c_int]
+              cuda.cuDeviceGet.restype = ctypes.c_int
+              cuda.cuDeviceGetUuid_v2.argtypes = [ctypes.c_void_p, CUdevice]
+              cuda.cuDeviceGetUuid_v2.restype = ctypes.c_int
+              cuda.cuCtxCreate_v2.argtypes = [ctypes.POINTER(CUcontext), ctypes.c_uint, CUdevice]
+              cuda.cuCtxCreate_v2.restype = ctypes.c_int
+              cuda.cuCtxDestroy_v2.argtypes = [CUcontext]
+              cuda.cuCtxDestroy_v2.restype = ctypes.c_int
+              cuda.cuMemAlloc_v2.argtypes = [ctypes.POINTER(CUdeviceptr), ctypes.c_size_t]
+              cuda.cuMemAlloc_v2.restype = ctypes.c_int
+              cuda.cuMemFree_v2.argtypes = [CUdeviceptr]
+              cuda.cuMemFree_v2.restype = ctypes.c_int
+
+              def check(rc, name):
+                  if rc != 0:
+                      raise RuntimeError(f"{name} failed rc={rc}")
+
+              check(cuda.cuInit(0), "cuInit")
+
+              count = ctypes.c_int()
+              check(cuda.cuDeviceGetCount(ctypes.byref(count)), "cuDeviceGetCount")
+              if count.value != 1:
+                  raise RuntimeError(f"expected exactly one CUDA-visible GPU, got {count.value}")
+
+              device = CUdevice()
+              check(cuda.cuDeviceGet(ctypes.byref(device), 0), "cuDeviceGet")
+
+              uuid_buf = (ctypes.c_ubyte * 16)()
+              check(cuda.cuDeviceGetUuid_v2(ctypes.byref(uuid_buf), device), "cuDeviceGetUuid_v2")
+              raw = bytes(uuid_buf)
+              actual_uuid = "GPU-" + (
+                  f"{raw[0:4].hex()}-{raw[4:6].hex()}-{raw[6:8].hex()}-"
+                  f"{raw[8:10].hex()}-{raw[10:16].hex()}"
+              )
+              if actual_uuid.lower() != expected_uuid.lower():
+                  raise RuntimeError(f"CUDA UUID mismatch: {actual_uuid} != {expected_uuid}")
+
+              ctx = CUcontext()
+              check(cuda.cuCtxCreate_v2(ctypes.byref(ctx), 0, device), "cuCtxCreate_v2")
+              ptr = CUdeviceptr()
+              allocation_bytes = 64 * 1024 * 1024
+
+              try:
+                  check(cuda.cuMemAlloc_v2(ctypes.byref(ptr), allocation_bytes), "cuMemAlloc_v2")
+                  check(cuda.cuMemFree_v2(ptr), "cuMemFree_v2")
+                  ptr = CUdeviceptr()
+              finally:
+                  if ptr.value:
+                      cuda.cuMemFree_v2(ptr)
+                  cuda.cuCtxDestroy_v2(ctx)
+
+              receipt.update(
+                  {
+                      "decision": "PASS",
+                      "failure_stage": None,
+                      "cuda_device_count": count.value,
+                      "cuda_device_uuid": actual_uuid,
+                      "allocation_bytes": allocation_bytes,
+                  }
+              )
+              write_receipt()
+          except BaseException as exc:
+              receipt["failure_reason"] = f"{type(exc).__name__}: {exc}"
+              receipt["traceback"] = traceback.format_exc(limit=8)
+              write_receipt()
+              raise
+          PY
+
+      - name: Upload PADataset GPU canary receipt
+        if: always()
+        uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02 # v4.6.2
+        with:
+          name: padataset-lambda-ci-gpu-receipt
+          path: ${{ runner.temp }}/padataset-lambda-ci-gpu-receipt.json
+          if-no-files-found: error
+          retention-days: 7
