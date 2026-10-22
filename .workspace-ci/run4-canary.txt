@@ -1,0 +1,4 @@
+PADataset Run 4 non-scientific Lambda CI canary candidate.
+
+This inert marker exists only to provide one immutable same-repository PR head for the bounded cpu-ci and gpu-ci acceptance routes.
+It does not build or modify datasets, train models, evaluate experiments, or change paper results.
