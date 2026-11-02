@@ -1,0 +1,19 @@
+name: Workspace CI v3 migration canary - padataset-gpu-single-public-v1
+on:
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  v3-class-canary:
+    if: ${{ github.actor == 'adamtrott78' }}
+    runs-on: lambda-padataset-gpu-single-public
+    timeout-minutes: 5
+    steps:
+      - name: Verify immutable v3 class envelope
+        shell: bash
+        run: |
+          set -euo pipefail
+          test "${GITHUB_ACTOR}" = "adamtrott78"
+          exec /usr/bin/python3 "/opt/workspace-ci/v3/canary/lambda_ci_v3_canary_probe.py" --expected-class "padataset-gpu-single-public-v1"
