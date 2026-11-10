@@ -394,3 +394,21 @@ machine-readable/reviewable and target/surrogate naming is unambiguous.
 **Next:** Stage 01 only — write the explicit A/B/C evidence partitions and
 taxonomy/leakage checks. Do not implement architecture A/B/C until Stage 01 is
 reviewed.
+
+
+## Stage 01 current status
+
+**COMPLETE — evidence partitions frozen.**
+
+Design artifact:
+
+- `docs/experiments/multisurrogate_dqnguard/STAGE01_EVIDENCE_PARTITIONS.md`
+
+The design enforces target quarantine, known-only backbone checkpoint selection,
+disjoint calibration roles, one known-only 5% final threshold, and explicit
+shared-vs-surrogate-specific state for A/B/C. Architecture C is selected as the
+first implementation candidate, but implementation remains blocked on Stage 02's
+common evaluation/provenance contract.
+
+**Next:** Stage 02 only — define the common result schema and deterministic smoke
+contract before architecture code proliferates.
