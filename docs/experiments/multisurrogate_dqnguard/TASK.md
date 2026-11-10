@@ -412,3 +412,18 @@ common evaluation/provenance contract.
 
 **Next:** Stage 02 only — define the common result schema and deterministic smoke
 contract before architecture code proliferates.
+
+
+## Stage 02 current status
+
+**COMPLETE — common result/provenance contract frozen.**
+
+Artifacts:
+
+- `docs/experiments/multisurrogate_dqnguard/STAGE02_RESULT_CONTRACT.md`
+- `docs/experiments/multisurrogate_dqnguard/stage02_result_schema.v1.json`
+
+The contract fixes per-target identity, metrics, known-only threshold semantics,
+architecture-specific provenance, deterministic smoke invariants, and reducer
+rules. Architecture C may now enter Stage 03 smoke implementation; target-test
+labels remain forbidden for tuning.
