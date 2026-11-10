@@ -355,3 +355,34 @@ Do **Stage 00 only**:
 
 Do not implement architecture A/B/C until Stage 00 is complete and Stage 01
 evidence partitions are explicit.
+
+
+## Stage 00 current status
+
+Completed from tracked GitHub evidence:
+
+- research branch created from exact PADataset main commit
+  `a8f952c7cf964730a01b2dc5c6cd75850912f94f`;
+- fixed-Scan DQNGuard, Target-Surrogate, and VarMax surrogate-all method semantics
+  recovered from current contexts and MILCOM paper evidence;
+- presentation future-work architectures recovered;
+- evaluation metrics and leakage/budget constraints frozen in this task.
+
+Blocked on prepared-runtime evidence:
+
+The canonical baseline CSVs named by `experiments/context/RESULTS.md` are
+ignored/local runtime artifacts and are **not tracked on GitHub**, including:
+
+- `results/og_method_comparison/og_dqnguard_vs_varmax_vs_shreyash_full.csv`;
+- `results/target_surrogate_selection/ts_matrix_surrogate_selection_rules_full.csv`
+  (or its reviewed alternate input).
+
+Therefore Stage 00 is not complete from GitHub alone. The smallest next action is
+a read-only inspection of the prepared Lambda PADataset checkout to establish:
+
+1. checkout branch/HEAD/dirty state;
+2. existence and hashes of the baseline comparison/matrix CSVs;
+3. referenced evaluator summary files;
+4. exact run directories/configs/checkpoints/cache identities behind B0/B1/B2.
+
+Do not invent or regenerate missing baseline artifacts before this inspection.
