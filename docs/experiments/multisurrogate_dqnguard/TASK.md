@@ -359,30 +359,38 @@ evidence partitions are explicit.
 
 ## Stage 00 current status
 
-Completed from tracked GitHub evidence:
+**COMPLETE — provenance frozen from the prepared Lambda evidence checkout.**
 
-- research branch created from exact PADataset main commit
-  `a8f952c7cf964730a01b2dc5c6cd75850912f94f`;
-- fixed-Scan DQNGuard, Target-Surrogate, and VarMax surrogate-all method semantics
-  recovered from current contexts and MILCOM paper evidence;
-- presentation future-work architectures recovered;
-- evaluation metrics and leakage/budget constraints frozen in this task.
+Machine-readable artifact:
 
-Blocked on prepared-runtime evidence:
+- `docs/experiments/multisurrogate_dqnguard/stage00_baseline_provenance.json`
 
-The canonical baseline CSVs named by `experiments/context/RESULTS.md` are
-ignored/local runtime artifacts and are **not tracked on GitHub**, including:
+Recovered and verified:
 
-- `results/og_method_comparison/og_dqnguard_vs_varmax_vs_shreyash_full.csv`;
-- `results/target_surrogate_selection/ts_matrix_surrogate_selection_rules_full.csv`
-  (or its reviewed alternate input).
+- clean execution authority is `17e1147614f27702e43565089d618182ff71c5af`;
+- historical evidence checkout is preserved read-only at
+  `leaf2026-review-1571342865@b5a09cede6680b9e2a53eac244db4fbd7eaf76ec`;
+- the historical tracked diff touches only `experiments/pa_dashboard.py` and two
+  manuscript sections; the Git index is clean;
+- the surviving run/config/checkpoint/cache lineage is 16,384 samples and the
+  later 8,192 manuscript wording remains an explicit provenance conflict;
+- B0 fixed-Scan DQNGuard is bound to all four evaluator summaries, configs and
+  `best_model.pt` hashes;
+- B1 is bound to all 20 ordered Target–Surrogate evaluator summaries, configs and
+  checkpoints, and all 20 evaluator `unknown_f1` values exactly match the
+  accepted rendered matrix;
+- B2 VarMax surrogate-all is bound to all four evaluator summaries and the same
+  underlying four OG backbone runs;
+- the accepted paper main-results summary and rendered TS matrix are SHA-256
+  pinned in the provenance artifact;
+- the two historical aggregate-input CSVs named by `experiments/context/RESULTS.md`
+  are absent from the current evidence checkout. They were **not recreated or
+  invented**; the recovered per-run evidence chains and accepted rendered
+  outputs are preserved instead.
 
-Therefore Stage 00 is not complete from GitHub alone. The smallest next action is
-a read-only inspection of the prepared Lambda PADataset checkout to establish:
+Stage 00 exit conditions are satisfied: baseline metrics and identities are
+machine-readable/reviewable and target/surrogate naming is unambiguous.
 
-1. checkout branch/HEAD/dirty state;
-2. existence and hashes of the baseline comparison/matrix CSVs;
-3. referenced evaluator summary files;
-4. exact run directories/configs/checkpoints/cache identities behind B0/B1/B2.
-
-Do not invent or regenerate missing baseline artifacts before this inspection.
+**Next:** Stage 01 only — write the explicit A/B/C evidence partitions and
+taxonomy/leakage checks. Do not implement architecture A/B/C until Stage 01 is
+reviewed.
