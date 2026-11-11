@@ -63,6 +63,11 @@ def main() -> None:
             "Stage 03 forbids target-informed backbone selection: "
             "early_stopping_mode must be known_only"
         )
+    if cfg.get("quarantine_target_until_test") is not True:
+        raise SystemExit(
+            "Stage 03 requires quarantine_target_until_test=true so target-open "
+            "examples are first consumed only by the frozen final evaluator"
+        )
     unknown_pas = list(cfg.get("unknown_pas") or [])
     if len(unknown_pas) != 1:
         raise SystemExit(f"Expected exactly one held-out target, got {unknown_pas}")
@@ -80,6 +85,12 @@ def main() -> None:
     )
     if payload.val_known is None or payload.test_known is None or payload.test_open is None:
         raise SystemExit("Required backbone splits are missing")
+    known_classes = list(payload.meta["class_names"])
+    if len(known_classes) != 4 or target_pa in known_classes:
+        raise SystemExit(
+            f"Stage 03 requires exactly four non-target known classes; "
+            f"target={target_pa}, known={known_classes}"
+        )
 
     partitions = partition_known_calibration(
         payload.val_known,
