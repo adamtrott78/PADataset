@@ -1,0 +1,65 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://padataset.local/scientific-request.v1.schema.json",
+  "title": "PADataset scientific request v1",
+  "oneOf": [
+    {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "schema_version",
+        "operation",
+        "expected_candidate_sha",
+        "dataset_profile"
+      ],
+      "properties": {
+        "schema_version": {
+          "const": 1
+        },
+        "operation": {
+          "const": "smoke"
+        },
+        "expected_candidate_sha": {
+          "type": "string",
+          "pattern": "^[0-9a-f]{40}$"
+        },
+        "dataset_profile": {
+          "const": "ota_core_high_run01_len16384_v1"
+        }
+      }
+    },
+    {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "schema_version",
+        "operation",
+        "expected_candidate_sha",
+        "dataset_profile",
+        "config_path"
+      ],
+      "properties": {
+        "schema_version": {
+          "const": 1
+        },
+        "operation": {
+          "enum": [
+            "train_backbone",
+            "stage03_archc"
+          ]
+        },
+        "expected_candidate_sha": {
+          "type": "string",
+          "pattern": "^[0-9a-f]{40}$"
+        },
+        "dataset_profile": {
+          "const": "ota_core_high_run01_len16384_v1"
+        },
+        "config_path": {
+          "type": "string",
+          "pattern": "^manifests/configs/[A-Za-z0-9_./-]+\\.json$"
+        }
+      }
+    }
+  ]
+}
