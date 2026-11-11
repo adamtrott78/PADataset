@@ -977,29 +977,33 @@ def run_experiment(cfg: Dict[str, Any], data_root: str) -> Dict[str, Any]:
             cm_filename="test_known_confusion_matrix.png",
         )
 
-        test_open_conf_stats = evaluate_open_confidence(
-            best_model,
-            known_loader=test_known_loader,
-            open_loader=test_open_loader,
-            device=device,
-            class_names=class_names,
-            save_dir=save_dir,
-            prefix="test_open_conf",
-            temperature=cfg.get("confidence_temperature", 1.0),
-        )
-
+        quarantine_target_until_test = bool(cfg.get("quarantine_target_until_test", False))
+        test_open_conf_stats = None
         val_manifold_stats = None
-        if val_known_balanced_loader is not None and val_open_balanced_loader is not None:
-            val_manifold_stats = evaluate_open_confidence(
+
+        if not quarantine_target_until_test:
+            test_open_conf_stats = evaluate_open_confidence(
                 best_model,
-                known_loader=val_known_balanced_loader,
-                open_loader=val_open_balanced_loader,
+                known_loader=test_known_loader,
+                open_loader=test_open_loader,
                 device=device,
                 class_names=class_names,
                 save_dir=save_dir,
-                prefix="val_open_conf",
+                prefix="test_open_conf",
                 temperature=cfg.get("confidence_temperature", 1.0),
             )
+
+            if val_known_balanced_loader is not None and val_open_balanced_loader is not None:
+                val_manifold_stats = evaluate_open_confidence(
+                    best_model,
+                    known_loader=val_known_balanced_loader,
+                    open_loader=val_open_balanced_loader,
+                    device=device,
+                    class_names=class_names,
+                    save_dir=save_dir,
+                    prefix="val_open_conf",
+                    temperature=cfg.get("confidence_temperature", 1.0),
+                )
 
         summary = {
             "run_name": run_name,
@@ -1034,22 +1038,22 @@ def run_experiment(cfg: Dict[str, Any], data_root: str) -> Dict[str, Any]:
             "test_known_weighted_f1": known_stats["weighted_f1"],
             "test_known_n_samples": known_stats["n_samples"],
 
-            "test_pmax_auroc": test_open_conf_stats["pmax_auroc"],
-            "test_p1p2_auroc": test_open_conf_stats["p1p2_auroc"],
-            "test_entropy_auroc": test_open_conf_stats["entropy_auroc"],
-            "test_energy_auroc": test_open_conf_stats["energy_auroc"],
-            "test_logit_variance_auroc": test_open_conf_stats["logit_variance_auroc"],
-            "test_softmax3_mean_auroc": test_open_conf_stats["softmax3_mean_auroc"],
-            "test_expanded5_mean_auroc": test_open_conf_stats["expanded5_mean_auroc"],
-            "test_dqn_proxy_softmax3": test_open_conf_stats["dqn_proxy_softmax3"],
-            "test_dqn_proxy_expanded5": test_open_conf_stats["dqn_proxy_expanded5"],
+            "test_pmax_auroc": None if test_open_conf_stats is None else test_open_conf_stats["pmax_auroc"],
+            "test_p1p2_auroc": None if test_open_conf_stats is None else test_open_conf_stats["p1p2_auroc"],
+            "test_entropy_auroc": None if test_open_conf_stats is None else test_open_conf_stats["entropy_auroc"],
+            "test_energy_auroc": None if test_open_conf_stats is None else test_open_conf_stats["energy_auroc"],
+            "test_logit_variance_auroc": None if test_open_conf_stats is None else test_open_conf_stats["logit_variance_auroc"],
+            "test_softmax3_mean_auroc": None if test_open_conf_stats is None else test_open_conf_stats["softmax3_mean_auroc"],
+            "test_expanded5_mean_auroc": None if test_open_conf_stats is None else test_open_conf_stats["expanded5_mean_auroc"],
+            "test_dqn_proxy_softmax3": None if test_open_conf_stats is None else test_open_conf_stats["dqn_proxy_softmax3"],
+            "test_dqn_proxy_expanded5": None if test_open_conf_stats is None else test_open_conf_stats["dqn_proxy_expanded5"],
 
-            "test_known_pmax_mean": test_open_conf_stats["known_pmax_mean"],
-            "test_open_pmax_mean": test_open_conf_stats["open_pmax_mean"],
-            "test_known_p1p2_mean": test_open_conf_stats["known_p1p2_mean"],
-            "test_open_p1p2_mean": test_open_conf_stats["open_p1p2_mean"],
-            "test_known_entropy_mean": test_open_conf_stats["known_entropy_mean"],
-            "test_open_entropy_mean": test_open_conf_stats["open_entropy_mean"],
+            "test_known_pmax_mean": None if test_open_conf_stats is None else test_open_conf_stats["known_pmax_mean"],
+            "test_open_pmax_mean": None if test_open_conf_stats is None else test_open_conf_stats["open_pmax_mean"],
+            "test_known_p1p2_mean": None if test_open_conf_stats is None else test_open_conf_stats["known_p1p2_mean"],
+            "test_open_p1p2_mean": None if test_open_conf_stats is None else test_open_conf_stats["open_p1p2_mean"],
+            "test_known_entropy_mean": None if test_open_conf_stats is None else test_open_conf_stats["known_entropy_mean"],
+            "test_open_entropy_mean": None if test_open_conf_stats is None else test_open_conf_stats["open_entropy_mean"],
 
             "val_softmax3_mean_auroc": None if val_manifold_stats is None else val_manifold_stats["softmax3_mean_auroc"],
             "val_expanded5_mean_auroc": None if val_manifold_stats is None else val_manifold_stats["expanded5_mean_auroc"],
@@ -1060,7 +1064,13 @@ def run_experiment(cfg: Dict[str, Any], data_root: str) -> Dict[str, Any]:
             "n_val": meta.get("n_val"),
             "n_test_known": meta.get("n_test_known"),
             "n_test_open": meta.get("n_test_open"),
-            "test_open_n_samples": len(data["test_open_ds"]),
+            "test_open_n_samples": None if quarantine_target_until_test else len(data["test_open_ds"]),
+            "target_test_consumed": not quarantine_target_until_test,
+            "target_quarantine_status": (
+                "PRESERVED_FOR_FINAL_FROZEN_EVALUATOR"
+                if quarantine_target_until_test
+                else "NOT_REQUESTED"
+            ),
 
             "cache_len": cfg.get("cache_len", 8192),
             "batch_size": batch_size,
@@ -1099,6 +1109,7 @@ def run_experiment(cfg: Dict[str, Any], data_root: str) -> Dict[str, Any]:
         "run_schema_version",
         "use_timestamped_run_dir",
         "notes",
+        "quarantine_target_until_test",
     ]:
         if _k in cfg:
             summary[_k] = cfg.get(_k)
