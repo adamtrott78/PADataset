@@ -4,17 +4,12 @@ import copy
 import hashlib
 import json
 from dataclasses import dataclass
-from typing import Any, Dict, Iterable, Mapping, Sequence
+from typing import TYPE_CHECKING, Any, Dict, Iterable, Mapping, Sequence
 
 import numpy as np
 
-from dqn_osr import (
-    DQNOSR,
-    compute_energy_from_logits,
-    compute_logit_variance,
-    compute_top2_gap_from_probs,
-)
-from osr_core import BackbonePayload, SplitOutputs
+if TYPE_CHECKING:
+    from osr_core import BackbonePayload, SplitOutputs
 
 
 ROLE_NAMES = ("fit", "guard", "norm", "threshold", "pseudo")
@@ -47,7 +42,7 @@ def take_split(split: SplitOutputs, indices: Sequence[int], suffix: str) -> Spli
     meta = None
     if getattr(split, "sample_meta", None) is not None:
         meta = [split.sample_meta[int(i)] for i in idx]
-    return SplitOutputs(
+    return type(split)(
         split_name=f"{split.split_name}_{suffix}",
         y_true=np.asarray(split.y_true)[idx],
         logits=np.asarray(split.logits)[idx],
@@ -68,7 +63,7 @@ def concat_splits(splits: Iterable[SplitOutputs], name: str) -> SplitOutputs:
         meta = []
         for split, m in zip(items, metas):
             meta.extend(list(m) if m is not None else [None] * len(split.y_true))
-    return SplitOutputs(
+    return type(items[0])(
         split_name=name,
         y_true=np.concatenate([np.asarray(s.y_true) for s in items], axis=0),
         logits=np.concatenate([np.asarray(s.logits) for s in items], axis=0),
@@ -185,6 +180,12 @@ def assert_target_quarantined(
 
 
 def guard_features(split: SplitOutputs, temperature: float = 1.0) -> np.ndarray:
+    from dqn_osr import (
+        compute_energy_from_logits,
+        compute_logit_variance,
+        compute_top2_gap_from_probs,
+    )
+
     gap = compute_top2_gap_from_probs(np.asarray(split.probs))
     var = compute_logit_variance(np.asarray(split.logits))
     energy = compute_energy_from_logits(np.asarray(split.logits), temperature=temperature)
@@ -336,6 +337,8 @@ class MultiSurrogateHybridDQNGuard:
         kwargs.setdefault("state_mode", "softmax3")
         kwargs.setdefault("seed", self.seed)
         kwargs.setdefault("device", "cpu")
+        from dqn_osr import DQNOSR
+
         self.dqn = DQNOSR(**kwargs)
         self.bands = PredictedClassBands()
         self.guards_: Dict[str, SurrogateGuard] = {}
