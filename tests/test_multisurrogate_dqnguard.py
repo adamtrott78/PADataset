@@ -1,4 +1,6 @@
+import json
 import unittest
+from pathlib import Path
 from types import SimpleNamespace
 
 import numpy as np
@@ -96,6 +98,34 @@ class MultiSurrogateDQNGuardContractTests(unittest.TestCase):
         split = make_split(n_per_class=4)
         with self.assertRaisesRegex(ValueError, "need >= 5"):
             partition_known_calibration(split, ["PA1", "PA2", "PA3", "PA4"])
+
+    def test_stage03_pa2_backbone_config_is_target_quarantined_four_class_ota(self):
+        repo_root = Path(__file__).resolve().parents[1]
+        cfg_path = (
+            repo_root
+            / "manifests"
+            / "configs"
+            / "mth602_stage03"
+            / "archC_backbone_knownonly_unkPA2_c16384_seed0.json"
+        )
+        cfg = json.loads(cfg_path.read_text())
+        self.assertEqual(cfg["unknown_pas"], ["PA2"])
+        self.assertEqual(set(cfg["pas"]), {"PA1", "PA2", "PA3", "PA4", "PA8"})
+        self.assertEqual(len(set(cfg["pas"]) - set(cfg["unknown_pas"])), 4)
+        self.assertEqual(cfg["cache_len"], 16384)
+        self.assertEqual(cfg["source_type"], "ota")
+        self.assertEqual(cfg["source_name"], "ota_core_high_run01")
+        self.assertEqual(cfg["dataset_tag"], "ota_core_high_run01")
+        self.assertEqual(cfg["noise_tag"], "high_run01")
+        self.assertEqual(cfg["early_stopping_mode"], "known_only")
+        self.assertEqual(cfg["model_selection_metric"], "val_macro_f1")
+        self.assertEqual(cfg["open_val_frac"], 0.0)
+        self.assertFalse(cfg["build_balanced_val_open"])
+        self.assertFalse(cfg["require_true_val_open"])
+        self.assertFalse(cfg["allow_val_open_fallback"])
+        self.assertTrue(cfg["quarantine_target_until_test"])
+        self.assertTrue(cfg["skip_cache_build"])
+        self.assertFalse(cfg["force_rebuild_cache"])
 
 
 if __name__ == "__main__":
