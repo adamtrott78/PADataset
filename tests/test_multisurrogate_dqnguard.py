@@ -1,8 +1,7 @@
 import unittest
+from types import SimpleNamespace
 
 import numpy as np
-
-from osr_core import SplitOutputs
 from multisurrogate_dqnguard import (
     EmpiricalCDFNormalizer,
     aggregate_max_guard,
@@ -25,7 +24,7 @@ def make_split(n_per_class=10, classes=4, name="known"):
     features = np.arange(n * 3, dtype=np.float32).reshape(n, 3)
     pred = probs.argmax(axis=1)
     meta = [{"sample_id": f"{name}-{i}"} for i in range(n)]
-    return SplitOutputs(
+    return SimpleNamespace(
         split_name=name,
         y_true=y,
         logits=logits,
