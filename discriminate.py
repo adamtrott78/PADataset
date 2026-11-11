@@ -830,6 +830,21 @@ def run_experiment(cfg: Dict[str, Any], data_root: str) -> Dict[str, Any]:
         val_known_balanced_loader = data.get("val_known_balanced_loader", None)
         val_open_balanced_loader = data.get("val_open_balanced_loader", None)
 
+        quarantine_target_until_test = bool(cfg.get("quarantine_target_until_test", False))
+        if quarantine_target_until_test:
+            if cfg.get("early_stopping_mode", "known_only") != "known_only":
+                raise ValueError(
+                    "quarantine_target_until_test requires early_stopping_mode='known_only'"
+                )
+            # Preserve target identity/splits in the dataset object, but do not
+            # iterate any target-open validation loader before the frozen
+            # checkpoint is selected from known validation only.
+            val_open_ds = None
+            val_open_loader = None
+            val_open_source = "quarantined_until_test"
+            val_known_balanced_loader = None
+            val_open_balanced_loader = None
+
     model = ModulationClassifierReduced(
         num_classes=num_classes,
         input_len=setup.cache_len,
