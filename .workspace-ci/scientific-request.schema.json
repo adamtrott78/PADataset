@@ -9,7 +9,6 @@
       "required": [
         "schema_version",
         "operation",
-        "expected_candidate_sha",
         "dataset_profile"
       ],
       "properties": {
@@ -18,10 +17,6 @@
         },
         "operation": {
           "const": "smoke"
-        },
-        "expected_candidate_sha": {
-          "type": "string",
-          "pattern": "^[0-9a-f]{40}$"
         },
         "dataset_profile": {
           "const": "ota_core_high_run01_len16384_v1"
@@ -34,7 +29,6 @@
       "required": [
         "schema_version",
         "operation",
-        "expected_candidate_sha",
         "dataset_profile",
         "config_path"
       ],
@@ -48,10 +42,6 @@
             "stage03_archc"
           ]
         },
-        "expected_candidate_sha": {
-          "type": "string",
-          "pattern": "^[0-9a-f]{40}$"
-        },
         "dataset_profile": {
           "const": "ota_core_high_run01_len16384_v1"
         },
@@ -61,5 +51,6 @@
         }
       }
     }
-  ]
+  ],
+  "$comment": "Candidate SHA is bound independently by the issue-comment trigger and exact open same-repository PR head; it is intentionally not repeated inside candidate-controlled request content."
 }
