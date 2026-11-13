@@ -64,6 +64,55 @@ class MultiSurrogateDQNGuardContractTests(unittest.TestCase):
         with self.assertRaisesRegex(ValueError, "target leakage"):
             assert_target_quarantined(parts, overlapping)
 
+    def test_real_default_collation_preserves_sample_identities_and_quarantine(self):
+        import torch
+        from torch.utils.data._utils.collate import default_collate
+        from osr_core import _collect_split_outputs, _decollate_sample_metadata
+        from multisurrogate_dqnguard import split_sample_ids
+
+        class DummyBackbone(torch.nn.Module):
+            def forward(self, x, return_features=False):
+                logits = torch.stack((x[:, 0], x[:, 1], x[:, 2], x[:, 3]), dim=1)
+                return (logits, x) if return_features else logits
+
+        samples = [
+            (torch.tensor([float(i % 4 == cls) for cls in range(4)]),
+             torch.tensor(i % 4),
+             {"dataset_index": i, "local_idx": i, "path": f"/cache/known-{i}.h5",
+              "pa_name": ("PA1", "PA3", "PA4", "PA8")[i % 4]})
+            for i in range(40)
+        ]
+        batches = [default_collate(samples[:17]), default_collate(samples[17:])]
+        self.assertIsInstance(batches[0][2], dict)
+        self.assertIsInstance(batches[0][2]["dataset_index"], torch.Tensor)
+        split = _collect_split_outputs(DummyBackbone(), batches, "cpu", "known")
+        self.assertEqual(len(split.sample_meta), len(split.y_true))
+        self.assertEqual([m["dataset_index"] for m in split.sample_meta], list(range(40)))
+        self.assertEqual([m["path"] for m in split.sample_meta],
+                         [f"/cache/known-{i}.h5" for i in range(40)])
+        self.assertEqual(len(set(split_sample_ids(split))), 40)
+
+        classes = ["PA1", "PA3", "PA4", "PA8"]
+        first = partition_known_calibration(split, classes, seed=17)
+        second = partition_known_calibration(split, classes, seed=17)
+        self.assertEqual(first.manifest["sha256"], second.manifest["sha256"])
+        groups = [set(v) for v in first.manifest["roles"].values()]
+        groups += [set(v) for v in first.manifest["pseudo_open"].values()]
+        union = set()
+        for group in groups:
+            self.assertFalse(union & group)
+            union.update(group)
+        self.assertEqual(union, set(split_sample_ids(split)))
+
+        target = make_split(n_per_class=2, classes=4, name="target")
+        assert_target_quarantined(first, target)
+        target.sample_meta[0] = split.sample_meta[0]
+        with self.assertRaisesRegex(ValueError, "target leakage"):
+            assert_target_quarantined(first, target)
+
+        with self.assertRaisesRegex(ValueError, "batch length mismatch"):
+            _decollate_sample_metadata({"dataset_index": torch.tensor([1, 2])}, 3)
+
     def test_empirical_normalizer_is_monotone(self):
         norm = EmpiricalCDFNormalizer().fit(np.array([0.0, 1.0, 2.0, 3.0]))
         out = norm.transform(np.array([-1.0, 0.5, 2.5, 9.0]))
