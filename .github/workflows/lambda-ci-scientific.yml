@@ -257,8 +257,6 @@ jobs:
           pathlib.Path(out).write_text(json.dumps(cfg, indent=2, sort_keys=True)+"\n")
           PY
 
-            "$runtime_python" experiments/pa_train_one.py --cfg "$normalized"
-
             run_dir="$(
               python3 - "$normalized" <<'PY'
           import json, pathlib, sys
@@ -269,6 +267,85 @@ jobs:
           print(save / cfg["run_name"])
           PY
             )"
+
+            emit_scientific_progress() {
+              local label="$1"
+              local progress_file="$2"
+              python3 - "$label" "$progress_file" <<'PY'
+          import json, pathlib, sys
+          label, raw_path = sys.argv[1:3]
+          path = pathlib.Path(raw_path)
+          if not path.is_file():
+              raise SystemExit(0)
+          try:
+              d = json.loads(path.read_text())
+          except Exception:
+              raise SystemExit(0)
+
+          phase = str(d.get("phase", "unknown"))
+          parts = [f"lane={label}", f"phase={phase}"]
+          if "epoch" in d and "epochs" in d:
+              parts.append(f"epoch={d['epoch']}/{d['epochs']}")
+          if "step" in d and "steps" in d:
+              parts.append(f"step={d['step']}/{d['steps']}")
+          if "pct" in d:
+              try:
+                  parts.append(f"pct={float(d['pct']):.1f}%")
+              except Exception:
+                  pass
+          if "steps_per_sec" in d:
+              try:
+                  parts.append(f"steps_per_sec={float(d['steps_per_sec']):.2f}")
+              except Exception:
+                  pass
+          if "dqn_episode" in d and "dqn_episodes" in d:
+              parts.append(f"dqn_episode={d['dqn_episode']}/{d['dqn_episodes']}")
+          if "dqn_avg_reward" in d and d["dqn_avg_reward"] is not None:
+              parts.append(f"dqn_reward={float(d['dqn_avg_reward']):.4f}")
+          if "dqn_avg_loss" in d and d["dqn_avg_loss"] is not None:
+              parts.append(f"dqn_loss={float(d['dqn_avg_loss']):.4f}")
+          if "dqn_epsilon" in d:
+              parts.append(f"epsilon={float(d['dqn_epsilon']):.4f}")
+          print(" | ".join(parts))
+          PY
+            }
+
+            run_with_scientific_progress() {
+              local label="$1"
+              local progress_file="$2"
+              shift 2
+              "$@" &
+              local child_pid=$!
+              local last_progress=""
+              while kill -0 "$child_pid" 2>/dev/null; do
+                local current_progress=""
+                current_progress="$(emit_scientific_progress "$label" "$progress_file" 2>/dev/null || true)"
+                if [[ -n "$current_progress" && "$current_progress" != "$last_progress" ]]; then
+                  echo "::notice title=Scientific progress::$current_progress"
+                  last_progress="$current_progress"
+                fi
+                sleep 30
+              done
+
+              set +e
+              wait "$child_pid"
+              local child_rc=$?
+              set -e
+
+              local final_progress=""
+              final_progress="$(emit_scientific_progress "$label" "$progress_file" 2>/dev/null || true)"
+              if [[ -n "$final_progress" && "$final_progress" != "$last_progress" ]]; then
+                echo "::notice title=Scientific progress::$final_progress"
+              fi
+              if (( child_rc != 0 )); then
+                echo "::error title=Scientific process failed::lane=$label rc=$child_rc"
+                return "$child_rc"
+              fi
+            }
+
+            train_progress="$run_dir/train_progress.json"
+            run_with_scientific_progress               "backbone"               "$train_progress"               "$runtime_python" experiments/pa_train_one.py --cfg "$normalized"
+
             [[ -f "$run_dir/config.json" ]]
             [[ -f "$run_dir/best_model.pt" ]]
             [[ -f "$run_dir/summary.json" ]]
@@ -276,7 +353,34 @@ jobs:
 
             if [[ "$OPERATION" == "stage03_archc" ]]; then
               eval_dir="$result_root/archc_eval"
-              "$runtime_python" experiments/pa_eval_multisurrogate_dqnguard.py                 --run-dir "$run_dir"                 --checkpoint best_model                 --out-dir "$eval_dir"                 --device cuda                 --batch-size 128                 --num-workers 0                 --partition-seed 1701                 --dqn-episodes 30                 --known-budget 0.05
+              osr_progress="$result_root/osr_progress.json"
+              python3 - "$osr_progress" <<'PY'
+          import json, pathlib, sys, time
+          path=pathlib.Path(sys.argv[1])
+          path.write_text(json.dumps({
+              "phase": "evaluation_start",
+              "pct": 0.0,
+              "time": time.strftime("%Y-%m-%dT%H:%M:%S%z"),
+          }, indent=2) + "\n")
+          PY
+              PADATASET_OSR_PROGRESS_JSON="$osr_progress"                 run_with_scientific_progress                   "architecture_c"                   "$osr_progress"                   "$runtime_python" experiments/pa_eval_multisurrogate_dqnguard.py                     --run-dir "$run_dir"                     --checkpoint best_model                     --out-dir "$eval_dir"                     --device cuda                     --batch-size 128                     --num-workers 0                     --partition-seed 1701                     --dqn-episodes 30                     --known-budget 0.05
+              python3 - "$osr_progress" <<'PY'
+          import json, pathlib, sys, time
+          path=pathlib.Path(sys.argv[1])
+          current={}
+          if path.is_file():
+              try:
+                  current=json.loads(path.read_text())
+              except Exception:
+                  current={}
+          current.update({
+              "phase": "evaluation_complete",
+              "pct": 100.0,
+              "time": time.strftime("%Y-%m-%dT%H:%M:%S%z"),
+          })
+          path.write_text(json.dumps(current, indent=2) + "\n")
+          PY
+              echo "::notice title=Scientific progress::$(emit_scientific_progress architecture_c "$osr_progress")"
 
               python3 - "$eval_dir/result_record.json" "$EXPECTED_SHA" <<'PY'
           import json, pathlib, sys
