@@ -732,7 +732,7 @@ def evaluate_osr_predictions(
         # full OSR
         "osr_acc": osr_acc,
         "osr_macro_f1": osr_macro_f1,
-        "osr_confusion_matrix": cm,
+        "osr_confusion_matrix": cm.tolist(),
         "label_names_with_unknown": known_class_names + [unknown_label_name],
     }
 
