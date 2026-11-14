@@ -148,6 +148,13 @@ class MultiSurrogateDQNGuardContractTests(unittest.TestCase):
         with self.assertRaisesRegex(ValueError, "need >= 5"):
             partition_known_calibration(split, ["PA1", "PA2", "PA3", "PA4"])
 
+    def test_osr_confusion_matrix_is_json_native(self):
+        repo_root = Path(__file__).resolve().parents[1]
+        source = (repo_root / "osr_core.py").read_text()
+        self.assertIn('"osr_confusion_matrix": cm.tolist()', source)
+        payload = {"osr_confusion_matrix": np.array([[1, 2], [3, 4]]).tolist()}
+        self.assertEqual(json.loads(json.dumps(payload)), payload)
+
     def test_stage03_pa2_backbone_config_is_target_quarantined_four_class_ota(self):
         repo_root = Path(__file__).resolve().parents[1]
         cfg_path = (
