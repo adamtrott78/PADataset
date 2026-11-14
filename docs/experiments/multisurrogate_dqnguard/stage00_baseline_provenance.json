@@ -1,0 +1,547 @@
+{
+  "schema": "padataset.multisurrogate_dqnguard.stage00_provenance.v1",
+  "task_id": "mth602-final-multisurrogate-dqnguard-v1",
+  "stage": "00",
+  "stage_status": "COMPLETE",
+  "recovered_at_utc": "2026-11-10T19:10:00Z",
+  "execution_source": {
+    "clean_sha": "17e1147614f27702e43565089d618182ff71c5af",
+    "clean_tree_sha": "89c1a5a216f2f328e83d8a2b1a21131aa7f9b56a",
+    "historical_checkout": {
+      "branch": "leaf2026-review-1571342865",
+      "head": "b5a09cede6680b9e2a53eac244db4fbd7eaf76ec",
+      "bytes": 113815479118,
+      "dirty": true,
+      "read_only": true,
+      "tracked_diff_sha256": "1670e6b442558e722c7d8d92835b79d8053c0e0ea4488951bb271fbe27df84d5",
+      "index_diff_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "tracked_diff_scope": [
+        "experiments/pa_dashboard.py",
+        "papers/milcom2026/sections/4-experiments.tex",
+        "papers/milcom2026/sections/6-discussion.tex"
+      ],
+      "manuscript_conflict": "Historical tracked diff changes paper cache wording from 16,384 to 8,192; surviving run configs/checkpoints/evaluator chains use 16,384 and remain authoritative for experiment identity."
+    }
+  },
+  "common_training_identity": {
+    "cache_len": 16384,
+    "cache_root": "/home/atrott/adamArchives/Adam/varMax/PADataset/_feature_cache_nvme/len16384/norm/ota__ota_core_high_run01__high_run01",
+    "normalize": true,
+    "source_type": "ota",
+    "source_name": "ota_core_high_run01",
+    "dataset_tag": "ota_core_high_run01",
+    "noise_tag": "high_run01",
+    "seed": 0,
+    "split_mode": "open_pa",
+    "open_val_frac": 0.15,
+    "lr": 0.0002,
+    "entropy_loss_weight": 0.05
+  },
+  "source_aggregate_inputs": {
+    "og_method_comparison_csv": {
+      "expected_path": "results/og_method_comparison/og_dqnguard_vs_varmax_vs_shreyash_full.csv",
+      "present_in_historical_checkout": false,
+      "disposition": "Do not invent. Accepted paper summary plus exact evaluator rows/configs/checkpoints recovered below."
+    },
+    "target_surrogate_selection_csv": {
+      "expected_path": "results/target_surrogate_selection/ts_matrix_surrogate_selection_rules_full.csv",
+      "present_in_historical_checkout": false,
+      "disposition": "Do not invent. Accepted rendered matrix plus all 20 exact evaluator rows/configs/checkpoints recovered below."
+    }
+  },
+  "accepted_outputs": {
+    "main_results_summary": {
+      "path": "papers/milcom2026/tables/main_results/main_osr_results_table_summary.csv",
+      "sha256": "39338ab190ae379b3a2ea0b4de13f731aee37e466b3c79422f1b6f612899df15"
+    },
+    "target_surrogate_matrix": {
+      "path": "papers/milcom2026/figures/target_surrogate_matrix/target_surrogate_unknown_f1_matrix.csv",
+      "sha256": "5ee4b00a97de334d1ec0964f93294d6bd6f560b6feace7f8d6b2ad6aa8c198e4",
+      "source_cell_match_count": 20,
+      "source_cell_count": 20
+    }
+  },
+  "baselines": {
+    "B0_fixed_scan_dqnguard": {
+      "description": "Fixed Scan/PA1 surrogate DQNGuard across target PA2/PA3/PA4/PA8 with known-only 5% operating budget.",
+      "aggregate": {
+        "folds": 4,
+        "known_reject_rate_mean": 0.049981937136128154,
+        "unknown_f1_mean": 0.8646222961811549,
+        "osr_macro_f1_mean": 0.8805920309973247,
+        "unknown_auroc_mean": 0.8909914336320044
+      },
+      "calibration": {
+        "surrogate_open_pa": "PA1",
+        "known_budget": 0.05,
+        "n_known": 625,
+        "n_surrogate_open": 625
+      },
+      "training_runs": [
+        {
+          "target": "PA2",
+          "config_sha256": "db6afa54ef60233216926b8faaf3125de376ce1c46effadca4a79027242cda22",
+          "checkpoint_sha256": "44e1e12d07c51da2f2d86978f943565a2c5f825f86130960790e2426b95f17c5",
+          "evaluator_sha256": "33fc2863d8d3830ba583a1f89decc409e164b25a0deb08599417b12eee62790c"
+        },
+        {
+          "target": "PA3",
+          "config_sha256": "c4f4aff4de69f11526c1cd39902c68db7280ce80e64de8bb6d23bfa701f5de22",
+          "checkpoint_sha256": "900d262fc8180e18c5f0361c8cf8d529a660e6c75cad249967db152bf2161a05",
+          "evaluator_sha256": "ef88141ce866e9252b58526e49bfb8783828cc8ef2dc40de8c7647c41033fe87"
+        },
+        {
+          "target": "PA4",
+          "config_sha256": "bf88750b8c120d83ce2633def5f89b68b0cd7791a6f5a3913b44ad11a173da52",
+          "checkpoint_sha256": "80486a1951a881dbb0ffd169b5c0dd6cec4b9a76ef89b54b9249e1e99d066b39",
+          "evaluator_sha256": "266cc69dbff5eb629066bb97edb2ef6ea810417fdd33f73ed770ff981e1ae9fc"
+        },
+        {
+          "target": "PA8",
+          "config_sha256": "edafdd326c84a20297ee8872a2865e00ec9cc673c6cb76cbc52ad5c348d138d4",
+          "checkpoint_sha256": "0a336fbd38a176bc1a02607054eb02dc4a077cfac9469290cc463f16e0f87f1a",
+          "evaluator_sha256": "c412ef97cc183ea20978dc9fd58e79a490f36170d1e8ceb1a696d2f168490767"
+        }
+      ]
+    },
+    "B1_target_surrogate_matrix": {
+      "description": "All 20 ordered target/surrogate cells across PA1/PA2/PA3/PA4/PA8.",
+      "cell_count": 20,
+      "all_cells_match_accepted_rendered_matrix": true,
+      "cells": [
+        {
+          "target_pa": "PA1",
+          "target_name": "Scan",
+          "surrogate_pa": "PA2",
+          "surrogate_name": "Burst",
+          "unknown_f1": 0.3241474447403035,
+          "evaluator_summary_path": "results_pa_osr_eval/l2o_ref_ent005_lr2e4_tgtPA1_surPA2_c16384_seed0__best_model__dqnguard_l2o_surPA2_knownonly_budget0.05/osr_summary.csv",
+          "evaluator_summary_sha256": "3a2f96dea4336bb2a93dac8c933efdc788f50af151abe2142db94c01cbe468bb",
+          "run_dir": "results_pa_ota_l2o/l2o_ref_ent005_lr2e4_tgtPA1_surPA2_c16384_seed0",
+          "config_sha256": "8d6225ed638ed0290276e13a9ccd5890eeb17bc6e74ed136858bf871521e3538",
+          "checkpoint": "best_model.pt",
+          "checkpoint_sha256": "ba8317905f10b6ff82c1ed5e5232218d6ce839fbbf84c9e0cfb58e4f9a04fc5c",
+          "calibration": {
+            "known_budget": 0.05,
+            "threshold_known_reject_cal": 0.0512,
+            "n_known": 625,
+            "n_surrogate_open": 625
+          }
+        },
+        {
+          "target_pa": "PA1",
+          "target_name": "Scan",
+          "surrogate_pa": "PA3",
+          "surrogate_name": "Sustain",
+          "unknown_f1": 0.003280439426304547,
+          "evaluator_summary_path": "results_pa_osr_eval/l2o_ref_ent005_lr2e4_tgtPA1_surPA3_c16384_seed0__best_model__dqnguard_l2o_surPA3_knownonly_budget0.05/osr_summary.csv",
+          "evaluator_summary_sha256": "338f6bd6da23af7cec8bb3802396189aa51f405b74b209bc984c1c943df53473",
+          "run_dir": "results_pa_ota_l2o/l2o_ref_ent005_lr2e4_tgtPA1_surPA3_c16384_seed0",
+          "config_sha256": "ee2e5a5eedb1d350fb273176d3834943d21f315925f9895741716552612a499b",
+          "checkpoint": "best_model.pt",
+          "checkpoint_sha256": "6f3d1f37ff390ef8cd5bb4ac4b7202a8d1bcb3e5028d28b96bc3bed5be281ed6",
+          "calibration": {
+            "known_budget": 0.05,
+            "threshold_known_reject_cal": 0.0512,
+            "n_known": 625,
+            "n_surrogate_open": 625
+          }
+        },
+        {
+          "target_pa": "PA1",
+          "target_name": "Scan",
+          "surrogate_pa": "PA4",
+          "surrogate_name": "Hop",
+          "unknown_f1": 0.7117376436145348,
+          "evaluator_summary_path": "results_pa_osr_eval/l2o_ref_ent005_lr2e4_tgtPA1_surPA4_c16384_seed0__best_model__dqnguard_l2o_surPA4_knownonly_budget0.05/osr_summary.csv",
+          "evaluator_summary_sha256": "e6c6ef4ecfde46fe4875ffc4f87d11b7e3ec568464c6d88d64ef39ac9e2f46f5",
+          "run_dir": "results_pa_ota_l2o/l2o_ref_ent005_lr2e4_tgtPA1_surPA4_c16384_seed0",
+          "config_sha256": "9664d11ac92a58a01c502dbedaabc7392958f97895e495b1b303ef03431e2b52",
+          "checkpoint": "best_model.pt",
+          "checkpoint_sha256": "5fd652a386902e74df11b4acbfd671d81ac88d88032edf083a7cb7e53cd5823d",
+          "calibration": {
+            "known_budget": 0.05,
+            "threshold_known_reject_cal": 0.0512,
+            "n_known": 625,
+            "n_surrogate_open": 625
+          }
+        },
+        {
+          "target_pa": "PA1",
+          "target_name": "Scan",
+          "surrogate_pa": "PA8",
+          "surrogate_name": "Replay",
+          "unknown_f1": 0.04367790346063389,
+          "evaluator_summary_path": "results_pa_osr_eval/l2o_ref_ent005_lr2e4_tgtPA1_surPA8_c16384_seed0__best_model__dqnguard_l2o_surPA8_knownonly_budget0.05/osr_summary.csv",
+          "evaluator_summary_sha256": "a406bc56ee2870a76f6bd736c041ca2ed1d43c23b8324b91e1089759dab7972e",
+          "run_dir": "results_pa_ota_l2o/l2o_ref_ent005_lr2e4_tgtPA1_surPA8_c16384_seed0",
+          "config_sha256": "abb1b0d717f69f5379cb3b6f09fa2774cd5761f26a8e551cb63496e4815acd66",
+          "checkpoint": "best_model.pt",
+          "checkpoint_sha256": "45c5ef75f4249cb14fdd6254ac89b065404aa2ae800216958acf2b4052eb8e3c",
+          "calibration": {
+            "known_budget": 0.05,
+            "threshold_known_reject_cal": 0.0512,
+            "n_known": 625,
+            "n_surrogate_open": 625
+          }
+        },
+        {
+          "target_pa": "PA2",
+          "target_name": "Burst",
+          "surrogate_pa": "PA1",
+          "surrogate_name": "Scan",
+          "unknown_f1": 0.583625064452224,
+          "evaluator_summary_path": "results_pa_osr_eval/l2o_ref_ent005_lr2e4_tgtPA2_surPA1_c16384_seed0__best_model__dqnguard_l2o_surPA1_knownonly_budget0.05/osr_summary.csv",
+          "evaluator_summary_sha256": "277eb729d9f57e1c9149b5b92a96d229cf404eff2a6955971070909ffa690548",
+          "run_dir": "results_pa_ota_l2o/l2o_ref_ent005_lr2e4_tgtPA2_surPA1_c16384_seed0",
+          "config_sha256": "e33255755f4cf02f906fa904052232d896ae1cc3ab7b9402d3ec10f142864cf9",
+          "checkpoint": "best_model.pt",
+          "checkpoint_sha256": "528cb26144fcf44d0730fa274bfcfd9bcd3776aeb472283d00b5d4107cc75875",
+          "calibration": {
+            "known_budget": 0.05,
+            "threshold_known_reject_cal": 0.0512,
+            "n_known": 625,
+            "n_surrogate_open": 625
+          }
+        },
+        {
+          "target_pa": "PA2",
+          "target_name": "Burst",
+          "surrogate_pa": "PA3",
+          "surrogate_name": "Sustain",
+          "unknown_f1": 0.005345347638501775,
+          "evaluator_summary_path": "results_pa_osr_eval/l2o_ref_ent005_lr2e4_tgtPA2_surPA3_c16384_seed0__best_model__dqnguard_l2o_surPA3_knownonly_budget0.05/osr_summary.csv",
+          "evaluator_summary_sha256": "627f681cf3b4cecf9d88d2cbf43403573a44f64fff86ec0b287f896c93cdea6b",
+          "run_dir": "results_pa_ota_l2o/l2o_ref_ent005_lr2e4_tgtPA2_surPA3_c16384_seed0",
+          "config_sha256": "4f8f6158aaa62d7212bbe1f5e750000cabeef8326dc11723741e29bf0b692f9f",
+          "checkpoint": "best_model.pt",
+          "checkpoint_sha256": "68d04206eb0a638fd3823b5a9c371e383c0ae95ddc1e450d41d1d86d9be1afd0",
+          "calibration": {
+            "known_budget": 0.05,
+            "threshold_known_reject_cal": 0.0512,
+            "n_known": 625,
+            "n_surrogate_open": 625
+          }
+        },
+        {
+          "target_pa": "PA2",
+          "target_name": "Burst",
+          "surrogate_pa": "PA4",
+          "surrogate_name": "Hop",
+          "unknown_f1": 0.1470692215230149,
+          "evaluator_summary_path": "results_pa_osr_eval/l2o_ref_ent005_lr2e4_tgtPA2_surPA4_c16384_seed0__best_model__dqnguard_l2o_surPA4_knownonly_budget0.05/osr_summary.csv",
+          "evaluator_summary_sha256": "f3652f24b38df5e7c541a89b810be3bee556e6e89cb16bdb01d006cfdaf804c8",
+          "run_dir": "results_pa_ota_l2o/l2o_ref_ent005_lr2e4_tgtPA2_surPA4_c16384_seed0",
+          "config_sha256": "a103f2644ab6cfc40d228077e6ea19137f7b2903cfa070886a25705b3295021a",
+          "checkpoint": "best_model.pt",
+          "checkpoint_sha256": "f68a153c81c10ed1e93477a9db1b18e79bd9d833218c54b55f9a6eb66f1abfcc",
+          "calibration": {
+            "known_budget": 0.05,
+            "threshold_known_reject_cal": 0.0512,
+            "n_known": 625,
+            "n_surrogate_open": 625
+          }
+        },
+        {
+          "target_pa": "PA2",
+          "target_name": "Burst",
+          "surrogate_pa": "PA8",
+          "surrogate_name": "Replay",
+          "unknown_f1": 0.6139655354688657,
+          "evaluator_summary_path": "results_pa_osr_eval/l2o_ref_ent005_lr2e4_tgtPA2_surPA8_c16384_seed0__best_model__dqnguard_l2o_surPA8_knownonly_budget0.05/osr_summary.csv",
+          "evaluator_summary_sha256": "f9ccb9a0a9c5b3a20df423912053768c170512b62bc0e6561b39d465963ea999",
+          "run_dir": "results_pa_ota_l2o/l2o_ref_ent005_lr2e4_tgtPA2_surPA8_c16384_seed0",
+          "config_sha256": "8ea5a2b13f5168a8a6c0a0a75facfe16f68d5c8025280afefead8e639e22d4e5",
+          "checkpoint": "best_model.pt",
+          "checkpoint_sha256": "bf8bdc697b759bc0c9aa5692f8c49ed829e6b9aca790b73f0dca8ce2e79fc807",
+          "calibration": {
+            "known_budget": 0.05,
+            "threshold_known_reject_cal": 0.0512,
+            "n_known": 625,
+            "n_surrogate_open": 625
+          }
+        },
+        {
+          "target_pa": "PA3",
+          "target_name": "Sustain",
+          "surrogate_pa": "PA1",
+          "surrogate_name": "Scan",
+          "unknown_f1": 0.8980611045828437,
+          "evaluator_summary_path": "results_pa_osr_eval/l2o_ref_ent005_lr2e4_tgtPA3_surPA1_c16384_seed0__best_model__dqnguard_l2o_surPA1_knownonly_budget0.05/osr_summary.csv",
+          "evaluator_summary_sha256": "9cfb9803ebc431afb3d97f71c9c5f9f4fbad27c25c2ff7a5e75055b5ca99c9ff",
+          "run_dir": "results_pa_ota_l2o/l2o_ref_ent005_lr2e4_tgtPA3_surPA1_c16384_seed0",
+          "config_sha256": "4835ceb5b07d4fd585b13b476543639adaf243824c91412148f116d4f98bee5b",
+          "checkpoint": "best_model.pt",
+          "checkpoint_sha256": "055eabbbdad3be0cc091c1b97221b15c3a9d50871d4dee50b6f7590f9a1ca9d2",
+          "calibration": {
+            "known_budget": 0.05,
+            "threshold_known_reject_cal": 0.0512,
+            "n_known": 625,
+            "n_surrogate_open": 625
+          }
+        },
+        {
+          "target_pa": "PA3",
+          "target_name": "Sustain",
+          "surrogate_pa": "PA2",
+          "surrogate_name": "Burst",
+          "unknown_f1": 0,
+          "evaluator_summary_path": "results_pa_osr_eval/l2o_ref_ent005_lr2e4_tgtPA3_surPA2_c16384_seed0__best_model__dqnguard_l2o_surPA2_knownonly_budget0.05/osr_summary.csv",
+          "evaluator_summary_sha256": "2336332aa9adca2c05faafc8e9b3a2d4c71f9671d1cd285179e2339f9068a833",
+          "run_dir": "results_pa_ota_l2o/l2o_ref_ent005_lr2e4_tgtPA3_surPA2_c16384_seed0",
+          "config_sha256": "ad4fff3a4f44c15e8acbe33070e9abf06c53040ff3c4e989f2c7339c772e3b30",
+          "checkpoint": "best_model.pt",
+          "checkpoint_sha256": "ec4957b20fd666da73511816903ca69c58667d646455598ff7ed46c90e462bb0",
+          "calibration": {
+            "known_budget": 0.05,
+            "threshold_known_reject_cal": 0.0512,
+            "n_known": 625,
+            "n_surrogate_open": 625
+          }
+        },
+        {
+          "target_pa": "PA3",
+          "target_name": "Sustain",
+          "surrogate_pa": "PA4",
+          "surrogate_name": "Hop",
+          "unknown_f1": 0.7862116830537883,
+          "evaluator_summary_path": "results_pa_osr_eval/l2o_ref_ent005_lr2e4_tgtPA3_surPA4_c16384_seed0__best_model__dqnguard_l2o_surPA4_knownonly_budget0.05/osr_summary.csv",
+          "evaluator_summary_sha256": "c3fa218a0e46489bf2ff6d58676a6e6ddfec04f44adc02933bce220ca4f9e56c",
+          "run_dir": "results_pa_ota_l2o/l2o_ref_ent005_lr2e4_tgtPA3_surPA4_c16384_seed0",
+          "config_sha256": "bc9c6986c6bbd729d512429532d276409888c5b62203616cc0536ce7aef796cd",
+          "checkpoint": "best_model.pt",
+          "checkpoint_sha256": "98d3f588604cff4b43a86656d235cb07c6e7ea1fe49e711361abbda5cc6a33e6",
+          "calibration": {
+            "known_budget": 0.05,
+            "threshold_known_reject_cal": 0.0512,
+            "n_known": 625,
+            "n_surrogate_open": 625
+          }
+        },
+        {
+          "target_pa": "PA3",
+          "target_name": "Sustain",
+          "surrogate_pa": "PA8",
+          "surrogate_name": "Replay",
+          "unknown_f1": 0.008062982542882137,
+          "evaluator_summary_path": "results_pa_osr_eval/l2o_ref_ent005_lr2e4_tgtPA3_surPA8_c16384_seed0__best_model__dqnguard_l2o_surPA8_knownonly_budget0.05/osr_summary.csv",
+          "evaluator_summary_sha256": "4fe9defbdcdd713a53f72c3c7d6c4f1eebeccda3200050a7c1d9861d668678b3",
+          "run_dir": "results_pa_ota_l2o/l2o_ref_ent005_lr2e4_tgtPA3_surPA8_c16384_seed0",
+          "config_sha256": "e337a1d52b6385081dffbc4d6e27e886847a1bdc1b1a6041df22ef08373a1c39",
+          "checkpoint": "best_model.pt",
+          "checkpoint_sha256": "e873f685214e2a627954e6b23924a4e28d35265a9e8f16b74e0f530ed2f2ed6c",
+          "calibration": {
+            "known_budget": 0.05,
+            "threshold_known_reject_cal": 0.0512,
+            "n_known": 625,
+            "n_surrogate_open": 625
+          }
+        },
+        {
+          "target_pa": "PA4",
+          "target_name": "Hop",
+          "surrogate_pa": "PA1",
+          "surrogate_name": "Scan",
+          "unknown_f1": 0.836077276580556,
+          "evaluator_summary_path": "results_pa_osr_eval/l2o_ref_ent005_lr2e4_tgtPA4_surPA1_c16384_seed0__best_model__dqnguard_l2o_surPA1_knownonly_budget0.05/osr_summary.csv",
+          "evaluator_summary_sha256": "687120bffbfcde8f4caba50b97a31f46816fe56282363960c825018fe444889c",
+          "run_dir": "results_pa_ota_l2o/l2o_ref_ent005_lr2e4_tgtPA4_surPA1_c16384_seed0",
+          "config_sha256": "0ff8c8a532d87eabb14d7baa1e4236d5bd450dcb35882f727000b44194e574cd",
+          "checkpoint": "best_model.pt",
+          "checkpoint_sha256": "ed15734e233f6ad0c9948b75faa065a4c2a378c5476e29c02f9dad04ef1345b7",
+          "calibration": {
+            "known_budget": 0.05,
+            "threshold_known_reject_cal": 0.0512,
+            "n_known": 625,
+            "n_surrogate_open": 625
+          }
+        },
+        {
+          "target_pa": "PA4",
+          "target_name": "Hop",
+          "surrogate_pa": "PA2",
+          "surrogate_name": "Burst",
+          "unknown_f1": 0.10370158024868313,
+          "evaluator_summary_path": "results_pa_osr_eval/l2o_ref_ent005_lr2e4_tgtPA4_surPA2_c16384_seed0__best_model__dqnguard_l2o_surPA2_knownonly_budget0.05/osr_summary.csv",
+          "evaluator_summary_sha256": "62c2c2ea0d9feafbc3712dd2cca6d10cd9d8a8f5b30ca5bc5fb85b0364413dff",
+          "run_dir": "results_pa_ota_l2o/l2o_ref_ent005_lr2e4_tgtPA4_surPA2_c16384_seed0",
+          "config_sha256": "5a262e25d224bcb8806c20a4831e7dc376e000602f7e009ae1b586732b9ebf88",
+          "checkpoint": "best_model.pt",
+          "checkpoint_sha256": "fe482c8d31d085fe6028456e31911a7f275f32c503c7f819402785e0f66d25c5",
+          "calibration": {
+            "known_budget": 0.05,
+            "threshold_known_reject_cal": 0.0512,
+            "n_known": 625,
+            "n_surrogate_open": 625
+          }
+        },
+        {
+          "target_pa": "PA4",
+          "target_name": "Hop",
+          "surrogate_pa": "PA3",
+          "surrogate_name": "Sustain",
+          "unknown_f1": 0.11396808319885243,
+          "evaluator_summary_path": "results_pa_osr_eval/l2o_ref_ent005_lr2e4_tgtPA4_surPA3_c16384_seed0__best_model__dqnguard_l2o_surPA3_knownonly_budget0.05/osr_summary.csv",
+          "evaluator_summary_sha256": "d703579f4d5d4a4e97b7ac703b903b8ca79add752aa1c848031f5d164088ceb1",
+          "run_dir": "results_pa_ota_l2o/l2o_ref_ent005_lr2e4_tgtPA4_surPA3_c16384_seed0",
+          "config_sha256": "b597be7ec0216bf28371eaa4b45bbbbf6b7a486973cd0f66478a825a96b9dc97",
+          "checkpoint": "best_model.pt",
+          "checkpoint_sha256": "9648ee5a2d4348cc7260efd782b49e1e3e424ed1952c927f64714b41639a8ee0",
+          "calibration": {
+            "known_budget": 0.05,
+            "threshold_known_reject_cal": 0.0512,
+            "n_known": 625,
+            "n_surrogate_open": 625
+          }
+        },
+        {
+          "target_pa": "PA4",
+          "target_name": "Hop",
+          "surrogate_pa": "PA8",
+          "surrogate_name": "Replay",
+          "unknown_f1": 0.48976216277876006,
+          "evaluator_summary_path": "results_pa_osr_eval/l2o_ref_ent005_lr2e4_tgtPA4_surPA8_c16384_seed0__best_model__dqnguard_l2o_surPA8_knownonly_budget0.05/osr_summary.csv",
+          "evaluator_summary_sha256": "3caebe70a5879e99b6ee52ec19fa098e5750adf13286350a2cc6ad621c9c82ae",
+          "run_dir": "results_pa_ota_l2o/l2o_ref_ent005_lr2e4_tgtPA4_surPA8_c16384_seed0",
+          "config_sha256": "73cbb50b72da59a72a2c24327a2d26ecfcdcddb817851ad2824068a186d35ac9",
+          "checkpoint": "best_model.pt",
+          "checkpoint_sha256": "49fc7972d9f8d4efa57916cdd084feb9d64a2ba0cb6d51def6db4abd61932f86",
+          "calibration": {
+            "known_budget": 0.05,
+            "threshold_known_reject_cal": 0.0512,
+            "n_known": 625,
+            "n_surrogate_open": 625
+          }
+        },
+        {
+          "target_pa": "PA8",
+          "target_name": "Replay",
+          "surrogate_pa": "PA1",
+          "surrogate_name": "Scan",
+          "unknown_f1": 0.8455768179332969,
+          "evaluator_summary_path": "results_pa_osr_eval/l2o_ref_ent005_lr2e4_tgtPA8_surPA1_c16384_seed0__best_model__dqnguard_l2o_surPA1_knownonly_budget0.05/osr_summary.csv",
+          "evaluator_summary_sha256": "c0e2f7643848d9f1a7b3ba0fa646fdf92f1bfb43c5c67b869ff07bdb9a41be37",
+          "run_dir": "results_pa_ota_l2o/l2o_ref_ent005_lr2e4_tgtPA8_surPA1_c16384_seed0",
+          "config_sha256": "ca35389320e425451a7ccc924a01f7e9c8b437a8ce546b79aa65930d01347553",
+          "checkpoint": "best_model.pt",
+          "checkpoint_sha256": "30bbd1b2eca5a1e8538ab7ef987475092fff03ced858bd86ba1868e631f4f074",
+          "calibration": {
+            "known_budget": 0.05,
+            "threshold_known_reject_cal": 0.0512,
+            "n_known": 625,
+            "n_surrogate_open": 625
+          }
+        },
+        {
+          "target_pa": "PA8",
+          "target_name": "Replay",
+          "surrogate_pa": "PA2",
+          "surrogate_name": "Burst",
+          "unknown_f1": 0.7708028519008802,
+          "evaluator_summary_path": "results_pa_osr_eval/l2o_ref_ent005_lr2e4_tgtPA8_surPA2_c16384_seed0__best_model__dqnguard_l2o_surPA2_knownonly_budget0.05/osr_summary.csv",
+          "evaluator_summary_sha256": "a9a5e16e63f97a801ca50827bab7330e45fbf4ca7439b9b2f6228463359db66f",
+          "run_dir": "results_pa_ota_l2o/l2o_ref_ent005_lr2e4_tgtPA8_surPA2_c16384_seed0",
+          "config_sha256": "563f05077979c68cb41aef424b803b7d183f6c5ab8f22a4b4722c51df3ce3fed",
+          "checkpoint": "best_model.pt",
+          "checkpoint_sha256": "1105d106d64e541fd4fa33c4b3eea4b858e7cdd9889a7983ef3a3616ea1557a4",
+          "calibration": {
+            "known_budget": 0.05,
+            "threshold_known_reject_cal": 0.0512,
+            "n_known": 625,
+            "n_surrogate_open": 625
+          }
+        },
+        {
+          "target_pa": "PA8",
+          "target_name": "Replay",
+          "surrogate_pa": "PA3",
+          "surrogate_name": "Sustain",
+          "unknown_f1": 0.18764903065279745,
+          "evaluator_summary_path": "results_pa_osr_eval/l2o_ref_ent005_lr2e4_tgtPA8_surPA3_c16384_seed0__best_model__dqnguard_l2o_surPA3_knownonly_budget0.05/osr_summary.csv",
+          "evaluator_summary_sha256": "53ad970d533b923be6d877ecb08f1fd112fdb37551126e81b096949846038acd",
+          "run_dir": "results_pa_ota_l2o/l2o_ref_ent005_lr2e4_tgtPA8_surPA3_c16384_seed0",
+          "config_sha256": "126cd82ce7c36eab71c307a178ab54162ac24881d8d4a23e80e7dcf31e20ba19",
+          "checkpoint": "best_model.pt",
+          "checkpoint_sha256": "20bc9f87b0dc2173be0a1b34df68989d9aed1d0243049820a25094dca384f3cc",
+          "calibration": {
+            "known_budget": 0.05,
+            "threshold_known_reject_cal": 0.0512,
+            "n_known": 625,
+            "n_surrogate_open": 625
+          }
+        },
+        {
+          "target_pa": "PA8",
+          "target_name": "Replay",
+          "surrogate_pa": "PA4",
+          "surrogate_name": "Hop",
+          "unknown_f1": 0.755855403239312,
+          "evaluator_summary_path": "results_pa_osr_eval/l2o_ref_ent005_lr2e4_tgtPA8_surPA4_c16384_seed0__best_model__dqnguard_l2o_surPA4_knownonly_budget0.05/osr_summary.csv",
+          "evaluator_summary_sha256": "f975e7397eb0a9ac3528bfed4a19c2ef1d88f5a994b39d814785e196cb197251",
+          "run_dir": "results_pa_ota_l2o/l2o_ref_ent005_lr2e4_tgtPA8_surPA4_c16384_seed0",
+          "config_sha256": "fe748d2bacaaed3925ab0790a1bab8aa037db52cacaad39ead21f7ff821f508c",
+          "checkpoint": "best_model.pt",
+          "checkpoint_sha256": "4cb0216db39ac5cf34979a795efb4ce6750fdb30da256bfe962b8d66b5444562",
+          "calibration": {
+            "known_budget": 0.05,
+            "threshold_known_reject_cal": 0.0512,
+            "n_known": 625,
+            "n_surrogate_open": 625
+          }
+        }
+      ]
+    },
+    "B2_varmax_surrogate_all": {
+      "description": "VarMax surrogate-all historical multi-surrogate design/control reference on the same four target folds as B0.",
+      "aggregate": {
+        "folds": 4,
+        "known_reject_rate_mean": 0.12840971587462358,
+        "unknown_f1_mean": 0.7447884679855061,
+        "osr_macro_f1_mean": 0.778265991444021,
+        "unknown_auroc_mean": 0.9512795497888364
+      },
+      "calibration": {
+        "mode": "surrogate_all",
+        "sweep_grid": "smoke",
+        "budget_matched_to_dqnguard": false,
+        "observed_no_feasible_solution_all_four": true,
+        "observed_best_feasible_all_four": false,
+        "note": "This is a design/control reference, not a 5%-budget-matched head-to-head baseline."
+      },
+      "evaluator_rows": [
+        {
+          "target": "PA2",
+          "sha256": "3b3ed6cfe55125ef461b0bd842f5b781644e074332ced467d46f7aa691a846aa"
+        },
+        {
+          "target": "PA3",
+          "sha256": "a3ac229e6c09094c9a2137ae3f10705a7511e4f34a01651dd3486c44e2f9a16e"
+        },
+        {
+          "target": "PA4",
+          "sha256": "9eb6b33aa655a449de68100c69a14901a17fdcdaf0b5d2dc507ab822ee3c21a1"
+        },
+        {
+          "target": "PA8",
+          "sha256": "88f5621343d2c560fc4aaaa6cb6a76eba6803febf0d60af07b2fc8ab6efeacae"
+        }
+      ],
+      "training_identity": "Uses the same four OG backbone run directories/configs/best_model checkpoints recorded under B0."
+    }
+  },
+  "leakage_and_selection_contract": {
+    "target_labels_for_tuning": false,
+    "final_threshold_source": "known calibration only",
+    "known_rejection_budget": 0.05,
+    "target_open_calibration_role": "diagnostic/control only",
+    "architecture_selection_may_use_target_test_metrics": false
+  },
+  "stage00_exit": {
+    "baseline_metrics_machine_readable": true,
+    "run_config_checkpoint_cache_identities_recovered": true,
+    "full_20_cell_matrix_source_chain_recovered": true,
+    "unresolved_target_surrogate_naming_ambiguity": false,
+    "architecture_implementation_authorized_next": false,
+    "next_stage": "Stage 01 evidence-partition design must be completed before architecture A/B/C implementation."
+  }
+}
