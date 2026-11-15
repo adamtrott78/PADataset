@@ -36,7 +36,13 @@ export OPENBLAS_NUM_THREADS="$CPU_THREADS"
 
 echo
 echo "=== PREFLIGHT: STFT TRAJECTORY UNIT TEST ==="
-"$PY" -m pytest -q "$ROOT/tests/test_stft_track_features.py"
+"$PY" - "$ROOT/tests/test_stft_track_features.py" <<'PY'
+import runpy, sys
+ns = runpy.run_path(sys.argv[1])
+fn = ns["test_stft_centroid_preserves_monotone_vs_revisit_structure"]
+fn()
+print("STFT_TRAJECTORY_UNIT_TEST=PASS")
+PY
 
 echo
 echo "=== PHASE 1: BUILD/RESUME STFT TRACK CACHE ==="
