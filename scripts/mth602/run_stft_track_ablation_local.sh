@@ -33,6 +33,30 @@ echo "gpu_index=$GPU_INDEX"
 export OMP_NUM_THREADS="$CPU_THREADS"
 export MKL_NUM_THREADS="$CPU_THREADS"
 export OPENBLAS_NUM_THREADS="$CPU_THREADS"
+export PYTHONPATH="$ROOT${PYTHONPATH:+:$PYTHONPATH}"
+
+echo
+echo "=== PREFLIGHT: ENVIRONMENT + RAW OTA ACCESS ==="
+[[ -d "$DATA_ROOT" ]] || { echo "Missing data root: $DATA_ROOT" >&2; exit 22; }
+"$PY" - <<'PY'
+import h5py, numpy, pandas, scipy, sklearn, torch
+import prepData
+from experiments import pa_build_stft_track_cache, pa_stft_track_diagnostic
+print("STFT_IMPORT_PREFLIGHT=PASS")
+print("torch_version=" + torch.__version__)
+print("cuda_available=" + str(torch.cuda.is_available()).lower())
+PY
+
+"$PY" "$ROOT/experiments/pa_build_stft_track_cache.py" \
+  --data-root "$DATA_ROOT" \
+  --cache-root "$CACHE_ROOT" \
+  --cache-len 16384 \
+  --source-type ota \
+  --source-name ota_core_high_run01 \
+  --dataset-tag ota_core_high_run01 \
+  --noise-tag high_run01 \
+  --frame-count "$FRAME_COUNT" \
+  --probe-only
 
 echo
 echo "=== PREFLIGHT: STFT TRAJECTORY UNIT TEST ==="
