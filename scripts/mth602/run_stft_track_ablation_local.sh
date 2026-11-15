@@ -17,7 +17,7 @@ VENV="${VENV:-$HOME/adamArchives/venvs/DNNs}"
 GPU_INDEX="${GPU_INDEX:-1}"
 CPU_THREADS="${CPU_THREADS:-16}"
 FRAME_COUNT="${FRAME_COUNT:-64}"
-GPU_BATCH_SIZE="${GPU_BATCH_SIZE:-32}"
+GPU_BATCH_SIZE="${GPU_BATCH_SIZE:-64}"
 
 ROOT="$(cd "$(dirname "${BASH_SOURCE[0]}")/../.." && pwd)"
 LOG_ROOT="$CANON_REPO/local_artifacts/stft_ablation_v1"
