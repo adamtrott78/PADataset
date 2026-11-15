@@ -79,7 +79,7 @@ jobs:
         run: |
           set -Eeuo pipefail
 
-          [[ "$(id -un)" == "ci-padataset" ]]
+          [[ "$(id -un)" == "ci-padataset-2" ]]
           [[ -n "${RUNNER_NAME:-}" ]]
           [[ -n "${RUNNER_TEMP:-}" ]]
           [[ -n "${P5_GPU_TARGET_UUID:-}" ]]
