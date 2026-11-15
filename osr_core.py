@@ -318,6 +318,31 @@ def load_backbone_run(
     )
 
 
+def _decollate_sample_metadata(meta: Any, batch_size: int) -> List[Dict[str, Any]]:
+    """Restore one metadata dict per sample from PyTorch default collation."""
+    if isinstance(meta, dict):
+        result: List[Dict[str, Any]] = [{} for _ in range(batch_size)]
+        for key, values in meta.items():
+            if isinstance(values, torch.Tensor):
+                if values.ndim == 0 or values.shape[0] != batch_size:
+                    raise ValueError(f"metadata field {key!r} batch length mismatch")
+                values = values.tolist()
+            elif isinstance(values, np.ndarray):
+                if values.ndim == 0 or len(values) != batch_size:
+                    raise ValueError(f"metadata field {key!r} batch length mismatch")
+                values = values.tolist()
+            elif not isinstance(values, (list, tuple)) or len(values) != batch_size:
+                raise ValueError(f"metadata field {key!r} batch length mismatch")
+            for index, value in enumerate(values):
+                result[index][key] = value.item() if isinstance(value, np.generic) else value
+        return result
+    if isinstance(meta, (list, tuple)) and len(meta) == batch_size and all(
+        isinstance(item, dict) for item in meta
+    ):
+        return list(meta)
+    raise ValueError("metadata must be a batched dict or per-sample dictionaries")
+
+
 def _collect_split_outputs(
     model: torch.nn.Module,
     loader,
@@ -336,7 +361,7 @@ def _collect_split_outputs(
         for batch in loader:
             if len(batch) == 3:
                 x, y, meta = batch
-                all_meta.extend(meta)
+                all_meta.extend(_decollate_sample_metadata(meta, len(y)))
             else:
                 x, y = batch
 
@@ -707,7 +732,7 @@ def evaluate_osr_predictions(
         # full OSR
         "osr_acc": osr_acc,
         "osr_macro_f1": osr_macro_f1,
-        "osr_confusion_matrix": cm,
+        "osr_confusion_matrix": cm.tolist(),
         "label_names_with_unknown": known_class_names + [unknown_label_name],
     }
 

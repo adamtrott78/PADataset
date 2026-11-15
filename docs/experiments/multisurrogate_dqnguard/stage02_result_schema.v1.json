@@ -1,0 +1,319 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "padataset.multisurrogate_dqnguard.result.v1",
+  "title": "Multi-Surrogate DQNGuard Result Record",
+  "type": "object",
+  "required": [
+    "schema",
+    "task_id",
+    "architecture",
+    "target_pa",
+    "source",
+    "backbone",
+    "evidence_partition",
+    "score",
+    "threshold",
+    "metrics",
+    "provenance",
+    "status"
+  ],
+  "properties": {
+    "schema": {
+      "const": "padataset.multisurrogate_dqnguard.result.v1"
+    },
+    "task_id": {
+      "const": "mth602-final-multisurrogate-dqnguard-v1"
+    },
+    "architecture": {
+      "enum": [
+        "B0",
+        "A",
+        "B",
+        "C"
+      ]
+    },
+    "target_pa": {
+      "enum": [
+        "PA1",
+        "PA2",
+        "PA3",
+        "PA4",
+        "PA8"
+      ]
+    },
+    "source": {
+      "type": "object",
+      "required": [
+        "git_sha",
+        "cache_len",
+        "cache_root",
+        "seed"
+      ],
+      "properties": {
+        "git_sha": {
+          "type": "string",
+          "pattern": "^[0-9a-f]{40}$"
+        },
+        "cache_len": {
+          "const": 16384
+        },
+        "cache_root": {
+          "type": "string",
+          "minLength": 1
+        },
+        "seed": {
+          "type": "integer"
+        },
+        "historical_evidence_head": {
+          "type": [
+            "string",
+            "null"
+          ],
+          "pattern": "^[0-9a-f]{40}$"
+        }
+      },
+      "additionalProperties": true
+    },
+    "backbone": {
+      "type": "object",
+      "required": [
+        "run_dir",
+        "config_sha256",
+        "checkpoint_path",
+        "checkpoint_sha256",
+        "known_classes",
+        "checkpoint_selection"
+      ],
+      "properties": {
+        "run_dir": {
+          "type": "string"
+        },
+        "config_sha256": {
+          "type": "string",
+          "pattern": "^[0-9a-f]{64}$"
+        },
+        "checkpoint_path": {
+          "type": "string"
+        },
+        "checkpoint_sha256": {
+          "type": "string",
+          "pattern": "^[0-9a-f]{64}$"
+        },
+        "known_classes": {
+          "type": "array",
+          "items": {
+            "enum": [
+              "PA1",
+              "PA2",
+              "PA3",
+              "PA4",
+              "PA8"
+            ]
+          },
+          "minItems": 3,
+          "maxItems": 4,
+          "uniqueItems": true
+        },
+        "checkpoint_selection": {
+          "enum": [
+            "historical_open_conf",
+            "known_only"
+          ]
+        }
+      },
+      "additionalProperties": true
+    },
+    "evidence_partition": {
+      "type": "object",
+      "required": [
+        "target_quarantined",
+        "known_fit",
+        "known_guard",
+        "known_norm",
+        "known_threshold",
+        "pseudo_open"
+      ],
+      "properties": {
+        "target_quarantined": {
+          "const": true
+        },
+        "known_fit": {
+          "type": "string"
+        },
+        "known_guard": {
+          "type": "string"
+        },
+        "known_norm": {
+          "type": "string"
+        },
+        "known_threshold": {
+          "type": "string"
+        },
+        "pseudo_open": {
+          "type": "array",
+          "items": {
+            "type": "object"
+          }
+        }
+      },
+      "additionalProperties": true
+    },
+    "score": {
+      "type": "object",
+      "required": [
+        "direction",
+        "definition"
+      ],
+      "properties": {
+        "direction": {
+          "const": "higher_is_more_unknown"
+        },
+        "definition": {
+          "type": "string",
+          "minLength": 1
+        },
+        "normalization": {
+          "type": [
+            "object",
+            "null"
+          ]
+        },
+        "aggregation": {
+          "type": [
+            "object",
+            "null"
+          ]
+        }
+      },
+      "additionalProperties": true
+    },
+    "threshold": {
+      "type": "object",
+      "required": [
+        "source",
+        "budget",
+        "quantile",
+        "value"
+      ],
+      "properties": {
+        "source": {
+          "const": "known_only"
+        },
+        "budget": {
+          "const": 0.05
+        },
+        "quantile": {
+          "const": 0.95
+        },
+        "value": {
+          "type": "number"
+        },
+        "calibration_known_reject_rate": {
+          "type": "number",
+          "minimum": 0,
+          "maximum": 1
+        }
+      },
+      "additionalProperties": true
+    },
+    "metrics": {
+      "type": "object",
+      "required": [
+        "known_reject_rate",
+        "unknown_precision",
+        "unknown_recall",
+        "unknown_f1",
+        "osr_macro_f1",
+        "unknown_auroc"
+      ],
+      "properties": {
+        "known_reject_rate": {
+          "type": "number",
+          "minimum": 0,
+          "maximum": 1
+        },
+        "unknown_precision": {
+          "type": "number",
+          "minimum": 0,
+          "maximum": 1
+        },
+        "unknown_recall": {
+          "type": "number",
+          "minimum": 0,
+          "maximum": 1
+        },
+        "unknown_f1": {
+          "type": "number",
+          "minimum": 0,
+          "maximum": 1
+        },
+        "osr_macro_f1": {
+          "type": "number",
+          "minimum": 0,
+          "maximum": 1
+        },
+        "unknown_auroc": {
+          "type": "number",
+          "minimum": 0,
+          "maximum": 1
+        }
+      },
+      "additionalProperties": true
+    },
+    "provenance": {
+      "type": "object",
+      "required": [
+        "config_sha256",
+        "checkpoint_sha256",
+        "result_sha256",
+        "command",
+        "target_labels_used_for_tuning"
+      ],
+      "properties": {
+        "config_sha256": {
+          "type": "string",
+          "pattern": "^[0-9a-f]{64}$"
+        },
+        "checkpoint_sha256": {
+          "type": "string",
+          "pattern": "^[0-9a-f]{64}$"
+        },
+        "result_sha256": {
+          "type": "string",
+          "pattern": "^[0-9a-f]{64}$"
+        },
+        "command": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          }
+        },
+        "target_labels_used_for_tuning": {
+          "const": false
+        },
+        "fallback_status": {
+          "type": [
+            "string",
+            "null"
+          ]
+        },
+        "feasibility_status": {
+          "type": [
+            "string",
+            "null"
+          ]
+        }
+      },
+      "additionalProperties": true
+    },
+    "status": {
+      "enum": [
+        "SMOKE",
+        "SMALL_REAL",
+        "FULL",
+        "FAILED"
+      ]
+    }
+  },
+  "additionalProperties": true
+}

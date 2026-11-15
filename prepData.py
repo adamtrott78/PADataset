@@ -1,6 +1,7 @@
 import os
 import glob
 import json
+import random
 from dataclasses import dataclass, field
 from typing import Any, Dict, List, Optional, Sequence, Tuple, Union
 
@@ -949,6 +950,41 @@ def make_pa_open_set_splits(
     }
 
 
+def _seed_dataloader_worker(worker_id: int) -> None:
+    worker_seed = torch.initial_seed() % (2**32)
+    random.seed(worker_seed)
+    np.random.seed(worker_seed)
+
+
+def make_seeded_dataloader(
+    dataset,
+    *,
+    batch_size: int,
+    shuffle: bool,
+    num_workers: int,
+    pin_memory: bool,
+    seed: int,
+    stream_id: int = 0,
+):
+    generator = torch.Generator()
+    generator.manual_seed(int(seed) + int(stream_id))
+    kwargs = {
+        "dataset": dataset,
+        "batch_size": batch_size,
+        "shuffle": shuffle,
+        "num_workers": num_workers,
+        "pin_memory": pin_memory,
+        "generator": generator,
+    }
+    if num_workers > 0:
+        kwargs.update(
+            worker_init_fn=_seed_dataloader_worker,
+            persistent_workers=True,
+            prefetch_factor=2,
+        )
+    return DataLoader(**kwargs)
+
+
 # -----------------------------
 # top-level build entrypoint
 # -----------------------------
@@ -1000,9 +1036,9 @@ def build_data_from_setup(
             "train_ds": train_ds,
             "val_ds": val_ds,
             "test_ds": test_ds,
-            "train_loader": DataLoader(train_ds, batch_size=batch_size, shuffle=True, num_workers=num_workers, pin_memory=pin_memory),
-            "val_loader": DataLoader(val_ds, batch_size=batch_size, shuffle=False, num_workers=num_workers, pin_memory=pin_memory),
-            "test_loader": DataLoader(test_ds, batch_size=batch_size, shuffle=False, num_workers=num_workers, pin_memory=pin_memory),
+            "train_loader": make_seeded_dataloader(train_ds, batch_size=batch_size, shuffle=True, num_workers=num_workers, pin_memory=pin_memory, seed=setup.seed, stream_id=1),
+            "val_loader": make_seeded_dataloader(val_ds, batch_size=batch_size, shuffle=False, num_workers=num_workers, pin_memory=pin_memory, seed=setup.seed, stream_id=2),
+            "test_loader": make_seeded_dataloader(test_ds, batch_size=batch_size, shuffle=False, num_workers=num_workers, pin_memory=pin_memory, seed=setup.seed, stream_id=3),
             "meta": meta,
         })
         return out
@@ -1032,17 +1068,17 @@ def build_data_from_setup(
             "val_known_balanced_ds": split["val_known_balanced"],
             "val_open_balanced_ds": split["val_open_balanced"],
 
-            "train_loader": DataLoader(split["train"], batch_size=batch_size, shuffle=True, num_workers=num_workers, pin_memory=pin_memory),
-            "val_loader": DataLoader(split["val"], batch_size=batch_size, shuffle=False, num_workers=num_workers, pin_memory=pin_memory),
-            "test_known_loader": DataLoader(split["test_known"], batch_size=batch_size, shuffle=False, num_workers=num_workers, pin_memory=pin_memory),
-            "val_open_loader": DataLoader(split["val_open"], batch_size=batch_size, shuffle=False, num_workers=num_workers, pin_memory=pin_memory),
-            "test_open_loader": DataLoader(split["test_open"], batch_size=batch_size, shuffle=False, num_workers=num_workers, pin_memory=pin_memory),
+            "train_loader": make_seeded_dataloader(split["train"], batch_size=batch_size, shuffle=True, num_workers=num_workers, pin_memory=pin_memory, seed=setup.seed, stream_id=11),
+            "val_loader": make_seeded_dataloader(split["val"], batch_size=batch_size, shuffle=False, num_workers=num_workers, pin_memory=pin_memory, seed=setup.seed, stream_id=12),
+            "test_known_loader": make_seeded_dataloader(split["test_known"], batch_size=batch_size, shuffle=False, num_workers=num_workers, pin_memory=pin_memory, seed=setup.seed, stream_id=13),
+            "val_open_loader": make_seeded_dataloader(split["val_open"], batch_size=batch_size, shuffle=False, num_workers=num_workers, pin_memory=pin_memory, seed=setup.seed, stream_id=14),
+            "test_open_loader": make_seeded_dataloader(split["test_open"], batch_size=batch_size, shuffle=False, num_workers=num_workers, pin_memory=pin_memory, seed=setup.seed, stream_id=15),
 
-            "val_known_balanced_loader": None if split["val_known_balanced"] is None else DataLoader(
-                split["val_known_balanced"], batch_size=batch_size, shuffle=False, num_workers=num_workers, pin_memory=pin_memory
+            "val_known_balanced_loader": None if split["val_known_balanced"] is None else make_seeded_dataloader(
+                split["val_known_balanced"], batch_size=batch_size, shuffle=False, num_workers=num_workers, pin_memory=pin_memory, seed=setup.seed, stream_id=16
             ),
-            "val_open_balanced_loader": None if split["val_open_balanced"] is None else DataLoader(
-                split["val_open_balanced"], batch_size=batch_size, shuffle=False, num_workers=num_workers, pin_memory=pin_memory
+            "val_open_balanced_loader": None if split["val_open_balanced"] is None else make_seeded_dataloader(
+                split["val_open_balanced"], batch_size=batch_size, shuffle=False, num_workers=num_workers, pin_memory=pin_memory, seed=setup.seed, stream_id=17
             ),
 
             "meta": split["meta"],
