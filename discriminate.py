@@ -20,13 +20,30 @@ from IPython.display import display
 from torch.utils.data import DataLoader, Subset
 from tqdm.auto import tqdm
 
-from prepData import DataSetup, build_data_from_setup
+from prepData import DataSetup, build_data_from_setup, make_seeded_dataloader
 from evaluate import evaluate_classifier, evaluate_open_confidence
+
+
+DETERMINISTIC_PROFILES = {
+    "strict",
+    "strict_tf32",
+    "cudnn_tf32",
+    "seeded_fast",
+}
 
 
 def configure_training_reproducibility(cfg: Dict[str, Any]) -> dict[str, Any]:
     seed = int(cfg.get("seed", 0))
     deterministic = bool(cfg.get("deterministic_training", False))
+    profile = str(cfg.get("deterministic_profile", "strict" if deterministic else "off"))
+
+    if deterministic and profile not in DETERMINISTIC_PROFILES:
+        raise ValueError(
+            f"Unsupported deterministic_profile={profile!r}; "
+            f"expected one of {sorted(DETERMINISTIC_PROFILES)}"
+        )
+    if not deterministic:
+        profile = "off"
 
     random.seed(seed)
     np.random.seed(seed)
@@ -34,20 +51,30 @@ def configure_training_reproducibility(cfg: Dict[str, Any]) -> dict[str, Any]:
     if torch.cuda.is_available():
         torch.cuda.manual_seed_all(seed)
 
+    use_deterministic_algorithms = profile in {"strict", "strict_tf32"}
+    cudnn_deterministic = profile in {"strict", "strict_tf32", "cudnn_tf32"}
+    cudnn_benchmark = profile == "seeded_fast"
+    allow_tf32 = profile in {"strict_tf32", "cudnn_tf32", "seeded_fast"}
+
     if deterministic:
         os.environ.setdefault("CUBLAS_WORKSPACE_CONFIG", ":4096:8")
-        torch.use_deterministic_algorithms(True)
+        torch.use_deterministic_algorithms(use_deterministic_algorithms)
         if hasattr(torch.backends, "cudnn"):
-            torch.backends.cudnn.benchmark = False
-            torch.backends.cudnn.deterministic = True
+            torch.backends.cudnn.benchmark = cudnn_benchmark
+            torch.backends.cudnn.deterministic = cudnn_deterministic
             if hasattr(torch.backends.cudnn, "allow_tf32"):
-                torch.backends.cudnn.allow_tf32 = False
+                torch.backends.cudnn.allow_tf32 = allow_tf32
         if hasattr(torch.backends, "cuda") and hasattr(torch.backends.cuda, "matmul"):
-            torch.backends.cuda.matmul.allow_tf32 = False
+            torch.backends.cuda.matmul.allow_tf32 = allow_tf32
 
     return {
         "seed": seed,
         "deterministic_training": deterministic,
+        "deterministic_profile": profile,
+        "use_deterministic_algorithms": use_deterministic_algorithms,
+        "cudnn_deterministic": cudnn_deterministic,
+        "cudnn_benchmark": cudnn_benchmark,
+        "allow_tf32": allow_tf32,
         "cublas_workspace_config": os.environ.get("CUBLAS_WORKSPACE_CONFIG"),
     }
 
@@ -515,6 +542,8 @@ def train_classifier(
         "val_dqn_anchor_high_known_frac": [],
         "val_dqn_anchor_low_open_frac": [],
         "lr": [],
+        "train_epoch_elapsed_sec": [],
+        "train_steps_per_sec": [],
     }
 
     best_metric = -np.inf
@@ -613,6 +642,9 @@ def train_classifier(
                     steps_per_sec=float(steps_per_sec),
                 )
 
+        train_epoch_elapsed_sec = time.time() - epoch_t0
+        train_steps_per_sec = total_train_batches / max(train_epoch_elapsed_sec, 1e-9)
+
         train_loss = running_loss / max(running_samples, 1)
         train_ce = running_ce / max(running_samples, 1)
         train_ent = running_ent / max(running_samples, 1)
@@ -677,6 +709,8 @@ def train_classifier(
         history["val_macro_f1"].append(val_stats["macro_f1"])
         history["val_weighted_f1"].append(val_stats["weighted_f1"])
         history["lr"].append(float(optimizer.param_groups[0]["lr"]))
+        history["train_epoch_elapsed_sec"].append(float(train_epoch_elapsed_sec))
+        history["train_steps_per_sec"].append(float(train_steps_per_sec))
 
         if open_conf_stats is not None:
             history["val_dqn_proxy_softmax3"].append(open_conf_stats["dqn_proxy_softmax3"])
@@ -726,6 +760,8 @@ def train_classifier(
             val_loss=float(val_stats["loss"]),
             val_acc=float(val_stats["acc"]),
             val_macro_f1=float(val_stats["macro_f1"]),
+            train_epoch_elapsed_sec=float(train_epoch_elapsed_sec),
+            train_steps_per_sec=float(train_steps_per_sec),
         )
 
         if early_stopping_mode == "known_only":
@@ -784,6 +820,9 @@ def run_experiment(cfg: Dict[str, Any], data_root: str) -> Dict[str, Any]:
         "REPRODUCIBILITY | "
         f"seed={reproducibility['seed']} | "
         f"deterministic_training={str(reproducibility['deterministic_training']).lower()} | "
+        f"deterministic_profile={reproducibility['deterministic_profile']} | "
+        f"use_deterministic_algorithms={str(reproducibility['use_deterministic_algorithms']).lower()} | "
+        f"allow_tf32={str(reproducibility['allow_tf32']).lower()} | "
         f"cublas_workspace_config={reproducibility['cublas_workspace_config']}",
         flush=True,
     )
@@ -835,6 +874,44 @@ def run_experiment(cfg: Dict[str, Any], data_root: str) -> Dict[str, Any]:
     )
 
     print(f"RUN_STAGE | run_name={run_name} | stage=build_data_done", flush=True)
+
+    throughput_probe = bool(cfg.get("throughput_probe", False))
+    if throughput_probe:
+        probe_train_samples = int(cfg.get("throughput_probe_train_samples", 4096))
+        probe_val_samples = int(cfg.get("throughput_probe_val_samples", 1024))
+        if probe_train_samples <= 0 or probe_val_samples <= 0:
+            raise ValueError("throughput probe sample bounds must be positive")
+
+        train_take = min(len(data["train_ds"]), probe_train_samples)
+        val_take = min(len(data["val_ds"]), probe_val_samples)
+        train_probe_ds = Subset(data["train_ds"], range(train_take))
+        val_probe_ds = Subset(data["val_ds"], range(val_take))
+
+        data["train_loader"] = make_seeded_dataloader(
+            train_probe_ds,
+            batch_size=batch_size,
+            shuffle=True,
+            num_workers=num_workers,
+            pin_memory=pin_memory,
+            seed=int(cfg.get("seed", 0)),
+            stream_id=101,
+        )
+        data["val_loader"] = make_seeded_dataloader(
+            val_probe_ds,
+            batch_size=batch_size,
+            shuffle=False,
+            num_workers=num_workers,
+            pin_memory=pin_memory,
+            seed=int(cfg.get("seed", 0)),
+            stream_id=102,
+        )
+        print(
+            "THROUGHPUT_PROBE | "
+            f"train_samples={train_take} | val_samples={val_take} | "
+            f"batch_size={batch_size} | num_workers={num_workers}",
+            flush=True,
+        )
+
     train_loader = data["train_loader"]
     val_loader = data["val_loader"]
     meta = data["meta"]
@@ -926,6 +1003,39 @@ def run_experiment(cfg: Dict[str, Any], data_root: str) -> Dict[str, Any]:
         confidence_temperature=cfg.get("confidence_temperature", 1.0),
     )
 
+    if throughput_probe:
+        summary = {
+            "run_name": run_name,
+            "save_dir": save_dir,
+            "throughput_probe": True,
+            "throughput_probe_train_samples": int(cfg.get("throughput_probe_train_samples", 4096)),
+            "throughput_probe_val_samples": int(cfg.get("throughput_probe_val_samples", 1024)),
+            "batch_size": batch_size,
+            "num_workers": num_workers,
+            "seed": int(cfg.get("seed", 0)),
+            "deterministic_training": bool(cfg.get("deterministic_training", False)),
+            "deterministic_profile": reproducibility["deterministic_profile"],
+            "deterministic_profile": reproducibility["deterministic_profile"],
+            "use_deterministic_algorithms": reproducibility["use_deterministic_algorithms"],
+            "allow_tf32": reproducibility["allow_tf32"],
+            "train_epoch_elapsed_sec": history["train_epoch_elapsed_sec"][-1],
+            "train_steps_per_sec": history["train_steps_per_sec"][-1],
+            "train_loss": history["train_loss"][-1],
+            "val_loss": history["val_loss"][-1],
+            "val_acc": history["val_acc"][-1],
+            "val_macro_f1": history["val_macro_f1"][-1],
+            "available_checkpoints": list_available_checkpoints(save_dir),
+        }
+        save_experiment_summary(summary, save_dir)
+        try:
+            if hasattr(data.get("dataset", None), "close"):
+                data["dataset"].close()
+        except Exception:
+            pass
+        cleanup_experiment_objects(train_loader, val_loader, model)
+        print(f"RUN_STAGE | run_name={run_name} | stage=throughput_probe_done", flush=True)
+        return summary
+
     print(f"RUN_STAGE | run_name={run_name} | stage=post_train_eval_start", flush=True)
 
     ckpt = torch.load(
@@ -997,6 +1107,7 @@ def run_experiment(cfg: Dict[str, Any], data_root: str) -> Dict[str, Any]:
             "epochs": cfg.get("epochs", 20),
             "seed": cfg.get("seed", 0),
             "deterministic_training": bool(cfg.get("deterministic_training", False)),
+            "deterministic_profile": reproducibility["deterministic_profile"],
 
             "source_type": meta.get("source_type"),
             "source_name": meta.get("source_name"),
@@ -1127,6 +1238,7 @@ def run_experiment(cfg: Dict[str, Any], data_root: str) -> Dict[str, Any]:
             "epochs": cfg.get("epochs", 20),
             "seed": cfg.get("seed", 0),
             "deterministic_training": bool(cfg.get("deterministic_training", False)),
+            "deterministic_profile": reproducibility["deterministic_profile"],
 
             "source_type": meta.get("source_type"),
             "source_name": meta.get("source_name"),
