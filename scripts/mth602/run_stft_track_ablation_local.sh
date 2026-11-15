@@ -35,6 +35,10 @@ export MKL_NUM_THREADS="$CPU_THREADS"
 export OPENBLAS_NUM_THREADS="$CPU_THREADS"
 
 echo
+echo "=== PREFLIGHT: STFT TRAJECTORY UNIT TEST ==="
+"$PY" -m pytest -q "$ROOT/tests/test_stft_track_features.py"
+
+echo
 echo "=== PHASE 1: BUILD/RESUME STFT TRACK CACHE ==="
 "$PY" "$ROOT/experiments/pa_build_stft_track_cache.py" \
   --data-root "$DATA_ROOT" \
