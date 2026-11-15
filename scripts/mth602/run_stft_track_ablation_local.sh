@@ -10,12 +10,14 @@ set -Eeuo pipefail
 CANON_REPO="${CANON_REPO:-$HOME/adamArchives/Adam/varMax/PADataset}"
 DATA_ROOT="${DATA_ROOT:-$CANON_REPO/data}"
 CACHE_ROOT="${CACHE_ROOT:-$CANON_REPO/_feature_cache_nvme/len16384/norm_stfttracks64_v1/ota__ota_core_high_run01__high_run01}"
+BASE_CACHE_ROOT="${BASE_CACHE_ROOT:-$CANON_REPO/_feature_cache_nvme/len16384/norm/ota__ota_core_high_run01__high_run01}"
 RESULT_ROOT="${RESULT_ROOT:-$CANON_REPO/results_pa_mth602_stft_ablation}"
 DIAG_ROOT="${DIAG_ROOT:-$CANON_REPO/results/pa1_pa4_stft_diagnostic/stfttracks64_v1}"
 VENV="${VENV:-$HOME/adamArchives/venvs/DNNs}"
 GPU_INDEX="${GPU_INDEX:-1}"
 CPU_THREADS="${CPU_THREADS:-16}"
 FRAME_COUNT="${FRAME_COUNT:-64}"
+GPU_BATCH_SIZE="${GPU_BATCH_SIZE:-32}"
 
 ROOT="$(cd "$(dirname "${BASH_SOURCE[0]}")/../.." && pwd)"
 LOG_ROOT="$CANON_REPO/local_artifacts/stft_ablation_v1"
@@ -34,6 +36,7 @@ export OMP_NUM_THREADS="$CPU_THREADS"
 export MKL_NUM_THREADS="$CPU_THREADS"
 export OPENBLAS_NUM_THREADS="$CPU_THREADS"
 export PYTHONPATH="$ROOT${PYTHONPATH:+:$PYTHONPATH}"
+export CUDA_VISIBLE_DEVICES="$GPU_INDEX"
 
 echo
 echo "=== PREFLIGHT: ENVIRONMENT + RAW OTA ACCESS ==="
@@ -41,21 +44,24 @@ echo "=== PREFLIGHT: ENVIRONMENT + RAW OTA ACCESS ==="
 "$PY" - <<'PY'
 import h5py, numpy, pandas, scipy, sklearn, torch
 import prepData
-from experiments import pa_build_stft_track_cache, pa_stft_track_diagnostic
+from experiments import pa_build_stft_track_cache, pa_build_stft_track_cache_gpu, pa_stft_track_diagnostic
 print("STFT_IMPORT_PREFLIGHT=PASS")
 print("torch_version=" + torch.__version__)
 print("cuda_available=" + str(torch.cuda.is_available()).lower())
 PY
 
-"$PY" "$ROOT/experiments/pa_build_stft_track_cache.py" \
+"$PY" "$ROOT/experiments/pa_build_stft_track_cache_gpu.py" \
   --data-root "$DATA_ROOT" \
   --cache-root "$CACHE_ROOT" \
+  --base-cache-root "$BASE_CACHE_ROOT" \
   --cache-len 16384 \
   --source-type ota \
   --source-name ota_core_high_run01 \
   --dataset-tag ota_core_high_run01 \
   --noise-tag high_run01 \
   --frame-count "$FRAME_COUNT" \
+  --batch-size "$GPU_BATCH_SIZE" \
+  --device cuda:0 \
   --probe-only
 
 echo
@@ -69,17 +75,20 @@ print("STFT_TRAJECTORY_UNIT_TEST=PASS")
 PY
 
 echo
-echo "=== PHASE 1: BUILD/RESUME STFT TRACK CACHE ==="
-"$PY" "$ROOT/experiments/pa_build_stft_track_cache.py" \
+echo "=== PHASE 1: GPU-ACCELERATED BUILD/RESUME STFT TRACK OVERLAY CACHE ==="
+"$PY" "$ROOT/experiments/pa_build_stft_track_cache_gpu.py" \
   --data-root "$DATA_ROOT" \
   --cache-root "$CACHE_ROOT" \
+  --base-cache-root "$BASE_CACHE_ROOT" \
   --cache-len 16384 \
   --source-type ota \
   --source-name ota_core_high_run01 \
   --dataset-tag ota_core_high_run01 \
   --noise-tag high_run01 \
   --frame-count "$FRAME_COUNT" \
-  2>&1 | tee "$LOG_ROOT/cache_build.log"
+  --batch-size "$GPU_BATCH_SIZE" \
+  --device cuda:0 \
+  2>&1 | tee "$LOG_ROOT/cache_build_gpu.log"
 
 [[ -f "$CACHE_ROOT/stft_track_cache_manifest.json" ]] || {
   echo "Cache manifest missing after build" >&2
@@ -102,7 +111,6 @@ pathlib.Path(out).write_text(json.dumps(cfg, indent=2, sort_keys=True) + "\n")
 PY
 
 (
-  export CUDA_VISIBLE_DEVICES="$GPU_INDEX"
   "$PY" "$ROOT/experiments/pa_train_one.py" \
     --cfg "$NORM_CFG" \
     --data-root "$DATA_ROOT"
