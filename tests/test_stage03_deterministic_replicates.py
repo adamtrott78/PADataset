@@ -21,6 +21,22 @@ class Stage03DeterministicReplicateTests(unittest.TestCase):
         ):
             self.assertIn(marker, source)
 
+    def test_stage03_overlap_probe_is_bounded_deterministic_and_quarantined(self):
+        path = CFG_ROOT / "perf_strict_tf32_w4_overlap_detv2.json"
+        cfg = json.loads(path.read_text())
+        self.assertTrue(cfg["throughput_probe"])
+        self.assertEqual(cfg["throughput_probe_train_samples"], 32768)
+        self.assertEqual(cfg["throughput_probe_val_samples"], 4096)
+        self.assertTrue(cfg["deterministic_training"])
+        self.assertEqual(cfg["deterministic_profile"], "strict_tf32")
+        self.assertEqual(cfg["num_workers"], 4)
+        self.assertEqual(cfg["unknown_pas"], ["PA2"])
+        self.assertTrue(cfg["quarantine_target_until_test"])
+        self.assertEqual(cfg["open_val_frac"], 0)
+        self.assertFalse(cfg["build_balanced_val_open"])
+        self.assertFalse(cfg["allow_val_open_fallback"])
+        self.assertEqual(cfg["cache_len"], 16384)
+
     def test_stage03_deterministic_replicates_are_exact_and_quarantined(self):
         for seed in (0, 1, 2):
             path = CFG_ROOT / (
