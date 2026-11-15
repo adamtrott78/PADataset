@@ -4,6 +4,7 @@ import copy
 import gc
 import json
 import os
+import random
 import time
 from datetime import datetime
 from typing import Any, Dict, Optional
@@ -21,6 +22,34 @@ from tqdm.auto import tqdm
 
 from prepData import DataSetup, build_data_from_setup
 from evaluate import evaluate_classifier, evaluate_open_confidence
+
+
+def configure_training_reproducibility(cfg: Dict[str, Any]) -> dict[str, Any]:
+    seed = int(cfg.get("seed", 0))
+    deterministic = bool(cfg.get("deterministic_training", False))
+
+    random.seed(seed)
+    np.random.seed(seed)
+    torch.manual_seed(seed)
+    if torch.cuda.is_available():
+        torch.cuda.manual_seed_all(seed)
+
+    if deterministic:
+        os.environ.setdefault("CUBLAS_WORKSPACE_CONFIG", ":4096:8")
+        torch.use_deterministic_algorithms(True)
+        if hasattr(torch.backends, "cudnn"):
+            torch.backends.cudnn.benchmark = False
+            torch.backends.cudnn.deterministic = True
+            if hasattr(torch.backends.cudnn, "allow_tf32"):
+                torch.backends.cudnn.allow_tf32 = False
+        if hasattr(torch.backends, "cuda") and hasattr(torch.backends.cuda, "matmul"):
+            torch.backends.cuda.matmul.allow_tf32 = False
+
+    return {
+        "seed": seed,
+        "deterministic_training": deterministic,
+        "cublas_workspace_config": os.environ.get("CUBLAS_WORKSPACE_CONFIG"),
+    }
 
 
 # -----------------------------
@@ -750,6 +779,15 @@ def run_experiment(cfg: Dict[str, Any], data_root: str) -> Dict[str, Any]:
     cfg = copy.deepcopy(cfg)
     cfg["root"] = data_root
 
+    reproducibility = configure_training_reproducibility(cfg)
+    print(
+        "REPRODUCIBILITY | "
+        f"seed={reproducibility['seed']} | "
+        f"deterministic_training={str(reproducibility['deterministic_training']).lower()} | "
+        f"cublas_workspace_config={reproducibility['cublas_workspace_config']}",
+        flush=True,
+    )
+
     print(f"RUN_STAGE | run_name={run_name} | stage=before_datasetup", flush=True)
     setup = DataSetup(
         root=data_root,
@@ -958,6 +996,7 @@ def run_experiment(cfg: Dict[str, Any], data_root: str) -> Dict[str, Any]:
             "scheduler_name": cfg.get("scheduler_name", "cosine"),
             "epochs": cfg.get("epochs", 20),
             "seed": cfg.get("seed", 0),
+            "deterministic_training": bool(cfg.get("deterministic_training", False)),
 
             "source_type": meta.get("source_type"),
             "source_name": meta.get("source_name"),
@@ -1087,6 +1126,7 @@ def run_experiment(cfg: Dict[str, Any], data_root: str) -> Dict[str, Any]:
             "open_conf_selection_metric": cfg.get("open_conf_selection_metric", "dqn_proxy_expanded5"),
             "epochs": cfg.get("epochs", 20),
             "seed": cfg.get("seed", 0),
+            "deterministic_training": bool(cfg.get("deterministic_training", False)),
 
             "source_type": meta.get("source_type"),
             "source_name": meta.get("source_name"),
@@ -1110,6 +1150,7 @@ def run_experiment(cfg: Dict[str, Any], data_root: str) -> Dict[str, Any]:
         "use_timestamped_run_dir",
         "notes",
         "quarantine_target_until_test",
+        "deterministic_training",
     ]:
         if _k in cfg:
             summary[_k] = cfg.get(_k)
