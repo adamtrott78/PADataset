@@ -5,7 +5,12 @@ import argparse
 import json
 import math
 import os
+import sys
 from pathlib import Path
+
+REPO_ROOT = Path(__file__).resolve().parents[1]
+if str(REPO_ROOT) not in sys.path:
+    sys.path.insert(0, str(REPO_ROOT))
 
 import h5py
 import numpy as np
@@ -267,6 +272,7 @@ def main() -> None:
     ap.add_argument("--source-glob", default=None)
     ap.add_argument("--frame-count", type=int, default=64)
     ap.add_argument("--force", action="store_true")
+    ap.add_argument("--probe-only", action="store_true", help="Validate source discovery and one real STFT transform, then exit.")
     args = ap.parse_args()
 
     setup = DataSetup(
@@ -284,6 +290,37 @@ def main() -> None:
         dataset_tag=args.dataset_tag,
         noise_tag=args.noise_tag,
     )
+    if args.probe_only:
+        records = discover_raw_sources(setup)
+        if not records:
+            raise RuntimeError("No raw OTA source records discovered")
+        rec = records[0]
+        with h5py.File(rec.path, "r") as fin:
+            Xds = fin["X"]
+            xshape = tuple(Xds.shape)
+            ch_axis, sample_axis, time_axis = _infer_x_layout(xshape)
+            iq = _load_iq_sample_from_h5(Xds, 0, ch_axis, sample_axis, time_axis)
+            feat = compute_stft_track_feature_stack(
+                iq,
+                out_len=int(setup.cache_len),
+                normalize=setup.normalize,
+                frame_count=int(args.frame_count),
+            )
+        if feat.shape != (8, int(setup.cache_len)):
+            raise RuntimeError(f"Unexpected STFT feature shape: {feat.shape}")
+        if not np.isfinite(feat).all():
+            raise RuntimeError("Non-finite values in STFT feature probe")
+        print(json.dumps({
+            "probe": "PASS",
+            "source_records": len(records),
+            "first_source": rec.path,
+            "raw_iq_shape": list(iq.shape),
+            "feature_shape": list(feat.shape),
+            "feature_mode": FEATURE_MODE,
+            "frame_count": int(args.frame_count),
+        }, indent=2, sort_keys=True))
+        return
+
     result = build_cache(setup, frame_count=int(args.frame_count))
     print(json.dumps(result, indent=2, sort_keys=True))
 
