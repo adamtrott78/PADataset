@@ -13,8 +13,8 @@
   "cache_len": 16384,
   "canonical_backbone_count": 10,
   "directed_cell_count": 20,
-  "completed_backbone_count": 9,
-  "remaining_backbone_count": 1,
+  "completed_backbone_count": 10,
+  "remaining_backbone_count": 0,
   "backbones": [
     {
       "canonical_pair": [
@@ -320,7 +320,7 @@
         "PA8"
       ],
       "canonical_w4_config": "manifests/configs/l2o_surrogate_matrix_repair_v1/l2o_repair_ref_ent005_lr2e4_tgtPA3_surPA4_c16384_seed0_detv2_w4.json",
-      "status": "PENDING_BACKBONE",
+      "status": "COMPLETE",
       "directed_cells": [
         {
           "evaluation_target": "PA3",
@@ -330,7 +330,28 @@
           "evaluation_target": "PA4",
           "evaluation_surrogate": "PA3"
         }
-      ]
+      ],
+      "training_direction": {
+        "target": "PA3",
+        "surrogate": "PA4"
+      },
+      "workflow_run_id": 43943016274,
+      "workflow_job_id": 133565212672,
+      "artifact_id": 14277201494,
+      "artifact_digest": "sha256:9e4b8ec93e19868cd46c8982503570e406d9b286cd2fa7e715f25e210d0d76b8",
+      "candidate_sha": "d1fd5b6d414e7b88675485f576732a424504455f",
+      "best_model_sha256": "d9fd5db822458e47b04b4efd74b9725a758445a84240d469c2d8fc69ba6c7580",
+      "config_sha256": "cfb3294c3a176a2a03b0882928fade4dd18e5aad0e0641241aaed4887c2ae3bb",
+      "best_epoch": 24,
+      "best_val_macro_f1": 1,
+      "best_val_acc": 1,
+      "test_known_macro_f1": 1,
+      "test_known_acc": 1,
+      "test_known_n_samples": 13479,
+      "elapsed_sec": 8171.1,
+      "early_stop_epoch": 34,
+      "target_test_consumed": false,
+      "target_quarantine_status": "PRESERVED_FOR_FINAL_FROZEN_EVALUATOR"
     },
     {
       "canonical_pair": [
