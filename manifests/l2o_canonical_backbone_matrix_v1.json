@@ -13,8 +13,8 @@
   "cache_len": 16384,
   "canonical_backbone_count": 10,
   "directed_cell_count": 20,
-  "completed_backbone_count": 3,
-  "remaining_backbone_count": 7,
+  "completed_backbone_count": 5,
+  "remaining_backbone_count": 5,
   "backbones": [
     {
       "canonical_pair": [
@@ -131,7 +131,7 @@
         "PA4"
       ],
       "canonical_w4_config": "manifests/configs/l2o_surrogate_matrix_repair_v1/l2o_repair_ref_ent005_lr2e4_tgtPA1_surPA8_c16384_seed0_detv2_w4.json",
-      "status": "PENDING_BACKBONE",
+      "status": "COMPLETE",
       "directed_cells": [
         {
           "evaluation_target": "PA1",
@@ -141,7 +141,21 @@
           "evaluation_target": "PA8",
           "evaluation_surrogate": "PA1"
         }
-      ]
+      ],
+      "training_direction": {
+        "target": "PA1",
+        "surrogate": "PA8"
+      },
+      "workflow_run_id": 43910986566,
+      "workflow_job_id": 133452498550,
+      "artifact_id": 14254576946,
+      "artifact_digest": "sha256:ac76ff326a203b5431a46efe715bfd100fcdabc08bebba589ef147d8b3f5c2f8",
+      "candidate_sha": "d1fd5b6d414e7b88675485f576732a424504455f",
+      "best_model_sha256": "22db811f9b28f7af796561951f4dc7cddaf4c18519e3a55e3b25daed99dac171",
+      "config_sha256": "443c1ba317254a9c75f8bccdd06e396a3e85029390a718dea89299b0e75906e5",
+      "best_epoch": 3,
+      "best_val_macro_f1": 1,
+      "elapsed_sec": 3177
     },
     {
       "canonical_pair": [
@@ -285,7 +299,7 @@
         "PA3"
       ],
       "canonical_w4_config": "manifests/configs/l2o_surrogate_matrix_repair_v1/l2o_repair_ref_ent005_lr2e4_tgtPA4_surPA8_c16384_seed0_detv2_w4.json",
-      "status": "PENDING_BACKBONE",
+      "status": "COMPLETE",
       "directed_cells": [
         {
           "evaluation_target": "PA4",
@@ -295,7 +309,21 @@
           "evaluation_target": "PA8",
           "evaluation_surrogate": "PA4"
         }
-      ]
+      ],
+      "training_direction": {
+        "target": "PA4",
+        "surrogate": "PA8"
+      },
+      "workflow_run_id": 43900291353,
+      "workflow_job_id": 133414718345,
+      "artifact_id": 14248615297,
+      "artifact_digest": "sha256:2ae0fc6ed66b02019c6a5b2b56bd2cf633056226dc779721f60ce01ed80c0fb7",
+      "candidate_sha": "d1fd5b6d414e7b88675485f576732a424504455f",
+      "best_model_sha256": "58c0559ede7100a7f20bdbd2e9eda4f3c938bf12c51b4aba4515597697334568",
+      "config_sha256": "b09aa5b4dddc9c1ed558a1bc7d24a6c50bb78ef3b193568434833d75ab5d6400",
+      "best_epoch": 3,
+      "best_val_macro_f1": 1,
+      "elapsed_sec": 3173.4
     }
   ]
 }
