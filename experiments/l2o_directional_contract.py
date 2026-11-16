@@ -118,6 +118,14 @@ def resolve_directional_l2o_contract(
     surrogate_cfg["target_unknown_pa"] = eval_target
     surrogate_cfg["surrogate_open_pa"] = eval_surrogate
     surrogate_cfg["known_pas_l2o"] = list(known)
+    # The repaired backbone config quarantines the true target by setting
+    # open_val_frac=0 and disabling balanced/required target-open validation.
+    # Surrogate calibration must preserve the original Track-A L2O evaluator
+    # semantics instead: a true surrogate-open validation split at 15%.
+    surrogate_cfg["open_val_frac"] = 0.15
+    surrogate_cfg["build_balanced_val_open"] = True
+    surrogate_cfg["require_true_val_open"] = True
+    surrogate_cfg["allow_val_open_fallback"] = False
 
     return DirectionalL2OContract(
         backbone_training_target=training_target,
