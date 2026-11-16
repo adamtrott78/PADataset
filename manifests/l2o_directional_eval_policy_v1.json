@@ -1,0 +1,27 @@
+{
+  "schema": "padataset.l2o-directional-eval-policy.v1",
+  "policy_id": "l2o_dqnguard_track_a_frozen_v1",
+  "purpose": "Frozen Track-A directional DQNGuard evaluation policy for the 10 canonical L2O backbones / 20 directed cells.",
+  "checkpoint": "best_model",
+  "band_accept_mode": "var_energy",
+  "decision_mode": "score_threshold",
+  "max_known_reject_cal": 0.05,
+  "known_cap": 625,
+  "open_cap": 625,
+  "mix_true_open": false,
+  "surrogate_frac": null,
+  "dqn_state_mode": "softmax3",
+  "dqn_device": "cpu",
+  "evaluator_device": "cuda",
+  "batch_size": 128,
+  "num_workers": 0,
+  "target_labels_used_for_tuning": false,
+  "invariants": [
+    "The true evaluation target is excluded from DQN fitting, threshold selection, HPO, retries, and method selection.",
+    "The DQN open calibration set is surrogate-only; mix_true_open must remain false.",
+    "The score threshold is selected from known calibration scores only.",
+    "The target test split is consumed only by the final frozen evaluation.",
+    "Only a COMPLETE canonical backbone with exact artifact/checkpoint/config provenance may be evaluated.",
+    "Reverse directional reuse is permitted only within the same unordered canonical excluded pair."
+  ]
+}

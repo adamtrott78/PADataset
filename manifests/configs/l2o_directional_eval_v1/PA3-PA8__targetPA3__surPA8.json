@@ -1,0 +1,14 @@
+{
+  "schema": "padataset.l2o-directional-eval-request.v1",
+  "policy_id": "l2o_dqnguard_track_a_frozen_v1",
+  "canonical_matrix": "manifests/l2o_canonical_backbone_matrix_v1.json",
+  "evaluation_policy": "manifests/l2o_directional_eval_policy_v1.json",
+  "canonical_key": "PA3-PA8",
+  "artifact_id": 14267872094,
+  "artifact_digest": "sha256:eb608ed9ccd6c17a8447a27778227435bbc389e48696178cec98933dcc440aa7",
+  "evaluation_target": "PA3",
+  "evaluation_surrogate": "PA8",
+  "checkpoint": "best_model",
+  "target_labels_used_for_tuning": false,
+  "status": "READY_FOR_BOUNDED_EVALUATOR"
+}
