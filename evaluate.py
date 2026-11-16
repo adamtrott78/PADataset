@@ -525,6 +525,22 @@ def collect_split_outputs_from_loader(
     )
 
 
+def _collect_optional_split_outputs_from_loader(
+    handle,
+    loader,
+    split_name: str,
+):
+    """Collect an optional split without treating an intentional zero-sized loader as data."""
+    if loader is None:
+        return None
+    try:
+        if len(loader) == 0:
+            return None
+    except TypeError:
+        pass
+    return collect_split_outputs_from_loader(handle, loader, split_name)
+
+
 def build_osr_eval_bundle(
     handle,
     batch_size: int = 64,
@@ -580,13 +596,13 @@ def build_osr_eval_bundle(
     print("OSR_STAGE | stage=collect_core_splits_done", flush=True)
 
     extras = {
-        "val_open": collect_split_outputs_from_loader(
+        "val_open": _collect_optional_split_outputs_from_loader(
             handle, data.get("val_open_loader", None), "val_open"
         ),
-        "val_known_balanced": collect_split_outputs_from_loader(
+        "val_known_balanced": _collect_optional_split_outputs_from_loader(
             handle, data.get("val_known_balanced_loader", None), "val_known_balanced"
         ),
-        "val_open_balanced": collect_split_outputs_from_loader(
+        "val_open_balanced": _collect_optional_split_outputs_from_loader(
             handle, data.get("val_open_balanced_loader", None), "val_open_balanced"
         ),
         "data_meta": data.get("meta", {}),
