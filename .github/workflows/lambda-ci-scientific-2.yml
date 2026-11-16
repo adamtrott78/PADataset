@@ -339,16 +339,7 @@ jobs:
               --out-dir "$eval_dir" > "$resolved"
 
             mapfile -t eval_args < <(
-              python3 - "$resolved" <<'PY'
-            import json, sys
-            args=json.load(open(sys.argv[1]))["evaluator_args"]
-            if not isinstance(args, list) or not args:
-                raise SystemExit("resolved evaluator args missing")
-            for arg in args:
-                if not isinstance(arg, str) or "\n" in arg or "\r" in arg:
-                    raise SystemExit("invalid evaluator argument")
-                print(arg)
-            PY
+              python3 -c 'import json,sys; a=json.load(open(sys.argv[1]))["evaluator_args"]; assert isinstance(a,list) and a; assert all(isinstance(x,str) and "\n" not in x and "\r" not in x for x in a); print(*a, sep="\n")' "$resolved"
             )
 
             "$runtime_python" experiments/pa_eval_dqn_guard_surrogate_open.py \

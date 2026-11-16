@@ -1,4 +1,5 @@
 from pathlib import Path
+import subprocess
 
 WORKFLOW = Path(".github/workflows/lambda-ci-scientific-2.yml")
 
@@ -60,3 +61,41 @@ def test_l2o_path_uses_frozen_policy_and_trusted_read_only_data():
     ]
     for marker in required:
         assert marker in text, marker
+
+
+def test_execute_block_is_valid_bash_syntax():
+    lines = _text().splitlines()
+    start = None
+    for i, line in enumerate(lines):
+        if line.strip() == "- name: Execute bounded scientific request":
+            start = i
+            break
+    assert start is not None
+
+    run_line = None
+    for i in range(start, len(lines)):
+        if lines[i].strip() == "run: |":
+            run_line = i
+            break
+    assert run_line is not None
+
+    body = []
+    for line in lines[run_line + 1:]:
+        if line.startswith("      - name: "):
+            break
+        if line.startswith("          "):
+            body.append(line[10:])
+        elif line == "":
+            body.append("")
+        else:
+            raise AssertionError(f"unexpected workflow indentation: {line!r}")
+
+    script = "\n".join(body) + "\n"
+    proc = subprocess.run(
+        ["bash", "-n"],
+        input=script,
+        text=True,
+        capture_output=True,
+        check=False,
+    )
+    assert proc.returncode == 0, proc.stderr
