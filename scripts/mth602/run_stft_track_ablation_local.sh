@@ -30,6 +30,23 @@ case "$ROOT" in
 esac
 LOG_ROOT="$CANON_REPO/local_artifacts/stft_ablation_v1"
 mkdir -p "$LOG_ROOT" "$RESULT_ROOT" "$DIAG_ROOT"
+DRIVER_LOG="$LOG_ROOT/persistent_driver.log"
+DRIVER_STATUS="$LOG_ROOT/driver_status.json"
+
+exec > >(tee -a "$DRIVER_LOG") 2>&1
+
+on_exit() {
+  rc=$?
+  printf '{"candidate_sha":"%s","worktree":"%s","exit_code":%d,"success":%s}\n' \
+    "$(git -C "$ROOT" rev-parse HEAD 2>/dev/null || printf unknown)" \
+    "$ROOT" \
+    "$rc" \
+    "$([[ "$rc" -eq 0 ]] && printf true || printf false)" \
+    > "$DRIVER_STATUS"
+  echo "STFT_DRIVER_EXIT_CODE=$rc"
+  echo "STFT_DRIVER_STATUS=$DRIVER_STATUS"
+}
+trap on_exit EXIT
 
 [[ -x "$VENV/bin/python" ]] || { echo "Missing DNNs python: $VENV/bin/python" >&2; exit 20; }
 PY="$VENV/bin/python"
