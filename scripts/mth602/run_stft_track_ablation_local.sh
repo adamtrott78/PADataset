@@ -98,9 +98,14 @@ echo "=== PREFLIGHT: STFT TRAJECTORY UNIT TEST ==="
 import runpy, sys
 ns = runpy.run_path(sys.argv[1])
 ns["test_stft_centroid_preserves_monotone_vs_revisit_structure"]()
-ns["test_pa1_legacy_cache_identity_is_canonicalized"]()
+import tempfile
+from pathlib import Path
+with tempfile.TemporaryDirectory() as td:
+    ns["test_legacy_cache_resolver_uses_stored_source_provenance"](Path(td))
+with tempfile.TemporaryDirectory() as td:
+    ns["test_legacy_cache_resolver_prefers_exact_source_path"](Path(td))
 print("STFT_TRAJECTORY_UNIT_TEST=PASS")
-print("STFT_PA1_LEGACY_MAPPING_TEST=PASS")
+print("STFT_LEGACY_PROVENANCE_MAPPING_TEST=PASS")
 PY
 
 echo
