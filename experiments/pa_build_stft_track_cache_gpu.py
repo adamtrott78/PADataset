@@ -153,10 +153,40 @@ def _make_virtual_cache(
     os.replace(tmp, out_path)
 
 
+def _is_pa1_record(rec) -> bool:
+    source_name = str(getattr(rec, "source_name", "") or "")
+    dataset_tag = str(getattr(rec, "dataset_tag", "") or "")
+    noise_tag = str(getattr(rec, "noise_tag", "") or "")
+    path_parts = set(Path(rec.path).parts)
+    return (
+        source_name == "ota_pa1_run01"
+        or dataset_tag == "ota_pa1_run01"
+        or noise_tag == "pa1_run01"
+        or "ota_pa1_run01" in path_parts
+    )
+
+
+def _resolve_legacy_base(
+    rec,
+    *,
+    core_cache_root: Path,
+    pa1_cache_root: Path,
+) -> Path:
+    root = pa1_cache_root if _is_pa1_record(rec) else core_cache_root
+    path = root / _cache_file_name(rec)
+    if not path.is_file():
+        source_kind = "pa1" if _is_pa1_record(rec) else "core"
+        raise FileNotFoundError(
+            f"Matching {source_kind} legacy cache missing: {path}"
+        )
+    return path
+
+
 def _probe(
     setup: DataSetup,
     *,
     base_cache_root: Path,
+    pa1_base_cache_root: Path,
     frame_count: int,
     batch_size: int,
     device: str,
@@ -167,9 +197,11 @@ def _probe(
 
     rec = records[0]
     name = _cache_file_name(rec)
-    base_path = base_cache_root / name
-    if not base_path.is_file():
-        raise FileNotFoundError(f"Missing matching legacy cache: {base_path}")
+    base_path = _resolve_legacy_base(
+        rec,
+        core_cache_root=base_cache_root,
+        pa1_cache_root=pa1_base_cache_root,
+    )
 
     with h5py.File(rec.path, "r") as fin:
         Xds = fin["X"]
@@ -244,7 +276,11 @@ def build(
         name = _cache_file_name(rec)
         out_path = cache_root / name
         track_path = tracks_root / (name + ".tracks.h5")
-        base_path = base_cache_root / name
+        base_path = _resolve_legacy_base(
+            rec,
+            core_cache_root=base_cache_root,
+            pa1_cache_root=pa1_base_cache_root,
+        )
 
         if out_path.is_file() and track_path.is_file() and not setup.force_rebuild_cache:
             skipped += 1
@@ -253,9 +289,6 @@ def build(
                 flush=True,
             )
             continue
-
-        if not base_path.is_file():
-            raise FileNotFoundError(f"Matching legacy cache missing: {base_path}")
 
         with h5py.File(rec.path, "r") as fin, h5py.File(base_path, "r") as base:
             Xds = fin["X"]
@@ -352,6 +385,7 @@ def build(
         "feature_mode": FEATURE_MODE,
         "cache_root": str(cache_root),
         "legacy_base_cache_root": str(base_cache_root),
+        "legacy_pa1_base_cache_root": str(pa1_base_cache_root),
         "cache_len": int(setup.cache_len),
         "frame_count": int(frame_count),
         "batch_size": int(batch_size),
@@ -375,6 +409,7 @@ def main() -> None:
     ap.add_argument("--data-root", required=True)
     ap.add_argument("--cache-root", required=True)
     ap.add_argument("--base-cache-root", required=True)
+    ap.add_argument("--pa1-base-cache-root", required=True)
     ap.add_argument("--cache-len", type=int, default=16384)
     ap.add_argument("--source-type", default="ota")
     ap.add_argument("--source-name", default="ota_core_high_run01")
@@ -401,11 +436,13 @@ def main() -> None:
         noise_tag=args.noise_tag,
     )
     base_cache_root = Path(os.path.expanduser(args.base_cache_root))
+    pa1_base_cache_root = Path(os.path.expanduser(args.pa1_base_cache_root))
 
     if args.probe_only:
         _probe(
             setup,
             base_cache_root=base_cache_root,
+            pa1_base_cache_root=pa1_base_cache_root,
             frame_count=int(args.frame_count),
             batch_size=int(args.batch_size),
             device=args.device,
@@ -415,6 +452,7 @@ def main() -> None:
     build(
         setup,
         base_cache_root=base_cache_root,
+        pa1_base_cache_root=pa1_base_cache_root,
         frame_count=int(args.frame_count),
         batch_size=int(args.batch_size),
         device=args.device,
