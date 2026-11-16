@@ -359,6 +359,7 @@ def build(
     setup: DataSetup,
     *,
     base_cache_root: Path,
+    pa1_base_cache_root: Path,
     frame_count: int,
     batch_size: int,
     device: str,
