@@ -13,8 +13,8 @@
   "cache_len": 16384,
   "canonical_backbone_count": 10,
   "directed_cell_count": 20,
-  "completed_backbone_count": 6,
-  "remaining_backbone_count": 4,
+  "completed_backbone_count": 8,
+  "remaining_backbone_count": 2,
   "backbones": [
     {
       "canonical_pair": [
@@ -193,7 +193,7 @@
         "PA8"
       ],
       "canonical_w4_config": "manifests/configs/l2o_surrogate_matrix_repair_v1/l2o_repair_ref_ent005_lr2e4_tgtPA2_surPA3_c16384_seed0_detv2_w4.json",
-      "status": "PENDING_BACKBONE",
+      "status": "COMPLETE",
       "directed_cells": [
         {
           "evaluation_target": "PA2",
@@ -203,7 +203,29 @@
           "evaluation_target": "PA3",
           "evaluation_surrogate": "PA2"
         }
-      ]
+      ],
+      "training_direction": {
+        "target": "PA2",
+        "surrogate": "PA3"
+      },
+      "workflow_run_id": 43921420197,
+      "workflow_job_id": 133489412741,
+      "artifact_id": 14259500161,
+      "artifact_digest": "sha256:ee084b1240318c45200ac453e34dd73ddbba068350434f31bd3e99988d7b50d7",
+      "candidate_sha": "d1fd5b6d414e7b88675485f576732a424504455f",
+      "best_model_sha256": "3c41cb73725af7f27bdac5dae3bf0231dd7e4dc8581e189352b9377079a153e5",
+      "config_sha256": "b349602a834c51f8d71c52144b8178274215bf4e0b554070e87a25dbb177236a",
+      "best_epoch": 3,
+      "best_val_macro_f1": 0.9253955249097198,
+      "best_val_acc": 0.9261401557285873,
+      "test_known_macro_f1": 0.9195729464289638,
+      "test_known_acc": 0.920436007711701,
+      "test_known_n_samples": 13486,
+      "elapsed_sec": 3177.1,
+      "early_stop_epoch": 13,
+      "target_test_consumed": false,
+      "target_quarantine_status": "PRESERVED_FOR_FINAL_FROZEN_EVALUATOR",
+      "validation_instability_note": "Known-only validation was highly unstable after best epoch 3; frozen best checkpoint preserved without target evidence."
     },
     {
       "canonical_pair": [
@@ -252,7 +274,7 @@
         "PA4"
       ],
       "canonical_w4_config": "manifests/configs/l2o_surrogate_matrix_repair_v1/l2o_repair_ref_ent005_lr2e4_tgtPA2_surPA8_c16384_seed0_detv2_w4.json",
-      "status": "PENDING_BACKBONE",
+      "status": "COMPLETE",
       "directed_cells": [
         {
           "evaluation_target": "PA2",
@@ -262,7 +284,29 @@
           "evaluation_target": "PA8",
           "evaluation_surrogate": "PA2"
         }
-      ]
+      ],
+      "training_direction": {
+        "target": "PA2",
+        "surrogate": "PA8"
+      },
+      "workflow_run_id": 43926895324,
+      "workflow_job_id": 133508635811,
+      "artifact_id": 14258984518,
+      "artifact_digest": "sha256:ec307627ec875a73f2e61596fb9eb5a42c137ec76c212f61f752076cc0278f9c",
+      "candidate_sha": "d1fd5b6d414e7b88675485f576732a424504455f",
+      "best_model_sha256": "ffcca05cdcf9fa6057aa7cdef7cb61ee28a56b039c8740abc5b7b7c6f7240fff",
+      "config_sha256": "e50dd327b185666ec0da3cf88a2aa91087cf5f69882a3eefdac22735d29c0dd2",
+      "best_epoch": 2,
+      "best_val_macro_f1": 0.9433003897151243,
+      "best_val_acc": 0.9435669262143122,
+      "test_known_macro_f1": 0.9448806320168245,
+      "test_known_acc": 0.9451282811804834,
+      "test_known_n_samples": 13486,
+      "elapsed_sec": 2898.7,
+      "early_stop_epoch": 12,
+      "target_test_consumed": false,
+      "target_quarantine_status": "PRESERVED_FOR_FINAL_FROZEN_EVALUATOR",
+      "validation_instability_note": "Known-only validation was highly unstable after best epoch 2; frozen best checkpoint preserved without target evidence."
     },
     {
       "canonical_pair": [
