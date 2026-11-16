@@ -13,8 +13,8 @@
   "cache_len": 16384,
   "canonical_backbone_count": 10,
   "directed_cell_count": 20,
-  "completed_backbone_count": 5,
-  "remaining_backbone_count": 5,
+  "completed_backbone_count": 6,
+  "remaining_backbone_count": 4,
   "backbones": [
     {
       "canonical_pair": [
@@ -62,7 +62,7 @@
         "PA8"
       ],
       "canonical_w4_config": "manifests/configs/l2o_surrogate_matrix_repair_v1/l2o_repair_ref_ent005_lr2e4_tgtPA1_surPA3_c16384_seed0_detv2_w4.json",
-      "status": "PENDING_BACKBONE",
+      "status": "COMPLETE",
       "directed_cells": [
         {
           "evaluation_target": "PA1",
@@ -72,7 +72,29 @@
           "evaluation_target": "PA3",
           "evaluation_surrogate": "PA1"
         }
-      ]
+      ],
+      "training_direction": {
+        "target": "PA1",
+        "surrogate": "PA3"
+      },
+      "workflow_run_id": 43900286950,
+      "workflow_job_id": 133414700376,
+      "artifact_id": 14255294889,
+      "artifact_digest": "sha256:7d3c6776c224c606ac60f2b04df7244fe41ae192265bb291c3f848e6b177a566",
+      "candidate_sha": "d1fd5b6d414e7b88675485f576732a424504455f",
+      "best_model_sha256": "e828b94bb36e29065dc46b37603bc0e7d459f51e69b16b9ea9857fe7f4ada9ad",
+      "config_sha256": "6e940320685592e800275f55ac1e139e21b2d65b8fb2119bb8f237f4e1c366fe",
+      "best_epoch": 26,
+      "best_val_macro_f1": 0.999925851719,
+      "best_val_acc": 0.9999258765102661,
+      "test_known_macro_f1": 0.9998517364899926,
+      "test_known_acc": 0.9998517749944416,
+      "test_known_n_samples": 13493,
+      "elapsed_sec": 8742.1,
+      "early_stop_epoch": 36,
+      "target_test_consumed": false,
+      "target_quarantine_status": "PRESERVED_FOR_FINAL_FROZEN_EVALUATOR",
+      "validation_instability_note": "Known-only validation macro-F1 showed large intermittent collapses despite smooth training loss; best checkpoint selection remained known-only and preserved epoch 26."
     },
     {
       "canonical_pair": [
