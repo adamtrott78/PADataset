@@ -23,6 +23,7 @@ from evaluate import (
 )
 from prepData import build_data_from_setup
 from dqn_osr import BandedGuardDQNOSR
+from experiments.l2o_directional_contract import resolve_directional_l2o_contract
 
 
 def cap_split(split, cap: int, seed: int, stratify: bool, suffix: str):
@@ -94,13 +95,28 @@ def concat_splits(split_a, split_b, suffix: str):
     )
 
 
-def build_surrogate_open_split(handle, surrogate_pa: str, batch_size: int, num_workers: int, data_root=None):
-    cfg = copy.deepcopy(handle.config)
-    cfg["unknown_pas"] = [surrogate_pa]
-
-    pas = cfg.get("pas", None)
-    if pas is not None:
-        cfg["pas"] = list(dict.fromkeys(list(pas) + [surrogate_pa]))
+def build_surrogate_open_split(
+    handle,
+    surrogate_pa: str,
+    batch_size: int,
+    num_workers: int,
+    data_root=None,
+    config_override=None,
+):
+    if config_override is None:
+        cfg = copy.deepcopy(handle.config)
+        cfg["unknown_pas"] = [surrogate_pa]
+        pas = cfg.get("pas", None)
+        if pas is not None:
+            cfg["pas"] = list(dict.fromkeys(list(pas) + [surrogate_pa]))
+    else:
+        cfg = copy.deepcopy(config_override)
+        if cfg.get("unknown_pas") != [surrogate_pa]:
+            raise ValueError(
+                "surrogate config unknown_pas must exactly match requested surrogate"
+            )
+        if surrogate_pa not in list(cfg.get("pas", [])):
+            raise ValueError("surrogate config pas must contain requested surrogate")
 
     setup = _make_setup_from_run_config(cfg, data_root=data_root)
     data = build_data_from_setup(
@@ -170,7 +186,9 @@ def main():
     ap.add_argument("--run-dir", required=True)
     ap.add_argument("--checkpoint", default="best_model")
     ap.add_argument("--out-dir", required=True)
-    ap.add_argument("--surrogate-open-pa", default="PA1")
+    ap.add_argument("--target-open-pa", default=None,
+                    help="Explicit final-evaluation target. May reverse the trained target/surrogate direction only within the same excluded pair.")
+    ap.add_argument("--surrogate-open-pa", required=True)
     ap.add_argument("--mix-true-open", action="store_true")
     ap.add_argument("--surrogate-frac", type=float, default=0.5)
     ap.add_argument("--mode", default="var_energy")
@@ -196,8 +214,20 @@ def main():
         device=args.device,
     )
 
+    contract = resolve_directional_l2o_contract(
+        handle.config,
+        evaluation_target=args.target_open_pa,
+        evaluation_surrogate=args.surrogate_open_pa,
+        model_class_names=handle.class_names,
+    )
+
+    directional_handle = copy.copy(handle)
+    directional_handle.config = contract.target_config
+    directional_handle.setup = None
+    directional_handle.unknown_pas = [contract.evaluation_target]
+
     payload, extras = build_osr_eval_bundle(
-        handle,
+        directional_handle,
         batch_size=args.batch_size,
         num_workers=args.num_workers,
         pin_memory=True,
@@ -206,11 +236,12 @@ def main():
 
     known_cal = payload.val_known
     surrogate_open = build_surrogate_open_split(
-        handle=handle,
-        surrogate_pa=args.surrogate_open_pa,
+        handle=directional_handle,
+        surrogate_pa=contract.evaluation_surrogate,
         batch_size=args.batch_size,
         num_workers=args.num_workers,
         data_root=args.data_root,
+        config_override=contract.surrogate_config,
     )
 
     seed = int(payload.meta.get("seed", 0) or 0)
@@ -313,8 +344,14 @@ def main():
         "run_dir": args.run_dir,
         "checkpoint": args.checkpoint,
         "method": f"dqn_banded_guard_{args.mode}_{calibration_label}_softmax3",
-        "target_unknown_pas": json.dumps(handle.config.get("unknown_pas", [])),
-        "surrogate_open_pa": args.surrogate_open_pa,
+        "target_unknown_pas": json.dumps([contract.evaluation_target]),
+        "surrogate_open_pa": contract.evaluation_surrogate,
+        "backbone_training_target": contract.backbone_training_target,
+        "backbone_training_surrogate": contract.backbone_training_surrogate,
+        "backbone_canonical_excluded_pair": json.dumps(list(contract.canonical_excluded_pair)),
+        "backbone_known_pas": json.dumps(list(contract.known_pas)),
+        "directional_reuse": bool(contract.directional_reuse),
+        "target_labels_used_for_tuning": False,
         "mix_true_open": bool(args.mix_true_open),
         "surrogate_frac": float(args.surrogate_frac),
         "band_accept_mode": args.mode,
