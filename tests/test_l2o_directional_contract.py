@@ -31,6 +31,10 @@ def test_original_direction_preserves_target_and_surrogate_roles():
     assert c.target_config["pas"] == ["PA2", "PA3", "PA8", "PA1"]
     assert c.surrogate_config["unknown_pas"] == ["PA4"]
     assert c.surrogate_config["pas"] == ["PA2", "PA3", "PA8", "PA4"]
+    assert c.surrogate_config["open_val_frac"] == 0.15
+    assert c.surrogate_config["build_balanced_val_open"] is True
+    assert c.surrogate_config["require_true_val_open"] is True
+    assert c.surrogate_config["allow_val_open_fallback"] is False
 
 
 def test_reverse_direction_reuses_same_backbone_without_target_in_surrogate_dataset():
@@ -47,6 +51,10 @@ def test_reverse_direction_reuses_same_backbone_without_target_in_surrogate_data
     assert c.target_config["pas"] == ["PA2", "PA3", "PA8", "PA4"]
     assert c.surrogate_config["unknown_pas"] == ["PA1"]
     assert c.surrogate_config["pas"] == ["PA2", "PA3", "PA8", "PA1"]
+    assert c.surrogate_config["open_val_frac"] == 0.15
+    assert c.surrogate_config["build_balanced_val_open"] is True
+    assert c.surrogate_config["require_true_val_open"] is True
+    assert c.surrogate_config["allow_val_open_fallback"] is False
     assert "PA4" not in c.surrogate_config["pas"]
 
 
@@ -80,6 +88,29 @@ def test_rejects_backbone_pas_provenance_drift():
             evaluation_surrogate="PA4",
             model_class_names=["PA2", "PA3", "PA8"],
         )
+
+
+def test_surrogate_calibration_restores_original_split_without_unquarantining_target():
+    cfg = _cfg()
+    cfg["open_val_frac"] = 0
+    cfg["build_balanced_val_open"] = False
+    cfg["require_true_val_open"] = False
+    cfg["allow_val_open_fallback"] = False
+
+    c = resolve_directional_l2o_contract(
+        cfg,
+        evaluation_target="PA1",
+        evaluation_surrogate="PA4",
+        model_class_names=["PA2", "PA3", "PA8"],
+    )
+
+    assert c.target_config["open_val_frac"] == 0
+    assert c.target_config["build_balanced_val_open"] is False
+    assert c.target_config["require_true_val_open"] is False
+    assert c.surrogate_config["open_val_frac"] == 0.15
+    assert c.surrogate_config["build_balanced_val_open"] is True
+    assert c.surrogate_config["require_true_val_open"] is True
+    assert "PA1" not in c.surrogate_config["pas"]
 
 
 def test_does_not_mutate_source_config():
