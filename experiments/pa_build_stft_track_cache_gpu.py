@@ -18,6 +18,7 @@ import torch
 from prepData import (
     DataSetup,
     OPTIONAL_SAMPLE_META_KEYS,
+    RawSourceRecord,
     _cache_file_name,
     _infer_x_layout,
     discover_raw_sources,
@@ -157,12 +158,27 @@ def _is_pa1_record(rec) -> bool:
     source_name = str(getattr(rec, "source_name", "") or "")
     dataset_tag = str(getattr(rec, "dataset_tag", "") or "")
     noise_tag = str(getattr(rec, "noise_tag", "") or "")
+    raw_name = Path(rec.path).name
     path_parts = set(Path(rec.path).parts)
     return (
         source_name == "ota_pa1_run01"
         or dataset_tag == "ota_pa1_run01"
         or noise_tag == "pa1_run01"
         or "ota_pa1_run01" in path_parts
+        or raw_name.startswith("ota_pa1_run01__")
+    )
+
+
+def _legacy_lookup_record(rec):
+    if not _is_pa1_record(rec):
+        return rec
+    return RawSourceRecord(
+        path=rec.path,
+        protocol_name=rec.protocol_name,
+        source_type="ota",
+        source_name="ota_pa1_run01",
+        dataset_tag="ota_pa1_run01",
+        noise_tag="pa1_run01",
     )
 
 
@@ -172,10 +188,12 @@ def _resolve_legacy_base(
     core_cache_root: Path,
     pa1_cache_root: Path,
 ) -> Path:
-    root = pa1_cache_root if _is_pa1_record(rec) else core_cache_root
-    path = root / _cache_file_name(rec)
+    is_pa1 = _is_pa1_record(rec)
+    root = pa1_cache_root if is_pa1 else core_cache_root
+    lookup_rec = _legacy_lookup_record(rec)
+    path = root / _cache_file_name(lookup_rec)
     if not path.is_file():
-        source_kind = "pa1" if _is_pa1_record(rec) else "core"
+        source_kind = "pa1" if is_pa1 else "core"
         raise FileNotFoundError(
             f"Matching {source_kind} legacy cache missing: {path}"
         )
