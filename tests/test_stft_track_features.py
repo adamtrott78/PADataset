@@ -1,6 +1,8 @@
 import numpy as np
 
 from experiments.pa_build_stft_track_cache import stft_frequency_tracks
+from experiments.pa_build_stft_track_cache_gpu import _is_pa1_record, _legacy_lookup_record
+from prepData import RawSourceRecord, _cache_file_name
 from experiments.pa_stft_track_diagnostic import trajectory_features
 
 
@@ -34,3 +36,24 @@ def test_stft_centroid_preserves_monotone_vs_revisit_structure():
     assert scan_features["monotonic_fraction"] == 1.0
     assert hop_features["revisit_fraction"] > scan_features["revisit_fraction"]
     assert hop_features["direction_change_rate"] > scan_features["direction_change_rate"]
+
+
+def test_pa1_legacy_cache_identity_is_canonicalized():
+    rec = RawSourceRecord(
+        path="/data/bluetooth/ota/ota_core_high_run01/ota_pa1_run01__shard_001__PA1.mat",
+        protocol_name="bluetooth",
+        source_type="ota",
+        source_name="ota_core_high_run01",
+        dataset_tag="ota_core_high_run01",
+        noise_tag="high_run01",
+    )
+    assert _is_pa1_record(rec)
+
+    lookup = _legacy_lookup_record(rec)
+    assert lookup.source_name == "ota_pa1_run01"
+    assert lookup.dataset_tag == "ota_pa1_run01"
+    assert lookup.noise_tag == "pa1_run01"
+    assert _cache_file_name(lookup) == (
+        "bluetooth__ota__ota_pa1_run01__ota_pa1_run01__pa1_run01__"
+        "ota_pa1_run01__shard_001__PA1.h5"
+    )
