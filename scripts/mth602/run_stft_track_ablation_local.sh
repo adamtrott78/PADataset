@@ -11,6 +11,7 @@ CANON_REPO="${CANON_REPO:-$HOME/adamArchives/Adam/varMax/PADataset}"
 DATA_ROOT="${DATA_ROOT:-$CANON_REPO/data}"
 CACHE_ROOT="${CACHE_ROOT:-$CANON_REPO/_feature_cache_nvme/len16384/norm_stfttracks64_v1/ota__ota_core_high_run01__high_run01}"
 BASE_CACHE_ROOT="${BASE_CACHE_ROOT:-$CANON_REPO/_feature_cache_nvme/len16384/norm/ota__ota_core_high_run01__high_run01}"
+PA1_BASE_CACHE_ROOT="${PA1_BASE_CACHE_ROOT:-$CANON_REPO/_feature_cache_nvme/len16384/norm/ota__ota_pa1_run01__pa1_run01}"
 RESULT_ROOT="${RESULT_ROOT:-$CANON_REPO/results_pa_mth602_stft_ablation}"
 DIAG_ROOT="${DIAG_ROOT:-$CANON_REPO/results/pa1_pa4_stft_diagnostic/stfttracks64_v1}"
 VENV="${VENV:-$HOME/adamArchives/venvs/DNNs}"
@@ -20,6 +21,13 @@ FRAME_COUNT="${FRAME_COUNT:-64}"
 GPU_BATCH_SIZE="${GPU_BATCH_SIZE:-64}"
 
 ROOT="$(cd "$(dirname "${BASH_SOURCE[0]}")/../.." && pwd)"
+case "$ROOT" in
+  /tmp/*)
+    echo "Refusing transient /tmp checkout: $ROOT" >&2
+    echo "Use a persistent checkout under $HOME/adamArchives/worktrees." >&2
+    exit 24
+    ;;
+esac
 LOG_ROOT="$CANON_REPO/local_artifacts/stft_ablation_v1"
 mkdir -p "$LOG_ROOT" "$RESULT_ROOT" "$DIAG_ROOT"
 
@@ -30,6 +38,8 @@ echo "=== STFT TRACK ABLATION ==="
 echo "candidate_sha=$(git -C "$ROOT" rev-parse HEAD)"
 echo "worktree=$ROOT"
 echo "cache_root=$CACHE_ROOT"
+echo "base_cache_root=$BASE_CACHE_ROOT"
+echo "pa1_base_cache_root=$PA1_BASE_CACHE_ROOT"
 echo "gpu_index=$GPU_INDEX"
 
 export OMP_NUM_THREADS="$CPU_THREADS"
@@ -54,6 +64,7 @@ PY
   --data-root "$DATA_ROOT" \
   --cache-root "$CACHE_ROOT" \
   --base-cache-root "$BASE_CACHE_ROOT" \
+  --pa1-base-cache-root "$PA1_BASE_CACHE_ROOT" \
   --cache-len 16384 \
   --source-type ota \
   --source-name ota_core_high_run01 \
@@ -80,6 +91,7 @@ echo "=== PHASE 1: GPU-ACCELERATED BUILD/RESUME STFT TRACK OVERLAY CACHE ==="
   --data-root "$DATA_ROOT" \
   --cache-root "$CACHE_ROOT" \
   --base-cache-root "$BASE_CACHE_ROOT" \
+  --pa1-base-cache-root "$PA1_BASE_CACHE_ROOT" \
   --cache-len 16384 \
   --source-type ota \
   --source-name ota_core_high_run01 \
@@ -88,7 +100,7 @@ echo "=== PHASE 1: GPU-ACCELERATED BUILD/RESUME STFT TRACK OVERLAY CACHE ==="
   --frame-count "$FRAME_COUNT" \
   --batch-size "$GPU_BATCH_SIZE" \
   --device cuda:0 \
-  2>&1 | tee "$LOG_ROOT/cache_build_gpu.log"
+  2>&1 | tee -a "$LOG_ROOT/cache_build_gpu.log"
 
 [[ -f "$CACHE_ROOT/stft_track_cache_manifest.json" ]] || {
   echo "Cache manifest missing after build" >&2
