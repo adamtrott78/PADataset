@@ -178,7 +178,7 @@
         "PA3",
         "PA8"
       ],
-      "canonical_w4_config": "manifests/configs/l2o_surrogate_matrix_repair_v1/l2o_repair_ref_ent005_lr2e4_tgtPA2_surPA4_c16384_seed0_detv2_w4.json",
+      "canonical_w4_config": "manifests/configs/l2o_surrogate_matrix_repair_v1/l2o_repair_ref_ent005_lr2e4_tgtPA4_surPA2_c16384_seed0_detv2_w4.json",
       "status": "COMPLETE",
       "training_direction": {
         "target": "PA4",
