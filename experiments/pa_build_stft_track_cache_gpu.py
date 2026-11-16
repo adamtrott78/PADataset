@@ -154,50 +154,121 @@ def _make_virtual_cache(
     os.replace(tmp, out_path)
 
 
-def _is_pa1_record(rec) -> bool:
-    source_name = str(getattr(rec, "source_name", "") or "")
-    dataset_tag = str(getattr(rec, "dataset_tag", "") or "")
-    noise_tag = str(getattr(rec, "noise_tag", "") or "")
-    raw_name = Path(rec.path).name
-    path_parts = set(Path(rec.path).parts)
-    return (
-        source_name == "ota_pa1_run01"
-        or dataset_tag == "ota_pa1_run01"
-        or noise_tag == "pa1_run01"
-        or "ota_pa1_run01" in path_parts
-        or raw_name.startswith("ota_pa1_run01__")
-    )
+def _path_key(value: str) -> str:
+    return os.path.normpath(os.path.abspath(os.path.expanduser(str(value))))
 
 
-def _legacy_lookup_record(rec):
-    if not _is_pa1_record(rec):
-        return rec
-    return RawSourceRecord(
-        path=rec.path,
-        protocol_name=rec.protocol_name,
-        source_type="ota",
-        source_name="ota_pa1_run01",
-        dataset_tag="ota_pa1_run01",
-        noise_tag="pa1_run01",
-    )
+def _add_index(mapping: dict, key: str, cache_path: Path) -> None:
+    if not key:
+        return
+    mapping.setdefault(key, []).append(cache_path)
 
 
-def _resolve_legacy_base(
-    rec,
-    *,
-    core_cache_root: Path,
-    pa1_cache_root: Path,
-) -> Path:
-    is_pa1 = _is_pa1_record(rec)
-    root = pa1_cache_root if is_pa1 else core_cache_root
-    lookup_rec = _legacy_lookup_record(rec)
-    path = root / _cache_file_name(lookup_rec)
-    if not path.is_file():
-        source_kind = "pa1" if is_pa1 else "core"
-        raise FileNotFoundError(
-            f"Matching {source_kind} legacy cache missing: {path}"
+def _build_legacy_cache_index(*roots: Path) -> dict:
+    """
+    Index legacy cache files by the source-path provenance stored in each HDF5.
+
+    This intentionally avoids reconstructing historical cache filenames. PA1 has
+    existed in both a dedicated cache namespace and later unified-core/split
+    layouts; the HDF5 source_path attribute is the durable provenance link.
+    """
+    exact = {}
+    real = {}
+    proto_base = {}
+
+    seen = set()
+    for root in roots:
+        root = Path(root)
+        if not root.is_dir():
+            continue
+        for cache_path in sorted(root.glob("*.h5")):
+            resolved_cache = str(cache_path.resolve())
+            if resolved_cache in seen:
+                continue
+            seen.add(resolved_cache)
+            try:
+                with h5py.File(cache_path, "r") as base:
+                    raw_source = base.attrs.get("source_path")
+                    protocol_name = base.attrs.get("protocol_name")
+            except (OSError, KeyError):
+                continue
+            if raw_source is None:
+                continue
+            if isinstance(raw_source, bytes):
+                raw_source = raw_source.decode("utf-8", errors="strict")
+            if isinstance(protocol_name, bytes):
+                protocol_name = protocol_name.decode("utf-8", errors="strict")
+
+            exact_key = _path_key(str(raw_source))
+            real_key = os.path.realpath(exact_key)
+            _add_index(exact, exact_key, cache_path)
+            _add_index(real, real_key, cache_path)
+            if protocol_name:
+                proto_key = f"{protocol_name}::{Path(str(raw_source)).name}"
+                _add_index(proto_base, proto_key, cache_path)
+
+    return {
+        "exact": exact,
+        "real": real,
+        "proto_base": proto_base,
+        "roots": [str(Path(root)) for root in roots],
+        "cache_files_indexed": len(seen),
+    }
+
+
+def _unique_index_hit(mapping: dict, key: str, *, mode: str) -> Path | None:
+    hits = mapping.get(key, [])
+    unique = []
+    seen = set()
+    for hit in hits:
+        resolved = str(Path(hit).resolve())
+        if resolved in seen:
+            continue
+        seen.add(resolved)
+        unique.append(Path(hit))
+    if len(unique) == 1:
+        return unique[0]
+    if len(unique) > 1:
+        raise RuntimeError(
+            f"Ambiguous legacy cache provenance via {mode} for {key}: "
+            + ", ".join(str(path) for path in unique)
         )
-    return path
+    return None
+
+
+def _resolve_legacy_base(rec, *, legacy_index: dict) -> Path:
+    raw_exact = _path_key(rec.path)
+
+    hit = _unique_index_hit(
+        legacy_index["exact"],
+        raw_exact,
+        mode="exact source_path",
+    )
+    if hit is not None:
+        return hit
+
+    hit = _unique_index_hit(
+        legacy_index["real"],
+        os.path.realpath(raw_exact),
+        mode="real source_path",
+    )
+    if hit is not None:
+        return hit
+
+    proto_key = f"{rec.protocol_name}::{Path(rec.path).name}"
+    hit = _unique_index_hit(
+        legacy_index["proto_base"],
+        proto_key,
+        mode="protocol+basename",
+    )
+    if hit is not None:
+        return hit
+
+    raise FileNotFoundError(
+        "No provenance-matched legacy cache for raw source "
+        f"{rec.path}; indexed_roots={legacy_index['roots']} "
+        f"cache_files_indexed={legacy_index['cache_files_indexed']}"
+    )
 
 
 def _probe(
@@ -213,19 +284,25 @@ def _probe(
     if not records:
         raise RuntimeError("No raw OTA records discovered")
 
-    rec = records[0]
-    base_path = _resolve_legacy_base(
-        rec,
-        core_cache_root=base_cache_root,
-        pa1_cache_root=pa1_base_cache_root,
+    legacy_index = _build_legacy_cache_index(
+        base_cache_root,
+        pa1_base_cache_root,
     )
-    pa1_rec = next((item for item in records if _is_pa1_record(item)), None)
+    rec = records[0]
+    base_path = _resolve_legacy_base(rec, legacy_index=legacy_index)
+    pa1_rec = next(
+        (
+            item
+            for item in records
+            if "PA1" in Path(item.path).stem
+        ),
+        None,
+    )
     if pa1_rec is None:
         raise RuntimeError("No PA1 raw record discovered during STFT cache probe")
     pa1_base_path = _resolve_legacy_base(
         pa1_rec,
-        core_cache_root=base_cache_root,
-        pa1_cache_root=pa1_base_cache_root,
+        legacy_index=legacy_index,
     )
 
     with h5py.File(rec.path, "r") as fin:
@@ -264,6 +341,9 @@ def _probe(
                 "legacy_base_cache": str(base_path),
                 "pa1_probe_source": pa1_rec.path,
                 "pa1_legacy_base_cache": str(pa1_base_path),
+                "legacy_cache_files_indexed": int(
+                    legacy_index["cache_files_indexed"]
+                ),
                 "iq_batch_shape": list(iq.shape),
                 "track_shape": list(gpu.shape),
                 "frame_count": int(frame_count),
@@ -299,14 +379,23 @@ def build(
     if not torch.cuda.is_available() and device.startswith("cuda"):
         raise RuntimeError("CUDA requested but unavailable")
 
+    legacy_index = _build_legacy_cache_index(
+        base_cache_root,
+        pa1_base_cache_root,
+    )
+    if legacy_index["cache_files_indexed"] == 0:
+        raise RuntimeError(
+            "No legacy cache files were indexed from "
+            f"{legacy_index['roots']}"
+        )
+
     for rec_i, rec in enumerate(records, start=1):
         name = _cache_file_name(rec)
         out_path = cache_root / name
         track_path = tracks_root / (name + ".tracks.h5")
         base_path = _resolve_legacy_base(
             rec,
-            core_cache_root=base_cache_root,
-            pa1_cache_root=pa1_base_cache_root,
+            legacy_index=legacy_index,
         )
 
         if out_path.is_file() and track_path.is_file() and not setup.force_rebuild_cache:
