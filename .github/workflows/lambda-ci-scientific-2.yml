@@ -233,7 +233,7 @@ jobs:
           with open(output_path, "a", encoding="utf-8") as out:
               out.write(f"operation={op}\n")
               out.write(f"config_path={config_path}\n")
-          PYY
+          PY
 
       - name: Execute bounded scientific request
         id: scientific
