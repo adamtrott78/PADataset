@@ -1,0 +1,6 @@
+Workspace Shell read-only evidence mountpoint.
+
+This tracked marker exists only so clean Git candidate materializations contain
+local_artifacts/evidence/ before the launcher overlays the read-only historical
+evidence mount. The marker does not grant authority and is shadowed by the
+read-only bind during candidate execution.
