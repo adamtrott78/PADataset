@@ -33,6 +33,7 @@ def test_trusted_lane_b_retains_existing_route_and_adds_only_bounded_l2o_op():
     ]
     for marker in forbidden:
         assert marker not in text, marker
+    assert "PYY" not in text
 
 
 def test_l2o_path_validates_provenance_before_download_and_eval():
