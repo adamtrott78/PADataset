@@ -214,9 +214,16 @@ def _probe(
         raise RuntimeError("No raw OTA records discovered")
 
     rec = records[0]
-    name = _cache_file_name(rec)
     base_path = _resolve_legacy_base(
         rec,
+        core_cache_root=base_cache_root,
+        pa1_cache_root=pa1_base_cache_root,
+    )
+    pa1_rec = next((item for item in records if _is_pa1_record(item)), None)
+    if pa1_rec is None:
+        raise RuntimeError("No PA1 raw record discovered during STFT cache probe")
+    pa1_base_path = _resolve_legacy_base(
+        pa1_rec,
         core_cache_root=base_cache_root,
         pa1_cache_root=pa1_base_cache_root,
     )
@@ -255,6 +262,8 @@ def _probe(
                 "source_records": len(records),
                 "first_source": rec.path,
                 "legacy_base_cache": str(base_path),
+                "pa1_probe_source": pa1_rec.path,
+                "pa1_legacy_base_cache": str(pa1_base_path),
                 "iq_batch_shape": list(iq.shape),
                 "track_shape": list(gpu.shape),
                 "frame_count": int(frame_count),
