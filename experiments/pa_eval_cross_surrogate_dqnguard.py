@@ -44,11 +44,16 @@ def git_head() -> str:
 
 def _flatten_cross_rows(params: dict) -> list[dict]:
     rows = []
-    for train_surrogate, by_eval in sorted(params["cross_metrics"].items()):
+    for candidate_id, by_eval in sorted(params["cross_metrics"].items()):
+        summary = params["candidate_summaries"][candidate_id]
+        train_surrogate = summary["train_surrogate"]
         for eval_surrogate, metrics in sorted(by_eval.items()):
             rows.append(
                 {
+                    "candidate_id": candidate_id,
                     "train_surrogate": train_surrogate,
+                    "band_weight_rule": summary.get("band_weight_rule"),
+                    "guard_scale": summary.get("guard_scale"),
                     "eval_surrogate": eval_surrogate,
                     "diagonal": False,
                     "unknown_precision": metrics["unknown_precision"],
@@ -81,7 +86,12 @@ def main() -> None:
     ap.add_argument(
         "--class-conditional-bands",
         action="store_true",
-        help="Enable frozen B2 predicted-class band guard on each surrogate candidate.",
+        help="Enable predicted-class band guard on each surrogate candidate.",
+    )
+    ap.add_argument(
+        "--tune-band-weights",
+        action="store_true",
+        help="Enable frozen B3 bounded band-rule/guard-scale search.",
     )
     args = ap.parse_args()
 
@@ -154,6 +164,7 @@ def main() -> None:
             "batch_size": 32,
         },
         use_class_conditional_bands=args.class_conditional_bands,
+        tune_band_weights=args.tune_band_weights,
     )
     method.fit(payload, partitions)
     if not method.fitted_ or method.selected_surrogate_ is None:
@@ -184,6 +195,9 @@ def main() -> None:
 
     params = method.get_params()
     selected = str(params["selected_surrogate"])
+    selected_candidate_id = str(
+        params.get("selected_candidate_id") or selected
+    )
 
     cross_rows = _flatten_cross_rows(params)
     pd.DataFrame(cross_rows).to_csv(
@@ -199,10 +213,12 @@ def main() -> None:
         "method": method.method_name,
         "state_mode": args.state_mode,
         "class_conditional_bands": bool(args.class_conditional_bands),
+        "tune_band_weights": bool(args.tune_band_weights),
         "band_params": params.get("band_params"),
         "target_pa": target_pa,
         "known_classes": known_classes,
         "selected_surrogate": selected,
+        "selected_candidate_id": selected_candidate_id,
         "selection_rule": [
             "max worst off-diagonal unknown_f1",
             "max mean off-diagonal unknown_f1",
@@ -212,7 +228,7 @@ def main() -> None:
         "selected_threshold": params["selected_threshold"],
         "threshold_known_reject_cal": params[
             "threshold_known_reject_cal"
-        ][selected],
+        ][selected_candidate_id],
         "known_budget": args.known_budget,
         "partition_manifest_sha256": partitions.manifest["sha256"],
         "candidate_summaries": params["candidate_summaries"],
@@ -234,7 +250,9 @@ def main() -> None:
         "architecture": "B",
         "state_mode": args.state_mode,
         "class_conditional_bands": bool(args.class_conditional_bands),
+        "tune_band_weights": bool(args.tune_band_weights),
         "band_params": params.get("band_params"),
+        "selected_candidate_id": selected_candidate_id,
         "selected_surrogate": selected,
         "score_threshold": float(params["selected_threshold"]),
         "known_budget": float(args.known_budget),
@@ -309,6 +327,7 @@ def main() -> None:
                 else "DQN Q_unknown - Q_known"
             ),
             "class_conditional_bands": bool(args.class_conditional_bands),
+            "tune_band_weights": bool(args.tune_band_weights),
             "band_params": params.get("band_params"),
         },
         "threshold": {
