@@ -22,6 +22,9 @@ B1_REQUEST = Path(
 B2_REQUEST = Path(
     "manifests/configs/archb_cross_surrogate_v1/PA2_B2_softmax3_bands.json"
 )
+B3_REQUEST = Path(
+    "manifests/configs/archb_cross_surrogate_v1/PA2_B3_band_weight_search.json"
+)
 
 
 def _request(tmp_path: Path) -> dict:
@@ -199,6 +202,61 @@ def test_b2_request_rejects_band_policy_drift(tmp_path):
     path = tmp_path / "bad-b2-band.json"
     path.write_text(json.dumps(data), encoding="utf-8")
     with pytest.raises(ValueError, match="band policy"):
+        resolve_archb_eval_request(
+            request_path=path,
+            run_dir=tmp_path / "run",
+            out_dir=tmp_path / "out",
+        )
+
+
+def test_b3_request_resolves_frozen_band_weight_search(tmp_path):
+    out = resolve_archb_eval_request(
+        request_path=B3_REQUEST,
+        run_dir=tmp_path / "run",
+        out_dir=tmp_path / "out",
+    )
+    assert out.artifact_id == 14180249360
+    assert out.workflow_run_id == 43751609944
+    assert out.target_pa == "PA2"
+    assert out.state_mode == "softmax3"
+    args = list(out.evaluator_args)
+    assert args[args.index("--state-mode") + 1] == "softmax3"
+    assert "--class-conditional-bands" in args
+    assert "--tune-band-weights" in args
+
+
+def test_b3_request_rejects_target_metric_tuning(tmp_path):
+    data = json.loads(B3_REQUEST.read_text(encoding="utf-8"))
+    data["target_metrics_used_for_b3_trigger_or_tuning"] = True
+    path = tmp_path / "bad-b3-target.json"
+    path.write_text(json.dumps(data), encoding="utf-8")
+    with pytest.raises(ValueError, match="target metrics"):
+        resolve_archb_eval_request(
+            request_path=path,
+            run_dir=tmp_path / "run",
+            out_dir=tmp_path / "out",
+        )
+
+
+def test_b3_request_rejects_trigger_provenance_drift(tmp_path):
+    data = json.loads(B3_REQUEST.read_text(encoding="utf-8"))
+    data["b3_trigger"]["b2_selected_mean_cross_unknown_f1"] = 0.99
+    path = tmp_path / "bad-b3-trigger.json"
+    path.write_text(json.dumps(data), encoding="utf-8")
+    with pytest.raises(ValueError, match="trigger provenance"):
+        resolve_archb_eval_request(
+            request_path=path,
+            run_dir=tmp_path / "run",
+            out_dir=tmp_path / "out",
+        )
+
+
+def test_b3_request_rejects_search_scope_drift(tmp_path):
+    data = json.loads(B3_REQUEST.read_text(encoding="utf-8"))
+    data["b3_search_policy"]["guard_scales"] = [0.1, 1.0, 10.0]
+    path = tmp_path / "bad-b3-search.json"
+    path.write_text(json.dumps(data), encoding="utf-8")
+    with pytest.raises(ValueError, match="search policy"):
         resolve_archb_eval_request(
             request_path=path,
             run_dir=tmp_path / "run",
