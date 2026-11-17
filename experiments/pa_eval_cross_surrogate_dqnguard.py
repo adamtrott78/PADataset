@@ -78,6 +78,11 @@ def main() -> None:
         choices=["softmax3", "expanded5"],
         default="softmax3",
     )
+    ap.add_argument(
+        "--class-conditional-bands",
+        action="store_true",
+        help="Enable frozen B2 predicted-class band guard on each surrogate candidate.",
+    )
     args = ap.parse_args()
 
     t0 = time.time()
@@ -148,6 +153,7 @@ def main() -> None:
             "learning_rate": 1e-3,
             "batch_size": 32,
         },
+        use_class_conditional_bands=args.class_conditional_bands,
     )
     method.fit(payload, partitions)
     if not method.fitted_ or method.selected_surrogate_ is None:
@@ -192,6 +198,8 @@ def main() -> None:
         "architecture": "B",
         "method": method.method_name,
         "state_mode": args.state_mode,
+        "class_conditional_bands": bool(args.class_conditional_bands),
+        "band_params": params.get("band_params"),
         "target_pa": target_pa,
         "known_classes": known_classes,
         "selected_surrogate": selected,
@@ -225,6 +233,8 @@ def main() -> None:
         "schema": "padataset.cross-surrogate-dqnguard-b.dqn.v1",
         "architecture": "B",
         "state_mode": args.state_mode,
+        "class_conditional_bands": bool(args.class_conditional_bands),
+        "band_params": params.get("band_params"),
         "selected_surrogate": selected,
         "score_threshold": float(params["selected_threshold"]),
         "known_budget": float(args.known_budget),
@@ -293,7 +303,13 @@ def main() -> None:
         "score": {
             "state_mode": args.state_mode,
             "direction": "higher_is_more_unknown",
-            "definition": "DQN Q_unknown - Q_known",
+            "definition": (
+                "DQN Q_unknown - Q_known + own-surrogate class-band empirical-CDF guard"
+                if args.class_conditional_bands
+                else "DQN Q_unknown - Q_known"
+            ),
+            "class_conditional_bands": bool(args.class_conditional_bands),
+            "band_params": params.get("band_params"),
         },
         "threshold": {
             "source": "known_only",
