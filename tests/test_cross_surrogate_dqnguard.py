@@ -21,6 +21,7 @@ def _install_lightweight_dependency_stubs():
 
     multisurrogate = ModuleType("multisurrogate_dqnguard")
     multisurrogate.CalibrationPartitions = type("CalibrationPartitions", (), {})
+    multisurrogate.EmpiricalCDFNormalizer = type("EmpiricalCDFNormalizer", (), {})
     multisurrogate.PredictedClassBands = type("PredictedClassBands", (), {})
     multisurrogate.SurrogateGuard = type("SurrogateGuard", (), {})
 
@@ -213,6 +214,40 @@ def test_b2_evaluator_keeps_target_materialization_after_candidate_freeze():
     )
     assert "--class-conditional-bands" in text
     assert "use_class_conditional_bands=args.class_conditional_bands" in text
+    fit_pos = text.index("method.fit(payload, partitions)")
+    target_pos = text.index('"test_open"', fit_pos)
+    assert target_pos > fit_pos
+
+
+def test_b3_search_is_bounded_and_does_not_change_dqn_state():
+    from pathlib import Path
+
+    text = Path("cross_surrogate_dqnguard.py").read_text(encoding="utf-8")
+    assert 'B3_BAND_WEIGHT_RULES = (' in text
+    for rule in (
+        "uniform",
+        "gap_only",
+        "variance_only",
+        "energy_only",
+        "gap_variance_equal",
+        "gap_energy_equal",
+        "variance_energy_equal",
+        "absolute_median_separation",
+    ):
+        assert f'"{rule}"' in text
+    assert "B3_GUARD_SCALES = (0.5, 1.0, 2.0)" in text
+    assert "tune_band_weights" in text
+    assert '"selection_evidence": "off_diagonal_pseudo_open_only"' in text
+    assert '"dqn_retrained_per_weight": False' in text
+
+
+def test_b3_search_does_not_materialize_target_before_fit():
+    from pathlib import Path
+
+    text = Path("experiments/pa_eval_cross_surrogate_dqnguard.py").read_text(
+        encoding="utf-8"
+    )
+    assert "--tune-band-weights" in text
     fit_pos = text.index("method.fit(payload, partitions)")
     target_pos = text.index('"test_open"', fit_pos)
     assert target_pos > fit_pos
