@@ -83,8 +83,12 @@ def main() -> None:
     t0 = time.time()
     out = Path(args.out_dir)
     if out.exists():
-        raise SystemExit(f"Refusing to overwrite existing output directory: {out}")
-    out.mkdir(parents=True)
+        if not out.is_dir():
+            raise SystemExit(f"Refusing non-directory output path: {out}")
+        if any(out.iterdir()):
+            raise SystemExit(f"Refusing to overwrite non-empty output directory: {out}")
+    else:
+        out.mkdir(parents=True)
 
     handle = load_backbone_run(args.run_dir, args.checkpoint, device=args.device)
     cfg = dict(handle.config)
