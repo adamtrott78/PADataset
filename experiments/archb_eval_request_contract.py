@@ -37,30 +37,50 @@ def resolve_archb_eval_request(
         raise ValueError("Architecture-B request is not evaluator-ready")
     if req.get("task_id") != "mth602-final-multisurrogate-dqnguard-v1":
         raise ValueError("Architecture-B task identity mismatch")
-    if req.get("architecture") != "B" or req.get("stage") != "B0":
+    if req.get("architecture") != "B":
+        raise ValueError("Architecture-B architecture drift")
+
+    stage = req.get("stage")
+    stage_policy = {
+        "B0": {
+            "policy_id": "mth602_archb_b0_frozen_v1",
+            "state_mode": "softmax3",
+        },
+        "B1": {
+            "policy_id": "mth602_archb_b1_frozen_v1",
+            "state_mode": "expanded5",
+        },
+    }.get(stage)
+    if stage_policy is None:
         raise ValueError("Architecture-B development stage drift")
-    if req.get("policy_id") != "mth602_archb_b0_frozen_v1":
+    if req.get("policy_id") != stage_policy["policy_id"]:
         raise ValueError("Architecture-B policy_id drift")
     if req.get("target_pa") != "PA2":
-        raise ValueError("B0 requires PA2 as the held-out target")
-    if req.get("state_mode") != "softmax3":
-        raise ValueError("B0 requires softmax3")
+        raise ValueError(f"{stage} requires PA2 as the held-out target")
+    if req.get("state_mode") != stage_policy["state_mode"]:
+        raise ValueError(f"{stage} state mode drift")
     if req.get("checkpoint") != "best_model":
-        raise ValueError("B0 requires best_model checkpoint")
+        raise ValueError(f"{stage} requires best_model checkpoint")
     if float(req.get("known_budget", -1)) != 0.05:
-        raise ValueError("B0 known-reject budget drift")
+        raise ValueError(f"{stage} known-reject budget drift")
     if int(req.get("partition_seed", -1)) != 1701:
-        raise ValueError("B0 partition seed drift")
+        raise ValueError(f"{stage} partition seed drift")
     if int(req.get("dqn_seed", -1)) != 42:
-        raise ValueError("B0 DQN seed drift")
+        raise ValueError(f"{stage} DQN seed drift")
     if int(req.get("dqn_episodes", -1)) != 30:
-        raise ValueError("B0 DQN episode count drift")
+        raise ValueError(f"{stage} DQN episode count drift")
     if int(req.get("batch_size", -1)) != 128:
-        raise ValueError("B0 evaluator batch size drift")
+        raise ValueError(f"{stage} evaluator batch size drift")
     if int(req.get("num_workers", -1)) != 0:
-        raise ValueError("B0 evaluator worker count drift")
+        raise ValueError(f"{stage} evaluator worker count drift")
     if req.get("evaluator_device") != "cuda":
-        raise ValueError("B0 evaluator must use CUDA")
+        raise ValueError(f"{stage} evaluator must use CUDA")
+
+    if stage == "B1":
+        if req.get("predeclared_stage_transition") is not True:
+            raise ValueError("B1 must be a predeclared stage transition")
+        if req.get("b0_target_metrics_used_for_b1_parameters") is not False:
+            raise ValueError("B1 may not use B0 target metrics for parameters")
 
     for field in (
         "target_labels_used_for_fitting",
@@ -99,7 +119,7 @@ def resolve_archb_eval_request(
         "--partition-seed", "1701",
         "--dqn-episodes", "30",
         "--known-budget", "0.05",
-        "--state-mode", "softmax3",
+        "--state-mode", str(req["state_mode"]),
     )
 
     return ArchBEvalRequest(
