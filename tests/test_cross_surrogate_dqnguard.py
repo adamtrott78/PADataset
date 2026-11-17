@@ -127,3 +127,44 @@ def test_known_only_score_threshold_application():
     assert pred["is_unknown"].tolist() == [False, False, True, True]
     assert pred["final_pred"].tolist() == [0, 1, 4, 4]
     assert np.allclose(pred["unknown_score"], [-0.2, 0.1, 0.5, 1.2])
+
+
+
+def test_evaluator_materializes_target_only_after_winner_freeze():
+    import ast
+    from pathlib import Path
+
+    source = Path("experiments/pa_eval_cross_surrogate_dqnguard.py").read_text(
+        encoding="utf-8"
+    )
+    tree = ast.parse(source)
+
+    fit_line = None
+    target_extract_line = None
+    prefit_payload_includes = None
+
+    for node in ast.walk(tree):
+        if isinstance(node, ast.Call) and isinstance(node.func, ast.Attribute):
+            if node.func.attr == "fit":
+                fit_line = node.lineno if fit_line is None else min(fit_line, node.lineno)
+        if isinstance(node, ast.Call) and isinstance(node.func, ast.Name):
+            if node.func.id == "build_backbone_payload":
+                for kw in node.keywords:
+                    if kw.arg == "include" and isinstance(kw.value, ast.Tuple):
+                        prefit_payload_includes = [
+                            elt.value for elt in kw.value.elts
+                            if isinstance(elt, ast.Constant)
+                        ]
+            if node.func.id == "extract_backbone_outputs":
+                if (
+                    len(node.args) >= 2
+                    and isinstance(node.args[1], ast.Constant)
+                    and node.args[1].value == "test_open"
+                ):
+                    target_extract_line = node.lineno
+
+    assert prefit_payload_includes == ["val_known", "test_known"]
+    assert fit_line is not None
+    assert target_extract_line is not None
+    assert target_extract_line > fit_line
+
