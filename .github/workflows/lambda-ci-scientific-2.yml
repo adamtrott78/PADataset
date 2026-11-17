@@ -212,23 +212,47 @@ jobs:
                       raise SystemExit("Architecture-B architecture drift")
                   stage = req.get("stage")
                   expected = {
-                      "B0": ("mth602_archb_b0_frozen_v1", "softmax3"),
-                      "B1": ("mth602_archb_b1_frozen_v1", "expanded5"),
+                      "B0": ("mth602_archb_b0_frozen_v1", "softmax3", False),
+                      "B1": ("mth602_archb_b1_frozen_v1", "expanded5", False),
+                      "B2": ("mth602_archb_b2_frozen_v1", "softmax3", True),
                   }.get(stage)
                   if expected is None:
                       raise SystemExit("Architecture-B stage drift")
-                  expected_policy, expected_state = expected
+                  expected_policy, expected_state, expected_bands = expected
                   if req.get("policy_id") != expected_policy:
                       raise SystemExit("Architecture-B policy drift")
                   if req.get("target_pa") != "PA2":
                       raise SystemExit("Architecture-B target drift")
                   if req.get("state_mode") != expected_state:
                       raise SystemExit("Architecture-B state drift")
+                  if bool(req.get("class_conditional_bands", False)) != expected_bands:
+                      raise SystemExit("Architecture-B class-band mode drift")
                   if stage == "B1":
                       if req.get("predeclared_stage_transition") is not True:
                           raise SystemExit("Architecture-B B1 is not predeclared")
                       if req.get("b0_target_metrics_used_for_b1_parameters") is not False:
                           raise SystemExit("Architecture-B B1 permits target-driven parameters")
+                  if stage == "B2":
+                      if req.get("predeclared_stage_transition") is not True:
+                          raise SystemExit("Architecture-B B2 is not predeclared")
+                      if req.get("target_metrics_used_for_state_mode_selection") is not False:
+                          raise SystemExit("Architecture-B B2 permits target-driven state selection")
+                      decision = req.get("state_mode_decision") or {}
+                      if decision.get("selected_state_mode") != "softmax3":
+                          raise SystemExit("Architecture-B B2 state decision drift")
+                      if float(decision.get("b0_selected_worst_cross_unknown_f1", -1)) != 0.003686635944700461:
+                          raise SystemExit("Architecture-B B2 B0 decision evidence drift")
+                      if float(decision.get("b1_selected_worst_cross_unknown_f1", -1)) != 0.0:
+                          raise SystemExit("Architecture-B B2 B1 decision evidence drift")
+                      if int(decision.get("b0_artifact_id", -1)) != 14354747328:
+                          raise SystemExit("Architecture-B B2 B0 artifact drift")
+                      if int(decision.get("b1_artifact_id", -1)) != 14361967189:
+                          raise SystemExit("Architecture-B B2 B1 artifact drift")
+                      band = req.get("band_policy") or {}
+                      if band.get("candidate_guard_training") != "own_pseudo_surrogate_only":
+                          raise SystemExit("Architecture-B B2 guard training drift")
+                      if band.get("composite_score") != "dqn_margin_plus_guard_cdf":
+                          raise SystemExit("Architecture-B B2 composite score drift")
                   if req.get("checkpoint") != "best_model":
                       raise SystemExit("Architecture-B checkpoint drift")
                   if float(req.get("known_budget", -1)) != 0.05:
@@ -415,10 +439,16 @@ jobs:
           assert d["evidence_partition"]["target_quarantined"] is True
           assert d["candidate_selection"]["own_surrogate_diagonal_excluded"] is True
           assert d["score"]["state_mode"] == req["state_mode"]
-          assert req["stage"] in {"B0", "B1"}
+          assert req["stage"] in {"B0", "B1", "B2"}
           if req["stage"] == "B1":
               assert req["predeclared_stage_transition"] is True
               assert req["b0_target_metrics_used_for_b1_parameters"] is False
+          if req["stage"] == "B2":
+              assert req["predeclared_stage_transition"] is True
+              assert req["target_metrics_used_for_state_mode_selection"] is False
+              assert d["score"]["class_conditional_bands"] is True
+              assert d["score"]["band_params"]["candidate_guard_training"] == "own_pseudo_surrogate_only"
+              assert d["score"]["band_params"]["composite_score"] == "dqn_margin_plus_guard_cdf"
           assert d["threshold"]["source"] == "known_only"
           assert float(d["threshold"]["budget"]) == 0.05
           p=d["provenance"]

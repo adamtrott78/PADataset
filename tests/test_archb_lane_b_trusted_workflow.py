@@ -14,11 +14,17 @@ def test_archb_gpu2_workflow_is_narrow_and_provenance_bound():
     assert 'padataset.archb-cross-surrogate-eval-request.v1' in text
     assert 'mth602_archb_b0_frozen_v1' in text
     assert 'mth602_archb_b1_frozen_v1' in text
-    assert '"B0": ("mth602_archb_b0_frozen_v1", "softmax3")' in text
-    assert '"B1": ("mth602_archb_b1_frozen_v1", "expanded5")' in text
+    assert 'mth602_archb_b2_frozen_v1' in text
+    assert '"B0": ("mth602_archb_b0_frozen_v1", "softmax3", False)' in text
+    assert '"B1": ("mth602_archb_b1_frozen_v1", "expanded5", False)' in text
+    assert '"B2": ("mth602_archb_b2_frozen_v1", "softmax3", True)' in text
     assert 'req.get("target_pa") != "PA2"' in text
     assert 'req.get("predeclared_stage_transition") is not True' in text
     assert 'req.get("b0_target_metrics_used_for_b1_parameters") is not False' in text
+    assert 'req.get("target_metrics_used_for_state_mode_selection") is not False' in text
+    assert '14354747328' in text
+    assert '14361967189' in text
+    assert 'own_pseudo_surrogate_only' in text
     assert 'float(req.get("known_budget", -1)) != 0.05' in text
     assert 'int(req.get("partition_seed", -1)) != 1701' in text
     assert 'int(req.get("dqn_episodes", -1)) != 30' in text
@@ -42,7 +48,8 @@ def test_archb_gpu2_workflow_uses_hardened_contract_and_final_result_checks():
     assert 'd["schema"] == "padataset.cross-surrogate-dqnguard-b.result.v1"' in text
     assert 'd["candidate_selection"]["own_surrogate_diagonal_excluded"] is True' in text
     assert 'd["score"]["state_mode"] == req["state_mode"]' in text
-    assert 'req["stage"] in {"B0", "B1"}' in text
+    assert 'req["stage"] in {"B0", "B1", "B2"}' in text
+    assert 'd["score"]["class_conditional_bands"] is True' in text
     assert 'd["threshold"]["source"] == "known_only"' in text
     assert 'p["target_first_consumed_after_winner_frozen"] is True' in text
     assert 'operation=archb_cross_surrogate' not in text  # no hard-coded forged receipt
