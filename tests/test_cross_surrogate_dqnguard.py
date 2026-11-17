@@ -251,3 +251,14 @@ def test_b3_search_does_not_materialize_target_before_fit():
     fit_pos = text.index("method.fit(payload, partitions)")
     target_pos = text.index('"test_open"', fit_pos)
     assert target_pos > fit_pos
+
+
+def test_b3_result_record_uses_selected_candidate_id_for_threshold_calibration():
+    from pathlib import Path
+
+    text = Path("experiments/pa_eval_cross_surrogate_dqnguard.py").read_text(
+        encoding="utf-8"
+    )
+    threshold_block = text.split('"threshold": {', 1)[1].split('"metrics": {', 1)[0]
+    assert 'params["threshold_known_reject_cal"][selected_candidate_id]' in threshold_block
+    assert 'params["threshold_known_reject_cal"][selected]' not in threshold_block
