@@ -19,6 +19,9 @@ REQUEST = Path(
 B1_REQUEST = Path(
     "manifests/configs/archb_cross_surrogate_v1/PA2_B1_expanded5.json"
 )
+B2_REQUEST = Path(
+    "manifests/configs/archb_cross_surrogate_v1/PA2_B2_softmax3_bands.json"
+)
 
 
 def _request(tmp_path: Path) -> dict:
@@ -141,6 +144,61 @@ def test_b1_request_rejects_state_mode_drift(tmp_path):
     path = tmp_path / "bad-b1-state.json"
     path.write_text(json.dumps(data), encoding="utf-8")
     with pytest.raises(ValueError, match="B1 state mode drift"):
+        resolve_archb_eval_request(
+            request_path=path,
+            run_dir=tmp_path / "run",
+            out_dir=tmp_path / "out",
+        )
+
+
+def test_b2_request_resolves_softmax3_plus_frozen_class_bands(tmp_path):
+    out = resolve_archb_eval_request(
+        request_path=B2_REQUEST,
+        run_dir=tmp_path / "run",
+        out_dir=tmp_path / "out",
+    )
+    assert out.artifact_id == 14180249360
+    assert out.workflow_run_id == 43751609944
+    assert out.target_pa == "PA2"
+    assert out.state_mode == "softmax3"
+    args = list(out.evaluator_args)
+    assert args[args.index("--state-mode") + 1] == "softmax3"
+    assert "--class-conditional-bands" in args
+    assert args[args.index("--known-budget") + 1] == "0.05"
+
+
+def test_b2_request_rejects_target_metric_state_selection(tmp_path):
+    data = json.loads(B2_REQUEST.read_text(encoding="utf-8"))
+    data["target_metrics_used_for_state_mode_selection"] = True
+    path = tmp_path / "bad-b2-target.json"
+    path.write_text(json.dumps(data), encoding="utf-8")
+    with pytest.raises(ValueError, match="target metrics"):
+        resolve_archb_eval_request(
+            request_path=path,
+            run_dir=tmp_path / "run",
+            out_dir=tmp_path / "out",
+        )
+
+
+def test_b2_request_rejects_state_decision_provenance_drift(tmp_path):
+    data = json.loads(B2_REQUEST.read_text(encoding="utf-8"))
+    data["state_mode_decision"]["b1_selected_worst_cross_unknown_f1"] = 0.1
+    path = tmp_path / "bad-b2-decision.json"
+    path.write_text(json.dumps(data), encoding="utf-8")
+    with pytest.raises(ValueError, match="decision provenance"):
+        resolve_archb_eval_request(
+            request_path=path,
+            run_dir=tmp_path / "run",
+            out_dir=tmp_path / "out",
+        )
+
+
+def test_b2_request_rejects_band_policy_drift(tmp_path):
+    data = json.loads(B2_REQUEST.read_text(encoding="utf-8"))
+    data["band_policy"]["percentiles"] = [1.0, 99.0]
+    path = tmp_path / "bad-b2-band.json"
+    path.write_text(json.dumps(data), encoding="utf-8")
+    with pytest.raises(ValueError, match="band policy"):
         resolve_archb_eval_request(
             request_path=path,
             run_dir=tmp_path / "run",
