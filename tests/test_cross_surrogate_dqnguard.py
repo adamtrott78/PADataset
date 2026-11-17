@@ -21,11 +21,14 @@ def _install_lightweight_dependency_stubs():
 
     multisurrogate = ModuleType("multisurrogate_dqnguard")
     multisurrogate.CalibrationPartitions = type("CalibrationPartitions", (), {})
+    multisurrogate.PredictedClassBands = type("PredictedClassBands", (), {})
+    multisurrogate.SurrogateGuard = type("SurrogateGuard", (), {})
 
     def _unexpected_runtime_call(*_args, **_kwargs):
         raise AssertionError("heavy runtime dependency unexpectedly exercised")
 
     multisurrogate.assert_target_quarantined = _unexpected_runtime_call
+    multisurrogate.fit_surrogate_guard = _unexpected_runtime_call
     multisurrogate.known_only_threshold = _unexpected_runtime_call
     sys.modules.setdefault("multisurrogate_dqnguard", multisurrogate)
 
@@ -188,3 +191,28 @@ def test_evaluator_allows_empty_precreated_output_dir_and_rejects_nonempty():
     assert "Refusing to overwrite existing output directory" not in text
     assert "if not out.is_dir():" in text
 
+
+
+def test_b2_band_path_uses_only_candidate_own_pseudo_surrogate():
+    from pathlib import Path
+
+    text = Path("cross_surrogate_dqnguard.py").read_text(encoding="utf-8")
+    assert "use_class_conditional_bands" in text
+    assert "PredictedClassBands(" in text
+    assert "bands.transform(partitions.pseudo_open[surrogate])" in text
+    assert "fit_surrogate_guard(" in text
+    assert '"candidate_guard_training": "own_pseudo_surrogate_only"' in text
+    assert '"composite_score": "dqn_margin_plus_guard_cdf"' in text
+
+
+def test_b2_evaluator_keeps_target_materialization_after_candidate_freeze():
+    from pathlib import Path
+
+    text = Path("experiments/pa_eval_cross_surrogate_dqnguard.py").read_text(
+        encoding="utf-8"
+    )
+    assert "--class-conditional-bands" in text
+    assert "use_class_conditional_bands=args.class_conditional_bands" in text
+    fit_pos = text.index("method.fit(payload, partitions)")
+    target_pos = text.index('"test_open"', fit_pos)
+    assert target_pos > fit_pos
