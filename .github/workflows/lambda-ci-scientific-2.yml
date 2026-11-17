@@ -45,7 +45,8 @@ jobs:
           if [[ "$request_token" != "smoke" ]] &&
              [[ ! "$request_token" =~ ^train_backbone:manifests/configs/[A-Za-z0-9_./-]+\.json$ ]] &&
              [[ ! "$request_token" =~ ^stage03_archc:manifests/configs/[A-Za-z0-9_./-]+\.json$ ]] &&
-             [[ ! "$request_token" =~ ^l2o_directional_eval:manifests/configs/l2o_directional_eval_v1/[A-Za-z0-9_.-]+\.json$ ]]; then
+             [[ ! "$request_token" =~ ^l2o_directional_eval:manifests/configs/l2o_directional_eval_v1/[A-Za-z0-9_.-]+\.json$ ]] &&
+             [[ ! "$request_token" =~ ^archb_cross_surrogate:manifests/configs/archb_cross_surrogate_v1/[A-Za-z0-9_.-]+\.json$ ]]; then
             echo "Scientific request token rejected" >&2
             exit 23
           fi
@@ -158,7 +159,7 @@ jobs:
               config_path = ""
           elif ":" in request_token:
               op, config_path = request_token.split(":", 1)
-              if op not in {"train_backbone", "stage03_archc", "l2o_directional_eval"}:
+              if op not in {"train_backbone", "stage03_archc", "l2o_directional_eval", "archb_cross_surrogate"}:
                   raise SystemExit(f"unsupported scientific operation: {op!r}")
               root = pathlib.Path.cwd().resolve()
               resolved = (root / config_path).resolve()
@@ -191,6 +192,55 @@ jobs:
                       raise SystemExit("directional evaluator checkpoint drift")
                   if req.get("target_labels_used_for_tuning") is not False:
                       raise SystemExit("directional evaluator permits target tuning")
+              elif op == "archb_cross_surrogate":
+                  if not re.fullmatch(
+                      r"manifests/configs/archb_cross_surrogate_v1/[A-Za-z0-9_.-]+\.json",
+                      config_path,
+                  ):
+                      raise SystemExit("Architecture-B evaluator request path rejected")
+                  allowed = (root / "manifests" / "configs" / "archb_cross_surrogate_v1").resolve()
+                  try:
+                      resolved.relative_to(allowed)
+                  except ValueError:
+                      raise SystemExit("Architecture-B evaluator request path escape")
+                  req = json.loads(resolved.read_text())
+                  if req.get("schema") != "padataset.archb-cross-surrogate-eval-request.v1":
+                      raise SystemExit("Architecture-B request schema mismatch")
+                  if req.get("status") != "READY_FOR_BOUNDED_EVALUATOR":
+                      raise SystemExit("Architecture-B request is not evaluator-ready")
+                  if req.get("policy_id") != "mth602_archb_b0_frozen_v1":
+                      raise SystemExit("Architecture-B policy drift")
+                  if req.get("architecture") != "B" or req.get("stage") != "B0":
+                      raise SystemExit("Architecture-B stage drift")
+                  if req.get("target_pa") != "PA2":
+                      raise SystemExit("Architecture-B B0 target drift")
+                  if req.get("state_mode") != "softmax3":
+                      raise SystemExit("Architecture-B B0 state drift")
+                  if req.get("checkpoint") != "best_model":
+                      raise SystemExit("Architecture-B checkpoint drift")
+                  if float(req.get("known_budget", -1)) != 0.05:
+                      raise SystemExit("Architecture-B known budget drift")
+                  if int(req.get("partition_seed", -1)) != 1701:
+                      raise SystemExit("Architecture-B partition seed drift")
+                  if int(req.get("dqn_episodes", -1)) != 30:
+                      raise SystemExit("Architecture-B DQN episode drift")
+                  if req.get("target_labels_used_for_fitting") is not False:
+                      raise SystemExit("Architecture-B permits target fitting")
+                  if req.get("target_labels_used_for_thresholding") is not False:
+                      raise SystemExit("Architecture-B permits target thresholding")
+                  if req.get("target_labels_used_for_candidate_selection") is not False:
+                      raise SystemExit("Architecture-B permits target candidate selection")
+                  if req.get("target_first_consumed_after_winner_frozen") is not True:
+                      raise SystemExit("Architecture-B target consumption ordering drift")
+                  src = req.get("source_backbone") or {}
+                  if int(src.get("artifact_id", -1)) != 14180249360:
+                      raise SystemExit("Architecture-B source artifact drift")
+                  if src.get("artifact_digest") != "sha256:f7de2637df85487b21903a448630815fc63c1247253b98ffc754b46586b9b39b":
+                      raise SystemExit("Architecture-B source artifact digest drift")
+                  if int(src.get("workflow_run_id", -1)) != 43751609944:
+                      raise SystemExit("Architecture-B source workflow drift")
+                  if src.get("candidate_sha") != "befe383fd67c8bca8d8ce370344b33c7e13cd52f":
+                      raise SystemExit("Architecture-B source candidate drift")
               else:
                   if not re.fullmatch(
                       r"manifests/configs/[A-Za-z0-9_./-]+\.json", config_path
@@ -274,6 +324,96 @@ jobs:
 
           if [[ "$OPERATION" == "smoke" ]]; then
             cp "$RUNNER_TEMP/scientific-runtime-smoke.json" "$result_root/runtime-smoke.json"
+          elif [[ "$OPERATION" == "archb_cross_surrogate" ]]; then
+            request_path="$CONFIG_PATH"
+            eval_dir="$result_root/archb_eval"
+            mkdir -p "$eval_dir"
+
+            pre_resolved="$RUNNER_TEMP/archb-pre-resolved.json"
+            "$runtime_python" experiments/archb_eval_request_contract.py \
+              --request "$request_path" \
+              --run-dir "$RUNNER_TEMP/unmaterialized-backbone" \
+              --out-dir "$eval_dir" > "$pre_resolved"
+
+            artifact_id="$(python3 -c 'import json,sys; print(json.load(open(sys.argv[1]))["artifact_id"])' "$pre_resolved")"
+            [[ "$artifact_id" == "14180249360" ]]
+
+            artifact_metadata="$RUNNER_TEMP/archb-artifact-metadata.json"
+            curl -fsSL \
+              -H "Accept: application/vnd.github+json" \
+              -H "Authorization: Bearer $GH_TOKEN" \
+              -H "X-GitHub-Api-Version: 2022-11-28" \
+              "https://api.github.com/repos/$REPOSITORY/actions/artifacts/$artifact_id" \
+              > "$artifact_metadata"
+
+            "$runtime_python" experiments/archb_artifact_transport_contract.py \
+              --request "$request_path" \
+              --artifact-metadata "$artifact_metadata" \
+              > "$RUNNER_TEMP/archb-transport-binding.json"
+
+            archive_url="$(python3 -c 'import json,sys; print(json.load(open(sys.argv[1]))["archive_download_url"])' "$artifact_metadata")"
+            artifact_zip="$RUNNER_TEMP/archb-backbone-artifact.zip"
+            curl -fL \
+              -H "Accept: application/vnd.github+json" \
+              -H "Authorization: Bearer $GH_TOKEN" \
+              -H "X-GitHub-Api-Version: 2022-11-28" \
+              "$archive_url" \
+              -o "$artifact_zip"
+
+            rehydrated="$RUNNER_TEMP/archb-rehydrated"
+            mkdir -p "$rehydrated"
+            "$runtime_python" experiments/archb_artifact_rehydrate.py \
+              --request "$request_path" \
+              --artifact-id "$artifact_id" \
+              --artifact-zip "$artifact_zip" \
+              --destination "$rehydrated" \
+              > "$RUNNER_TEMP/archb-rehydrate.json"
+
+            run_dir="$(python3 -c 'import json,sys; print(json.load(open(sys.argv[1]))["run_dir"])' "$RUNNER_TEMP/archb-rehydrate.json")"
+            [[ -d "$run_dir" ]]
+
+            resolved="$RUNNER_TEMP/archb-resolved.json"
+            "$runtime_python" experiments/archb_eval_request_contract.py \
+              --request "$request_path" \
+              --run-dir "$run_dir" \
+              --out-dir "$eval_dir" > "$resolved"
+
+            mapfile -t eval_args < <(
+              python3 -c 'import json,sys; a=json.load(open(sys.argv[1]))["evaluator_args"]; assert isinstance(a,list) and a; assert all(isinstance(x,str) and "\n" not in x and "\r" not in x for x in a); print(*a, sep="\n")' "$resolved"
+            )
+
+            "$runtime_python" experiments/pa_eval_cross_surrogate_dqnguard.py \
+              "${eval_args[@]}"
+
+            [[ -f "$eval_dir/result_record.json" ]]
+            python3 - "$eval_dir/result_record.json" "$EXPECTED_SHA" <<'PY'
+          import json, pathlib, sys
+          path, expected_sha = sys.argv[1:3]
+          d=json.loads(pathlib.Path(path).read_text())
+          assert d["schema"] == "padataset.cross-surrogate-dqnguard-b.result.v1"
+          assert d["architecture"] == "B"
+          assert d["target_pa"] == "PA2"
+          assert d["status"] == "SMALL_REAL"
+          assert d["source"]["git_sha"] == expected_sha
+          assert d["source"]["cache_len"] == 16384
+          assert d["backbone"]["checkpoint_selection"] == "known_only"
+          assert d["backbone"]["known_classes"] == ["PA1","PA3","PA4","PA8"]
+          assert d["evidence_partition"]["target_quarantined"] is True
+          assert d["candidate_selection"]["own_surrogate_diagonal_excluded"] is True
+          assert d["score"]["state_mode"] == "softmax3"
+          assert d["threshold"]["source"] == "known_only"
+          assert float(d["threshold"]["budget"]) == 0.05
+          p=d["provenance"]
+          assert p["target_labels_used_for_fitting"] is False
+          assert p["target_labels_used_for_thresholding"] is False
+          assert p["target_labels_used_for_candidate_selection"] is False
+          assert p["target_first_consumed_after_winner_frozen"] is True
+          PY
+
+            cp "$artifact_metadata" "$eval_dir/artifact-metadata.json"
+            cp "$RUNNER_TEMP/archb-transport-binding.json" "$eval_dir/artifact-transport-binding.json"
+            cp "$RUNNER_TEMP/archb-rehydrate.json" "$eval_dir/rehydration.json"
+            cp "$resolved" "$eval_dir/resolved-request.json"
           elif [[ "$OPERATION" == "l2o_directional_eval" ]]; then
             request_path="$CONFIG_PATH"
             matrix_path="manifests/l2o_canonical_backbone_matrix_v1.json"
