@@ -168,3 +168,23 @@ def test_evaluator_materializes_target_only_after_winner_freeze():
     assert target_extract_line is not None
     assert target_extract_line > fit_line
 
+
+
+
+def test_evaluator_allows_empty_precreated_output_dir_and_rejects_nonempty():
+    import ast
+    from pathlib import Path
+
+    source = Path("experiments/pa_eval_cross_surrogate_dqnguard.py").read_text(
+        encoding="utf-8"
+    )
+    tree = ast.parse(source)
+
+    # Structural regression: the evaluator must distinguish an empty
+    # workflow-created directory from a non-empty prior result directory.
+    text = source
+    assert "if any(out.iterdir()):" in text
+    assert "Refusing to overwrite non-empty output directory" in text
+    assert "Refusing to overwrite existing output directory" not in text
+    assert "if not out.is_dir():" in text
+
