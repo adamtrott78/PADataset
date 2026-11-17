@@ -28,6 +28,11 @@ case "$ROOT" in
     exit 24
     ;;
 esac
+# Anchor stdin-Python imports and all relative module resolution to the exact
+# detached candidate checkout. Python places the current working directory
+# ahead of PYTHONPATH, so merely exporting PYTHONPATH is insufficient when
+# the operator launches this script from the canonical PADataset checkout.
+cd "$ROOT"
 LOG_ROOT="$CANON_REPO/local_artifacts/stft_ablation_v1"
 mkdir -p "$LOG_ROOT" "$RESULT_ROOT" "$DIAG_ROOT"
 DRIVER_LOG="$LOG_ROOT/persistent_driver.log"
