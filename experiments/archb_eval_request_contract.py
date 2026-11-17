@@ -46,16 +46,25 @@ def resolve_archb_eval_request(
             "policy_id": "mth602_archb_b0_frozen_v1",
             "state_mode": "softmax3",
             "class_conditional_bands": False,
+            "tune_band_weights": False,
         },
         "B1": {
             "policy_id": "mth602_archb_b1_frozen_v1",
             "state_mode": "expanded5",
             "class_conditional_bands": False,
+            "tune_band_weights": False,
         },
         "B2": {
             "policy_id": "mth602_archb_b2_frozen_v1",
             "state_mode": "softmax3",
             "class_conditional_bands": True,
+            "tune_band_weights": False,
+        },
+        "B3": {
+            "policy_id": "mth602_archb_b3_frozen_v1",
+            "state_mode": "softmax3",
+            "class_conditional_bands": True,
+            "tune_band_weights": True,
         },
     }.get(stage)
     if stage_policy is None:
@@ -70,6 +79,10 @@ def resolve_archb_eval_request(
         stage_policy["class_conditional_bands"]
     ):
         raise ValueError(f"{stage} class-conditional band mode drift")
+    if bool(req.get("tune_band_weights", False)) != bool(
+        stage_policy["tune_band_weights"]
+    ):
+        raise ValueError(f"{stage} band-weight tuning mode drift")
     if req.get("checkpoint") != "best_model":
         raise ValueError(f"{stage} requires best_model checkpoint")
     if float(req.get("known_budget", -1)) != 0.05:
@@ -124,6 +137,60 @@ def resolve_archb_eval_request(
         if band != exact_band:
             raise ValueError("B2 band policy drift")
 
+    if stage == "B3":
+        if req.get("predeclared_stage_transition") is not True:
+            raise ValueError("B3 must be a predeclared stage transition")
+        if req.get("target_metrics_used_for_b3_trigger_or_tuning") is not False:
+            raise ValueError("B3 may not use target metrics for trigger or tuning")
+
+        trigger = req.get("b3_trigger") or {}
+        exact_trigger = {
+            "rule": "B2 demonstrates complementary pseudo-open development value",
+            "b0_artifact_id": 14354747328,
+            "b0_selected_mean_cross_unknown_f1": 0.1102334,
+            "b0_selected_mean_cross_osr_macro_f1": 0.7314352,
+            "b0_selected_worst_cross_unknown_f1": 0.0036866,
+            "b2_artifact_id": 14369751106,
+            "b2_artifact_digest": "sha256:e5d76e4b8b90c101218a7c3603c9fd92d8e87b439eaffa36a9f46a1525e17d00",
+            "b2_selected_mean_cross_unknown_f1": 0.12087985437740191,
+            "b2_selected_mean_cross_osr_macro_f1": 0.7357077527296183,
+            "b2_selected_worst_cross_unknown_f1": 0.0036101083032490976,
+            "all_b2_candidate_guard_weights_uniform": True,
+        }
+        if trigger != exact_trigger:
+            raise ValueError("B3 trigger provenance drift")
+
+        search = req.get("b3_search_policy") or {}
+        exact_search = {
+            "weight_rules": [
+                "uniform",
+                "gap_only",
+                "variance_only",
+                "energy_only",
+                "gap_variance_equal",
+                "gap_energy_equal",
+                "variance_energy_equal",
+                "absolute_median_separation",
+            ],
+            "guard_scales": [0.5, 1.0, 2.0],
+            "band_percentiles": [5.0, 95.0],
+            "features": ["top2_gap", "logit_variance", "energy"],
+            "selection_evidence": "off_diagonal_pseudo_open_only",
+            "selection_rule": [
+                "max worst off-diagonal unknown_f1",
+                "max mean off-diagonal unknown_f1",
+                "max mean off-diagonal osr_macro_f1",
+                "min known_guard_reject_rate",
+            ],
+            "dqn_state_mode": "softmax3",
+            "dqn_training_changed": False,
+            "candidate_guard_training": "own_pseudo_surrogate_only",
+            "threshold_source": "known_only",
+            "known_budget": 0.05,
+        }
+        if search != exact_search:
+            raise ValueError("B3 search policy drift")
+
     for field in (
         "target_labels_used_for_fitting",
         "target_labels_used_for_thresholding",
@@ -165,6 +232,8 @@ def resolve_archb_eval_request(
     )
     if bool(req.get("class_conditional_bands", False)):
         args = (*args, "--class-conditional-bands")
+    if bool(req.get("tune_band_weights", False)):
+        args = (*args, "--tune-band-weights")
 
     return ArchBEvalRequest(
         artifact_id=int(src["artifact_id"]),
