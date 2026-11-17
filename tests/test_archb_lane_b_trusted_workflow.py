@@ -15,7 +15,7 @@ def test_archb_gpu2_workflow_is_narrow_and_provenance_bound():
     assert 'mth602_archb_b0_frozen_v1' in text
     assert 'mth602_archb_b1_frozen_v1' in text
     assert 'mth602_archb_b2_frozen_v1' in text
-    assert '"B0": ("mth602_archb_b0_frozen_v1", "softmax3")' in text
+    assert '"B0": ("mth602_archb_b0_frozen_v1", "softmax3", False)' in text
     assert '"B1": ("mth602_archb_b1_frozen_v1", "expanded5", False)' in text
     assert '"B2": ("mth602_archb_b2_frozen_v1", "softmax3", True)' in text
     assert 'req.get("target_pa") != "PA2"' in text
