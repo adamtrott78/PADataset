@@ -23,6 +23,7 @@ from multisurrogate_dqnguard import (
 from osr_core import (
     build_backbone_payload,
     evaluate_osr_predictions,
+    extract_backbone_outputs,
     load_backbone_run,
 )
 
@@ -103,20 +104,20 @@ def main() -> None:
     if int(cfg.get("cache_len", -1)) != 16384:
         raise SystemExit("Architecture B provenance requires cache_len=16384")
 
+    # Keep the genuine target physically unconsumed through Architecture-B
+    # fitting, thresholding, and cross-surrogate candidate selection.
     payload = build_backbone_payload(
         handle,
-        include=("val_known", "test_known", "test_open"),
+        include=("val_known", "test_known"),
         batch_size=args.batch_size,
         num_workers=args.num_workers,
         pin_memory=True,
         return_sample_meta=True,
     )
-    if (
-        payload.val_known is None
-        or payload.test_known is None
-        or payload.test_open is None
-    ):
-        raise SystemExit("Required backbone splits are missing")
+    if payload.val_known is None or payload.test_known is None:
+        raise SystemExit("Required known backbone splits are missing")
+    if payload.test_open is not None:
+        raise SystemExit("Target-open split was consumed before winner freeze")
 
     known_classes = list(payload.meta["class_names"])
     if len(known_classes) != 4 or target_pa in known_classes:
@@ -130,7 +131,6 @@ def main() -> None:
         payload.meta["class_names"],
         seed=args.partition_seed,
     )
-    assert_target_quarantined(partitions, payload.test_open)
 
     method = CrossSurrogateDQNGuardB(
         state_mode=args.state_mode,
@@ -146,14 +146,26 @@ def main() -> None:
         },
     )
     method.fit(payload, partitions)
+    if not method.fitted_ or method.selected_surrogate_ is None:
+        raise RuntimeError("Architecture-B winner was not frozen after fit")
 
-    # The true target is first used here, after the Architecture-B winner is frozen.
+    # The genuine target is first materialized here, after the winner is frozen.
+    target_open = extract_backbone_outputs(
+        handle,
+        "test_open",
+        batch_size=args.batch_size,
+        num_workers=args.num_workers,
+        pin_memory=True,
+        return_sample_meta=True,
+    )
+    assert_target_quarantined(partitions, target_open)
+
     unknown_label = int(payload.meta["num_classes"])
     known_pred = method.predict(payload.test_known, unknown_label)
-    open_pred = method.predict(payload.test_open, unknown_label)
+    open_pred = method.predict(target_open, unknown_label)
     target_metrics = evaluate_osr_predictions(
         known_split=payload.test_known,
-        open_split=payload.test_open,
+        open_split=target_open,
         known_pred=known_pred,
         open_pred=open_pred,
         known_class_names=payload.meta["class_names"],
