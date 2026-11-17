@@ -335,7 +335,7 @@ def main() -> None:
             "budget": float(args.known_budget),
             "value": float(params["selected_threshold"]),
             "calibration_known_reject_rate": float(
-                params["threshold_known_reject_cal"][selected]
+                params["threshold_known_reject_cal"][selected_candidate_id]
             ),
         },
         "metrics": {
