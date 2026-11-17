@@ -1,9 +1,42 @@
 from __future__ import annotations
 
-from types import SimpleNamespace
+import sys
+from types import ModuleType, SimpleNamespace
 
 import numpy as np
 import pytest
+
+
+def _install_lightweight_dependency_stubs():
+    """Isolate pure Architecture-B logic from unavailable GPU dependencies.
+
+    Workspace Shell candidate-pytest intentionally does not carry PyTorch.
+    These tests exercise selection/summarization/threshold application only,
+    so replace heavy runtime modules with the minimum import surface required
+    by cross_surrogate_dqnguard.
+    """
+    dqn_osr = ModuleType("dqn_osr")
+    dqn_osr.DQNOSR = type("DQNOSR", (), {})
+    sys.modules.setdefault("dqn_osr", dqn_osr)
+
+    multisurrogate = ModuleType("multisurrogate_dqnguard")
+    multisurrogate.CalibrationPartitions = type("CalibrationPartitions", (), {})
+
+    def _unexpected_runtime_call(*_args, **_kwargs):
+        raise AssertionError("heavy runtime dependency unexpectedly exercised")
+
+    multisurrogate.assert_target_quarantined = _unexpected_runtime_call
+    multisurrogate.known_only_threshold = _unexpected_runtime_call
+    sys.modules.setdefault("multisurrogate_dqnguard", multisurrogate)
+
+    osr_core = ModuleType("osr_core")
+    osr_core.BackbonePayload = type("BackbonePayload", (), {})
+    osr_core.SplitOutputs = type("SplitOutputs", (), {})
+    osr_core.evaluate_osr_predictions = _unexpected_runtime_call
+    sys.modules.setdefault("osr_core", osr_core)
+
+
+_install_lightweight_dependency_stubs()
 
 from cross_surrogate_dqnguard import (
     apply_dqn_score_threshold,
