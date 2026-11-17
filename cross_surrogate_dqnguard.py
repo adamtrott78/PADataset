@@ -8,6 +8,7 @@ import numpy as np
 from dqn_osr import DQNOSR
 from multisurrogate_dqnguard import (
     CalibrationPartitions,
+    EmpiricalCDFNormalizer,
     PredictedClassBands,
     SurrogateGuard,
     assert_target_quarantined,
@@ -15,6 +16,69 @@ from multisurrogate_dqnguard import (
     known_only_threshold,
 )
 from osr_core import BackbonePayload, SplitOutputs, evaluate_osr_predictions
+
+
+B3_BAND_WEIGHT_RULES = (
+    "uniform",
+    "gap_only",
+    "variance_only",
+    "energy_only",
+    "gap_variance_equal",
+    "gap_energy_equal",
+    "variance_energy_equal",
+    "absolute_median_separation",
+)
+B3_GUARD_SCALES = (0.5, 1.0, 2.0)
+
+
+def _normalized_nonnegative(weights: np.ndarray) -> np.ndarray:
+    values = np.asarray(weights, dtype=float).reshape(-1)
+    if values.shape != (3,) or not np.isfinite(values).all():
+        raise ValueError("band guard weights must be three finite values")
+    values = np.maximum(values, 0.0)
+    total = float(values.sum())
+    if total <= 0.0:
+        return np.full(3, 1.0 / 3.0, dtype=float)
+    return values / total
+
+
+def fit_b3_band_guard(
+    surrogate: str,
+    known_distance_features: np.ndarray,
+    pseudo_distance_features: np.ndarray,
+    weight_rule: str,
+) -> SurrogateGuard:
+    known = np.asarray(known_distance_features, dtype=float)
+    pseudo = np.asarray(pseudo_distance_features, dtype=float)
+    if known.ndim != 2 or pseudo.ndim != 2 or known.shape[1] != 3 or pseudo.shape[1] != 3:
+        raise ValueError("B3 band distance feature shapes must be Nx3")
+
+    fixed = {
+        "uniform": [1.0, 1.0, 1.0],
+        "gap_only": [1.0, 0.0, 0.0],
+        "variance_only": [0.0, 1.0, 0.0],
+        "energy_only": [0.0, 0.0, 1.0],
+        "gap_variance_equal": [1.0, 1.0, 0.0],
+        "gap_energy_equal": [1.0, 0.0, 1.0],
+        "variance_energy_equal": [0.0, 1.0, 1.0],
+    }
+    if weight_rule in fixed:
+        weights = _normalized_nonnegative(np.asarray(fixed[weight_rule], dtype=float))
+    elif weight_rule == "absolute_median_separation":
+        separation = np.abs(
+            np.median(pseudo, axis=0) - np.median(known, axis=0)
+        )
+        weights = _normalized_nonnegative(separation)
+    else:
+        raise ValueError(f"Unsupported B3 band weight rule: {weight_rule}")
+
+    raw_known = known @ weights
+    normalizer = EmpiricalCDFNormalizer().fit(raw_known)
+    return SurrogateGuard(
+        surrogate=str(surrogate),
+        weights=weights,
+        normalizer=normalizer,
+    )
 
 
 def apply_unknown_score_threshold(
@@ -158,6 +222,7 @@ class CrossSurrogateDQNGuardB:
         seed: int = 42,
         dqn_kwargs: Dict[str, Any] | None = None,
         use_class_conditional_bands: bool = False,
+        tune_band_weights: bool = False,
     ):
         self.state_mode = str(state_mode)
         if self.state_mode not in {"softmax3", "expanded5"}:
@@ -169,6 +234,9 @@ class CrossSurrogateDQNGuardB:
         self.seed = int(seed)
         self.dqn_kwargs = dict(dqn_kwargs or {})
         self.use_class_conditional_bands = bool(use_class_conditional_bands)
+        self.tune_band_weights = bool(tune_band_weights)
+        if self.tune_band_weights and not self.use_class_conditional_bands:
+            raise ValueError("B3 band tuning requires class-conditional bands")
 
         self.candidates_: Dict[str, DQNOSR] = {}
         self.thresholds_: Dict[str, float] = {}
@@ -177,7 +245,9 @@ class CrossSurrogateDQNGuardB:
         self.candidate_summaries_: Dict[str, Dict[str, Any]] = {}
         self.bands_: PredictedClassBands | None = None
         self.candidate_guards_: Dict[str, SurrogateGuard] = {}
+        self.candidate_guard_scales_: Dict[str, float] = {}
 
+        self.selected_candidate_id_: str | None = None
         self.selected_surrogate_: str | None = None
         self.selected_dqn_: DQNOSR | None = None
         self.selected_threshold_: float | None = None
@@ -198,6 +268,7 @@ class CrossSurrogateDQNGuardB:
         *,
         guard: SurrogateGuard | None,
         bands: PredictedClassBands | None,
+        guard_scale: float = 1.0,
     ) -> np.ndarray:
         score = np.asarray(dqn.score(split), dtype=np.float64)
         if not self.use_class_conditional_bands:
@@ -205,7 +276,7 @@ class CrossSurrogateDQNGuardB:
         if guard is None or bands is None:
             raise RuntimeError("B2 class-conditional guard is not fitted")
         distance = bands.transform(split)
-        return (score + guard.score(distance)).astype(np.float64)
+        return (score + float(guard_scale) * guard.score(distance)).astype(np.float64)
 
     def fit(
         self,
@@ -236,6 +307,7 @@ class CrossSurrogateDQNGuardB:
         cross_metrics: Dict[str, Dict[str, Dict[str, Any]]] = {}
         summaries: Dict[str, Dict[str, Any]] = {}
         candidate_guards: Dict[str, SurrogateGuard] = {}
+        candidate_guard_scales: Dict[str, float] = {}
 
         bands: PredictedClassBands | None = None
         known_norm_distance: np.ndarray | None = None
@@ -257,9 +329,30 @@ class CrossSurrogateDQNGuardB:
                     "calibration_open": partitions.pseudo_open[surrogate],
                 },
             )
+            candidates[surrogate] = dqn
 
-            guard = None
-            if self.use_class_conditional_bands:
+            if not self.use_class_conditional_bands:
+                specs = [(surrogate, None, 1.0, "none")]
+            elif self.tune_band_weights:
+                if bands is None or known_norm_distance is None:
+                    raise RuntimeError("B3 band state missing")
+                pseudo_distance = bands.transform(partitions.pseudo_open[surrogate])
+                specs = []
+                for weight_rule in B3_BAND_WEIGHT_RULES:
+                    guard = fit_b3_band_guard(
+                        surrogate,
+                        known_norm_distance,
+                        pseudo_distance,
+                        weight_rule,
+                    )
+                    for guard_scale in B3_GUARD_SCALES:
+                        candidate_id = (
+                            f"{surrogate}|{weight_rule}|scale={guard_scale:g}"
+                        )
+                        specs.append(
+                            (candidate_id, guard, float(guard_scale), weight_rule)
+                        )
+            else:
                 if bands is None or known_norm_distance is None:
                     raise RuntimeError("B2 band state missing")
                 guard = fit_surrogate_guard(
@@ -267,72 +360,83 @@ class CrossSurrogateDQNGuardB:
                     known_norm_distance,
                     bands.transform(partitions.pseudo_open[surrogate]),
                 )
-                candidate_guards[surrogate] = guard
+                specs = [(surrogate, guard, 1.0, "positive_median_separation_else_uniform")]
 
-            threshold_scores = self._candidate_score(
-                dqn,
-                partitions.known_threshold,
-                guard=guard,
-                bands=bands,
-            )
-            threshold, realized = known_only_threshold(
-                threshold_scores,
-                budget=self.budget,
-            )
+            for candidate_id, guard, guard_scale, weight_rule in specs:
+                if guard is not None:
+                    candidate_guards[candidate_id] = guard
+                    candidate_guard_scales[candidate_id] = float(guard_scale)
 
-            known_pred = apply_unknown_score_threshold(
-                self._candidate_score(
+                threshold_scores = self._candidate_score(
                     dqn,
-                    partitions.known_guard,
+                    partitions.known_threshold,
                     guard=guard,
                     bands=bands,
-                ),
-                partitions.known_guard,
-                threshold,
-                unknown_label,
-            )
-            known_guard_reject = float(np.mean(known_pred["is_unknown"]))
+                    guard_scale=guard_scale,
+                )
+                threshold, realized = known_only_threshold(
+                    threshold_scores,
+                    budget=self.budget,
+                )
 
-            rows: Dict[str, Dict[str, Any]] = {}
-            for eval_surrogate in pseudo_names:
-                if eval_surrogate == surrogate:
-                    continue
-                open_split = partitions.pseudo_open[eval_surrogate]
-                open_pred = apply_unknown_score_threshold(
+                known_pred = apply_unknown_score_threshold(
                     self._candidate_score(
                         dqn,
-                        open_split,
+                        partitions.known_guard,
                         guard=guard,
                         bands=bands,
+                        guard_scale=guard_scale,
                     ),
-                    open_split,
+                    partitions.known_guard,
                     threshold,
                     unknown_label,
                 )
-                rows[eval_surrogate] = evaluate_osr_predictions(
-                    known_split=partitions.known_guard,
-                    open_split=open_split,
-                    known_pred=known_pred,
-                    open_pred=open_pred,
-                    known_class_names=class_names,
-                    unknown_label_name="unknown",
-                )
+                known_guard_reject = float(np.mean(known_pred["is_unknown"]))
 
-            candidates[surrogate] = dqn
-            thresholds[surrogate] = float(threshold)
-            threshold_reject[surrogate] = float(realized)
-            cross_metrics[surrogate] = rows
-            summaries[surrogate] = summarize_cross_surrogate_candidate(
-                surrogate,
-                rows,
-                known_guard_reject_rate=known_guard_reject,
-            )
-            summaries[surrogate]["threshold"] = float(threshold)
-            summaries[surrogate][
-                "threshold_known_reject_cal"
-            ] = float(realized)
+                rows: Dict[str, Dict[str, Any]] = {}
+                for eval_surrogate in pseudo_names:
+                    if eval_surrogate == surrogate:
+                        continue
+                    open_split = partitions.pseudo_open[eval_surrogate]
+                    open_pred = apply_unknown_score_threshold(
+                        self._candidate_score(
+                            dqn,
+                            open_split,
+                            guard=guard,
+                            bands=bands,
+                            guard_scale=guard_scale,
+                        ),
+                        open_split,
+                        threshold,
+                        unknown_label,
+                    )
+                    rows[eval_surrogate] = evaluate_osr_predictions(
+                        known_split=partitions.known_guard,
+                        open_split=open_split,
+                        known_pred=known_pred,
+                        open_pred=open_pred,
+                        known_class_names=class_names,
+                        unknown_label_name="unknown",
+                    )
+
+                thresholds[candidate_id] = float(threshold)
+                threshold_reject[candidate_id] = float(realized)
+                cross_metrics[candidate_id] = rows
+                summary = summarize_cross_surrogate_candidate(
+                    surrogate,
+                    rows,
+                    known_guard_reject_rate=known_guard_reject,
+                )
+                summary["candidate_id"] = candidate_id
+                summary["band_weight_rule"] = weight_rule
+                summary["guard_scale"] = float(guard_scale)
+                summary["threshold"] = float(threshold)
+                summary["threshold_known_reject_cal"] = float(realized)
+                summaries[candidate_id] = summary
 
         selected = select_cross_surrogate_candidate(summaries)
+        selected_summary = summaries[selected]
+        selected_surrogate = str(selected_summary["train_surrogate"])
 
         self.candidates_ = candidates
         self.thresholds_ = thresholds
@@ -341,8 +445,10 @@ class CrossSurrogateDQNGuardB:
         self.candidate_summaries_ = summaries
         self.bands_ = bands
         self.candidate_guards_ = candidate_guards
-        self.selected_surrogate_ = selected
-        self.selected_dqn_ = candidates[selected]
+        self.candidate_guard_scales_ = candidate_guard_scales
+        self.selected_candidate_id_ = selected
+        self.selected_surrogate_ = selected_surrogate
+        self.selected_dqn_ = candidates[selected_surrogate]
         self.selected_threshold_ = thresholds[selected]
         self.partition_manifest_ = copy.deepcopy(partitions.manifest)
         self.fitted_ = True
@@ -350,12 +456,15 @@ class CrossSurrogateDQNGuardB:
     def score(self, split: SplitOutputs) -> np.ndarray:
         if not self.fitted_ or self.selected_dqn_ is None:
             raise RuntimeError("Architecture B must be fitted first")
-        guard = self.candidate_guards_.get(self.selected_surrogate_)
+        candidate_id = self.selected_candidate_id_ or self.selected_surrogate_
+        guard = self.candidate_guards_.get(candidate_id)
+        guard_scale = self.candidate_guard_scales_.get(candidate_id, 1.0)
         return self._candidate_score(
             self.selected_dqn_,
             split,
             guard=guard,
             bands=self.bands_,
+            guard_scale=guard_scale,
         )
 
     def predict(
@@ -394,7 +503,11 @@ class CrossSurrogateDQNGuardB:
                 "fit_role": "known_guard",
                 "percentiles": [5.0, 95.0],
                 "normalization_fit_role": "known_norm",
-                "guard_weight_rule": "positive_median_separation_else_uniform",
+                "guard_weight_rule": (
+                    "bounded_b3_search"
+                    if self.tune_band_weights
+                    else "positive_median_separation_else_uniform"
+                ),
                 "candidate_guard_training": "own_pseudo_surrogate_only",
                 "guard_normalization": "empirical_known_cdf",
                 "composite_score": "dqn_margin_plus_guard_cdf",
@@ -402,6 +515,19 @@ class CrossSurrogateDQNGuardB:
                     name: guard.weights.tolist()
                     for name, guard in sorted(self.candidate_guards_.items())
                 },
+                "candidate_guard_scales": copy.deepcopy(
+                    self.candidate_guard_scales_
+                ),
+                "b3_search": (
+                    {
+                        "weight_rules": list(B3_BAND_WEIGHT_RULES),
+                        "guard_scales": list(B3_GUARD_SCALES),
+                        "selection_evidence": "off_diagonal_pseudo_open_only",
+                        "dqn_retrained_per_weight": False,
+                    }
+                    if self.tune_band_weights
+                    else None
+                ),
             }
 
         return {
@@ -409,6 +535,8 @@ class CrossSurrogateDQNGuardB:
             "architecture": "B",
             "state_mode": self.state_mode,
             "use_class_conditional_bands": self.use_class_conditional_bands,
+            "tune_band_weights": self.tune_band_weights,
+            "selected_candidate_id": self.selected_candidate_id_,
             "band_params": band_params,
             "budget": self.budget,
             "seed": self.seed,
