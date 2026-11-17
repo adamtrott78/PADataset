@@ -1,0 +1,89 @@
+{
+  "schema": "padataset.archb-cross-surrogate-eval-request.v1",
+  "status": "READY_FOR_BOUNDED_EVALUATOR",
+  "task_id": "mth602-final-multisurrogate-dqnguard-v1",
+  "architecture": "B",
+  "stage": "B3",
+  "policy_id": "mth602_archb_b3_frozen_v1",
+  "target_pa": "PA2",
+  "state_mode": "softmax3",
+  "class_conditional_bands": true,
+  "tune_band_weights": true,
+  "checkpoint": "best_model",
+  "known_budget": 0.05,
+  "partition_seed": 1701,
+  "dqn_seed": 42,
+  "dqn_episodes": 30,
+  "batch_size": 128,
+  "num_workers": 0,
+  "evaluator_device": "cuda",
+  "predeclared_stage_transition": true,
+  "target_metrics_used_for_b3_trigger_or_tuning": false,
+  "b3_trigger": {
+    "rule": "B2 demonstrates complementary pseudo-open development value",
+    "b0_artifact_id": 14354747328,
+    "b0_selected_mean_cross_unknown_f1": 0.1102334,
+    "b0_selected_mean_cross_osr_macro_f1": 0.7314352,
+    "b0_selected_worst_cross_unknown_f1": 0.0036866,
+    "b2_artifact_id": 14369751106,
+    "b2_artifact_digest": "sha256:e5d76e4b8b90c101218a7c3603c9fd92d8e87b439eaffa36a9f46a1525e17d00",
+    "b2_selected_mean_cross_unknown_f1": 0.12087985437740191,
+    "b2_selected_mean_cross_osr_macro_f1": 0.7357077527296183,
+    "b2_selected_worst_cross_unknown_f1": 0.0036101083032490976,
+    "all_b2_candidate_guard_weights_uniform": true
+  },
+  "b3_search_policy": {
+    "weight_rules": [
+      "uniform",
+      "gap_only",
+      "variance_only",
+      "energy_only",
+      "gap_variance_equal",
+      "gap_energy_equal",
+      "variance_energy_equal",
+      "absolute_median_separation"
+    ],
+    "guard_scales": [
+      0.5,
+      1,
+      2
+    ],
+    "band_percentiles": [
+      5,
+      95
+    ],
+    "features": [
+      "top2_gap",
+      "logit_variance",
+      "energy"
+    ],
+    "selection_evidence": "off_diagonal_pseudo_open_only",
+    "selection_rule": [
+      "max worst off-diagonal unknown_f1",
+      "max mean off-diagonal unknown_f1",
+      "max mean off-diagonal osr_macro_f1",
+      "min known_guard_reject_rate"
+    ],
+    "dqn_state_mode": "softmax3",
+    "dqn_training_changed": false,
+    "candidate_guard_training": "own_pseudo_surrogate_only",
+    "threshold_source": "known_only",
+    "known_budget": 0.05
+  },
+  "target_labels_used_for_fitting": false,
+  "target_labels_used_for_thresholding": false,
+  "target_labels_used_for_candidate_selection": false,
+  "target_first_consumed_after_winner_frozen": true,
+  "source_backbone": {
+    "artifact_id": 14180249360,
+    "artifact_digest": "sha256:f7de2637df85487b21903a448630815fc63c1247253b98ffc754b46586b9b39b",
+    "artifact_name": "padataset-scientific-43751609944",
+    "workflow_run_id": 43751609944,
+    "candidate_sha": "befe383fd67c8bca8d8ce370344b33c7e13cd52f",
+    "dataset_profile": "ota_core_high_run01_len16384_v1",
+    "run_name": "mth602_archC_backbone_knownonly_unkPA2_c16384_seed0_detv2",
+    "config_sha256": "a9c08353490f944ec1c5fb363002f41a8b32f875914251c30604cc2c03b35188",
+    "best_model_sha256": "4fa0c67d1c0c619ab4cde058519ca603fa95d8afb8f58ebf8d564ebafb9989ef",
+    "runtime_tree_sha256": "6922847a7ea87c318a36e1fd2cd3af5283e768ff06de90c4cb2558ea0d48cdaa"
+  }
+}
