@@ -31,6 +31,81 @@ from prepData import (
 
 FEATURE_MODE = "stft_tracks64_v1"
 
+EXPECTED_CORE_PROTOCOLS = ("wifi", "bluetooth", "zigbee")
+EXPECTED_CORE_SHARDS = tuple(range(1, 21))
+EXPECTED_CORE_SUFFIXES = (
+    "PA1__part_01_of_02",
+    "PA1__part_02_of_02",
+    "PA2",
+    "PA3",
+    "PA4",
+    "PA8",
+)
+
+
+def discover_stft_core_sources(setup: DataSetup) -> tuple[list, dict]:
+    """
+    Freeze the STFT lane to the same unified-core source universe used to
+    construct the trusted legacy cache.
+
+    The ota_core_high_run01 directories can contain historical/dedicated PA1
+    artifacts whose filenames do not belong to the unified core bank. Generic
+    directory discovery sees those files, but the production cache contract is
+    exactly 3 protocols x 20 shards x 6 canonical core files = 360 records.
+    """
+    records = discover_raw_sources(setup)
+    source_name = str(setup.source_name or "")
+    if source_name != "ota_core_high_run01":
+        raise ValueError(
+            "STFT core source selection is frozen to ota_core_high_run01; "
+            f"got source_name={source_name!r}"
+        )
+
+    expected = {
+        (
+            proto,
+            f"{source_name}__shard_{shard:03d}__{suffix}.mat",
+        )
+        for proto in EXPECTED_CORE_PROTOCOLS
+        for shard in EXPECTED_CORE_SHARDS
+        for suffix in EXPECTED_CORE_SUFFIXES
+    }
+
+    selected = {}
+    ignored = []
+    for rec in records:
+        key = (str(rec.protocol_name), Path(rec.path).name)
+        if key in expected:
+            if key in selected:
+                raise RuntimeError(
+                    f"Duplicate canonical STFT core source for {key}: "
+                    f"{selected[key].path} and {rec.path}"
+                )
+            selected[key] = rec
+        else:
+            ignored.append(rec)
+
+    missing = sorted(expected - set(selected))
+    if missing:
+        preview = ", ".join(f"{proto}/{name}" for proto, name in missing[:12])
+        raise FileNotFoundError(
+            "Canonical unified-core STFT source coverage incomplete: "
+            f"missing={len(missing)} preview=[{preview}]"
+        )
+
+    ordered = sorted(selected.values(), key=lambda rec: rec.path)
+    if len(ordered) != 360:
+        raise RuntimeError(
+            f"Expected exactly 360 canonical unified-core STFT sources, got {len(ordered)}"
+        )
+
+    return ordered, {
+        "source_records_discovered": len(records),
+        "canonical_source_records": len(ordered),
+        "ignored_noncanonical_records": len(ignored),
+    }
+
+
 
 def _pool_1d(x: np.ndarray, out_len: int) -> np.ndarray:
     x = np.asarray(x, dtype=np.float32)
@@ -143,7 +218,7 @@ def build_cache(setup: DataSetup, frame_count: int) -> dict:
 
     cache_root = Path(os.path.expanduser(setup.cache_root))
     cache_root.mkdir(parents=True, exist_ok=True)
-    raw_records = discover_raw_sources(setup)
+    raw_records, _ = discover_stft_core_sources(setup)
 
     built = 0
     skipped = 0
@@ -291,7 +366,7 @@ def main() -> None:
         noise_tag=args.noise_tag,
     )
     if args.probe_only:
-        records = discover_raw_sources(setup)
+        records, source_selection = discover_stft_core_sources(setup)
         if not records:
             raise RuntimeError("No raw OTA source records discovered")
         rec = records[0]
@@ -313,6 +388,9 @@ def main() -> None:
         print(json.dumps({
             "probe": "PASS",
             "source_records": len(records),
+            "source_records_discovered": source_selection["source_records_discovered"],
+            "canonical_source_records": source_selection["canonical_source_records"],
+            "ignored_noncanonical_records": source_selection["ignored_noncanonical_records"],
             "first_source": rec.path,
             "raw_iq_shape": list(iq.shape),
             "feature_shape": list(feat.shape),
