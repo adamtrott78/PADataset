@@ -175,6 +175,7 @@ def _build_legacy_cache_index(*roots: Path) -> dict:
     exact = {}
     real = {}
     proto_base = {}
+    basename = {}
 
     seen = set()
     for root in roots:
@@ -203,14 +204,20 @@ def _build_legacy_cache_index(*roots: Path) -> dict:
             real_key = os.path.realpath(exact_key)
             _add_index(exact, exact_key, cache_path)
             _add_index(real, real_key, cache_path)
+            source_basename = Path(str(raw_source)).name
             if protocol_name:
-                proto_key = f"{protocol_name}::{Path(str(raw_source)).name}"
+                proto_key = f"{protocol_name}::{source_basename}"
                 _add_index(proto_base, proto_key, cache_path)
+            # Some historical PA1 caches predate protocol_name metadata.
+            # A basename is accepted only when it uniquely identifies one
+            # cache file across all indexed roots; ambiguity still fails closed.
+            _add_index(basename, source_basename, cache_path)
 
     return {
         "exact": exact,
         "real": real,
         "proto_base": proto_base,
+        "basename": basename,
         "roots": [str(Path(root)) for root in roots],
         "cache_files_indexed": len(seen),
     }
@@ -264,6 +271,15 @@ def _resolve_legacy_base(rec, *, legacy_index: dict) -> Path:
     if hit is not None:
         return hit
 
+    basename_key = Path(rec.path).name
+    hit = _unique_index_hit(
+        legacy_index["basename"],
+        basename_key,
+        mode="unique basename",
+    )
+    if hit is not None:
+        return hit
+
     raise FileNotFoundError(
         "No provenance-matched legacy cache for raw source "
         f"{rec.path}; indexed_roots={legacy_index['roots']} "
@@ -305,6 +321,14 @@ def _probe(
         legacy_index=legacy_index,
     )
 
+    # Resolve every discovered source before the expensive resume/build phase.
+    # This makes provenance coverage a true preflight invariant rather than
+    # allowing a historical naming variant to fail partway through the cache.
+    resolved_all = [
+        _resolve_legacy_base(item, legacy_index=legacy_index)
+        for item in records
+    ]
+
     with h5py.File(rec.path, "r") as fin:
         Xds = fin["X"]
         ch_axis, sample_axis, time_axis = _infer_x_layout(tuple(Xds.shape))
@@ -344,6 +368,7 @@ def _probe(
                 "legacy_cache_files_indexed": int(
                     legacy_index["cache_files_indexed"]
                 ),
+                "provenance_records_resolved": len(resolved_all),
                 "iq_batch_shape": list(iq.shape),
                 "track_shape": list(gpu.shape),
                 "frame_count": int(frame_count),
