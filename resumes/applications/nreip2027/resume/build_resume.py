@@ -61,7 +61,7 @@ CONTENT = {
             "Ph.D. in Engineering and Applied Science (EAS), Computer Science "
             "and Information Science (CSIS) Curriculum Option"
         ),
-        "grad_meta": "Expected May 2030 | Graduate GPA: 4.0/4.0",
+        "grad_meta": "Expected May 2029 | Graduate GPA: 4.0/4.0",
         "coursework_label": "Selected Graduate Coursework:",
         "coursework": (
             "Network Security & Data Assurance; Secure Software Development; "
@@ -86,7 +86,7 @@ CONTENT = {
             "electrical-engineering researchers using ROS2 and Gazebo."
         ),
         "dqn_title": "DQNGuard: Towards Open-World RF Preliminary-Action Detection",
-        "dqn_meta": "First author | IEEE MILCOM 2026, accepted/to appear",
+        "dqn_meta": "First author | IEEE MILCOM 2026, published 2026",
         "dqn_bullets": [
             (
                 "Designed and implemented the end-to-end DQNGuard pipeline for "
@@ -131,7 +131,7 @@ CONTENT = {
         (
             'Trott, A., Popillo, C., Bastian, N. D., Zhou, R., and Kul, G. '
             '"DQNGuard: Towards Open-World RF Preliminary-Action Detection." '
-            "IEEE MILCOM 2026, accepted/to appear."
+            "IEEE MILCOM 2026, published 2026."
         ),
         (
             'Trott, A., Thompson, H., and Kul, G. "Model Evaluation for '

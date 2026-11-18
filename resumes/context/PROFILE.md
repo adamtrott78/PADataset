@@ -17,7 +17,7 @@ wording.
 - Ph.D. in Engineering and Applied Science (EAS), Computer Science and
   Information Science (CSIS) Curriculum Option
 - Began Spring 2026
-- Expected completion: May 2030
+- Expected completion: May 2029
 - Graduate GPA: 4.0/4.0
 
 **University of Massachusetts Dartmouth**
@@ -67,7 +67,7 @@ Research areas and activities include:
 
 ### DQNGuard: Towards Open-World RF Preliminary-Action Detection
 
-- First-listed author; accepted for IEEE MILCOM 2026, to appear
+- First-listed author; published in IEEE MILCOM 2026
 - Designed and implemented the end-to-end DQNGuard research pipeline and
   coordinated the research effort
 - OTA WiFi, Bluetooth, and Zigbee RF data

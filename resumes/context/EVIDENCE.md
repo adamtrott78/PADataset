@@ -39,7 +39,7 @@ VERIFIED_CURRENT
 VALUE
 Resume-facing wording: Ph.D. in Engineering and Applied Science (EAS), Computer
 Science and Information Science (CSIS) Curriculum Option. Began Spring 2026.
-Expected completion May 2030. Graduate GPA: 4.0/4.0.
+Expected completion May 2029. Graduate GPA: 4.0/4.0.
 
 The reviewed university transcript identifies the current program as
 "Engineering & Applied Science PhD Program of Study" with subplan "Computer
@@ -48,9 +48,9 @@ Science & Information Systems Concentration."
 EVIDENCE
 PRIVATE_REVIEWED — university transcript dated 2026-09-03 establishes current
 Ph.D. program/subplan and 4.0 graduate cumulative GPA.
-PRIVATE_REVIEWED — current DCSA Student Experience '27 resume establishes the
-resume-facing program wording, Spring 2026 start, and expected May 2030
-completion.
+USER_PROVIDED — on 2026-11-12, the candidate reported that the current Ph.D.
+plan from their professor targets Spring 2029; resume-facing completion is May
+2029.
 
 PERMITTED WORDING
 "Ph.D. in Engineering and Applied Science (EAS), Computer Science and
@@ -223,16 +223,20 @@ VERIFIED_CURRENT
 
 VALUE
 Authors: Adam Trott, Cameron Popillo, Nathaniel D. Bastian, Roulin Zhou, and
-Gokhan Kul. Accepted for IEEE MILCOM 2026; to appear.
+Gokhan Kul. Published in the Proceedings of the 2026 IEEE Military
+Communications Conference (MILCOM) on 2026-10-12.
 
 EVIDENCE
 TRACKED_PRIMARY — `papers/milcom2026/main.tex` establishes title and author
 order.
-PRIVATE_REVIEWED — current DCSA resume establishes accepted/to-appear status.
+PUBLICATION_PRIMARY — NSF Public Access Repository record 10720777 lists the
+publisher/repository as the Proceedings of the 2026 IEEE Military Communications
+Conference (MILCOM) and the publication date as 2026-10-12; public full text is
+embargoed until 2027-10-12.
 
 NOTES
-The tracked manuscript source establishes authorship but does not independently
-serve as conference-acceptance evidence.
+The tracked manuscript source establishes authorship; the NSF repository record
+establishes publication status and date.
 
 ### Individual research contribution
 

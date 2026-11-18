@@ -206,7 +206,7 @@ through target relevance.
 | HICSS-59 research | RF, ML, OSR, experimental design | HIGHEST PRIORITY | Major research entry | Verified current evidence |
 | HICSS nine-fold / 30-run evaluation | Rigorous experimentation | CORE | Method/evaluation bullet | Verified current evidence |
 | Operational-AI red-team research | AI/cybersecurity; autonomy; simulation | CORE | One concise research bullet or sub-entry | Verified current |
-| MILCOM paper | Research communication/publication | CORE | Publications section | Verified accepted/to appear |
+| MILCOM paper | Research communication/publication | CORE | Publications section | Verified published 2026 |
 | HICSS paper | Research communication/publication | CORE | Publications section | Verified published |
 | NUWC-client senior design capstone | Navy context; software; systems; project leadership | CORE | Selected technical experience | Verified historical |
 | Cyber Defense & Operations TA | Cybersecurity depth; technical communication | INCLUDE | One or two compact bullets | Verified historical |
@@ -232,7 +232,7 @@ Include:
 - University of Massachusetts Dartmouth;
 - Ph.D. in Engineering and Applied Science;
 - CSIS/Computer Science and Information Science resume-facing curriculum wording;
-- expected May 2030;
+- expected May 2029;
 - graduate GPA 4.0/4.0.
 
 Use a compact selected-coursework line rather than a long course inventory.
@@ -331,7 +331,7 @@ Include both first-author papers in compact scholarly form.
 ### MILCOM 2026
 
 Adam Trott et al., "DQNGuard: Towards Open-World RF Preliminary-Action
-Detection," IEEE MILCOM 2026, accepted / to appear.
+Detection," IEEE MILCOM 2026, published 2026.
 
 This plan owns the citation content, authorship, title, venue, year, and
 publication status.
@@ -562,7 +562,7 @@ must be resolved from ignored private inputs for the private submission artifact
 **University of Massachusetts Dartmouth**
 **Ph.D. in Engineering and Applied Science (EAS), Computer Science and
 Information Science (CSIS) Curriculum Option**
-Expected May 2030 | Graduate GPA: 4.0/4.0
+Expected May 2029 | Graduate GPA: 4.0/4.0
 
 `[MANDATORY PRIVATE GOVERNMENT-APPLICATION CREDENTIAL]`
 
@@ -584,7 +584,7 @@ Jun–Aug 2025; Jun–Aug 2026
   researchers using ROS2 and Gazebo.
 
 **DQNGuard: Towards Open-World RF Preliminary-Action Detection**
-First author | IEEE MILCOM 2026, accepted/to appear
+First author | IEEE MILCOM 2026, published 2026
 
 - Designed and implemented the end-to-end DQNGuard pipeline for open-world RF
   preliminary-action detection, including a multi-domain CNN and open-set
@@ -611,7 +611,7 @@ First author | HICSS-59, published 2026; presented Jan. 8, 2026
 
 Trott, A., Popillo, C., Bastian, N. D., Zhou, R., and Kul, G. **"DQNGuard:
 Towards Open-World RF Preliminary-Action Detection."** IEEE MILCOM 2026,
-accepted/to appear.
+published 2026.
 
 Trott, A., Thompson, H., and Kul, G. **"Model Evaluation for Radio-Frequency
 Signal Modulation Classifiers in the Existence of Novel Samples."** Proceedings

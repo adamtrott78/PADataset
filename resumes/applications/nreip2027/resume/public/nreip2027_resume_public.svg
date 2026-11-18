@@ -11,7 +11,7 @@
   <text x="38.00" y="75.30" font-family="Liberation Sans" font-size="9.80" font-weight="700" font-style="normal" fill="#111111" text-anchor="start">University of Massachusetts Dartmouth</text>
   <text x="38.00" y="86.95" font-family="Liberation Sans" font-size="9.80" font-weight="700" font-style="normal" fill="#111111" text-anchor="start">Ph.D. in Engineering and Applied Science (EAS), Computer Science and Information Science (CSIS) Curriculum</text>
   <text x="38.00" y="97.80" font-family="Liberation Sans" font-size="9.80" font-weight="700" font-style="normal" fill="#111111" text-anchor="start">Option</text>
-  <text x="38.00" y="109.05" font-family="Liberation Sans" font-size="8.80" font-weight="400" font-style="normal" fill="#333333" text-anchor="start">Expected May 2030 | Graduate GPA: 4.0/4.0</text>
+  <text x="38.00" y="109.05" font-family="Liberation Sans" font-size="8.80" font-weight="400" font-style="normal" fill="#333333" text-anchor="start">Expected May 2029 | Graduate GPA: 4.0/4.0</text>
   <text x="38.00" y="119.70" font-family="Liberation Sans" font-size="9.00" font-weight="700" font-style="normal" fill="#111111" text-anchor="start">[private government application credential - withheld] | Jan. 2026-Present</text>
   <text x="38.00" y="131.20" font-family="Liberation Sans" font-size="9.00" font-weight="700" font-style="normal" fill="#111111" text-anchor="start">Selected Graduate Coursework:</text>
   <text x="177.04" y="131.20" font-family="Liberation Sans" font-size="9.00" font-weight="400" font-style="normal" fill="#111111" text-anchor="start">Network Security &amp; Data Assurance; Secure Software Development; Fundamentals of Deep</text>
@@ -27,7 +27,7 @@
   <text x="55.00" y="230.15" font-family="Liberation Sans" font-size="9.10" font-weight="400" font-style="normal" fill="#111111" text-anchor="start">Developed and tested an operational-AI red-teaming framework on an autonomous vehicle with cybersecurity, computer science,</text>
   <text x="55.00" y="240.60" font-family="Liberation Sans" font-size="9.10" font-weight="400" font-style="normal" fill="#111111" text-anchor="start">and electrical-engineering researchers using ROS2 and Gazebo.</text>
   <text x="38.00" y="254.85" font-family="Liberation Sans" font-size="9.80" font-weight="700" font-style="normal" fill="#111111" text-anchor="start">DQNGuard: Towards Open-World RF Preliminary-Action Detection</text>
-  <text x="38.00" y="266.10" font-family="Liberation Sans" font-size="8.80" font-weight="400" font-style="normal" fill="#333333" text-anchor="start">First author | IEEE MILCOM 2026, accepted/to appear</text>
+  <text x="38.00" y="266.10" font-family="Liberation Sans" font-size="8.80" font-weight="400" font-style="normal" fill="#333333" text-anchor="start">First author | IEEE MILCOM 2026, published 2026</text>
   <circle cx="44.00" cy="275.15" r="1.65" fill="#111111"/>
   <text x="55.00" y="277.85" font-family="Liberation Sans" font-size="9.10" font-weight="400" font-style="normal" fill="#111111" text-anchor="start">Designed and implemented the end-to-end DQNGuard pipeline for open-world RF preliminary-action detection, including a</text>
   <text x="55.00" y="288.30" font-family="Liberation Sans" font-size="9.10" font-weight="400" font-style="normal" fill="#111111" text-anchor="start">multi-domain CNN and open-set decision layer; benchmarked against VarMax and a DQN-IDS-style baseline.</text>
@@ -48,7 +48,7 @@
   <text x="38.00" y="420.25" font-family="Liberation Sans" font-size="10.40" font-weight="700" font-style="normal" fill="#111111" text-anchor="start" letter-spacing="0.35">SELECTED PUBLICATIONS</text>
   <line x1="38.00" y1="423.35" x2="574.00" y2="423.35" stroke="#202020" stroke-width="0.75"/>
   <text x="38.00" y="434.25" font-family="Liberation Sans" font-size="8.90" font-weight="400" font-style="normal" fill="#111111" text-anchor="start">Trott, A., Popillo, C., Bastian, N. D., Zhou, R., and Kul, G. &quot;DQNGuard: Towards Open-World RF Preliminary-Action Detection.&quot; IEEE</text>
-  <text x="50.00" y="444.20" font-family="Liberation Sans" font-size="8.90" font-weight="400" font-style="normal" fill="#111111" text-anchor="start">MILCOM 2026, accepted/to appear.</text>
+  <text x="50.00" y="444.20" font-family="Liberation Sans" font-size="8.90" font-weight="400" font-style="normal" fill="#111111" text-anchor="start">MILCOM 2026, published 2026.</text>
   <text x="38.00" y="456.95" font-family="Liberation Sans" font-size="8.90" font-weight="400" font-style="normal" fill="#111111" text-anchor="start">Trott, A., Thompson, H., and Kul, G. &quot;Model Evaluation for Radio-Frequency Signal Modulation Classifiers in the Existence of Novel</text>
   <text x="50.00" y="466.90" font-family="Liberation Sans" font-size="8.90" font-weight="400" font-style="normal" fill="#111111" text-anchor="start">Samples.&quot; Proceedings of the 59th Hawaii International Conference on System Sciences (HICSS-59), 2026.</text>
   <text x="38.00" y="482.35" font-family="Liberation Sans" font-size="10.40" font-weight="700" font-style="normal" fill="#111111" text-anchor="start" letter-spacing="0.35">TECHNICAL SKILLS</text>
