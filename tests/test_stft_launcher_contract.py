@@ -25,3 +25,16 @@ def test_stft_launcher_still_refuses_tmp_and_preserves_resume_semantics():
     assert 'Refusing transient /tmp checkout' in text
     assert '--force' not in text
     assert '--probe-only' in text
+
+
+def test_stft_provenance_preflight_covers_all_sources_and_fails_closed():
+    text = Path("experiments/pa_build_stft_track_cache_gpu.py").read_text(
+        encoding="utf-8"
+    )
+
+    assert '"basename": basename' in text
+    assert 'mode="unique basename"' in text
+    assert "resolved_all = [" in text
+    assert "for item in records" in text
+    assert '"provenance_records_resolved": len(resolved_all)' in text
+    assert "Ambiguous legacy cache provenance via {mode}" in text
