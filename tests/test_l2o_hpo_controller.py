@@ -149,14 +149,15 @@ def test_ranker_prefers_feasible_min_class_before_higher_macro():
 def test_only_terminal_finalist_can_freeze_and_target_eval_locks_pair():
     ledger = new_ledger(["PA2-PA3"], "policy")
     ledger = register_trial(ledger, "PA2-PA3", "PA2-PA3__t001", "a" * 64, "finalist", "cfg1.json")
+    instance_id = "PA2-PA3__t001__finalist"
     for state in ["REQUESTED", "QUEUED", "RUNNING", "TERMINAL"]:
-        ledger = transition_trial(ledger, "PA2-PA3__t001", state)
-    ledger = freeze_pair(ledger, "PA2-PA3", "PA2-PA3__t001")
-    ledger = mark_target_open_evaluated(ledger, "PA2-PA3", "PA2-PA3__t001")
+        ledger = transition_trial(ledger, instance_id, state)
+    ledger = freeze_pair(ledger, "PA2-PA3", instance_id)
+    ledger = mark_target_open_evaluated(ledger, "PA2-PA3", instance_id)
     with pytest.raises(ValueError, match="frozen"):
         register_trial(ledger, "PA2-PA3", "PA2-PA3__t002", "b" * 64, "screen", "cfg2.json")
     with pytest.raises(ValueError, match="cannot alter freeze"):
-        freeze_pair(ledger, "PA2-PA3", "PA2-PA3__t001")
+        freeze_pair(ledger, "PA2-PA3", instance_id)
 
 
 def test_finalist_gate_freezes_only_when_both_thresholds_pass():
@@ -169,3 +170,29 @@ def test_finalist_gate_freezes_only_when_both_thresholds_pass():
     assert pair["winner_trial_id"] == "pass"
     assert pair["gate_pass"] is True
     assert pair["frozen"] is True
+
+
+def test_committed_wave0_configs_exactly_match_generator():
+    from pathlib import Path
+    import json
+
+    root = Path(__file__).resolve().parents[1]
+    space = json.loads((root / "manifests/hpo/l2o_repair_hpo_space_v1.json").read_text())
+    base_paths = {
+        "PA2-PA3": root / "manifests/configs/l2o_surrogate_matrix_repair_v1/l2o_repair_ref_ent005_lr2e4_tgtPA2_surPA3_c16384_seed0_detv2_w4.json",
+        "PA2-PA8": root / "manifests/configs/l2o_surrogate_matrix_repair_v1/l2o_repair_ref_ent005_lr2e4_tgtPA2_surPA8_c16384_seed0_detv2_w4.json",
+        "PA3-PA8": root / "manifests/configs/l2o_surrogate_matrix_repair_v1/l2o_repair_ref_ent005_lr2e4_tgtPA3_surPA8_c16384_seed0_detv2_w4.json",
+    }
+    out_dir = root / "manifests/configs/l2o_hpo_pilot_v2/wave0"
+    files = sorted(out_dir.glob("*.json"))
+    assert len(files) == 24
+    seed = 6022026
+    for pair, base_path in base_paths.items():
+        base = json.loads(base_path.read_text())
+        for trial_index in range(8):
+            params = candidate_params(space, trial_index, seed)
+            expected = build_trial_config(base, space, params, "screen", trial_index, seed)
+            path = out_dir / f"{expected['run_name']}.json"
+            assert path.is_file()
+            actual = json.loads(path.read_text())
+            assert actual == expected
