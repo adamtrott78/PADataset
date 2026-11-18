@@ -3,12 +3,15 @@ from pathlib import Path
 import h5py
 import numpy as np
 
-from experiments.pa_build_stft_track_cache import stft_frequency_tracks
+from experiments.pa_build_stft_track_cache import (
+    discover_stft_core_sources,
+    stft_frequency_tracks,
+)
 from experiments.pa_build_stft_track_cache_gpu import (
     _build_legacy_cache_index,
     _resolve_legacy_base,
 )
-from prepData import RawSourceRecord
+from prepData import DataSetup, RawSourceRecord
 from experiments.pa_stft_track_diagnostic import trajectory_features
 
 
@@ -101,74 +104,71 @@ def test_legacy_cache_resolver_prefers_exact_source_path(tmp_path):
     assert _resolve_legacy_base(rec, legacy_index=index).resolve() == cache_path.resolve()
 
 
-def test_legacy_cache_resolver_uses_unique_basename_when_protocol_metadata_missing(tmp_path):
-    raw = (
-        tmp_path
-        / "data"
-        / "bluetooth"
-        / "ota"
-        / "ota_core_high_run01"
-        / "ota_pa1_run01__shard_001__PA1.mat"
+def test_stft_core_source_selection_matches_unified_cache_contract(tmp_path):
+    source_name = "ota_core_high_run01"
+    suffixes = (
+        "PA1__part_01_of_02",
+        "PA1__part_02_of_02",
+        "PA2",
+        "PA3",
+        "PA4",
+        "PA8",
     )
-    raw.parent.mkdir(parents=True)
-    raw.write_bytes(b"raw")
+    for proto in ("wifi", "bluetooth", "zigbee"):
+        root = tmp_path / proto / "ota" / source_name
+        root.mkdir(parents=True)
+        for shard in range(1, 21):
+            for suffix in suffixes:
+                (root / f"{source_name}__shard_{shard:03d}__{suffix}.mat").touch()
+        for shard in range(1, 6):
+            (root / f"ota_pa1_run01__shard_{shard:03d}__PA1.mat").touch()
 
-    cache_root = tmp_path / "cache-pa1"
-    cache_root.mkdir()
-    cache_path = cache_root / "historical-pa1.h5"
-    with h5py.File(cache_path, "w") as fout:
-        fout.attrs["source_path"] = str(
-            tmp_path
-            / "legacy"
-            / "ota_pa1_run01"
-            / raw.name
-        )
-
-    index = _build_legacy_cache_index(cache_root)
-    rec = RawSourceRecord(
-        path=str(raw),
-        protocol_name="bluetooth",
+    setup = DataSetup(
+        root=str(tmp_path),
         source_type="ota",
-        source_name="ota_core_high_run01",
-        dataset_tag="ota_core_high_run01",
+        source_name=source_name,
+        dataset_tag=source_name,
         noise_tag="high_run01",
     )
+    records, meta = discover_stft_core_sources(setup)
 
-    assert _resolve_legacy_base(rec, legacy_index=index).resolve() == cache_path.resolve()
+    assert len(records) == 360
+    assert meta == {
+        "source_records_discovered": 375,
+        "canonical_source_records": 360,
+        "ignored_noncanonical_records": 15,
+    }
+    assert all(Path(rec.path).name.startswith(source_name + "__") for rec in records)
 
 
-def test_legacy_cache_resolver_unique_basename_fails_closed_on_ambiguity(tmp_path):
-    raw = (
-        tmp_path
-        / "data"
-        / "bluetooth"
-        / "ota"
-        / "ota_core_high_run01"
-        / "ota_pa1_run01__shard_001__PA1.mat"
+def test_stft_core_source_selection_fails_on_missing_canonical_source(tmp_path):
+    source_name = "ota_core_high_run01"
+    suffixes = (
+        "PA1__part_01_of_02",
+        "PA1__part_02_of_02",
+        "PA2",
+        "PA3",
+        "PA4",
+        "PA8",
     )
-    raw.parent.mkdir(parents=True)
-    raw.write_bytes(b"raw")
+    for proto in ("wifi", "bluetooth", "zigbee"):
+        root = tmp_path / proto / "ota" / source_name
+        root.mkdir(parents=True)
+        for shard in range(1, 21):
+            for suffix in suffixes:
+                if proto == "zigbee" and shard == 20 and suffix == "PA8":
+                    continue
+                (root / f"{source_name}__shard_{shard:03d}__{suffix}.mat").touch()
 
-    cache_root = tmp_path / "cache"
-    cache_root.mkdir()
-    for i in (1, 2):
-        cache_path = cache_root / f"historical-{i}.h5"
-        with h5py.File(cache_path, "w") as fout:
-            fout.attrs["source_path"] = str(
-                tmp_path / f"legacy-{i}" / raw.name
-            )
-
-    index = _build_legacy_cache_index(cache_root)
-    rec = RawSourceRecord(
-        path=str(raw),
-        protocol_name="bluetooth",
+    setup = DataSetup(
+        root=str(tmp_path),
         source_type="ota",
-        source_name="ota_core_high_run01",
-        dataset_tag="ota_core_high_run01",
+        source_name=source_name,
+        dataset_tag=source_name,
         noise_tag="high_run01",
     )
 
     import pytest
 
-    with pytest.raises(RuntimeError, match="Ambiguous legacy cache provenance via unique basename"):
-        _resolve_legacy_base(rec, legacy_index=index)
+    with pytest.raises(FileNotFoundError, match="Canonical unified-core STFT source coverage incomplete"):
+        discover_stft_core_sources(setup)
