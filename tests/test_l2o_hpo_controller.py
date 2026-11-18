@@ -196,3 +196,35 @@ def test_committed_wave0_configs_exactly_match_generator():
             assert path.is_file()
             actual = json.loads(path.read_text())
             assert actual == expected
+
+
+def test_wave0_manifest_and_ledger_bind_exact_config_bytes():
+    from pathlib import Path
+    import hashlib
+    import json
+
+    root = Path(__file__).resolve().parents[1]
+    manifest = json.loads((root / "manifests/hpo/l2o_repair_pilot_v2/wave0.json").read_text())
+    ledger = json.loads((root / "manifests/hpo/l2o_repair_pilot_v2/ledger.json").read_text())
+    assert manifest["schema"] == "padataset.l2o-hpo-committed-wave.v2"
+    assert manifest["selection_evidence"] == "known_validation_only"
+    assert manifest["target_metrics_allowed_for_selection"] is False
+    assert manifest["test_metrics_allowed_for_selection"] is False
+    assert len(manifest["entries"]) == 24
+    assert len(ledger["trials"]) == 24
+
+    seen = set()
+    for entry in manifest["entries"]:
+        instance_id = entry["instance_id"]
+        assert instance_id not in seen
+        seen.add(instance_id)
+        path = root / entry["config_path"]
+        assert path.is_file()
+        digest = hashlib.sha256(path.read_bytes()).hexdigest()
+        assert digest == entry["config_sha256"]
+        trial = ledger["trials"][instance_id]
+        assert trial["status"] == "GENERATED"
+        assert trial["trial_id"] == entry["trial_id"]
+        assert trial["canonical_pair"] == entry["canonical_pair"]
+        assert trial["config_path"] == entry["config_path"]
+        assert trial["config_sha256"] == digest
