@@ -99,3 +99,76 @@ def test_legacy_cache_resolver_prefers_exact_source_path(tmp_path):
     )
 
     assert _resolve_legacy_base(rec, legacy_index=index).resolve() == cache_path.resolve()
+
+
+def test_legacy_cache_resolver_uses_unique_basename_when_protocol_metadata_missing(tmp_path):
+    raw = (
+        tmp_path
+        / "data"
+        / "bluetooth"
+        / "ota"
+        / "ota_core_high_run01"
+        / "ota_pa1_run01__shard_001__PA1.mat"
+    )
+    raw.parent.mkdir(parents=True)
+    raw.write_bytes(b"raw")
+
+    cache_root = tmp_path / "cache-pa1"
+    cache_root.mkdir()
+    cache_path = cache_root / "historical-pa1.h5"
+    with h5py.File(cache_path, "w") as fout:
+        fout.attrs["source_path"] = str(
+            tmp_path
+            / "legacy"
+            / "ota_pa1_run01"
+            / raw.name
+        )
+
+    index = _build_legacy_cache_index(cache_root)
+    rec = RawSourceRecord(
+        path=str(raw),
+        protocol_name="bluetooth",
+        source_type="ota",
+        source_name="ota_core_high_run01",
+        dataset_tag="ota_core_high_run01",
+        noise_tag="high_run01",
+    )
+
+    assert _resolve_legacy_base(rec, legacy_index=index).resolve() == cache_path.resolve()
+
+
+def test_legacy_cache_resolver_unique_basename_fails_closed_on_ambiguity(tmp_path):
+    raw = (
+        tmp_path
+        / "data"
+        / "bluetooth"
+        / "ota"
+        / "ota_core_high_run01"
+        / "ota_pa1_run01__shard_001__PA1.mat"
+    )
+    raw.parent.mkdir(parents=True)
+    raw.write_bytes(b"raw")
+
+    cache_root = tmp_path / "cache"
+    cache_root.mkdir()
+    for i in (1, 2):
+        cache_path = cache_root / f"historical-{i}.h5"
+        with h5py.File(cache_path, "w") as fout:
+            fout.attrs["source_path"] = str(
+                tmp_path / f"legacy-{i}" / raw.name
+            )
+
+    index = _build_legacy_cache_index(cache_root)
+    rec = RawSourceRecord(
+        path=str(raw),
+        protocol_name="bluetooth",
+        source_type="ota",
+        source_name="ota_core_high_run01",
+        dataset_tag="ota_core_high_run01",
+        noise_tag="high_run01",
+    )
+
+    import pytest
+
+    with pytest.raises(RuntimeError, match="Ambiguous legacy cache provenance via unique basename"):
+        _resolve_legacy_base(rec, legacy_index=index)
