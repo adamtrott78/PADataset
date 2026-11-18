@@ -1,0 +1,494 @@
+{
+  "schema": "padataset.l2o-hpo-committed-wave.v2",
+  "policy_id": "mth602_l2o_hpo_pilot_v2",
+  "stage": "screen",
+  "wave_index": 0,
+  "wave_size": 8,
+  "candidate_seed": 6022026,
+  "selection_evidence": "known_validation_only",
+  "target_metrics_allowed_for_selection": false,
+  "test_metrics_allowed_for_selection": false,
+  "validated_generator_head": "97c25d54a5863f58f5130afa41de601d36df7983",
+  "entries": [
+    {
+      "trial_id": "PA2-PA3__t000",
+      "instance_id": "PA2-PA3__t000__screen",
+      "canonical_pair": "PA2-PA3",
+      "trial_index": 0,
+      "stage": "screen",
+      "config_path": "manifests/configs/l2o_hpo_pilot_v2/wave0/l2o_hpo_v2_PA2_PA3_t000_screen.json",
+      "config_sha256": "41b6babc53d4da1bb7e559a270a07b7a3edc788a4a0dede83ed34c5abc629fe9",
+      "params": {
+        "lr": 0.00071457877274,
+        "weight_decay": 0.00001,
+        "lambda_center": 0,
+        "label_smoothing": 0.05,
+        "entropy_loss_weight": 0.05,
+        "mlp_dropout": 0.3,
+        "grad_clip_norm": 2,
+        "scheduler_name": "cosine",
+        "batch_size": 16
+      }
+    },
+    {
+      "trial_id": "PA2-PA8__t000",
+      "instance_id": "PA2-PA8__t000__screen",
+      "canonical_pair": "PA2-PA8",
+      "trial_index": 0,
+      "stage": "screen",
+      "config_path": "manifests/configs/l2o_hpo_pilot_v2/wave0/l2o_hpo_v2_PA2_PA8_t000_screen.json",
+      "config_sha256": "9ac7150e1f8a1d388427f124336e766ebceeb7af9220cd209a8fba171a094cec",
+      "params": {
+        "lr": 0.00071457877274,
+        "weight_decay": 0.00001,
+        "lambda_center": 0,
+        "label_smoothing": 0.05,
+        "entropy_loss_weight": 0.05,
+        "mlp_dropout": 0.3,
+        "grad_clip_norm": 2,
+        "scheduler_name": "cosine",
+        "batch_size": 16
+      }
+    },
+    {
+      "trial_id": "PA3-PA8__t000",
+      "instance_id": "PA3-PA8__t000__screen",
+      "canonical_pair": "PA3-PA8",
+      "trial_index": 0,
+      "stage": "screen",
+      "config_path": "manifests/configs/l2o_hpo_pilot_v2/wave0/l2o_hpo_v2_PA3_PA8_t000_screen.json",
+      "config_sha256": "dcd9c35ece2c718bbbda0d62d4aeef06d035aaf7da0fb011f4d45ed3bd160e0a",
+      "params": {
+        "lr": 0.00071457877274,
+        "weight_decay": 0.00001,
+        "lambda_center": 0,
+        "label_smoothing": 0.05,
+        "entropy_loss_weight": 0.05,
+        "mlp_dropout": 0.3,
+        "grad_clip_norm": 2,
+        "scheduler_name": "cosine",
+        "batch_size": 16
+      }
+    },
+    {
+      "trial_id": "PA2-PA3__t001",
+      "instance_id": "PA2-PA3__t001__screen",
+      "canonical_pair": "PA2-PA3",
+      "trial_index": 1,
+      "stage": "screen",
+      "config_path": "manifests/configs/l2o_hpo_pilot_v2/wave0/l2o_hpo_v2_PA2_PA3_t001_screen.json",
+      "config_sha256": "f48a17b6d009dfd17e8f8fe3f6f97ee67bef928855ff2a3909031577bd90fe11",
+      "params": {
+        "lr": 0.0000707750991937,
+        "weight_decay": 0.001,
+        "lambda_center": 0.05,
+        "label_smoothing": 0,
+        "entropy_loss_weight": 0,
+        "mlp_dropout": 0.4,
+        "grad_clip_norm": 2,
+        "scheduler_name": "plateau",
+        "batch_size": 8
+      }
+    },
+    {
+      "trial_id": "PA2-PA8__t001",
+      "instance_id": "PA2-PA8__t001__screen",
+      "canonical_pair": "PA2-PA8",
+      "trial_index": 1,
+      "stage": "screen",
+      "config_path": "manifests/configs/l2o_hpo_pilot_v2/wave0/l2o_hpo_v2_PA2_PA8_t001_screen.json",
+      "config_sha256": "2c93b855a60bca44f16005e890a8d81b009535a2a970d17c20866bce5ce73976",
+      "params": {
+        "lr": 0.0000707750991937,
+        "weight_decay": 0.001,
+        "lambda_center": 0.05,
+        "label_smoothing": 0,
+        "entropy_loss_weight": 0,
+        "mlp_dropout": 0.4,
+        "grad_clip_norm": 2,
+        "scheduler_name": "plateau",
+        "batch_size": 8
+      }
+    },
+    {
+      "trial_id": "PA3-PA8__t001",
+      "instance_id": "PA3-PA8__t001__screen",
+      "canonical_pair": "PA3-PA8",
+      "trial_index": 1,
+      "stage": "screen",
+      "config_path": "manifests/configs/l2o_hpo_pilot_v2/wave0/l2o_hpo_v2_PA3_PA8_t001_screen.json",
+      "config_sha256": "87c3805db598562a53567da3668be9abccccc269674fee58a8ffe12840a53c0e",
+      "params": {
+        "lr": 0.0000707750991937,
+        "weight_decay": 0.001,
+        "lambda_center": 0.05,
+        "label_smoothing": 0,
+        "entropy_loss_weight": 0,
+        "mlp_dropout": 0.4,
+        "grad_clip_norm": 2,
+        "scheduler_name": "plateau",
+        "batch_size": 8
+      }
+    },
+    {
+      "trial_id": "PA2-PA3__t002",
+      "instance_id": "PA2-PA3__t002__screen",
+      "canonical_pair": "PA2-PA3",
+      "trial_index": 2,
+      "stage": "screen",
+      "config_path": "manifests/configs/l2o_hpo_pilot_v2/wave0/l2o_hpo_v2_PA2_PA3_t002_screen.json",
+      "config_sha256": "b40e536c37a44393dcf7d1d45e30b85ab10d6d8bf76e76cd9b9c5430ab49c995",
+      "params": {
+        "lr": 0.000093484508038,
+        "weight_decay": 0.0001,
+        "lambda_center": 0.1,
+        "label_smoothing": 0.15,
+        "entropy_loss_weight": 0,
+        "mlp_dropout": 0.4,
+        "grad_clip_norm": 0.5,
+        "scheduler_name": "plateau",
+        "batch_size": 16
+      }
+    },
+    {
+      "trial_id": "PA2-PA8__t002",
+      "instance_id": "PA2-PA8__t002__screen",
+      "canonical_pair": "PA2-PA8",
+      "trial_index": 2,
+      "stage": "screen",
+      "config_path": "manifests/configs/l2o_hpo_pilot_v2/wave0/l2o_hpo_v2_PA2_PA8_t002_screen.json",
+      "config_sha256": "815deafe4d68e8c3bb5cedc01707bc063ed64bead6965da741e69a4d1e3fce81",
+      "params": {
+        "lr": 0.000093484508038,
+        "weight_decay": 0.0001,
+        "lambda_center": 0.1,
+        "label_smoothing": 0.15,
+        "entropy_loss_weight": 0,
+        "mlp_dropout": 0.4,
+        "grad_clip_norm": 0.5,
+        "scheduler_name": "plateau",
+        "batch_size": 16
+      }
+    },
+    {
+      "trial_id": "PA3-PA8__t002",
+      "instance_id": "PA3-PA8__t002__screen",
+      "canonical_pair": "PA3-PA8",
+      "trial_index": 2,
+      "stage": "screen",
+      "config_path": "manifests/configs/l2o_hpo_pilot_v2/wave0/l2o_hpo_v2_PA3_PA8_t002_screen.json",
+      "config_sha256": "924b04a1ff1649b43c9584eca69a6cd085ccea4c7967892c2aa42cad806d31b2",
+      "params": {
+        "lr": 0.000093484508038,
+        "weight_decay": 0.0001,
+        "lambda_center": 0.1,
+        "label_smoothing": 0.15,
+        "entropy_loss_weight": 0,
+        "mlp_dropout": 0.4,
+        "grad_clip_norm": 0.5,
+        "scheduler_name": "plateau",
+        "batch_size": 16
+      }
+    },
+    {
+      "trial_id": "PA2-PA3__t003",
+      "instance_id": "PA2-PA3__t003__screen",
+      "canonical_pair": "PA2-PA3",
+      "trial_index": 3,
+      "stage": "screen",
+      "config_path": "manifests/configs/l2o_hpo_pilot_v2/wave0/l2o_hpo_v2_PA2_PA3_t003_screen.json",
+      "config_sha256": "641a4346218b526fb7de4a73b67101e41cc56515f7be28dfafc79eaae76aa273",
+      "params": {
+        "lr": 0.000245285551497,
+        "weight_decay": 0.00001,
+        "lambda_center": 0.2,
+        "label_smoothing": 0.15,
+        "entropy_loss_weight": 0,
+        "mlp_dropout": 0.4,
+        "grad_clip_norm": null,
+        "scheduler_name": "cosine",
+        "batch_size": 8
+      }
+    },
+    {
+      "trial_id": "PA2-PA8__t003",
+      "instance_id": "PA2-PA8__t003__screen",
+      "canonical_pair": "PA2-PA8",
+      "trial_index": 3,
+      "stage": "screen",
+      "config_path": "manifests/configs/l2o_hpo_pilot_v2/wave0/l2o_hpo_v2_PA2_PA8_t003_screen.json",
+      "config_sha256": "7d0fd4221b8c187bb51bd4d4590d8ece064d177eae2048ab34aa4e6ab8cad862",
+      "params": {
+        "lr": 0.000245285551497,
+        "weight_decay": 0.00001,
+        "lambda_center": 0.2,
+        "label_smoothing": 0.15,
+        "entropy_loss_weight": 0,
+        "mlp_dropout": 0.4,
+        "grad_clip_norm": null,
+        "scheduler_name": "cosine",
+        "batch_size": 8
+      }
+    },
+    {
+      "trial_id": "PA3-PA8__t003",
+      "instance_id": "PA3-PA8__t003__screen",
+      "canonical_pair": "PA3-PA8",
+      "trial_index": 3,
+      "stage": "screen",
+      "config_path": "manifests/configs/l2o_hpo_pilot_v2/wave0/l2o_hpo_v2_PA3_PA8_t003_screen.json",
+      "config_sha256": "cbf25df4ac0301c7aaffbe953ca5fdbd09d523a01b98d6502718d79bd868bb26",
+      "params": {
+        "lr": 0.000245285551497,
+        "weight_decay": 0.00001,
+        "lambda_center": 0.2,
+        "label_smoothing": 0.15,
+        "entropy_loss_weight": 0,
+        "mlp_dropout": 0.4,
+        "grad_clip_norm": null,
+        "scheduler_name": "cosine",
+        "batch_size": 8
+      }
+    },
+    {
+      "trial_id": "PA2-PA3__t004",
+      "instance_id": "PA2-PA3__t004__screen",
+      "canonical_pair": "PA2-PA3",
+      "trial_index": 4,
+      "stage": "screen",
+      "config_path": "manifests/configs/l2o_hpo_pilot_v2/wave0/l2o_hpo_v2_PA2_PA3_t004_screen.json",
+      "config_sha256": "99974e55b3e117d91fb6c3cbf785f4b084d9b33095780ed665361269a7688afc",
+      "params": {
+        "lr": 0.00021888997856,
+        "weight_decay": 0.001,
+        "lambda_center": 0.05,
+        "label_smoothing": 0.15,
+        "entropy_loss_weight": 0,
+        "mlp_dropout": 0.5,
+        "grad_clip_norm": 0.5,
+        "scheduler_name": "cosine",
+        "batch_size": 8
+      }
+    },
+    {
+      "trial_id": "PA2-PA8__t004",
+      "instance_id": "PA2-PA8__t004__screen",
+      "canonical_pair": "PA2-PA8",
+      "trial_index": 4,
+      "stage": "screen",
+      "config_path": "manifests/configs/l2o_hpo_pilot_v2/wave0/l2o_hpo_v2_PA2_PA8_t004_screen.json",
+      "config_sha256": "1c1f94c982f39ce7ba3a22bebda9f675710bba75b15781e2fa74166e6d5161b9",
+      "params": {
+        "lr": 0.00021888997856,
+        "weight_decay": 0.001,
+        "lambda_center": 0.05,
+        "label_smoothing": 0.15,
+        "entropy_loss_weight": 0,
+        "mlp_dropout": 0.5,
+        "grad_clip_norm": 0.5,
+        "scheduler_name": "cosine",
+        "batch_size": 8
+      }
+    },
+    {
+      "trial_id": "PA3-PA8__t004",
+      "instance_id": "PA3-PA8__t004__screen",
+      "canonical_pair": "PA3-PA8",
+      "trial_index": 4,
+      "stage": "screen",
+      "config_path": "manifests/configs/l2o_hpo_pilot_v2/wave0/l2o_hpo_v2_PA3_PA8_t004_screen.json",
+      "config_sha256": "6a7510a8398744fc9c4bce58163f786fb68d56741e51059b23caa6828260286e",
+      "params": {
+        "lr": 0.00021888997856,
+        "weight_decay": 0.001,
+        "lambda_center": 0.05,
+        "label_smoothing": 0.15,
+        "entropy_loss_weight": 0,
+        "mlp_dropout": 0.5,
+        "grad_clip_norm": 0.5,
+        "scheduler_name": "cosine",
+        "batch_size": 8
+      }
+    },
+    {
+      "trial_id": "PA2-PA3__t005",
+      "instance_id": "PA2-PA3__t005__screen",
+      "canonical_pair": "PA2-PA3",
+      "trial_index": 5,
+      "stage": "screen",
+      "config_path": "manifests/configs/l2o_hpo_pilot_v2/wave0/l2o_hpo_v2_PA2_PA3_t005_screen.json",
+      "config_sha256": "43c149c50b4da8f818f2cf8a9afd098d7906277afc015cb5d75f59a805aadceb",
+      "params": {
+        "lr": 0.000138243592449,
+        "weight_decay": 0,
+        "lambda_center": 0,
+        "label_smoothing": 0,
+        "entropy_loss_weight": 0.1,
+        "mlp_dropout": 0.4,
+        "grad_clip_norm": null,
+        "scheduler_name": "cosine",
+        "batch_size": 16
+      }
+    },
+    {
+      "trial_id": "PA2-PA8__t005",
+      "instance_id": "PA2-PA8__t005__screen",
+      "canonical_pair": "PA2-PA8",
+      "trial_index": 5,
+      "stage": "screen",
+      "config_path": "manifests/configs/l2o_hpo_pilot_v2/wave0/l2o_hpo_v2_PA2_PA8_t005_screen.json",
+      "config_sha256": "f1962f79cacfd1b3fbba8a68632d282154d9879922e237e5b2f36fdf63d15487",
+      "params": {
+        "lr": 0.000138243592449,
+        "weight_decay": 0,
+        "lambda_center": 0,
+        "label_smoothing": 0,
+        "entropy_loss_weight": 0.1,
+        "mlp_dropout": 0.4,
+        "grad_clip_norm": null,
+        "scheduler_name": "cosine",
+        "batch_size": 16
+      }
+    },
+    {
+      "trial_id": "PA3-PA8__t005",
+      "instance_id": "PA3-PA8__t005__screen",
+      "canonical_pair": "PA3-PA8",
+      "trial_index": 5,
+      "stage": "screen",
+      "config_path": "manifests/configs/l2o_hpo_pilot_v2/wave0/l2o_hpo_v2_PA3_PA8_t005_screen.json",
+      "config_sha256": "6015ece932947c92725e0bf96a197fe1c2a03676c54b63f1cf2985b637222c0a",
+      "params": {
+        "lr": 0.000138243592449,
+        "weight_decay": 0,
+        "lambda_center": 0,
+        "label_smoothing": 0,
+        "entropy_loss_weight": 0.1,
+        "mlp_dropout": 0.4,
+        "grad_clip_norm": null,
+        "scheduler_name": "cosine",
+        "batch_size": 16
+      }
+    },
+    {
+      "trial_id": "PA2-PA3__t006",
+      "instance_id": "PA2-PA3__t006__screen",
+      "canonical_pair": "PA2-PA3",
+      "trial_index": 6,
+      "stage": "screen",
+      "config_path": "manifests/configs/l2o_hpo_pilot_v2/wave0/l2o_hpo_v2_PA2_PA3_t006_screen.json",
+      "config_sha256": "cb3ef163e38216975e6f9d12ce5eb329376e866a788cf765d2deb43b154636a5",
+      "params": {
+        "lr": 0.000684221057374,
+        "weight_decay": 0.001,
+        "lambda_center": 0,
+        "label_smoothing": 0.15,
+        "entropy_loss_weight": 0.05,
+        "mlp_dropout": 0.3,
+        "grad_clip_norm": null,
+        "scheduler_name": "plateau",
+        "batch_size": 8
+      }
+    },
+    {
+      "trial_id": "PA2-PA8__t006",
+      "instance_id": "PA2-PA8__t006__screen",
+      "canonical_pair": "PA2-PA8",
+      "trial_index": 6,
+      "stage": "screen",
+      "config_path": "manifests/configs/l2o_hpo_pilot_v2/wave0/l2o_hpo_v2_PA2_PA8_t006_screen.json",
+      "config_sha256": "95d2aa9ae3ed649865702573b50d294f9ce111d8c70cde27321b11965943ea59",
+      "params": {
+        "lr": 0.000684221057374,
+        "weight_decay": 0.001,
+        "lambda_center": 0,
+        "label_smoothing": 0.15,
+        "entropy_loss_weight": 0.05,
+        "mlp_dropout": 0.3,
+        "grad_clip_norm": null,
+        "scheduler_name": "plateau",
+        "batch_size": 8
+      }
+    },
+    {
+      "trial_id": "PA3-PA8__t006",
+      "instance_id": "PA3-PA8__t006__screen",
+      "canonical_pair": "PA3-PA8",
+      "trial_index": 6,
+      "stage": "screen",
+      "config_path": "manifests/configs/l2o_hpo_pilot_v2/wave0/l2o_hpo_v2_PA3_PA8_t006_screen.json",
+      "config_sha256": "7c854435abb7c50a1d3ceb32c536aea0d26ad95305f40baa406f5aaca31adf46",
+      "params": {
+        "lr": 0.000684221057374,
+        "weight_decay": 0.001,
+        "lambda_center": 0,
+        "label_smoothing": 0.15,
+        "entropy_loss_weight": 0.05,
+        "mlp_dropout": 0.3,
+        "grad_clip_norm": null,
+        "scheduler_name": "plateau",
+        "batch_size": 8
+      }
+    },
+    {
+      "trial_id": "PA2-PA3__t007",
+      "instance_id": "PA2-PA3__t007__screen",
+      "canonical_pair": "PA2-PA3",
+      "trial_index": 7,
+      "stage": "screen",
+      "config_path": "manifests/configs/l2o_hpo_pilot_v2/wave0/l2o_hpo_v2_PA2_PA3_t007_screen.json",
+      "config_sha256": "92055b60c0874082732661469973d420d6cb8033ce950fdbefbdbfdcc7ff724e",
+      "params": {
+        "lr": 0.0000704567293035,
+        "weight_decay": 0,
+        "lambda_center": 0.1,
+        "label_smoothing": 0.1,
+        "entropy_loss_weight": 0.1,
+        "mlp_dropout": 0.3,
+        "grad_clip_norm": 0.5,
+        "scheduler_name": "plateau",
+        "batch_size": 8
+      }
+    },
+    {
+      "trial_id": "PA2-PA8__t007",
+      "instance_id": "PA2-PA8__t007__screen",
+      "canonical_pair": "PA2-PA8",
+      "trial_index": 7,
+      "stage": "screen",
+      "config_path": "manifests/configs/l2o_hpo_pilot_v2/wave0/l2o_hpo_v2_PA2_PA8_t007_screen.json",
+      "config_sha256": "cec8894ac574e99d369a73b4a2626e5a6e45b4b71467e1efccf4db6cd9e8b281",
+      "params": {
+        "lr": 0.0000704567293035,
+        "weight_decay": 0,
+        "lambda_center": 0.1,
+        "label_smoothing": 0.1,
+        "entropy_loss_weight": 0.1,
+        "mlp_dropout": 0.3,
+        "grad_clip_norm": 0.5,
+        "scheduler_name": "plateau",
+        "batch_size": 8
+      }
+    },
+    {
+      "trial_id": "PA3-PA8__t007",
+      "instance_id": "PA3-PA8__t007__screen",
+      "canonical_pair": "PA3-PA8",
+      "trial_index": 7,
+      "stage": "screen",
+      "config_path": "manifests/configs/l2o_hpo_pilot_v2/wave0/l2o_hpo_v2_PA3_PA8_t007_screen.json",
+      "config_sha256": "99f9c5f0aed3e45a372593c8c0655695e0e4cca781c71717377234a6d022a478",
+      "params": {
+        "lr": 0.0000704567293035,
+        "weight_decay": 0,
+        "lambda_center": 0.1,
+        "label_smoothing": 0.1,
+        "entropy_loss_weight": 0.1,
+        "mlp_dropout": 0.3,
+        "grad_clip_norm": 0.5,
+        "scheduler_name": "plateau",
+        "batch_size": 8
+      }
+    }
+  ]
+}
