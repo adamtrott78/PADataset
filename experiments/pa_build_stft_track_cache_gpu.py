@@ -21,10 +21,10 @@ from prepData import (
     RawSourceRecord,
     _cache_file_name,
     _infer_x_layout,
-    discover_raw_sources,
 )
 from experiments.pa_build_stft_track_cache import (
     FEATURE_MODE,
+    discover_stft_core_sources,
     stft_frequency_tracks,
 )
 
@@ -175,7 +175,6 @@ def _build_legacy_cache_index(*roots: Path) -> dict:
     exact = {}
     real = {}
     proto_base = {}
-    basename = {}
 
     seen = set()
     for root in roots:
@@ -208,16 +207,11 @@ def _build_legacy_cache_index(*roots: Path) -> dict:
             if protocol_name:
                 proto_key = f"{protocol_name}::{source_basename}"
                 _add_index(proto_base, proto_key, cache_path)
-            # Some historical PA1 caches predate protocol_name metadata.
-            # A basename is accepted only when it uniquely identifies one
-            # cache file across all indexed roots; ambiguity still fails closed.
-            _add_index(basename, source_basename, cache_path)
 
     return {
         "exact": exact,
         "real": real,
         "proto_base": proto_base,
-        "basename": basename,
         "roots": [str(Path(root)) for root in roots],
         "cache_files_indexed": len(seen),
     }
@@ -271,15 +265,6 @@ def _resolve_legacy_base(rec, *, legacy_index: dict) -> Path:
     if hit is not None:
         return hit
 
-    basename_key = Path(rec.path).name
-    hit = _unique_index_hit(
-        legacy_index["basename"],
-        basename_key,
-        mode="unique basename",
-    )
-    if hit is not None:
-        return hit
-
     raise FileNotFoundError(
         "No provenance-matched legacy cache for raw source "
         f"{rec.path}; indexed_roots={legacy_index['roots']} "
@@ -296,7 +281,7 @@ def _probe(
     batch_size: int,
     device: str,
 ) -> None:
-    records = discover_raw_sources(setup)
+    records, source_selection = discover_stft_core_sources(setup)
     if not records:
         raise RuntimeError("No raw OTA records discovered")
 
@@ -361,6 +346,9 @@ def _probe(
                 "probe": "PASS",
                 "device": device,
                 "source_records": len(records),
+                "source_records_discovered": source_selection["source_records_discovered"],
+                "canonical_source_records": source_selection["canonical_source_records"],
+                "ignored_noncanonical_records": source_selection["ignored_noncanonical_records"],
                 "first_source": rec.path,
                 "legacy_base_cache": str(base_path),
                 "pa1_probe_source": pa1_rec.path,
@@ -397,7 +385,7 @@ def build(
     tracks_root = cache_root / "_stft_tracks"
     tracks_root.mkdir(parents=True, exist_ok=True)
 
-    records = discover_raw_sources(setup)
+    records, _ = discover_stft_core_sources(setup)
     built = 0
     skipped = 0
     total_samples = 0
