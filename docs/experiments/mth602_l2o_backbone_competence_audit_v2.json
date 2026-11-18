@@ -1,0 +1,245 @@
+{
+  "schema": "padataset.mth602-l2o-backbone-competence-audit.v2",
+  "provenance": {
+    "canonical_matrix_ref": "PR26@99ba123e1455566e16d86d6faf67fef3be8ab0b9",
+    "source": "10 canonical GitHub Actions backbone artifacts; summary.json, history.json, best_model.pt val_stats",
+    "target_metrics_used_for_selection": false
+  },
+  "competency_gate": {
+    "val_macro_f1_min": 0.95,
+    "val_min_class_f1_min": 0.9
+  },
+  "stability_metrics": {
+    "val_std": "population stddev of epoch val_macro_f1",
+    "collapse_lt90": "count of epochs with val_macro_f1 < 0.90",
+    "collapse_lt80": "count of epochs with val_macro_f1 < 0.80",
+    "collapse_lt50": "count of epochs with val_macro_f1 < 0.50",
+    "post95_below90": "after first epoch reaching 0.95, count later epochs below 0.90",
+    "max_adjacent_drop": "largest one-epoch decline in val_macro_f1",
+    "tail5_mean": "mean val_macro_f1 over final 5 trained epochs"
+  },
+  "records": [
+    {
+      "pair": "PA1-PA2",
+      "artifact_id": 14208028365,
+      "best_epoch": 3,
+      "epochs_run": 13,
+      "val_macro_f1": 1,
+      "val_min_class_f1": 1,
+      "val_per_class_f1": {
+        "PA3": 1,
+        "PA4": 1,
+        "PA8": 1
+      },
+      "test_known_macro_f1": 0.9998518518445358,
+      "val_std": 0.0016897116977187257,
+      "collapse_lt90": 0,
+      "collapse_lt80": 0,
+      "collapse_lt50": 0,
+      "post95_below90": 0,
+      "max_adjacent_drop": 0.006282449626461184,
+      "tail5_mean": 0.9997925920907166
+    },
+    {
+      "pair": "PA1-PA3",
+      "artifact_id": 14255294889,
+      "best_epoch": 26,
+      "epochs_run": 36,
+      "val_macro_f1": 0.999925851719,
+      "val_min_class_f1": 0.999888678615162,
+      "val_per_class_f1": {
+        "PA2": 0.999888678615162,
+        "PA4": 1,
+        "PA8": 0.999888876541838
+      },
+      "test_known_macro_f1": 0.9998517364899926,
+      "val_std": 0.16314191898271527,
+      "collapse_lt90": 12,
+      "collapse_lt80": 10,
+      "collapse_lt50": 1,
+      "post95_below90": 8,
+      "max_adjacent_drop": 0.43199518800652514,
+      "tail5_mean": 0.9980868803555836
+    },
+    {
+      "pair": "PA1-PA4",
+      "artifact_id": 14234315002,
+      "best_epoch": 19,
+      "epochs_run": 29,
+      "val_macro_f1": 0.999925851719,
+      "val_min_class_f1": 0.999888678615162,
+      "val_per_class_f1": {
+        "PA2": 0.999888678615162,
+        "PA3": 1,
+        "PA8": 0.999888876541838
+      },
+      "test_known_macro_f1": 1,
+      "val_std": 0.2794763537564807,
+      "collapse_lt90": 17,
+      "collapse_lt80": 16,
+      "collapse_lt50": 7,
+      "post95_below90": 7,
+      "max_adjacent_drop": 0.8325829699604821,
+      "tail5_mean": 0.870447653149092
+    },
+    {
+      "pair": "PA1-PA8",
+      "artifact_id": 14254576946,
+      "best_epoch": 3,
+      "epochs_run": 13,
+      "val_macro_f1": 1,
+      "val_min_class_f1": 1,
+      "val_per_class_f1": {
+        "PA2": 1,
+        "PA3": 1,
+        "PA4": 1
+      },
+      "test_known_macro_f1": 1,
+      "val_std": 0.041559915005373455,
+      "collapse_lt90": 2,
+      "collapse_lt80": 0,
+      "collapse_lt50": 0,
+      "post95_below90": 2,
+      "max_adjacent_drop": 0.11277904710950404,
+      "tail5_mean": 0.9995106110536927
+    },
+    {
+      "pair": "PA2-PA3",
+      "artifact_id": 14259500161,
+      "best_epoch": 3,
+      "epochs_run": 13,
+      "val_macro_f1": 0.9253955249097198,
+      "val_min_class_f1": 0.8787728847105394,
+      "val_per_class_f1": {
+        "PA1": 0.8991902834008098,
+        "PA4": 0.8787728847105394,
+        "PA8": 0.9982234066178104
+      },
+      "test_known_macro_f1": 0.9195729464289638,
+      "val_std": 0.09860593869981474,
+      "collapse_lt90": 12,
+      "collapse_lt80": 12,
+      "collapse_lt50": 0,
+      "post95_below90": 0,
+      "max_adjacent_drop": 0.3142315886205812,
+      "tail5_mean": 0.6435039501510367
+    },
+    {
+      "pair": "PA2-PA4",
+      "artifact_id": 14208870849,
+      "best_epoch": 3,
+      "epochs_run": 13,
+      "val_macro_f1": 1,
+      "val_min_class_f1": 1,
+      "val_per_class_f1": {
+        "PA1": 1,
+        "PA3": 1,
+        "PA8": 1
+      },
+      "test_known_macro_f1": 1,
+      "val_std": 0.2593953684396881,
+      "collapse_lt90": 5,
+      "collapse_lt80": 3,
+      "collapse_lt50": 2,
+      "post95_below90": 5,
+      "max_adjacent_drop": 0.7163398575758126,
+      "tail5_mean": 0.6278983400596246
+    },
+    {
+      "pair": "PA2-PA8",
+      "artifact_id": 14258984518,
+      "best_epoch": 2,
+      "epochs_run": 12,
+      "val_macro_f1": 0.9433003897151243,
+      "val_min_class_f1": 0.9094586555621654,
+      "val_per_class_f1": {
+        "PA1": 0.920664785199122,
+        "PA3": 0.9997777283840854,
+        "PA4": 0.9094586555621654
+      },
+      "test_known_macro_f1": 0.9448806320168245,
+      "val_std": 0.20416123786559304,
+      "collapse_lt90": 11,
+      "collapse_lt80": 8,
+      "collapse_lt50": 5,
+      "post95_below90": 0,
+      "max_adjacent_drop": 0.4691218999964584,
+      "tail5_mean": 0.6929095250947287
+    },
+    {
+      "pair": "PA3-PA4",
+      "artifact_id": 14277201494,
+      "best_epoch": 24,
+      "epochs_run": 34,
+      "val_macro_f1": 1,
+      "val_min_class_f1": 1,
+      "val_per_class_f1": {
+        "PA1": 1,
+        "PA2": 1,
+        "PA8": 1
+      },
+      "test_known_macro_f1": 1,
+      "val_std": 0.23074483032127294,
+      "collapse_lt90": 7,
+      "collapse_lt80": 6,
+      "collapse_lt50": 3,
+      "post95_below90": 5,
+      "max_adjacent_drop": 0.832888369477163,
+      "tail5_mean": 0.9998961921600438
+    },
+    {
+      "pair": "PA3-PA8",
+      "artifact_id": 14267872094,
+      "best_epoch": 1,
+      "epochs_run": 11,
+      "val_macro_f1": 0.8966316187092961,
+      "val_min_class_f1": 0.8258441228738258,
+      "val_per_class_f1": {
+        "PA1": 0.8258441228738258,
+        "PA2": 1,
+        "PA4": 0.8640507332540627
+      },
+      "test_known_macro_f1": 0.8952296085145685,
+      "val_std": 0.26325805458147716,
+      "collapse_lt90": 11,
+      "collapse_lt80": 7,
+      "collapse_lt50": 5,
+      "post95_below90": 0,
+      "max_adjacent_drop": 0.5985583313010782,
+      "tail5_mean": 0.39690037950692814
+    },
+    {
+      "pair": "PA4-PA8",
+      "artifact_id": 14248615297,
+      "best_epoch": 3,
+      "epochs_run": 13,
+      "val_macro_f1": 1,
+      "val_min_class_f1": 1,
+      "val_per_class_f1": {
+        "PA1": 1,
+        "PA2": 1,
+        "PA3": 1
+      },
+      "test_known_macro_f1": 1,
+      "val_std": 0.0836238717770361,
+      "collapse_lt90": 1,
+      "collapse_lt80": 1,
+      "collapse_lt50": 0,
+      "post95_below90": 1,
+      "max_adjacent_drop": 0.3141436168913191,
+      "tail5_mean": 0.9999702911408619
+    }
+  ],
+  "summary": {
+    "macro_gate_failures": [
+      "PA2-PA3",
+      "PA2-PA8",
+      "PA3-PA8"
+    ],
+    "min_class_gate_failures": [
+      "PA2-PA3",
+      "PA3-PA8"
+    ],
+    "observation": "Several best-checkpoint-competent pairs still show severe validation instability; stability should remain captured and may become a second-stage uniform qualification dimension after the weak-pair OSR pilot."
+  }
+}
