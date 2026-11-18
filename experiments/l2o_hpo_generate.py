@@ -222,7 +222,10 @@ def screen_cli(args: argparse.Namespace) -> None:
     manifest_path = Path(args.manifest)
     manifest_path.parent.mkdir(parents=True, exist_ok=True)
     manifest_path.write_text(json.dumps(manifest, indent=2, sort_keys=True) + "\n", encoding="utf-8")
-    if args.emit_manifest_json:\n        print(json.dumps(manifest, sort_keys=True))\n    else:\n        print(json.dumps({"configs": len(entries), "manifest": str(manifest_path)}, sort_keys=True))
+    if args.emit_manifest_json:
+        print(json.dumps(manifest, sort_keys=True))
+    else:
+        print(json.dumps({"configs": len(entries), "manifest": str(manifest_path)}, sort_keys=True))
 
 
 def promote_cli(args: argparse.Namespace) -> None:
