@@ -27,14 +27,22 @@ def test_stft_launcher_still_refuses_tmp_and_preserves_resume_semantics():
     assert '--probe-only' in text
 
 
-def test_stft_provenance_preflight_covers_all_sources_and_fails_closed():
-    text = Path("experiments/pa_build_stft_track_cache_gpu.py").read_text(
+def test_stft_provenance_preflight_freezes_canonical_core_universe():
+    cpu_text = Path("experiments/pa_build_stft_track_cache.py").read_text(
+        encoding="utf-8"
+    )
+    gpu_text = Path("experiments/pa_build_stft_track_cache_gpu.py").read_text(
         encoding="utf-8"
     )
 
-    assert '"basename": basename' in text
-    assert 'mode="unique basename"' in text
-    assert "resolved_all = [" in text
-    assert "for item in records" in text
-    assert '"provenance_records_resolved": len(resolved_all)' in text
-    assert "Ambiguous legacy cache provenance via {mode}" in text
+    assert "EXPECTED_CORE_PROTOCOLS" in cpu_text
+    assert "EXPECTED_CORE_SHARDS = tuple(range(1, 21))" in cpu_text
+    assert "EXPECTED_CORE_SUFFIXES" in cpu_text
+    assert "Expected exactly 360 canonical unified-core STFT sources" in cpu_text
+    assert '"ignored_noncanonical_records"' in cpu_text
+    assert "discover_stft_core_sources(setup)" in gpu_text
+    assert "resolved_all = [" in gpu_text
+    assert '"provenance_records_resolved": len(resolved_all)' in gpu_text
+    assert '"canonical_source_records"' in gpu_text
+    assert '"ignored_noncanonical_records"' in gpu_text
+    assert 'mode="unique basename"' not in gpu_text
