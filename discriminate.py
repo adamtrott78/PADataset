@@ -271,6 +271,7 @@ def make_scheduler(
     optimizer,
     scheduler_name: str,
     epochs: int,
+    scheduler_t_max_epochs: Optional[int] = None,
     scheduler_factor: float = 0.5,
     scheduler_patience: int = 5,
     scheduler_min_lr: float = 1e-7,
@@ -278,9 +279,12 @@ def make_scheduler(
     scheduler_name = (scheduler_name or "cosine").lower()
 
     if scheduler_name == "cosine":
+        scheduler_t_max = epochs if scheduler_t_max_epochs is None else int(scheduler_t_max_epochs)
+        if scheduler_t_max <= 0:
+            raise ValueError("scheduler_t_max_epochs must be positive")
         return torch.optim.lr_scheduler.CosineAnnealingLR(
             optimizer,
-            T_max=epochs,
+            T_max=scheduler_t_max,
             eta_min=scheduler_min_lr,
         )
 
@@ -415,6 +419,7 @@ def train_classifier(
     class_weight_mode: Optional[str] = None,
     grad_clip_norm: Optional[float] = None,
     scheduler_name: str = "cosine",
+    scheduler_t_max_epochs: Optional[int] = None,
     scheduler_factor: float = 0.5,
     scheduler_patience: int = 5,
     scheduler_min_lr: float = 1e-7,
@@ -489,6 +494,7 @@ def train_classifier(
         optimizer=optimizer,
         scheduler_name=scheduler_name,
         epochs=epochs,
+        scheduler_t_max_epochs=scheduler_t_max_epochs,
         scheduler_factor=scheduler_factor,
         scheduler_patience=scheduler_patience,
         scheduler_min_lr=scheduler_min_lr,
@@ -551,6 +557,28 @@ def train_classifier(
     epochs_since_improve = 0
     last_val_stats = None
     last_open_conf_stats = None
+
+    def save_training_state(epoch: int) -> None:
+        torch.save(
+            {
+                "schema": "padataset.backbone-training-state.v1",
+                "epoch": epoch,
+                "model_state_dict": model.state_dict(),
+                "center_loss_state_dict": center_loss.state_dict(),
+                "optimizer_state_dict": optimizer.state_dict(),
+                "scheduler_state_dict": None if scheduler is None else scheduler.state_dict(),
+                "best_epoch": best_epoch,
+                "best_metric": best_metric,
+                "epochs_since_improve": epochs_since_improve,
+                "history": copy.deepcopy(history),
+                "python_random_state": random.getstate(),
+                "numpy_random_state": np.random.get_state(),
+                "torch_rng_state": torch.get_rng_state(),
+                "torch_cuda_rng_state_all": torch.cuda.get_rng_state_all() if torch.cuda.is_available() else None,
+                "config": config_dict,
+            },
+            os.path.join(save_dir, "training_state_latest.pt"),
+        )
 
     total_train_batches = len(train_loader)
 
@@ -789,6 +817,11 @@ def train_classifier(
             else:
                 scheduler.step()
 
+        # Persist the exact post-epoch optimizer/scheduler/RNG state so a later
+        # finalist can continue this trajectory without restarting or changing
+        # the cosine horizon.
+        save_training_state(epoch)
+
         if early_stopping_patience is not None and epochs_since_improve >= early_stopping_patience:
             print(f"Early stopping at epoch {epoch} (best epoch: {best_epoch})")
             break
@@ -990,6 +1023,7 @@ def run_experiment(cfg: Dict[str, Any], data_root: str) -> Dict[str, Any]:
         class_weight_mode=cfg.get("class_weight_mode", None),
         grad_clip_norm=cfg.get("grad_clip_norm", None),
         scheduler_name=cfg.get("scheduler_name", "cosine"),
+        scheduler_t_max_epochs=cfg.get("scheduler_t_max_epochs", None),
         scheduler_factor=cfg.get("scheduler_factor", 0.5),
         scheduler_patience=cfg.get("scheduler_patience", 5),
         scheduler_min_lr=cfg.get("scheduler_min_lr", 1e-7),
