@@ -228,3 +228,51 @@ def test_wave0_manifest_and_ledger_bind_exact_config_bytes():
         assert trial["canonical_pair"] == entry["canonical_pair"]
         assert trial["config_path"] == entry["config_path"]
         assert trial["config_sha256"] == digest
+
+
+def test_cosine_horizon_is_decoupled_from_stage_budget_and_state_is_resumable():
+    from pathlib import Path
+
+    root = Path(__file__).resolve().parents[1]
+    source = (root / "discriminate.py").read_text()
+    assert "scheduler_t_max_epochs: Optional[int] = None" in source
+    assert "scheduler_t_max = epochs if scheduler_t_max_epochs is None else int(scheduler_t_max_epochs)" in source
+    assert "T_max=scheduler_t_max" in source
+    assert '"optimizer_state_dict": optimizer.state_dict()' in source
+    assert '"scheduler_state_dict": None if scheduler is None else scheduler.state_dict()' in source
+    assert '"center_loss_state_dict": center_loss.state_dict()' in source
+    assert '"torch_rng_state": torch.get_rng_state()' in source
+    assert '"training_state_latest.pt"' in source
+
+
+def test_refine_tmax60_repair_configs_freeze_final_cosine_horizon():
+    from pathlib import Path
+    import json
+
+    root = Path(__file__).resolve().parents[1]
+    repair_dir = root / "manifests/configs/l2o_hpo_pilot_v2/refine0_tmax60"
+    files = sorted(repair_dir.glob("*.json"))
+    assert len(files) == 4
+    expected = {
+        "PA2-PA3__t003",
+        "PA2-PA3__t005",
+        "PA2-PA8__t003",
+        "PA3-PA8__t005",
+    }
+    observed = set()
+    for path in files:
+        cfg = json.loads(path.read_text())
+        assert cfg["epochs"] == 24
+        assert cfg["scheduler_name"] == "cosine"
+        assert cfg["scheduler_t_max_epochs"] == 60
+        assert cfg["hpo_trial"]["stage"] == "refine"
+        assert cfg["hpo_trial"]["selection_evidence"] == "known_validation_only"
+        assert cfg["hpo_trial"]["target_metrics_allowed_for_selection"] is False
+        assert cfg["hpo_trial"]["test_metrics_allowed_for_selection"] is False
+        assert cfg["hpo_trial"]["scheduler_horizon_repair"] == {
+            "reason": "decouple_cosine_horizon_from_stage_budget",
+            "scheduler_t_max_epochs": 60,
+            "supersedes_refine_t_max_epochs": 24,
+        }
+        observed.add(cfg["hpo_trial"]["trial_id"])
+    assert observed == expected
