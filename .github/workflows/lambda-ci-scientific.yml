@@ -5,6 +5,7 @@ on:
     types: [created]
 
 permissions:
+  actions: read
   contents: read
   pull-requests: read
 
@@ -43,7 +44,8 @@ jobs:
           request_token="$(printf '%s\n' "$COMMENT_BODY" | awk '{print $3}')"
           if [[ "$request_token" != "smoke" ]] &&
              [[ ! "$request_token" =~ ^train_backbone:manifests/configs/[A-Za-z0-9_./-]+\.json$ ]] &&
-             [[ ! "$request_token" =~ ^stage03_archc:manifests/configs/[A-Za-z0-9_./-]+\.json$ ]]; then
+             [[ ! "$request_token" =~ ^stage03_archc:manifests/configs/[A-Za-z0-9_./-]+\.json$ ]] &&
+             [[ ! "$request_token" =~ ^l2o_directional_eval:manifests/configs/l2o_directional_eval_v1/[A-Za-z0-9_.-]+\.json$ ]]; then
             echo "Scientific request token rejected" >&2
             exit 23
           fi
@@ -156,47 +158,75 @@ jobs:
               config_path = ""
           elif ":" in request_token:
               op, config_path = request_token.split(":", 1)
-              if op not in {"train_backbone", "stage03_archc"}:
+              if op not in {"train_backbone", "stage03_archc", "l2o_directional_eval"}:
                   raise SystemExit(f"unsupported scientific operation: {op!r}")
-              if not re.fullmatch(
-                  r"manifests/configs/[A-Za-z0-9_./-]+\.json", config_path
-              ):
-                  raise SystemExit("config path rejected")
               root = pathlib.Path.cwd().resolve()
               resolved = (root / config_path).resolve()
-              try:
-                  resolved.relative_to(root / "manifests" / "configs")
-              except ValueError:
-                  raise SystemExit("config path escape")
               if not resolved.is_file() or resolved.is_symlink():
-                  raise SystemExit("config is not a regular repository file")
-              cfg = json.loads(resolved.read_text())
-              if cfg.get("skip_cache_build") is not True:
-                  raise SystemExit("scientific config must use an existing trusted cache")
-              if cfg.get("force_rebuild_cache") is not False:
-                  raise SystemExit("scientific config may not rebuild cache")
-              if int(cfg.get("cache_len", -1)) != 16384:
-                  raise SystemExit("scientific v1 requires cache_len=16384")
-              if cfg.get("source_type") != "ota":
-                  raise SystemExit("scientific v1 requires OTA source")
-              if cfg.get("source_name") != "ota_core_high_run01":
-                  raise SystemExit("source_name mismatch")
-              if cfg.get("dataset_tag") != "ota_core_high_run01":
-                  raise SystemExit("dataset_tag mismatch")
-              if cfg.get("noise_tag") != "high_run01":
-                  raise SystemExit("noise_tag mismatch")
+                  raise SystemExit("config/request is not a regular repository file")
 
-              if op == "stage03_archc":
-                  if cfg.get("unknown_pas") != ["PA2"]:
-                      raise SystemExit("Stage 03 v1 requires PA2 target")
-                  if set(cfg.get("pas") or []) != {"PA1","PA2","PA3","PA4","PA8"}:
-                      raise SystemExit("Stage 03 v1 requires five-PA taxonomy")
-                  if cfg.get("early_stopping_mode") != "known_only":
-                      raise SystemExit("Stage 03 v1 requires known-only checkpoint selection")
-                  if cfg.get("quarantine_target_until_test") is not True:
-                      raise SystemExit("Stage 03 v1 requires target quarantine")
-                  if float(cfg.get("open_val_frac", -1)) != 0.0:
-                      raise SystemExit("Stage 03 v1 requires zero target-open validation")
+              if op == "l2o_directional_eval":
+                  if not re.fullmatch(
+                      r"manifests/configs/l2o_directional_eval_v1/[A-Za-z0-9_.-]+\.json",
+                      config_path,
+                  ):
+                      raise SystemExit("directional evaluator request path rejected")
+                  allowed = (root / "manifests" / "configs" / "l2o_directional_eval_v1").resolve()
+                  try:
+                      resolved.relative_to(allowed)
+                  except ValueError:
+                      raise SystemExit("directional evaluator request path escape")
+                  req = json.loads(resolved.read_text())
+                  if req.get("schema") != "padataset.l2o-directional-eval-request.v1":
+                      raise SystemExit("directional evaluator request schema mismatch")
+                  if req.get("status") != "READY_FOR_BOUNDED_EVALUATOR":
+                      raise SystemExit("directional evaluator request is not ready")
+                  if req.get("policy_id") != "l2o_dqnguard_track_a_frozen_v1":
+                      raise SystemExit("directional evaluator policy_id drift")
+                  if req.get("canonical_matrix") != "manifests/l2o_canonical_backbone_matrix_v1.json":
+                      raise SystemExit("directional evaluator canonical matrix drift")
+                  if req.get("evaluation_policy") != "manifests/l2o_directional_eval_policy_v1.json":
+                      raise SystemExit("directional evaluator policy path drift")
+                  if req.get("checkpoint") != "best_model":
+                      raise SystemExit("directional evaluator checkpoint drift")
+                  if req.get("target_labels_used_for_tuning") is not False:
+                      raise SystemExit("directional evaluator permits target tuning")
+              else:
+                  if not re.fullmatch(
+                      r"manifests/configs/[A-Za-z0-9_./-]+\.json", config_path
+                  ):
+                      raise SystemExit("config path rejected")
+                  try:
+                      resolved.relative_to(root / "manifests" / "configs")
+                  except ValueError:
+                      raise SystemExit("config path escape")
+                  cfg = json.loads(resolved.read_text())
+                  if cfg.get("skip_cache_build") is not True:
+                      raise SystemExit("scientific config must use an existing trusted cache")
+                  if cfg.get("force_rebuild_cache") is not False:
+                      raise SystemExit("scientific config may not rebuild cache")
+                  if int(cfg.get("cache_len", -1)) != 16384:
+                      raise SystemExit("scientific v1 requires cache_len=16384")
+                  if cfg.get("source_type") != "ota":
+                      raise SystemExit("scientific v1 requires OTA source")
+                  if cfg.get("source_name") != "ota_core_high_run01":
+                      raise SystemExit("source_name mismatch")
+                  if cfg.get("dataset_tag") != "ota_core_high_run01":
+                      raise SystemExit("dataset_tag mismatch")
+                  if cfg.get("noise_tag") != "high_run01":
+                      raise SystemExit("noise_tag mismatch")
+
+                  if op == "stage03_archc":
+                      if cfg.get("unknown_pas") != ["PA2"]:
+                          raise SystemExit("Stage 03 v1 requires PA2 target")
+                      if set(cfg.get("pas") or []) != {"PA1","PA2","PA3","PA4","PA8"}:
+                          raise SystemExit("Stage 03 v1 requires five-PA taxonomy")
+                      if cfg.get("early_stopping_mode") != "known_only":
+                          raise SystemExit("Stage 03 v1 requires known-only checkpoint selection")
+                      if cfg.get("quarantine_target_until_test") is not True:
+                          raise SystemExit("Stage 03 v1 requires target quarantine")
+                      if float(cfg.get("open_val_frac", -1)) != 0.0:
+                          raise SystemExit("Stage 03 v1 requires zero target-open validation")
           else:
               raise SystemExit("scientific request token rejected")
 
@@ -212,6 +242,8 @@ jobs:
           OPERATION: ${{ steps.request.outputs.operation }}
           CONFIG_PATH: ${{ steps.request.outputs.config_path }}
           TRUSTED_DATA: ${{ steps.preflight.outputs.trusted_data }}
+          REPOSITORY: ${{ github.repository }}
+          GH_TOKEN: ${{ github.token }}
         shell: bash
         run: |
           set -Eeuo pipefail
@@ -242,6 +274,91 @@ jobs:
 
           if [[ "$OPERATION" == "smoke" ]]; then
             cp "$RUNNER_TEMP/scientific-runtime-smoke.json" "$result_root/runtime-smoke.json"
+          elif [[ "$OPERATION" == "l2o_directional_eval" ]]; then
+            request_path="$CONFIG_PATH"
+            matrix_path="manifests/l2o_canonical_backbone_matrix_v1.json"
+            policy_path="manifests/l2o_directional_eval_policy_v1.json"
+            eval_dir="$result_root/l2o_eval"
+            mkdir -p "$eval_dir"
+
+            pre_resolved="$RUNNER_TEMP/l2o-pre-resolved.json"
+            "$runtime_python" experiments/l2o_eval_request_contract.py \
+              --request "$request_path" \
+              --matrix "$matrix_path" \
+              --policy "$policy_path" \
+              --run-dir "$RUNNER_TEMP/unmaterialized-backbone" \
+              --out-dir "$eval_dir" > "$pre_resolved"
+
+            artifact_id="$(python3 -c 'import json,sys; print(json.load(open(sys.argv[1]))["artifact_id"])' "$pre_resolved")"
+            canonical_key="$(python3 -c 'import json,sys; print(json.load(open(sys.argv[1]))["canonical_key"])' "$pre_resolved")"
+            [[ "$artifact_id" =~ ^[0-9]+$ ]]
+            [[ "$canonical_key" =~ ^PA(1|2|3|4|8)-PA(1|2|3|4|8)$ ]]
+
+            artifact_metadata="$RUNNER_TEMP/l2o-artifact-metadata.json"
+            curl -fsSL \
+              -H "Accept: application/vnd.github+json" \
+              -H "Authorization: Bearer $GH_TOKEN" \
+              -H "X-GitHub-Api-Version: 2022-11-28" \
+              "https://api.github.com/repos/$REPOSITORY/actions/artifacts/$artifact_id" \
+              > "$artifact_metadata"
+
+            "$runtime_python" experiments/l2o_artifact_transport_contract.py \
+              --request "$request_path" \
+              --matrix "$matrix_path" \
+              --artifact-metadata "$artifact_metadata" \
+              > "$RUNNER_TEMP/l2o-transport-binding.json"
+
+            archive_url="$(python3 -c 'import json,sys; print(json.load(open(sys.argv[1]))["archive_download_url"])' "$artifact_metadata")"
+            artifact_zip="$RUNNER_TEMP/l2o-backbone-artifact.zip"
+            curl -fL \
+              -H "Accept: application/vnd.github+json" \
+              -H "Authorization: Bearer $GH_TOKEN" \
+              -H "X-GitHub-Api-Version: 2022-11-28" \
+              "$archive_url" \
+              -o "$artifact_zip"
+
+            rehydrated="$RUNNER_TEMP/l2o-rehydrated"
+            mkdir -p "$rehydrated"
+            "$runtime_python" experiments/l2o_artifact_rehydrate.py \
+              --matrix "$matrix_path" \
+              --canonical-key "$canonical_key" \
+              --artifact-id "$artifact_id" \
+              --artifact-zip "$artifact_zip" \
+              --destination "$rehydrated" \
+              > "$RUNNER_TEMP/l2o-rehydrate.json"
+
+            run_dir="$(python3 -c 'import json,sys; print(json.load(open(sys.argv[1]))["run_dir"])' "$RUNNER_TEMP/l2o-rehydrate.json")"
+            [[ -d "$run_dir" ]]
+
+            resolved="$RUNNER_TEMP/l2o-resolved.json"
+            "$runtime_python" experiments/l2o_eval_request_contract.py \
+              --request "$request_path" \
+              --matrix "$matrix_path" \
+              --policy "$policy_path" \
+              --run-dir "$run_dir" \
+              --out-dir "$eval_dir" > "$resolved"
+
+            mapfile -t eval_args < <(
+              python3 -c 'import json,sys; a=json.load(open(sys.argv[1]))["evaluator_args"]; assert isinstance(a,list) and a; assert all(isinstance(x,str) and "\n" not in x and "\r" not in x for x in a); print(*a, sep="\n")' "$resolved"
+            )
+
+            "$runtime_python" experiments/pa_eval_dqn_guard_surrogate_open.py \
+              "${eval_args[@]}" \
+              --data-root "$TRUSTED_DATA"
+
+            [[ -f "$eval_dir/osr_summary.csv" ]]
+
+            "$runtime_python" experiments/l2o_eval_result_record.py \
+              --request "$request_path" \
+              --matrix "$matrix_path" \
+              --policy "$policy_path" \
+              --summary-csv "$eval_dir/osr_summary.csv" \
+              --output "$eval_dir/result_record.json"
+
+            cp "$artifact_metadata" "$eval_dir/artifact-metadata.json"
+            cp "$RUNNER_TEMP/l2o-transport-binding.json" "$eval_dir/artifact-transport-binding.json"
+            cp "$RUNNER_TEMP/l2o-rehydrate.json" "$eval_dir/rehydration.json"
+            cp "$resolved" "$eval_dir/resolved-request.json"
           else
             normalized="$RUNNER_TEMP/normalized-scientific-config.json"
             python3 - "$CONFIG_PATH" "$TRUSTED_DATA" "$result_root" "$normalized" <<'PY'
