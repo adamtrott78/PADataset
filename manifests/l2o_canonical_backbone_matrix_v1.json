@@ -273,7 +273,7 @@
         "PA3",
         "PA4"
       ],
-      "canonical_w4_config": "manifests/configs/l2o_surrogate_matrix_repair_v1/l2o_repair_ref_ent005_lr2e4_tgtPA2_surPA8_c16384_seed0_detv2_w4.json",
+      "canonical_w4_config": "manifests/configs/l2o_hpo_pilot_v2/finalists/l2o_hpo_v2_PA2_PA8_t007_finalist.json",
       "status": "COMPLETE",
       "directed_cells": [
         {
@@ -289,15 +289,15 @@
         "target": "PA2",
         "surrogate": "PA8"
       },
-      "workflow_run_id": 43926895324,
-      "workflow_job_id": 133508635811,
-      "artifact_id": 14258984518,
-      "artifact_digest": "sha256:ec307627ec875a73f2e61596fb9eb5a42c137ec76c212f61f752076cc0278f9c",
-      "candidate_sha": "d1fd5b6d414e7b88675485f576732a424504455f",
-      "best_model_sha256": "ffcca05cdcf9fa6057aa7cdef7cb61ee28a56b039c8740abc5b7b7c6f7240fff",
-      "config_sha256": "e50dd327b185666ec0da3cf88a2aa91087cf5f69882a3eefdac22735d29c0dd2",
-      "best_epoch": 2,
-      "best_val_macro_f1": 0.9433003897151243,
+      "workflow_run_id": 44924427484,
+      "workflow_job_id": 136907282120,
+      "artifact_id": 14719755202,
+      "artifact_digest": "sha256:086bf301c75197206ba3e4ae402b31081e75e8b86cf04727c4d49f73371069f8",
+      "candidate_sha": "ab87931408651b0b3516d910b13474822fb2a93d",
+      "best_model_sha256": "1ccdf80e9114d397e8eedffcaf569c5e051b2f483cf2ef17e546ce8b65143ccf",
+      "config_sha256": "03ff74c6c3caa4dfdc03bcd7bfd86de65f365d46133ecc5bcfc213782c1e5a22",
+      "best_epoch": 18,
+      "best_val_macro_f1": 0.9876063834565111,
       "best_val_acc": 0.9435669262143122,
       "test_known_macro_f1": 0.9448806320168245,
       "test_known_acc": 0.9451282811804834,
@@ -306,7 +306,9 @@
       "early_stop_epoch": 12,
       "target_test_consumed": false,
       "target_quarantine_status": "PRESERVED_FOR_FINAL_FROZEN_EVALUATOR",
-      "validation_instability_note": "Known-only validation was highly unstable after best epoch 2; frozen best checkpoint preserved without target evidence."
+      "validation_instability_note": "Known-only validation was highly unstable after best epoch 2; frozen best checkpoint preserved without target evidence.",
+      "hpo_finalist_trial_id": "PA2-PA8__t007",
+      "hpo_selection_evidence": "known_validation_only"
     },
     {
       "canonical_pair": [
@@ -364,7 +366,7 @@
         "PA2",
         "PA4"
       ],
-      "canonical_w4_config": "manifests/configs/l2o_surrogate_matrix_repair_v1/l2o_repair_ref_ent005_lr2e4_tgtPA3_surPA8_c16384_seed0_detv2_w4.json",
+      "canonical_w4_config": "manifests/configs/l2o_hpo_pilot_v2/finalists/l2o_hpo_v2_PA3_PA8_t001_finalist.json",
       "status": "COMPLETE",
       "directed_cells": [
         {
@@ -380,15 +382,15 @@
         "target": "PA3",
         "surrogate": "PA8"
       },
-      "workflow_run_id": 43943022113,
-      "workflow_job_id": 133565235633,
-      "artifact_id": 14267872094,
-      "artifact_digest": "sha256:eb608ed9ccd6c17a8447a27778227435bbc389e48696178cec98933dcc440aa7",
-      "candidate_sha": "d1fd5b6d414e7b88675485f576732a424504455f",
-      "best_model_sha256": "1a3fd379e2f85fd25fbe862768fc886564943d5776ca8d07398e1611a3da926d",
-      "config_sha256": "8d376af22aab4b7c3e2c156821df4a5116ba4206867238e39684e350f3873909",
-      "best_epoch": 1,
-      "best_val_macro_f1": 0.8966316187092961,
+      "workflow_run_id": 44924431170,
+      "workflow_job_id": 136907293141,
+      "artifact_id": 14717512029,
+      "artifact_digest": "sha256:5a52046ddd01077141cbbb8a5ba8fe2acf451f3a79bba70d90e7f37ba619ae2f",
+      "candidate_sha": "ab87931408651b0b3516d910b13474822fb2a93d",
+      "best_model_sha256": "e8d6190ae8f7fb7aa7c2df535adbc5de090ebeebf29f0e65f448fc6e820fcaed",
+      "config_sha256": "44d2c41e788c0a46072288983f2f509a998816a07c005a3e6aa0907fd345910f",
+      "best_epoch": 5,
+      "best_val_macro_f1": 0.9749894729486733,
       "best_val_acc": 0.8981893737013951,
       "test_known_macro_f1": 0.8952296085145685,
       "test_known_acc": 0.8968024334149418,
@@ -397,7 +399,9 @@
       "early_stop_epoch": 11,
       "target_test_consumed": false,
       "target_quarantine_status": "PRESERVED_FOR_FINAL_FROZEN_EVALUATOR",
-      "validation_instability_note": "Known-only validation degraded sharply after best epoch 1; frozen best checkpoint preserved without target evidence."
+      "validation_instability_note": "Known-only validation degraded sharply after best epoch 1; frozen best checkpoint preserved without target evidence.",
+      "hpo_finalist_trial_id": "PA3-PA8__t001",
+      "hpo_selection_evidence": "known_validation_only"
     },
     {
       "canonical_pair": [
