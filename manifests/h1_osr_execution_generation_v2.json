@@ -1,0 +1,60 @@
+{
+  "schema": "padataset.h1-osr-execution-generation.v1",
+  "purpose": "Rebind only the three remaining frozen H1 directional OSR cells across GPU0/GPU1 after three terminal successes; no scientific method/config/artifact selection change.",
+  "predecessor_candidate_sha": "573be0e7281f18c42c5f0ec326e4090a52f80d93",
+  "completed_terminal_evidence": [
+    {
+      "direction": "PA2<-PA3",
+      "run_id": 44944515567,
+      "conclusion": "success"
+    },
+    {
+      "direction": "PA3<-PA2",
+      "run_id": 44944517585,
+      "conclusion": "success"
+    },
+    {
+      "direction": "PA2<-PA8",
+      "run_id": 44944519746,
+      "conclusion": "success"
+    }
+  ],
+  "stale_queued_admissions_to_be_invalidated_by_head_change": [
+    {
+      "direction": "PA8<-PA2",
+      "run_id": 44944523065
+    },
+    {
+      "direction": "PA3<-PA8",
+      "run_id": 44944525269
+    },
+    {
+      "direction": "PA8<-PA3",
+      "run_id": 44944528254
+    }
+  ],
+  "remaining_exactly_once_plan": [
+    {
+      "direction": "PA8<-PA2",
+      "lane": "GPU0",
+      "route": "/lambda-scientific"
+    },
+    {
+      "direction": "PA3<-PA8",
+      "lane": "GPU1",
+      "route": "/lambda-scientific-2"
+    },
+    {
+      "direction": "PA8<-PA3",
+      "lane": "GPU0",
+      "route": "/lambda-scientific"
+    }
+  ],
+  "invariants": {
+    "scientific_code_changed": false,
+    "directional_request_manifests_changed": false,
+    "frozen_backbone_artifacts_changed": false,
+    "target_labels_used_for_tuning": false,
+    "old_queued_runs_are_non_evidence_if_started_after_head_change": true
+  }
+}
