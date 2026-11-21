@@ -1,0 +1,40 @@
+{
+  "schema": "padataset.l2o-hpo-finalists.v1",
+  "selection_evidence": "known_validation_only",
+  "target_metrics_allowed_for_selection": false,
+  "test_metrics_allowed_for_selection": false,
+  "osr_metrics_allowed_for_selection": false,
+  "finalists": [
+    {
+      "trial_id": "PA2-PA8__t007",
+      "canonical_pair": "PA2-PA8",
+      "scheduler_name": "plateau",
+      "config_path": "manifests/configs/l2o_hpo_pilot_v2/finalists/l2o_hpo_v2_PA2_PA8_t007_finalist.json",
+      "execution_mode": "fresh_frozen_finalist",
+      "authorized_for_admission": true
+    },
+    {
+      "trial_id": "PA3-PA8__t001",
+      "canonical_pair": "PA3-PA8",
+      "scheduler_name": "plateau",
+      "config_path": "manifests/configs/l2o_hpo_pilot_v2/finalists/l2o_hpo_v2_PA3_PA8_t001_finalist.json",
+      "execution_mode": "fresh_frozen_finalist",
+      "authorized_for_admission": true
+    },
+    {
+      "trial_id": "PA2-PA3__t005",
+      "canonical_pair": "PA2-PA3",
+      "scheduler_name": "cosine",
+      "config_path": "manifests/configs/l2o_hpo_pilot_v2/finalists/l2o_hpo_v2_PA2_PA3_t005_finalist.json",
+      "execution_mode": "deterministic_replay_candidate_NOT_AUTHORIZED",
+      "authorized_for_admission": false
+    }
+  ],
+  "cosine_resume_gate": {
+    "trial_id": "PA2-PA3__t005",
+    "exact_resume_authorized": false,
+    "reason": "saved epoch-24 training state omitted dedicated train DataLoader generator and persistent-worker RNG state",
+    "safe_alternative_candidate": "deterministic epoch-0 replay under the already-frozen T_max=60 protocol",
+    "requires_authority_decision": true
+  }
+}

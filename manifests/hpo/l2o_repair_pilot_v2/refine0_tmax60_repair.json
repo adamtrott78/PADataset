@@ -1,0 +1,37 @@
+{
+  "schema": "padataset.l2o-hpo-refine-cosine-horizon-repair.v1",
+  "source_head": "31ff2c1baf38483808057b5eae3839ba1dcf8533",
+  "reason": "The prior refine stage coupled cosine T_max to epochs=24, changing the optimization trajectory relative to a 60-epoch finalist. Re-run only cosine refine candidates with scheduler_t_max_epochs=60.",
+  "training_budget_epochs": 24,
+  "scheduler_t_max_epochs": 60,
+  "selection_evidence": "known_validation_only",
+  "target_metrics_allowed_for_selection": false,
+  "test_metrics_allowed_for_selection": false,
+  "osr_metrics_allowed_for_selection": false,
+  "candidates": [
+    {
+      "trial_id": "PA2-PA3__t003",
+      "canonical_pair": "PA2-PA3",
+      "source_config": "manifests/configs/l2o_hpo_pilot_v2/refine0/l2o_hpo_v2_PA2_PA3_t003_refine.json",
+      "repair_config": "manifests/configs/l2o_hpo_pilot_v2/refine0_tmax60/l2o_hpo_v2_PA2_PA3_t003_refine_tmax60.json"
+    },
+    {
+      "trial_id": "PA2-PA3__t005",
+      "canonical_pair": "PA2-PA3",
+      "source_config": "manifests/configs/l2o_hpo_pilot_v2/refine0/l2o_hpo_v2_PA2_PA3_t005_refine.json",
+      "repair_config": "manifests/configs/l2o_hpo_pilot_v2/refine0_tmax60/l2o_hpo_v2_PA2_PA3_t005_refine_tmax60.json"
+    },
+    {
+      "trial_id": "PA2-PA8__t003",
+      "canonical_pair": "PA2-PA8",
+      "source_config": "manifests/configs/l2o_hpo_pilot_v2/refine0/l2o_hpo_v2_PA2_PA8_t003_refine.json",
+      "repair_config": "manifests/configs/l2o_hpo_pilot_v2/refine0_tmax60/l2o_hpo_v2_PA2_PA8_t003_refine_tmax60.json"
+    },
+    {
+      "trial_id": "PA3-PA8__t005",
+      "canonical_pair": "PA3-PA8",
+      "source_config": "manifests/configs/l2o_hpo_pilot_v2/refine0/l2o_hpo_v2_PA3_PA8_t005_refine.json",
+      "repair_config": "manifests/configs/l2o_hpo_pilot_v2/refine0_tmax60/l2o_hpo_v2_PA3_PA8_t005_refine_tmax60.json"
+    }
+  ]
+}

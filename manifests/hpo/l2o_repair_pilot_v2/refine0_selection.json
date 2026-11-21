@@ -1,0 +1,80 @@
+{
+  "schema": "padataset.l2o-hpo-refine-selection.v1",
+  "source_screen_head": "8b176ce931a1d802127ec2591d38ad0a4cedafb4",
+  "stage": "refine",
+  "selection_evidence": "known_validation_only",
+  "target_metrics_used": false,
+  "test_metrics_used": false,
+  "screen_attempt1": {
+    "scientific_successes": 18,
+    "infrastructure_failures": 6
+  },
+  "infrastructure_retry": {
+    "attempt2_requested": 6,
+    "attempt2_scientific_successes": 0,
+    "attempt2_infrastructure_failures": 6,
+    "retry_budget_exhausted": true
+  },
+  "ranking_rule": "feasible_min_class_first_then_val_macro_f1_then_val_min_class_f1",
+  "gate": {
+    "val_macro_f1_min": 0.95,
+    "val_min_class_f1_min": 0.9
+  },
+  "policy_note": "The reviewed ranker accepts COMPLETE known-validation records and does not require a fixed successful-record count. After the single infrastructure retry was exhausted, six COMPLETE candidates per pair constitute the useful screen wave; top two per pair are promoted.",
+  "entries": [
+    {
+      "trial_id": "PA2-PA3__t003",
+      "canonical_pair": "PA2-PA3",
+      "source_config_path": "manifests/configs/l2o_hpo_pilot_v2/wave0/l2o_hpo_v2_PA2_PA3_t003_screen.json",
+      "refine_config_path": "manifests/configs/l2o_hpo_pilot_v2/refine0/l2o_hpo_v2_PA2_PA3_t003_refine.json",
+      "artifact_id": 14458068741,
+      "val_macro_f1": 0.9879791290387318,
+      "val_min_class_f1": 0.9818181818181818
+    },
+    {
+      "trial_id": "PA2-PA3__t005",
+      "canonical_pair": "PA2-PA3",
+      "source_config_path": "manifests/configs/l2o_hpo_pilot_v2/wave0/l2o_hpo_v2_PA2_PA3_t005_screen.json",
+      "refine_config_path": "manifests/configs/l2o_hpo_pilot_v2/refine0/l2o_hpo_v2_PA2_PA3_t005_refine.json",
+      "artifact_id": 14482812632,
+      "val_macro_f1": 0.9783293686192883,
+      "val_min_class_f1": 0.9670056497175141
+    },
+    {
+      "trial_id": "PA2-PA8__t003",
+      "canonical_pair": "PA2-PA8",
+      "source_config_path": "manifests/configs/l2o_hpo_pilot_v2/wave0/l2o_hpo_v2_PA2_PA8_t003_screen.json",
+      "refine_config_path": "manifests/configs/l2o_hpo_pilot_v2/refine0/l2o_hpo_v2_PA2_PA8_t003_refine.json",
+      "artifact_id": 14479854133,
+      "val_macro_f1": 0.9884992937864042,
+      "val_min_class_f1": 0.9827105409927496
+    },
+    {
+      "trial_id": "PA2-PA8__t007",
+      "canonical_pair": "PA2-PA8",
+      "source_config_path": "manifests/configs/l2o_hpo_pilot_v2/wave0/l2o_hpo_v2_PA2_PA8_t007_screen.json",
+      "refine_config_path": "manifests/configs/l2o_hpo_pilot_v2/refine0/l2o_hpo_v2_PA2_PA8_t007_refine.json",
+      "artifact_id": 14475500374,
+      "val_macro_f1": 0.9820379424952458,
+      "val_min_class_f1": 0.972556135178045
+    },
+    {
+      "trial_id": "PA3-PA8__t005",
+      "canonical_pair": "PA3-PA8",
+      "source_config_path": "manifests/configs/l2o_hpo_pilot_v2/wave0/l2o_hpo_v2_PA3_PA8_t005_screen.json",
+      "refine_config_path": "manifests/configs/l2o_hpo_pilot_v2/refine0/l2o_hpo_v2_PA3_PA8_t005_refine.json",
+      "artifact_id": 14468453114,
+      "val_macro_f1": 0.9837465208087242,
+      "val_min_class_f1": 0.9752290464879538
+    },
+    {
+      "trial_id": "PA3-PA8__t001",
+      "canonical_pair": "PA3-PA8",
+      "source_config_path": "manifests/configs/l2o_hpo_pilot_v2/wave0/l2o_hpo_v2_PA3_PA8_t001_screen.json",
+      "refine_config_path": "manifests/configs/l2o_hpo_pilot_v2/refine0/l2o_hpo_v2_PA3_PA8_t001_refine.json",
+      "artifact_id": 14454773812,
+      "val_macro_f1": 0.9749894729486733,
+      "val_min_class_f1": 0.9619534355479841
+    }
+  ]
+}
