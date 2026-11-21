@@ -1,0 +1,98 @@
+{
+  "schema": "padataset.l2o-hpo-tight60-completion.v1",
+  "source_pr37_head": "ab87931408651b0b3516d910b13474822fb2a93d",
+  "purpose": "Complete a corrected long-horizon 6-recipe x 3-pair known-only HPO matrix without altering frozen PR37 finalists.",
+  "pairs": [
+    "PA2-PA3",
+    "PA2-PA8",
+    "PA3-PA8"
+  ],
+  "recipes": [
+    "t000",
+    "t001",
+    "t002",
+    "t003",
+    "t005",
+    "t007"
+  ],
+  "protocol": {
+    "max_epochs": 60,
+    "early_stopping_patience": 10,
+    "cosine_t_max_epochs": 60,
+    "selection_evidence": "known_validation_only",
+    "target_metrics_allowed_for_selection": false,
+    "test_metrics_allowed_for_selection": false,
+    "target_open_osr_allowed_for_selection": false,
+    "competence_gate": {
+      "val_macro_f1_min": 0.95,
+      "val_min_class_f1_min": 0.9
+    },
+    "ranking": [
+      "descending count of pairs passing competency gate",
+      "descending worst-pair validation min-class F1",
+      "descending mean validation macro-F1",
+      "descending mean validation min-class F1",
+      "ascending recipe id as deterministic final tie-break"
+    ]
+  },
+  "existing_corrected_cells": [
+    {
+      "pair": "PA2-PA3",
+      "recipe": "t003",
+      "run_id": 44635249728,
+      "artifact_id": 14587636734
+    },
+    {
+      "pair": "PA2-PA3",
+      "recipe": "t005",
+      "run_id": 44635259724,
+      "artifact_id": 14593806373
+    },
+    {
+      "pair": "PA2-PA8",
+      "recipe": "t003",
+      "run_id": 44635266599,
+      "artifact_id": 14596936713
+    },
+    {
+      "pair": "PA2-PA8",
+      "recipe": "t007",
+      "run_id": 44600249538,
+      "artifact_id": 14587758676
+    },
+    {
+      "pair": "PA3-PA8",
+      "recipe": "t005",
+      "run_id": 44635272660,
+      "artifact_id": 14589123836
+    },
+    {
+      "pair": "PA3-PA8",
+      "recipe": "t001",
+      "run_id": 44600262628,
+      "artifact_id": 14575803556
+    }
+  ],
+  "new_cells": [
+    "PA2-PA3:t000",
+    "PA2-PA3:t001",
+    "PA2-PA3:t002",
+    "PA2-PA3:t007",
+    "PA2-PA8:t000",
+    "PA2-PA8:t001",
+    "PA2-PA8:t002",
+    "PA2-PA8:t005",
+    "PA3-PA8:t000",
+    "PA3-PA8:t002",
+    "PA3-PA8:t003",
+    "PA3-PA8:t007"
+  ],
+  "invariants": [
+    "Recipe hyperparameters are inherited unchanged from the corresponding predeclared wave0 recipe.",
+    "All new cells use the actual 60-epoch horizon from epoch 0.",
+    "Cosine cells use scheduler_t_max_epochs=60 from epoch 0.",
+    "Plateau cells retain plateau scheduling and have no scheduler_t_max_epochs runtime key.",
+    "True target remains quarantined from fitting, checkpoint selection, HPO ranking, retry decisions, and threshold selection.",
+    "Previously observed target-open OSR results cannot influence this HPO ranking."
+  ]
+}
