@@ -14,6 +14,8 @@ def _cfg():
         "target_unknown_pa": "PA1",
         "surrogate_open_pa": "PA4",
         "known_pas_l2o": ["PA2", "PA3", "PA8"],
+        "open_val_frac": 0.0,
+        "build_balanced_val_open": False,
         "seed": 0,
     }
 
@@ -31,6 +33,12 @@ def test_original_direction_preserves_target_and_surrogate_roles():
     assert c.target_config["pas"] == ["PA2", "PA3", "PA8", "PA1"]
     assert c.surrogate_config["unknown_pas"] == ["PA4"]
     assert c.surrogate_config["pas"] == ["PA2", "PA3", "PA8", "PA4"]
+    assert c.target_config["open_val_frac"] == 0.15
+    assert c.target_config["build_balanced_val_open"] is True
+    assert c.surrogate_config["open_val_frac"] == 0.15
+    assert c.surrogate_config["build_balanced_val_open"] is True
+    assert c.surrogate_config["require_true_val_open"] is True
+    assert c.surrogate_config["allow_val_open_fallback"] is False
 
 
 def test_reverse_direction_reuses_same_backbone_without_target_in_surrogate_dataset():
