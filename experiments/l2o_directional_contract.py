@@ -111,6 +111,13 @@ def resolve_directional_l2o_contract(
     target_cfg["target_unknown_pa"] = eval_target
     target_cfg["surrogate_open_pa"] = eval_surrogate
     target_cfg["known_pas_l2o"] = list(known)
+    # Final target-open evaluation occurs only after the backbone/checkpoint is
+    # frozen. Reconstruct the original Track-A 15% open partition so the
+    # evaluator can materialize val_open/test_open consistently. The directional
+    # evaluator never uses target val_open for DQN fitting or threshold choice
+    # when mix_true_open is false; target labels remain final diagnostic evidence.
+    target_cfg["open_val_frac"] = 0.15
+    target_cfg["build_balanced_val_open"] = True
 
     surrogate_cfg = copy.deepcopy(cfg)
     surrogate_cfg["unknown_pas"] = [eval_surrogate]
