@@ -276,3 +276,33 @@ def test_refine_tmax60_repair_configs_freeze_final_cosine_horizon():
         }
         observed.add(cfg["hpo_trial"]["trial_id"])
     assert observed == expected
+
+
+def test_finalist_configs_preserve_known_only_selection_and_gate_cosine_replay():
+    from pathlib import Path
+    import json
+
+    root = Path(__file__).resolve().parents[1]
+    manifest = json.loads((root / "manifests/hpo/l2o_repair_pilot_v2/finalists.json").read_text())
+    assert manifest["schema"] == "padataset.l2o-hpo-finalists.v1"
+    assert manifest["selection_evidence"] == "known_validation_only"
+    assert manifest["target_metrics_allowed_for_selection"] is False
+    assert manifest["test_metrics_allowed_for_selection"] is False
+    assert manifest["osr_metrics_allowed_for_selection"] is False
+    rows = {x["trial_id"]: x for x in manifest["finalists"]}
+    assert set(rows) == {"PA2-PA3__t005", "PA2-PA8__t007", "PA3-PA8__t001"}
+    assert rows["PA2-PA8__t007"]["authorized_for_admission"] is True
+    assert rows["PA3-PA8__t001"]["authorized_for_admission"] is True
+    assert rows["PA2-PA3__t005"]["authorized_for_admission"] is False
+    for row in rows.values():
+        cfg = json.loads((root / row["config_path"]).read_text())
+        assert cfg["epochs"] == 60
+        assert cfg["hpo_trial"]["stage"] == "finalist"
+        assert cfg["hpo_trial"]["selection_evidence"] == "known_validation_only"
+        assert cfg["hpo_trial"]["target_metrics_allowed_for_selection"] is False
+        assert cfg["hpo_trial"]["test_metrics_allowed_for_selection"] is False
+    cosine = json.loads((root / rows["PA2-PA3__t005"]["config_path"]).read_text())
+    assert cosine["scheduler_name"] == "cosine"
+    assert cosine["scheduler_t_max_epochs"] == 60
+    assert cosine["hpo_trial"]["resume_claim"] is False
+    assert cosine["hpo_trial"]["finalist_execution_mode"] == "deterministic_replay_candidate_NOT_AUTHORIZED"
