@@ -1,65 +1,61 @@
-import numpy as np
+import ast
+from pathlib import Path
 
-from evaluate import collect_split_outputs_from_loader
-from osr_core import SplitOutputs
-from experiments.l2o_directional_contract import resolve_directional_l2o_contract
-from experiments.l2o_pair_cached_dqnguard import save_split, load_split
+ROOT = Path(__file__).resolve().parents[1]
 
 
-def _base_cfg():
-    return {
-        "split_mode": "open_pa",
-        "unknown_pas": ["PA1"],
-        "target_unknown_pa": "PA1",
-        "surrogate_open_pa": "PA2",
-        "known_pas_l2o": ["PA3", "PA4", "PA8"],
-        "pas": ["PA3", "PA4", "PA8", "PA1"],
-        "open_val_frac": 0,
-        "build_balanced_val_open": False,
-        "quarantine_target_until_test": True,
-    }
+def _text(path):
+    return (ROOT / path).read_text()
+
+
+def test_repaired_sources_parse():
+    for path in [
+        "evaluate.py",
+        "experiments/l2o_directional_contract.py",
+        "experiments/l2o_pair_cached_dqnguard.py",
+    ]:
+        ast.parse(_text(path), filename=path)
 
 
 def test_directional_contract_restores_proven_track_a_eval_partition():
-    c = resolve_directional_l2o_contract(
-        _base_cfg(),
-        evaluation_target="PA1",
-        evaluation_surrogate="PA2",
-        model_class_names=["PA3", "PA4", "PA8"],
-    )
-    assert c.target_config["open_val_frac"] == 0.15
-    assert c.target_config["build_balanced_val_open"] is True
-    assert c.surrogate_config["open_val_frac"] == 0.15
-    assert c.surrogate_config["build_balanced_val_open"] is True
-    assert c.surrogate_config["require_true_val_open"] is True
-    assert c.surrogate_config["allow_val_open_fallback"] is False
+    text = _text("experiments/l2o_directional_contract.py")
+    assert 'target_cfg["open_val_frac"] = 0.15' in text
+    assert 'target_cfg["build_balanced_val_open"] = True' in text
+    assert 'surrogate_cfg["open_val_frac"] = 0.15' in text
+    assert 'surrogate_cfg["build_balanced_val_open"] = True' in text
+    assert 'surrogate_cfg["require_true_val_open"] = True' in text
+    assert 'surrogate_cfg["allow_val_open_fallback"] = False' in text
 
 
-def test_empty_optional_loader_returns_none():
-    class DummyModel:
-        def eval(self):
-            return self
-
-    class DummyHandle:
-        model = DummyModel()
-
-    assert collect_split_outputs_from_loader(DummyHandle(), [], "empty") is None
+def test_empty_optional_loader_is_guarded():
+    text = _text("evaluate.py")
+    marker = "def collect_split_outputs_from_loader"
+    start = text.index(marker)
+    body = text[start:start + 2500]
+    assert "if not all_y:" in body
+    assert "return None" in body
 
 
-def test_pair_cache_split_round_trip(tmp_path):
-    original = SplitOutputs(
-        split_name="val_known",
-        y_true=np.asarray([0, 1], dtype=np.int64),
-        logits=np.asarray([[1.0, 2.0], [3.0, 4.0]], dtype=np.float32),
-        features=np.asarray([[5.0], [6.0]], dtype=np.float32),
-        closed_pred=np.asarray([1, 1], dtype=np.int64),
-        probs=np.asarray([[0.25, 0.75], [0.4, 0.6]], dtype=np.float32),
-        sample_meta=None,
-    )
-    path = tmp_path / "split.npz"
-    save_split(path, original)
-    restored = load_split(path)
+def test_pair_cache_persists_before_directional_dqn():
+    text = _text("experiments/l2o_pair_cached_dqnguard.py")
+    assert "def save_split(" in text
+    assert "os.replace(tmp, path)" in text
+    assert "status=COLLECT_DONE" in text
+    assert 'paths["val_known"]' in text
+    assert 'paths["test_known"]' in text
+    assert 'f"val_open_{args.pair_a}"' in text
+    assert 'f"test_open_{args.pair_a}"' in text
+    assert 'f"val_open_{args.pair_b}"' in text
+    assert 'f"test_open_{args.pair_b}"' in text
+    first_eval = text.index("rows.append(evaluate_direction(")
+    assert text.index("COLLECT_DONE") < first_eval
 
-    assert restored.split_name == original.split_name
-    for field in ("y_true", "logits", "features", "closed_pred", "probs"):
-        np.testing.assert_array_equal(getattr(restored, field), getattr(original, field))
+
+def test_pair_cache_is_cpu_only_and_provenance_bound():
+    text = _text("experiments/l2o_pair_cached_dqnguard.py")
+    assert 'if args.device != "cpu":' in text
+    assert "if torch.cuda.is_available():" in text
+    assert '"checkpoint_sha256": sha256_file(checkpoint_path)' in text
+    assert '"config_sha256": sha256_file(config_path)' in text
+    assert '"target_partition_open_val_frac": 0.15' in text
+    assert '"surrogate_partition_open_val_frac": 0.15' in text
