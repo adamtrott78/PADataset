@@ -11,7 +11,7 @@ def test_registered_cpu_workflow_contains_narrow_cpu_osr_job():
         "runs-on: lambda-padataset-cpu-public",
         "actions: read",
         "contents: read",
-        "pull-requests: read",
+        "pull-requests: write",
         "issues: write",
         "l2o_directional_eval_v1",
         "l2o_eval_request_contract.py",
