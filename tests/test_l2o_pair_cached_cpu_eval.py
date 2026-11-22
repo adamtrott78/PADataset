@@ -69,3 +69,10 @@ def test_pair_cache_progress_reports_rate_and_eta():
     assert "samples={samples_done}/{total_text}" in text
     assert "pct={pct_text}" in text
     assert "now - last_print >= 2.0" in text
+
+
+def test_pair_cache_script_bootstraps_repo_root():
+    text = _text("experiments/l2o_pair_cached_dqnguard.py")
+    assert "REPO_ROOT = Path(__file__).resolve().parents[1]" in text
+    assert "sys.path.insert(0, str(REPO_ROOT))" in text
+    assert text.index("sys.path.insert(0, str(REPO_ROOT))") < text.index("from evaluate import")
