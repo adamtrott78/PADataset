@@ -477,6 +477,31 @@ jobs:
       issues: write
 
     steps:
+      - name: Post PA1-PA2 bridge start marker
+        env:
+          GH_TOKEN: ${{ github.token }}
+          REPOSITORY: ${{ github.repository }}
+          PR_NUMBER: ${{ github.event.issue.number }}
+        shell: bash
+        run: |
+          set -Eeuo pipefail
+          body="$(
+            python3 - <<'PY'
+          import json, os
+          d={
+            "marker":"MTH602_PA1PA2_CPU_BRIDGE_STARTED_V1",
+            "workflow_run_id":int(os.environ["GITHUB_RUN_ID"]),
+          }
+          print("MTH602_PA1PA2_CPU_BRIDGE_STARTED_V1\n\n```json")
+          print(json.dumps(d,sort_keys=True))
+          print("```")
+          PY
+          )"
+          gh api --method POST \
+            -H "Accept: application/vnd.github+json" \
+            "/repos/$REPOSITORY/issues/$PR_NUMBER/comments" \
+            -f body="$body"
+
       - name: Verify exact PA1-PA2 bridge request
         env:
           COMMENT_BODY: ${{ github.event.comment.body }}

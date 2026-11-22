@@ -15,6 +15,7 @@ def test_bridge_is_on_active_scientific_workflow_and_hosted():
         "7c439dc693c96777ec04ded9e76b69a7dc9b8d774cf4192bd502f880cda77f79",
         "mth602-pa1-pa2-t007-cpu-bridge-v1",
         "MTH602_PA1PA2_CPU_BRIDGE_V2",
+        "MTH602_PA1PA2_CPU_BRIDGE_STARTED_V1",
     ]
     for marker in required:
         assert marker in text
