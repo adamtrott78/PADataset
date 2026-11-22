@@ -18,7 +18,7 @@ jobs:
       github.event.comment.author_association == 'OWNER' &&
       startsWith(github.event.comment.body, '/lambda-scientific-2 ')
     runs-on: lambda-padataset-scientific-single-gpu-2
-    timeout-minutes: 240
+    timeout-minutes: 360
 
     steps:
       - name: Verify exact PR head
