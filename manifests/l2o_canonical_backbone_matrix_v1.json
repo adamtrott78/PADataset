@@ -27,18 +27,18 @@
         "PA4",
         "PA8"
       ],
-      "canonical_w4_config": "manifests/configs/l2o_surrogate_matrix_repair_v1/l2o_repair_ref_ent005_lr2e4_tgtPA1_surPA2_c16384_seed0_detv2_w4.json",
+      "canonical_w4_config": "manifests/configs/l2o_t007_fullmatrix_v1/l2o_t007_fullmatrix_PA1_PA2.json",
       "status": "COMPLETE",
       "training_direction": {
         "target": "PA1",
         "surrogate": "PA2"
       },
-      "workflow_run_id": 43823548277,
-      "workflow_job_id": 133151929831,
-      "artifact_id": 14208028365,
-      "candidate_sha": "11338e6c5f9054bd7683658e2ab2fa8ddb5406a5",
-      "best_model_sha256": "6cad772f2b88e8f768ca8c623112e48b980ce1706e4dc6a1ac40a5c826f690f3",
-      "config_sha256": "212381aef96580dafe80ba9d36aacdaea8f01283533bf705840aec93168e9aba",
+      "workflow_run_id": 45047242656,
+      "workflow_job_id": 137284402449,
+      "artifact_id": 14765881457,
+      "candidate_sha": "85bc8cb667a000d3fc544b33f8e96a6775074561",
+      "best_model_sha256": "82effeb4d9f669cfdcc16dca2539149c3d6f5ec5a79901153108d509175b48ee",
+      "config_sha256": "f61293f6877e8d95663003faea3230b736700b1574d63c9f94f7cbbbef39ebb6",
       "directed_cells": [
         {
           "evaluation_target": "PA1",
@@ -49,7 +49,18 @@
           "evaluation_surrogate": "PA1"
         }
       ],
-      "artifact_digest": "sha256:56bc6ba3b124ef2cc042762f7de0f56a0ec19b35986cdffe6a08a6df5a147011"
+      "artifact_digest": "sha256:7c439dc693c96777ec04ded9e76b69a7dc9b8d774cf4192bd502f880cda77f79",
+      "best_epoch": 2,
+      "best_val_macro_f1": 1,
+      "best_val_acc": 1,
+      "test_known_macro_f1": 0.9999259259250115,
+      "test_known_acc": 0.9999259259259259,
+      "test_known_n_samples": 13500,
+      "target_test_consumed": false,
+      "target_quarantine_status": "PRESERVED_FOR_FINAL_FROZEN_EVALUATOR",
+      "hpo_finalist_trial_id": "PA1-PA2__t007__fullmatrix",
+      "hpo_selection_evidence": "known_validation_only",
+      "diagnostic_role": "T007_FULLMATRIX_POST_FREEZE_STANDARD_DQNGUARD_OSR_NO_SELECTION_FEEDBACK"
     },
     {
       "canonical_pair": [
