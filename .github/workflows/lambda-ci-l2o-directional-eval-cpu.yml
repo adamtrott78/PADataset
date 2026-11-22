@@ -74,6 +74,39 @@ jobs:
             echo "request_path=$request_path"
           } >> "$GITHUB_OUTPUT"
 
+      - name: Post CPU evaluator start marker
+        env:
+          REPOSITORY: ${{ github.repository }}
+          PR_NUMBER: ${{ github.event.issue.number }}
+          GH_TOKEN: ${{ github.token }}
+          REQUEST_PATH: ${{ steps.gate.outputs.request_path }}
+        shell: bash
+        run: |
+          set -Eeuo pipefail
+          python3 - "$REPOSITORY" "$PR_NUMBER" "$GH_TOKEN" "$REQUEST_PATH" <<'PY'
+          import json, os, sys, urllib.request
+          repo, pr, token, request_path=sys.argv[1:]
+          payload={
+              "marker":"MTH602_CPU_OSR_STARTED_V1",
+              "workflow_run_id":int(os.environ["GITHUB_RUN_ID"]),
+              "request_path":request_path,
+          }
+          body="MTH602_CPU_OSR_STARTED_V1\n\n```json\n"+json.dumps(payload,sort_keys=True)+"\n```"
+          req=urllib.request.Request(
+              f"https://api.github.com/repos/{repo}/issues/{pr}/comments",
+              data=json.dumps({"body":body}).encode(),
+              headers={
+                  "Accept":"application/vnd.github+json",
+                  "Authorization":f"Bearer {token}",
+                  "X-GitHub-Api-Version":"2022-11-28",
+                  "Content-Type":"application/json",
+              },
+              method="POST",
+          )
+          with urllib.request.urlopen(req,timeout=30) as r:
+              print(r.status)
+          PY
+
       - name: Prove bounded CPU scientific runner
         id: preflight
         shell: bash
