@@ -514,6 +514,9 @@ def collect_split_outputs_from_loader(
         all_probs.append(probs.cpu().numpy())
         all_closed_pred.append(pred.cpu().numpy())
 
+    if not all_y:
+        return None
+
     return SplitOutputs(
         split_name=split_name,
         y_true=np.concatenate(all_y, axis=0),
