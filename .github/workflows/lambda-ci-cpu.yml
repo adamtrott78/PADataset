@@ -668,3 +668,128 @@ jobs:
           with urllib.request.urlopen(req,timeout=30) as r:
               print(r.status)
           PY
+
+  pa1pa2-t007-artifact-bridge:
+    name: "mth602-pa1pa2-t007-artifact-bridge"
+    if: >-
+      github.event.issue.pull_request &&
+      github.event.issue.number == 42 &&
+      github.actor == 'adamtrott78' &&
+      github.event.comment.author_association == 'OWNER' &&
+      startsWith(github.event.comment.body, '/lambda-l2o-eval-cpu ')
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    permissions:
+      actions: read
+      contents: write
+      pull-requests: read
+      issues: write
+
+    steps:
+      - name: Verify exact PA1-PA2 CPU bridge request
+        env:
+          COMMENT_BODY: ${{ github.event.comment.body }}
+          REPOSITORY: ${{ github.repository }}
+          PR_NUMBER: ${{ github.event.issue.number }}
+          GH_TOKEN: ${{ github.token }}
+        shell: bash
+        run: |
+          set -Eeuo pipefail
+          [[ "$(printf '%s\n' "$COMMENT_BODY" | awk 'NF{print NF}')" == "3" ]]
+          expected_sha="$(printf '%s\n' "$COMMENT_BODY" | awk '{print $2}')"
+          request_path="$(printf '%s\n' "$COMMENT_BODY" | awk '{print $3}')"
+
+          [[ "$expected_sha" == "761deab35e728fba99177ae3f09192caf512fbde" ]]
+          case "$request_path" in
+            manifests/configs/l2o_directional_eval_v1/PA1-PA2__targetPA1__surPA2.json|            manifests/configs/l2o_directional_eval_v1/PA1-PA2__targetPA2__surPA1.json) ;;
+            *) echo "PA1-PA2 bridge request rejected" >&2; exit 20 ;;
+          esac
+
+          actual_sha="$(
+            curl -fsSL \
+              -H "Accept: application/vnd.github+json" \
+              -H "Authorization: Bearer $GH_TOKEN" \
+              -H "X-GitHub-Api-Version: 2022-11-28" \
+              "https://api.github.com/repos/$REPOSITORY/pulls/$PR_NUMBER" |
+            python3 -c 'import json,sys; print(json.load(sys.stdin)["head"]["sha"])'
+          )"
+          [[ "$actual_sha" == "$expected_sha" ]]
+
+      - name: Mirror exact PA1-PA2 training artifact to public release asset
+        id: bridge
+        env:
+          GH_TOKEN: ${{ github.token }}
+          REPOSITORY: ${{ github.repository }}
+        shell: bash
+        run: |
+          set -Eeuo pipefail
+          artifact_id=14765881457
+          expected_digest=7c439dc693c96777ec04ded9e76b69a7dc9b8d774cf4192bd502f880cda77f79
+          out=pa1-pa2-t007-artifact-14765881457.zip
+          tag=mth602-pa1-pa2-t007-cpu-bridge-v1
+
+          curl -fL \
+            -H "Accept: application/vnd.github+json" \
+            -H "Authorization: Bearer $GH_TOKEN" \
+            -H "X-GitHub-Api-Version: 2022-11-28" \
+            "https://api.github.com/repos/$REPOSITORY/actions/artifacts/$artifact_id/zip" \
+            -o "$out"
+
+          actual_digest="$(sha256sum "$out" | awk '{print $1}')"
+          [[ "$actual_digest" == "$expected_digest" ]] || {
+            echo "Artifact archive digest mismatch" >&2
+            exit 30
+          }
+
+          if ! gh release view "$tag" --repo "$REPOSITORY" >/dev/null 2>&1; then
+            gh release create "$tag" \
+              --repo "$REPOSITORY" \
+              --target main \
+              --title "MTH602 PA1-PA2 t007 CPU bridge" \
+              --notes "Temporary public transport for provenance-bound PA1-PA2/t007 artifact 14765881457. Scientific source remains GitHub Actions run 45047242656."
+          fi
+
+          gh release upload "$tag" "$out" --repo "$REPOSITORY" --clobber
+
+          url="$(
+            gh release view "$tag" --repo "$REPOSITORY" --json assets \
+              --jq '.assets[] | select(.name=="pa1-pa2-t007-artifact-14765881457.zip") | .url'
+          )"
+          [[ "$url" == https://github.com/* ]]
+
+          {
+            echo "asset_url=$url"
+            echo "artifact_sha256=$actual_digest"
+          } >> "$GITHUB_OUTPUT"
+
+      - name: Post bridge URL
+        env:
+          GH_TOKEN: ${{ github.token }}
+          REPOSITORY: ${{ github.repository }}
+          PR_NUMBER: ${{ github.event.issue.number }}
+          ASSET_URL: ${{ steps.bridge.outputs.asset_url }}
+          ARTIFACT_SHA256: ${{ steps.bridge.outputs.artifact_sha256 }}
+        shell: bash
+        run: |
+          set -Eeuo pipefail
+          body="$(
+            python3 - <<'PY'
+          import json, os
+          d={
+            "marker":"MTH602_PA1PA2_CPU_BRIDGE_V1",
+            "workflow_run_id":int(os.environ["GITHUB_RUN_ID"]),
+            "artifact_id":14765881457,
+            "artifact_sha256":os.environ["ARTIFACT_SHA256"],
+            "asset_url":os.environ["ASSET_URL"],
+          }
+          print("MTH602_PA1PA2_CPU_BRIDGE_V1\n\n```json")
+          print(json.dumps(d,sort_keys=True))
+          print("```")
+          PY
+          )"
+          gh api \
+            --method POST \
+            -H "Accept: application/vnd.github+json" \
+            "/repos/$REPOSITORY/issues/$PR_NUMBER/comments" \
+            -f body="$body"
+
