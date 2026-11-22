@@ -1,0 +1,95 @@
+{
+  "schema": "padataset.l2o-t007-fullmatrix.v1",
+  "purpose": "Uniform 60-epoch t007 backbone qualification across all 10 canonical excluded PA pairs after the known-validation pilot.",
+  "recipe": {
+    "id": "t007",
+    "source_config": "manifests/configs/l2o_hpo_tight60_v1/l2o_hpo_tight60_PA2_PA3_t007.json",
+    "selection_evidence": "known_validation_only",
+    "target_metrics_allowed_for_selection": false,
+    "test_metrics_allowed_for_selection": false,
+    "osr_metrics_allowed_for_selection": false,
+    "params": {
+      "lr": 0.0000704567293035,
+      "weight_decay": 0,
+      "lambda_center": 0.1,
+      "label_smoothing": 0.1,
+      "entropy_loss_weight": 0.1,
+      "mlp_dropout": 0.3,
+      "grad_clip_norm": 0.5,
+      "scheduler_name": "plateau",
+      "batch_size": 8
+    },
+    "epochs": 60,
+    "scheduler_t_max_epochs": null
+  },
+  "existing_pilot_pairs": [
+    {
+      "pair": "PA2-PA3",
+      "status": "COMPLETE",
+      "run_id": 44954728466,
+      "artifact_id": 14736363148
+    },
+    {
+      "pair": "PA2-PA8",
+      "status": "COMPLETE",
+      "run_id": 44600249538,
+      "artifact_id": 14719755202
+    },
+    {
+      "pair": "PA3-PA8",
+      "status": "IN_PROGRESS_IDENTICAL_RERUN",
+      "run_id": 44954748830,
+      "job_id": 137275754026
+    }
+  ],
+  "remaining_pairs": [
+    {
+      "pair": "PA1-PA2",
+      "config": "manifests/configs/l2o_t007_fullmatrix_v1/l2o_t007_fullmatrix_PA1_PA2.json",
+      "planned_lane": "/lambda-scientific",
+      "admission_status": "STAGED_NOT_YET_ADMITTED"
+    },
+    {
+      "pair": "PA1-PA3",
+      "config": "manifests/configs/l2o_t007_fullmatrix_v1/l2o_t007_fullmatrix_PA1_PA3.json",
+      "planned_lane": "/lambda-scientific-2",
+      "admission_status": "STAGED_NOT_YET_ADMITTED"
+    },
+    {
+      "pair": "PA1-PA4",
+      "config": "manifests/configs/l2o_t007_fullmatrix_v1/l2o_t007_fullmatrix_PA1_PA4.json",
+      "planned_lane": "/lambda-scientific",
+      "admission_status": "STAGED_NOT_YET_ADMITTED"
+    },
+    {
+      "pair": "PA1-PA8",
+      "config": "manifests/configs/l2o_t007_fullmatrix_v1/l2o_t007_fullmatrix_PA1_PA8.json",
+      "planned_lane": "/lambda-scientific-2",
+      "admission_status": "STAGED_NOT_YET_ADMITTED"
+    },
+    {
+      "pair": "PA2-PA4",
+      "config": "manifests/configs/l2o_t007_fullmatrix_v1/l2o_t007_fullmatrix_PA2_PA4.json",
+      "planned_lane": "/lambda-scientific",
+      "admission_status": "STAGED_NOT_YET_ADMITTED"
+    },
+    {
+      "pair": "PA3-PA4",
+      "config": "manifests/configs/l2o_t007_fullmatrix_v1/l2o_t007_fullmatrix_PA3_PA4.json",
+      "planned_lane": "/lambda-scientific-2",
+      "admission_status": "STAGED_NOT_YET_ADMITTED"
+    },
+    {
+      "pair": "PA4-PA8",
+      "config": "manifests/configs/l2o_t007_fullmatrix_v1/l2o_t007_fullmatrix_PA4_PA8.json",
+      "planned_lane": "/lambda-scientific",
+      "admission_status": "STAGED_NOT_YET_ADMITTED"
+    }
+  ],
+  "invariants": [
+    "All seven new pairs use the exact t007 optimizer/training hyperparameters and 60-epoch budget.",
+    "Only pair topology, run identity, and provenance metadata differ.",
+    "No target/test/OSR metric may select or modify the t007 recipe, checkpoint, retry, or pair freeze.",
+    "Do not advance this candidate head while exact-head-bound jobs are queued or running."
+  ]
+}
