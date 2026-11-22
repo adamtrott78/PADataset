@@ -108,18 +108,18 @@
         "PA3",
         "PA8"
       ],
-      "canonical_w4_config": "manifests/configs/l2o_surrogate_matrix_repair_v1/l2o_repair_ref_ent005_lr2e4_tgtPA1_surPA4_c16384_seed0_detv2_w4.json",
+      "canonical_w4_config": "manifests/configs/l2o_t007_fullmatrix_v1/l2o_t007_fullmatrix_PA1_PA4.json",
       "status": "COMPLETE",
       "training_direction": {
         "target": "PA1",
         "surrogate": "PA4"
       },
-      "workflow_run_id": 43864994829,
-      "workflow_job_id": 133291147020,
-      "artifact_id": 14234315002,
-      "candidate_sha": "9a2c4959be705eeab71ec8fbe5ba83cbf7b7fb5a",
-      "best_model_sha256": "cc6e1ebee33cc49c76ed4bd4c9e50e56851769c328494357c574e2dbbe44f84b",
-      "config_sha256": "693a06e17aac6a09821ec4048abd595cf1f1e3896b60977a513ee2f11c812550",
+      "workflow_run_id": 45047248043,
+      "workflow_job_id": 137284419157,
+      "artifact_id": 14769480157,
+      "candidate_sha": "85bc8cb667a000d3fc544b33f8e96a6775074561",
+      "best_model_sha256": "b6a45e669799940ec595954badb4ff4afda2b4262b5941a999eba6dd669e8613",
+      "config_sha256": "ff285f8369d739da1213c5fca1bce772f8e56ee33d22cf124f2ac685436f8b27",
       "duplicate_determinism_evidence": {
         "workflow_run_id": 43864996062,
         "workflow_job_id": 133291152101,
@@ -141,7 +141,18 @@
           "evaluation_surrogate": "PA1"
         }
       ],
-      "artifact_digest": "sha256:a12b93da7efe365e372d675d977f8335e6b12bf53d79cc3d81010e2cd001bb7b"
+      "artifact_digest": "sha256:f59f2acff9cf6a1ba865edd59de25dcadae2a6cb9885e898d106e61cf3143fac",
+      "best_epoch": 10,
+      "best_val_macro_f1": 0.9997034066668679,
+      "best_val_acc": 0.9997035060410644,
+      "test_known_macro_f1": 0.9997034726279979,
+      "test_known_acc": 0.9997035499888831,
+      "test_known_n_samples": 13493,
+      "target_test_consumed": false,
+      "target_quarantine_status": "PRESERVED_FOR_FINAL_FROZEN_EVALUATOR",
+      "hpo_finalist_trial_id": "PA1-PA4__t007__fullmatrix",
+      "hpo_selection_evidence": "known_validation_only",
+      "diagnostic_role": "T007_FULLMATRIX_POST_FREEZE_STANDARD_DQNGUARD_OSR_NO_SELECTION_FEEDBACK"
     },
     {
       "canonical_pair": [
