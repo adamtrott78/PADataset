@@ -62,10 +62,80 @@ def collect_and_cache(handle, loader, split_name: str, path: Path) -> SplitOutpu
         print(f"PAIR_CACHE | split={split_name} | status=HIT | n={len(out.y_true)}", flush=True)
         return out
 
-    print(f"PAIR_CACHE | split={split_name} | status=COLLECT_START", flush=True)
-    out = collect_split_outputs_from_loader(handle, loader, split_name)
-    if out is None:
+    total_samples = None
+    try:
+        total_samples = len(loader.dataset)
+    except Exception:
+        total_samples = None
+
+    handle.model.eval()
+    all_y = []
+    all_logits = []
+    all_features = []
+    all_probs = []
+    all_closed_pred = []
+    samples_done = 0
+    t0 = time.time()
+    last_print = 0.0
+
+    print(
+        f"PAIR_CACHE | split={split_name} | status=COLLECT_START"
+        + (f" | total_samples={total_samples}" if total_samples is not None else ""),
+        flush=True,
+    )
+
+    with torch.no_grad():
+        for batch in loader:
+            if len(batch) == 3:
+                x, y, _ = batch
+            else:
+                x, y = batch
+
+            x = x.to(handle.device, non_blocking=True)
+            logits, features = handle.model(x, return_features=True)
+            probs = torch.softmax(logits, dim=1)
+            pred = logits.argmax(dim=1)
+
+            all_y.append(y.cpu().numpy())
+            all_logits.append(logits.cpu().numpy())
+            all_features.append(features.cpu().numpy())
+            all_probs.append(probs.cpu().numpy())
+            all_closed_pred.append(pred.cpu().numpy())
+
+            samples_done += int(len(y))
+            now = time.time()
+            if now - last_print >= 2.0 or (total_samples is not None and samples_done >= total_samples):
+                elapsed = max(now - t0, 1e-9)
+                rate = samples_done / elapsed
+                eta = None
+                if total_samples is not None and rate > 0:
+                    eta = max(0.0, (total_samples - samples_done) / rate)
+                eta_text = "-" if eta is None else time.strftime("%H:%M:%S", time.gmtime(eta))
+                total_text = "?" if total_samples is None else str(total_samples)
+                pct = None if total_samples in (None, 0) else 100.0 * samples_done / total_samples
+                pct_text = "-" if pct is None else f"{pct:6.2f}%"
+                print(
+                    f"PAIR_CACHE_PROGRESS | split={split_name}"
+                    f" | samples={samples_done}/{total_text}"
+                    f" | pct={pct_text}"
+                    f" | samples_per_sec={rate:.2f}"
+                    f" | eta={eta_text}",
+                    flush=True,
+                )
+                last_print = now
+
+    if not all_y:
         raise RuntimeError(f"required split is empty: {split_name}")
+
+    out = SplitOutputs(
+        split_name=split_name,
+        y_true=np.concatenate(all_y, axis=0),
+        logits=np.concatenate(all_logits, axis=0),
+        features=np.concatenate(all_features, axis=0),
+        probs=np.concatenate(all_probs, axis=0),
+        closed_pred=np.concatenate(all_closed_pred, axis=0),
+        sample_meta=None,
+    )
     save_split(path, out)
     print(f"PAIR_CACHE | split={split_name} | status=COLLECT_DONE | n={len(out.y_true)} | path={path}", flush=True)
     return out
