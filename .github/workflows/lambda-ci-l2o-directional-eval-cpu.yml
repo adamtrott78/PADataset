@@ -22,6 +22,39 @@ jobs:
     timeout-minutes: 120
 
     steps:
+      - name: Post raw CPU evaluator run marker
+        env:
+          REPOSITORY: ${{ github.repository }}
+          PR_NUMBER: ${{ github.event.issue.number }}
+          GH_TOKEN: ${{ github.token }}
+          COMMENT_BODY: ${{ github.event.comment.body }}
+        shell: bash
+        run: |
+          set -Eeuo pipefail
+          python3 - "$REPOSITORY" "$PR_NUMBER" "$GH_TOKEN" "$COMMENT_BODY" <<'PY'
+          import json, os, sys, urllib.request
+          repo, pr, token, comment_body=sys.argv[1:]
+          payload={
+              "marker":"MTH602_CPU_OSR_RAW_START_V1",
+              "workflow_run_id":int(os.environ["GITHUB_RUN_ID"]),
+              "comment_body":comment_body,
+          }
+          body="MTH602_CPU_OSR_RAW_START_V1\n\n```json\n"+json.dumps(payload,sort_keys=True)+"\n```"
+          req=urllib.request.Request(
+              f"https://api.github.com/repos/{repo}/issues/{pr}/comments",
+              data=json.dumps({"body":body}).encode(),
+              headers={
+                  "Accept":"application/vnd.github+json",
+                  "Authorization":f"Bearer {token}",
+                  "X-GitHub-Api-Version":"2022-11-28",
+                  "Content-Type":"application/json",
+              },
+              method="POST",
+          )
+          with urllib.request.urlopen(req,timeout=30) as r:
+              print(r.status)
+          PY
+
       - name: Verify exact PR head and bounded request
         id: gate
         env:

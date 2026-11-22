@@ -26,6 +26,7 @@ def test_cpu_osr_workflow_is_narrow_and_cpu_only():
         "PENDING_SAME_BACKBONE_CUDA_REFERENCE",
         "MTH602_CPU_OSR_RESULT_V1",
         "MTH602_CPU_OSR_STARTED_V1",
+        "MTH602_CPU_OSR_RAW_START_V1",
     ]
     for marker in required:
         assert marker in text
