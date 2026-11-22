@@ -59,3 +59,13 @@ def test_pair_cache_is_cpu_only_and_provenance_bound():
     assert '"config_sha256": sha256_file(config_path)' in text
     assert '"target_partition_open_val_frac": 0.15' in text
     assert '"surrogate_partition_open_val_frac": 0.15' in text
+
+
+def test_pair_cache_progress_reports_rate_and_eta():
+    text = _text("experiments/l2o_pair_cached_dqnguard.py")
+    assert "PAIR_CACHE_PROGRESS" in text
+    assert "samples_per_sec=" in text
+    assert "eta=" in text
+    assert "samples={samples_done}/{total_text}" in text
+    assert "pct={pct_text}" in text
+    assert "now - last_print >= 2.0" in text
