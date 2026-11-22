@@ -1,10 +1,10 @@
 from pathlib import Path
 
 ROOT = Path(__file__).resolve().parents[1]
-WF = ROOT / ".github/workflows/lambda-ci-l2o-directional-eval-cpu.yml"
+WF = ROOT / ".github/workflows/lambda-ci-cpu.yml"
 
 
-def test_cpu_osr_workflow_is_narrow_and_cpu_only():
+def test_registered_cpu_workflow_contains_narrow_cpu_osr_job():
     text = WF.read_text(encoding="utf-8")
     required = [
         "startsWith(github.event.comment.body, '/lambda-l2o-eval-cpu ')",
