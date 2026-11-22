@@ -39,6 +39,12 @@ class ScientificDualLaneWorkflowTests(unittest.TestCase):
             self.assertIn(marker, A)
             self.assertIn(marker, B)
 
+    def test_scientific_lanes_allow_six_hour_jobs(self):
+        self.assertIn("timeout-minutes: 360", A)
+        self.assertIn("timeout-minutes: 360", B)
+        self.assertNotIn("timeout-minutes: 240", A)
+        self.assertNotIn("timeout-minutes: 240", B)
+
     def test_lane_b_artifacts_are_namespaced(self):
         self.assertIn("name: padataset-scientific-2-${{ github.run_id }}", B)
 
