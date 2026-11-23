@@ -220,7 +220,7 @@
       "artifact_digest": "sha256:3419dd982709fccdfccce0a044260542a904ce9c86e1c4ef4e8e8bcb76c96b4d",
       "candidate_sha": "da521eaee997c56012290c9c261ee1831432ebbc",
       "best_model_sha256": "39d919f1203c76358fded8e67cd85fc2047a7d4cc884d14eb516ff1e08995341",
-      "config_sha256": "2886a7c76591d362c98e7956071a5fff57b455314a1a239ac1524f869ac46926",
+      "config_sha256": "2886a7c76591b362c98e7956071a5fff57b455314a1a239ac1524f869ac46926",
       "best_epoch": 25,
       "best_val_macro_f1": 0.9935446126501883,
       "best_val_acc": 0.9935483870967742,
