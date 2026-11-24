@@ -1,0 +1,16 @@
+{
+  "schema": "padataset.l2o-directional-eval-request.v1",
+  "policy_id": "l2o_dqnguard_track_a_frozen_v1",
+  "canonical_matrix": "manifests/l2o_canonical_backbone_matrix_v1.json",
+  "evaluation_policy": "manifests/l2o_directional_eval_policy_v1.json",
+  "canonical_key": "PA1-PA3",
+  "artifact_id": 14783316485,
+  "artifact_digest": "sha256:75f307066bb408a10850ba9942293886e3fb07bdf0c2201f05f9b11be859973e",
+  "evaluation_target": "PA1",
+  "evaluation_surrogate": "PA3",
+  "checkpoint": "best_model",
+  "target_labels_used_for_tuning": false,
+  "status": "READY_FOR_BOUNDED_EVALUATOR",
+  "analysis_mode": "selector_geometry_pair_v1",
+  "diagnostic_role": "POST_FREEZE_HISTORICAL_RULE_BC_REPLICATION_NO_SELECTION_FEEDBACK"
+}

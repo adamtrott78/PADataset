@@ -202,7 +202,25 @@ def main():
     ap.add_argument("--batch-size", type=int, default=128)
     ap.add_argument("--num-workers", type=int, default=0)
     ap.add_argument("--data-root", default=None)
+    ap.add_argument("--selector-geometry-pair-only", action="store_true")
     args = ap.parse_args()
+
+    if args.selector_geometry_pair_only:
+        from experiments.l2o_selector_geometry_pair_v1 import run_selector_geometry_pair
+        run_selector_geometry_pair(
+            run_dir=args.run_dir,
+            checkpoint=args.checkpoint,
+            out_dir=args.out_dir,
+            evaluation_target=args.target_open_pa,
+            evaluation_surrogate=args.surrogate_open_pa,
+            known_cap=args.known_cap,
+            open_cap=args.open_cap,
+            device=args.device,
+            batch_size=args.batch_size,
+            num_workers=args.num_workers,
+            data_root=args.data_root,
+        )
+        return
 
     t0 = time.time()
     out_dir = Path(args.out_dir)

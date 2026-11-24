@@ -16,6 +16,7 @@ class DirectionalEvalRequest:
     evaluation_target: str
     evaluation_surrogate: str
     checkpoint: str
+    analysis_mode: str | None
     evaluator_args: Tuple[str, ...]
 
 
@@ -62,6 +63,9 @@ def resolve_directional_eval_request(
         raise ValueError("request is not ready for bounded evaluator")
     if request.get("target_labels_used_for_tuning") is not False:
         raise ValueError("request must prohibit target labels for tuning")
+    analysis_mode = request.get("analysis_mode")
+    if analysis_mode not in {None, "selector_geometry_pair_v1"}:
+        raise ValueError(f"unsupported analysis_mode: {analysis_mode!r}")
 
     row = _find_row(matrix, str(request.get("canonical_key")))
     if int(request.get("artifact_id", -1)) != int(row.get("artifact_id", -2)):
@@ -111,6 +115,8 @@ def resolve_directional_eval_request(
         "--batch-size", str(int(policy["batch_size"])),
         "--num-workers", str(int(policy["num_workers"])),
     ]
+    if analysis_mode == "selector_geometry_pair_v1":
+        args.append("--selector-geometry-pair-only")
 
     # Deliberately never add --mix-true-open. Target-open examples are final
     # evaluation evidence only; they are forbidden from DQN fitting/thresholding.
@@ -121,6 +127,7 @@ def resolve_directional_eval_request(
         evaluation_target=target,
         evaluation_surrogate=surrogate,
         checkpoint=str(policy["checkpoint"]),
+        analysis_mode=analysis_mode,
         evaluator_args=tuple(args),
     )
 
@@ -148,6 +155,7 @@ def main() -> None:
         "evaluation_target": resolved.evaluation_target,
         "evaluation_surrogate": resolved.evaluation_surrogate,
         "checkpoint": resolved.checkpoint,
+        "analysis_mode": resolved.analysis_mode,
         "evaluator_args": list(resolved.evaluator_args),
     }, sort_keys=True))
 

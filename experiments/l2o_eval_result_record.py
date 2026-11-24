@@ -58,12 +58,71 @@ def build_result_record(
         raise ValueError("artifact digest mismatch")
 
     df = pd.read_csv(summary_csv)
+
+    target = str(request["evaluation_target"])
+    surrogate = str(request["evaluation_surrogate"])
+    analysis_mode = request.get("analysis_mode")
+
+    if analysis_mode == "selector_geometry_pair_v1":
+        if len(df) != 2:
+            raise ValueError(f"selector geometry requires exactly two directional rows, got {len(df)}")
+        if set(df.get("analysis_mode", [])) != {"selector_geometry_pair_v1"}:
+            raise ValueError("selector geometry analysis_mode mismatch")
+        got = set(zip(df["target"].astype(str), df["surrogate"].astype(str)))
+        expected = {(target, surrogate), (surrogate, target)}
+        if got != expected:
+            raise ValueError(f"selector geometry directions mismatch: got={got!r} expected={expected!r}")
+        required = [
+            "known_p1_mean", "sur_p1_mean", "p1_drop_known_minus_sur",
+            "known_gap_mean", "sur_gap_mean", "gap_drop_known_minus_sur",
+            "known_entropy_mean", "sur_entropy_mean", "entropy_rise_sur_minus_known",
+            "confidence_geometry_score", "sur_centroid_margin_median",
+            "surrogate_known_distance_ratio", "feature_distance_score",
+            "feature_boundary_score", "target_labels_used_for_tuning",
+        ]
+        missing = [name for name in required if name not in df.columns]
+        if missing:
+            raise ValueError(f"selector geometry fields missing: {missing!r}")
+        for value in df["target_labels_used_for_tuning"]:
+            if str(value).strip().lower() not in {"false", "0"}:
+                raise ValueError("selector geometry reports target-label tuning")
+        record = {
+            "schema": "padataset.l2o-selector-geometry-result.v1",
+            "status": "COMPLETE",
+            "analysis_mode": analysis_mode,
+            "policy_id": policy["policy_id"],
+            "canonical_key": backbone["canonical_key"],
+            "canonical_pair": list(backbone["canonical_pair"]),
+            "known_pas": list(backbone["known_pas"]),
+            "artifact": {
+                "id": int(backbone["artifact_id"]),
+                "digest": backbone["artifact_digest"],
+                "workflow_run_id": int(backbone["workflow_run_id"]),
+                "workflow_job_id": int(backbone["workflow_job_id"]),
+                "candidate_sha": backbone["candidate_sha"],
+                "best_model_sha256": backbone["best_model_sha256"],
+                "config_sha256": backbone["config_sha256"],
+            },
+            "checkpoint": request["checkpoint"],
+            "provenance": {
+                "target_labels_used_for_tuning": False,
+                "target_test_consumed": False,
+                "frozen_historical_formulas": True,
+                "known_cap": int(policy["known_cap"]),
+                "open_cap": int(policy["open_cap"]),
+            },
+            "rows": df.to_dict(orient="records"),
+        }
+        output_path.parent.mkdir(parents=True, exist_ok=True)
+        output_path.write_text(json.dumps(record, indent=2, sort_keys=True) + "\n", encoding="utf-8")
+        return record
+
+    if analysis_mode is not None:
+        raise ValueError(f"unsupported analysis_mode: {analysis_mode!r}")
     if len(df) != 1:
         raise ValueError(f"expected exactly one evaluator summary row, got {len(df)}")
     row = df.iloc[0].to_dict()
 
-    target = str(request["evaluation_target"])
-    surrogate = str(request["evaluation_surrogate"])
     if str(row.get("surrogate_open_pa")) != surrogate:
         raise ValueError("evaluator surrogate mismatch")
 
