@@ -7,6 +7,13 @@ WORKFLOWS = [
 ]
 
 
+def _global_permissions_text(text: str) -> str:
+    lines = text.splitlines()
+    start = next(i for i, line in enumerate(lines) if line == "permissions:")
+    end = next(i for i in range(start + 1, len(lines)) if lines[i] == "jobs:")
+    return "\n".join(lines[start:end])
+
+
 def _primary_job_text(text: str, job_key: str) -> str:
     lines = text.splitlines()
     start = next(i for i, line in enumerate(lines) if line == f"  {job_key}:")
@@ -74,12 +81,14 @@ def test_control_path_uses_read_only_scientific_permissions_and_trusted_data():
         text = path.read_text(encoding="utf-8")
         job_key = "padataset-scientific-2" if path.name.endswith("-2.yml") else "padataset-scientific"
         primary = _primary_job_text(text, job_key)
-        assert "actions: read" in primary
-        assert "contents: read" in primary
-        assert "pull-requests: read" in primary
-        assert "contents: write" not in primary
-        assert "actions: write" not in primary
-        assert "pull-requests: write" not in primary
+        global_permissions = _global_permissions_text(text)
+        assert "actions: read" in global_permissions
+        assert "contents: read" in global_permissions
+        assert "pull-requests: read" in global_permissions
+        assert "contents: write" not in global_permissions
+        assert "actions: write" not in global_permissions
+        assert "pull-requests: write" not in global_permissions
+        assert "permissions:" not in primary
         control = text[text.index('elif [[ "$OPERATION" == "l2o_control_eval" ]]'):]
         assert '--data-root "$TRUSTED_DATA"' in control
 
