@@ -12,7 +12,6 @@ import torch
 
 from osr_core import load_backbone_run
 from evaluate import (
-    build_osr_eval_bundle,
     collect_split_outputs_from_loader,
     _make_setup_from_run_config,
 )
@@ -165,17 +164,33 @@ def run_selector_geometry_pair(
     directional_handle.setup = None
     directional_handle.unknown_pas = [forward.evaluation_target]
 
-    payload, _extras = build_osr_eval_bundle(
-        directional_handle,
+    # Historical Rule B/C only consume known validation and surrogate-open
+    # validation. Build exactly the same target split, but do not materialize
+    # test_known/test_open because they are not inputs to either rule.
+    setup = _make_setup_from_run_config(forward.target_config, data_root=data_root)
+    data = build_data_from_setup(
+        setup,
         batch_size=batch_size,
         num_workers=num_workers,
         pin_memory=True,
-        data_root=data_root,
     )
+    try:
+        known_full = collect_split_outputs_from_loader(
+            directional_handle, data["val_loader"], "val_known"
+        )
+    finally:
+        try:
+            if hasattr(data.get("dataset", None), "close"):
+                data["dataset"].close()
+        except Exception:
+            pass
+        del data
+        if torch.cuda.is_available():
+            torch.cuda.empty_cache()
 
-    seed = int(payload.meta.get("seed", 0) or 0)
+    seed = int(handle.config.get("seed", 0) or 0)
     known_cal = cap_split(
-        payload.val_known, known_cap, seed + 101, True, "cap_known"
+        known_full, known_cap, seed + 101, True, "cap_known"
     )
 
     rows = []
