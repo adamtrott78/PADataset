@@ -390,8 +390,31 @@
           "evaluation_surrogate": "PA3"
         }
       ],
-      "status": "PENDING_BACKBONE",
-      "pending_reason": "Current exact t007 rerun 45100307460 is still training on GPU0; do not evaluate an older PA3-PA8 artifact."
+      "status": "COMPLETE",
+      "canonical_w4_config": "manifests/configs/l2o_hpo_tight60_v1/l2o_hpo_tight60_PA3_PA8_t007.json",
+      "training_direction": {
+        "target": "PA3",
+        "surrogate": "PA8"
+      },
+      "workflow_run_id": 45273831156,
+      "workflow_job_id": 138040300764,
+      "artifact_id": 14880924639,
+      "artifact_digest": "sha256:8aa657cc305cc989cf1bcf988ef1466b79f1b3403c973de77dd0edd20cd1191b",
+      "candidate_sha": "da521eaee997c56012290c9c261ee1831432ebbc",
+      "best_model_sha256": "bd7fc0d2d48d55e5ac0d21aeeaf67a24de292f09f46d2866b6af8212e0c3b49c",
+      "config_sha256": "447622e1edbea11e126a0774a72c99f3c81cfed8989e92184eedd21e5e133522",
+      "best_epoch": 59,
+      "best_val_macro_f1": 0.993767333813158,
+      "best_val_acc": 0.993766696349065,
+      "test_known_macro_f1": 0.9939164551116267,
+      "test_known_acc": 0.9939164626455969,
+      "test_known_n_samples": 13479,
+      "target_test_consumed": false,
+      "target_quarantine_status": "PRESERVED_FOR_FINAL_FROZEN_EVALUATOR",
+      "hpo_finalist_trial_id": "PA3-PA8__t007__tight60",
+      "hpo_selection_evidence": "known_validation_only",
+      "diagnostic_role": "T007_POST_FREEZE_STANDARD_DQNGUARD_OSR_NO_SELECTION_FEEDBACK",
+      "elapsed_sec": 14510
     },
     {
       "canonical_pair": [
