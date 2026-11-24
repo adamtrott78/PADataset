@@ -4,11 +4,12 @@
   "canonical_matrix": "manifests/l2o_canonical_backbone_matrix_v1.json",
   "evaluation_policy": "manifests/l2o_directional_eval_policy_v1.json",
   "canonical_key": "PA4-PA8",
-  "artifact_id": 14248615297,
-  "artifact_digest": "sha256:2ae0fc6ed66b02019c6a5b2b56bd2cf633056226dc779721f60ce01ed80c0fb7",
+  "artifact_id": 14773056923,
+  "artifact_digest": "sha256:a954478e8c7c644a9122dfd525e4928c02c8866fe874d9a67039d54f60e6c57e",
   "evaluation_target": "PA8",
   "evaluation_surrogate": "PA4",
   "checkpoint": "best_model",
   "target_labels_used_for_tuning": false,
-  "status": "READY_FOR_BOUNDED_EVALUATOR"
+  "status": "READY_FOR_BOUNDED_EVALUATOR",
+  "diagnostic_role": "T007_POST_FREEZE_STANDARD_DQNGUARD_OSR_NO_SELECTION_FEEDBACK"
 }

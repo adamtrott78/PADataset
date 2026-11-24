@@ -11,5 +11,5 @@
   "checkpoint": "best_model",
   "target_labels_used_for_tuning": false,
   "status": "READY_FOR_BOUNDED_EVALUATOR",
-  "diagnostic_role": "T007_POST_KNOWN_VALIDATION_FREEZE_OSR_ONLY_NO_SELECTION_FEEDBACK"
+  "diagnostic_role": "T007_POST_FREEZE_STANDARD_DQNGUARD_OSR_NO_SELECTION_FEEDBACK"
 }
