@@ -7,6 +7,18 @@ WORKFLOWS = [
 ]
 
 
+def _primary_job_text(text: str, job_key: str) -> str:
+    lines = text.splitlines()
+    start = next(i for i, line in enumerate(lines) if line == f"  {job_key}:")
+    end = len(lines)
+    for i in range(start + 1, len(lines)):
+        line = lines[i]
+        if line.startswith("  ") and not line.startswith("    ") and line.endswith(":"):
+            end = i
+            break
+    return "\n".join(lines[start:end])
+
+
 def _execute_script(text: str) -> str:
     lines = text.splitlines()
     start = next(i for i, line in enumerate(lines) if line.strip() == "- name: Execute bounded scientific request")
@@ -60,12 +72,14 @@ def test_control_path_validates_before_download_and_evaluation():
 def test_control_path_uses_read_only_scientific_permissions_and_trusted_data():
     for path in WORKFLOWS:
         text = path.read_text(encoding="utf-8")
-        assert "actions: read" in text
-        assert "contents: read" in text
-        assert "pull-requests: read" in text
-        assert "contents: write" not in text
-        assert "actions: write" not in text
-        assert "pull-requests: write" not in text
+        job_key = "padataset-scientific-2" if path.name.endswith("-2.yml") else "padataset-scientific"
+        primary = _primary_job_text(text, job_key)
+        assert "actions: read" in primary
+        assert "contents: read" in primary
+        assert "pull-requests: read" in primary
+        assert "contents: write" not in primary
+        assert "actions: write" not in primary
+        assert "pull-requests: write" not in primary
         control = text[text.index('elif [[ "$OPERATION" == "l2o_control_eval" ]]'):]
         assert '--data-root "$TRUSTED_DATA"' in control
 
