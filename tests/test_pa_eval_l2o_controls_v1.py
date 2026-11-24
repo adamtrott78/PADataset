@@ -31,3 +31,19 @@ def test_policy_has_no_dqnguard_band_or_threshold_fields_for_dqn_control():
     source = EVALUATOR.read_text(encoding="utf-8")
     assert "known-only percentile" not in source.lower()
     assert "score_threshold" not in source
+
+
+def test_target_test_is_not_materialized_until_both_controls_are_fitted():
+    source = EVALUATOR.read_text(encoding="utf-8")
+    marker = "TARGET_TEST_FIRST_CONSUMPTION_AFTER_BOTH_CONTROLS_FROZEN"
+    assert marker in source
+    freeze = source.index(marker)
+    dqn_fit = source.index("dqn.fit(calibration_payload")
+    varmax_fit = source.index("varmax.fit(calibration_payload")
+    final_bundle = source.index("evaluation_payload, _ = build_osr_eval_bundle(", freeze)
+    assert dqn_fit < freeze
+    assert varmax_fit < freeze
+    assert freeze < final_bundle
+    calibration_helper = source[source.index("def build_target_calibration_payload"):source.index("def _metrics")]
+    assert "test_known_loader" not in calibration_helper
+    assert "test_open_loader" not in calibration_helper
