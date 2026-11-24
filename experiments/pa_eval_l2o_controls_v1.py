@@ -3,6 +3,7 @@ from __future__ import annotations
 
 import argparse
 import copy
+import gc
 import json
 import sys
 import time
@@ -13,10 +14,16 @@ REPO_ROOT = Path(__file__).resolve().parents[1]
 sys.path.insert(0, str(REPO_ROOT))
 
 import pandas as pd
+import torch
 
 from dqn_osr import DQNOSR
-from evaluate import build_osr_eval_bundle
-from osr_core import evaluate_osr_predictions, load_backbone_run
+from evaluate import (
+    build_osr_eval_bundle,
+    collect_split_outputs_from_loader,
+    _make_setup_from_run_config,
+)
+from osr_core import BackbonePayload, evaluate_osr_predictions, load_backbone_run
+from prepData import build_data_from_setup
 from varmax_osr import VarMaxOSR
 from experiments.l2o_directional_contract import resolve_directional_l2o_contract
 from experiments.pa_eval_dqn_guard_surrogate_open import build_surrogate_open_split, cap_split
@@ -98,6 +105,71 @@ def make_varmax_control(policy: Dict[str, Any]) -> VarMaxOSR:
     )
 
 
+def _payload_meta(handle):
+    return {
+        "run_name": handle.run_name,
+        "run_dir": handle.run_dir,
+        "checkpoint_tag": handle.checkpoint_tag,
+        "unknown_pas": handle.unknown_pas,
+        "class_names": handle.class_names,
+        "num_classes": handle.num_classes,
+        "cache_len": handle.config.get("cache_len"),
+        "seed": handle.config.get("seed"),
+        "epochs": handle.config.get("epochs"),
+        "source_type": handle.config.get("source_type", "digital"),
+        "source_name": handle.config.get("source_name", "pilot_noisy_torch"),
+        "dataset_tag": handle.config.get("dataset_tag"),
+        "noise_tag": handle.config.get("noise_tag"),
+    }
+
+
+def build_target_calibration_payload(
+    handle,
+    *,
+    batch_size: int,
+    num_workers: int,
+    data_root: str | None,
+):
+    """Collect only known validation evidence; do not iterate target-test loaders."""
+    setup = _make_setup_from_run_config(handle.config, data_root=data_root)
+    data = build_data_from_setup(
+        setup,
+        batch_size=batch_size,
+        num_workers=num_workers,
+        pin_memory=True,
+    )
+    try:
+        known = collect_split_outputs_from_loader(handle, data["val_loader"], "val_known_control_fit")
+        balanced_loader = data.get("val_known_balanced_loader", None)
+        balanced = (
+            collect_split_outputs_from_loader(handle, balanced_loader, "val_known_balanced_control_fit")
+            if balanced_loader is not None
+            else None
+        )
+        payload = BackbonePayload(
+            meta=_payload_meta(handle),
+            val_known=known,
+            test_known=None,
+            test_open=None,
+        )
+        extras = {
+            "val_known_balanced": balanced,
+            "val_open": None,
+            "val_open_balanced": None,
+        }
+        return payload, extras
+    finally:
+        try:
+            if hasattr(data.get("dataset", None), "close"):
+                data["dataset"].close()
+        except Exception:
+            pass
+        del data
+        gc.collect()
+        if torch.cuda.is_available():
+            torch.cuda.empty_cache()
+
+
 def _metrics(method, payload):
     unknown_label = int(payload.meta["num_classes"])
     known_pred = method.predict(payload.test_known, unknown_label=unknown_label)
@@ -166,11 +238,10 @@ def run_controls(
     directional_handle.setup = None
     directional_handle.unknown_pas = [contract.evaluation_target]
 
-    payload, extras = build_osr_eval_bundle(
+    calibration_payload, calibration_extras = build_target_calibration_payload(
         directional_handle,
         batch_size=batch_size,
         num_workers=num_workers,
-        pin_memory=True,
         data_root=data_root,
     )
 
@@ -186,32 +257,45 @@ def run_controls(
     dqn_cfg = policy["controls"]["dqn_ids_style"]
     known_cap = int(dqn_cfg["known_cap"])
     open_cap = int(dqn_cfg["open_cap"])
-    if len(payload.val_known.y_true) < known_cap:
+    if len(calibration_payload.val_known.y_true) < known_cap:
         raise ValueError("insufficient known validation samples for exact DQN cap")
     if len(surrogate_open.y_true) < open_cap:
         raise ValueError("insufficient surrogate validation samples for exact DQN cap")
 
-    seed = int(payload.meta.get("seed", 0) or 0)
-    known_cal = cap_split(payload.val_known, known_cap, seed + 101, True, "control_cap_known")
+    seed = int(calibration_payload.meta.get("seed", 0) or 0)
+    known_cal = cap_split(calibration_payload.val_known, known_cap, seed + 101, True, "control_cap_known")
     open_cal = cap_split(surrogate_open, open_cap, seed + 202, False, "control_cap_surrogate")
     if len(known_cal.y_true) != known_cap or len(open_cal.y_true) != open_cap:
         raise ValueError("DQN control calibration caps are not exact")
 
     # Freeze/finalize both controls before target-test evaluation.
     dqn = make_dqn_control(policy)
-    dqn.fit(payload, calibration={
+    dqn.fit(calibration_payload, calibration={
         "calibration_mode": "external_surrogate_cap625",
         "calibration_known": known_cal,
         "calibration_open": open_cal,
     })
 
     varmax = make_varmax_control(policy)
-    varmax_cal = build_varmax_calibration(payload, extras, policy)
-    varmax.fit(payload, calibration=varmax_cal)
+    varmax_cal = build_varmax_calibration(calibration_payload, calibration_extras, policy)
+    varmax.fit(calibration_payload, calibration=varmax_cal)
 
-    # Target test is consumed only after both control fits are complete.
-    dqn_metrics = _metrics(dqn, payload)
-    varmax_metrics = _metrics(varmax, payload)
+    # TARGET_TEST_FIRST_CONSUMPTION_AFTER_BOTH_CONTROLS_FROZEN
+    # Only now materialize target known/test-open outputs for final evaluation.
+    evaluation_payload, _ = build_osr_eval_bundle(
+        directional_handle,
+        batch_size=batch_size,
+        num_workers=num_workers,
+        pin_memory=True,
+        data_root=data_root,
+    )
+    if evaluation_payload.meta["class_names"] != calibration_payload.meta["class_names"]:
+        raise ValueError("evaluation class ordering drift after control freeze")
+    if evaluation_payload.meta["unknown_pas"] != calibration_payload.meta["unknown_pas"]:
+        raise ValueError("evaluation target identity drift after control freeze")
+
+    dqn_metrics = _metrics(dqn, evaluation_payload)
+    varmax_metrics = _metrics(varmax, evaluation_payload)
 
     dqn_fit = copy.deepcopy(getattr(dqn, "last_fit_summary_", {}))
     vm_best = copy.deepcopy(getattr(varmax, "best_sweep_result_", None)) or {}
