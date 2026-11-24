@@ -9,7 +9,7 @@ import pandas as pd
 
 from experiments.l2o_eval_request_contract import resolve_directional_eval_request
 from experiments.l2o_eval_result_record import build_result_record
-from experiments.l2o_selector_geometry_pair_v1 import (
+from experiments.l2o_selector_geometry_metrics_v1 import (
     summarize_confidence,
     summarize_feature_geometry,
 )
