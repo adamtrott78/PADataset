@@ -20,7 +20,12 @@ def test_trusted_lane_b_retains_existing_route_and_adds_only_bounded_l2o_op():
         "train_backbone:manifests/configs/",
         "stage03_archc:manifests/configs/",
         "l2o_directional_eval:manifests/configs/l2o_directional_eval_v1/",
-        'op not in {"train_backbone", "stage03_archc", "l2o_directional_eval"}',
+        'op not in {"train_backbone", "stage03_archc", "l2o_directional_eval", "l2o_control_eval", "archb_cross_surrogate"}',
+        "l2o_control_eval:manifests/configs/l2o_control_eval_v1/",
+        "experiments/l2o_control_request_contract.py",
+        "experiments/l2o_control_artifact_transport_contract.py",
+        "experiments/pa_eval_l2o_controls_v1.py",
+        "experiments/l2o_control_eval_result_record.py",
     ]
     for marker in required:
         assert marker in text, marker
