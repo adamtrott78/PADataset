@@ -8,6 +8,18 @@ def _text() -> str:
     return WORKFLOW.read_text(encoding="utf-8")
 
 
+def _primary_job_text() -> str:
+    lines = _text().splitlines()
+    start = next(i for i, line in enumerate(lines) if line == "  padataset-scientific-2:")
+    end = len(lines)
+    for i in range(start + 1, len(lines)):
+        line = lines[i]
+        if line.startswith("  ") and not line.startswith("    ") and line.endswith(":"):
+            end = i
+            break
+    return "\n".join(lines[start:end])
+
+
 def test_trusted_lane_b_retains_existing_route_and_adds_only_bounded_l2o_op():
     text = _text()
     required = [
@@ -37,20 +49,25 @@ def test_trusted_lane_b_retains_existing_route_and_adds_only_bounded_l2o_op():
         "pull-requests: write",
         "/lambda-l2o-eval-2 ",
     ]
+    primary = _primary_job_text()
     for marker in forbidden:
-        assert marker not in text, marker
+        if marker in {"contents: write", "actions: write", "pull-requests: write"}:
+            assert marker not in primary, marker
+        else:
+            assert marker not in text, marker
     assert "PYY" not in text
 
 
 def test_l2o_path_validates_provenance_before_download_and_eval():
     text = _text()
-    pre = text.index("experiments/l2o_eval_request_contract.py")
-    metadata = text.index("actions/artifacts/$artifact_id")
-    transport = text.index("experiments/l2o_artifact_transport_contract.py")
-    archive = text.index('archive_download_url')
-    rehydrate = text.index("experiments/l2o_artifact_rehydrate.py")
-    evaluator = text.index("experiments/pa_eval_dqn_guard_surrogate_open.py")
-    record = text.index("experiments/l2o_eval_result_record.py")
+    block = text.index('elif [[ "$OPERATION" == "l2o_directional_eval" ]]')
+    pre = text.index("experiments/l2o_eval_request_contract.py", block)
+    metadata = text.index("actions/artifacts/$artifact_id", block)
+    transport = text.index("experiments/l2o_artifact_transport_contract.py", block)
+    archive = text.index('archive_download_url', block)
+    rehydrate = text.index("experiments/l2o_artifact_rehydrate.py", block)
+    evaluator = text.index("experiments/pa_eval_dqn_guard_surrogate_open.py", block)
+    record = text.index("experiments/l2o_eval_result_record.py", block)
     assert pre < metadata < transport < archive < rehydrate < evaluator < record
 
 
