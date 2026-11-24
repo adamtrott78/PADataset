@@ -45,7 +45,8 @@ jobs:
           if [[ "$request_token" != "smoke" ]] &&
              [[ ! "$request_token" =~ ^train_backbone:manifests/configs/[A-Za-z0-9_./-]+\.json$ ]] &&
              [[ ! "$request_token" =~ ^stage03_archc:manifests/configs/[A-Za-z0-9_./-]+\.json$ ]] &&
-             [[ ! "$request_token" =~ ^l2o_directional_eval:manifests/configs/l2o_directional_eval_v1/[A-Za-z0-9_.-]+\.json$ ]]; then
+             [[ ! "$request_token" =~ ^l2o_directional_eval:manifests/configs/l2o_directional_eval_v1/[A-Za-z0-9_.-]+\.json$ ]] &&
+             [[ ! "$request_token" =~ ^l2o_control_eval:manifests/configs/l2o_control_eval_v1/[A-Za-z0-9_.-]+\.json$ ]]; then
             echo "Scientific request token rejected" >&2
             exit 23
           fi
@@ -158,7 +159,7 @@ jobs:
               config_path = ""
           elif ":" in request_token:
               op, config_path = request_token.split(":", 1)
-              if op not in {"train_backbone", "stage03_archc", "l2o_directional_eval"}:
+              if op not in {"train_backbone", "stage03_archc", "l2o_directional_eval", "l2o_control_eval"}:
                   raise SystemExit(f"unsupported scientific operation: {op!r}")
               root = pathlib.Path.cwd().resolve()
               resolved = (root / config_path).resolve()
@@ -191,6 +192,41 @@ jobs:
                       raise SystemExit("directional evaluator checkpoint drift")
                   if req.get("target_labels_used_for_tuning") is not False:
                       raise SystemExit("directional evaluator permits target tuning")
+              elif op == "l2o_control_eval":
+                  if not re.fullmatch(
+                      r"manifests/configs/l2o_control_eval_v1/[A-Za-z0-9_.-]+\.json",
+                      config_path,
+                  ):
+                      raise SystemExit("control evaluator request path rejected")
+                  allowed = (root / "manifests" / "configs" / "l2o_control_eval_v1").resolve()
+                  try:
+                      resolved.relative_to(allowed)
+                  except ValueError:
+                      raise SystemExit("control evaluator request path escape")
+                  req = json.loads(resolved.read_text())
+                  if req.get("schema") != "padataset.l2o-control-eval-request.v1":
+                      raise SystemExit("control evaluator request schema mismatch")
+                  if req.get("status") != "READY_FOR_BOUNDED_CONTROL_EVALUATOR":
+                      raise SystemExit("control evaluator request is not ready")
+                  if req.get("policy_id") != "l2o_repaired_controls_frozen_v1":
+                      raise SystemExit("control evaluator policy_id drift")
+                  if req.get("canonical_matrix") != "manifests/l2o_canonical_backbone_matrix_v1.json":
+                      raise SystemExit("control evaluator canonical matrix drift")
+                  if req.get("control_plan") != "manifests/l2o_control_matrix_plan_v1.json":
+                      raise SystemExit("control evaluator plan path drift")
+                  if req.get("evaluation_policy") != "manifests/l2o_control_eval_policy_v1.json":
+                      raise SystemExit("control evaluator policy path drift")
+                  if req.get("checkpoint") != "best_model":
+                      raise SystemExit("control evaluator checkpoint drift")
+                  if req.get("target_labels_used_for_tuning") is not False:
+                      raise SystemExit("control evaluator permits target tuning")
+                  if req.get("target_test_consumed_before_final_eval") is not False:
+                      raise SystemExit("control evaluator permits pre-final target-test use")
+                  if req.get("controls") != [
+                      "dqn_ids_style_softmax3_external_surrogate_cap625_v1",
+                      "varmax_surrogate_all_smoke_matched_l2o_v1",
+                  ]:
+                      raise SystemExit("control evaluator method set drift")
               else:
                   if not re.fullmatch(
                       r"manifests/configs/[A-Za-z0-9_./-]+\.json", config_path
@@ -358,6 +394,96 @@ jobs:
             cp "$artifact_metadata" "$eval_dir/artifact-metadata.json"
             cp "$RUNNER_TEMP/l2o-transport-binding.json" "$eval_dir/artifact-transport-binding.json"
             cp "$RUNNER_TEMP/l2o-rehydrate.json" "$eval_dir/rehydration.json"
+            cp "$resolved" "$eval_dir/resolved-request.json"
+          elif [[ "$OPERATION" == "l2o_control_eval" ]]; then
+            request_path="$CONFIG_PATH"
+            matrix_path="manifests/l2o_canonical_backbone_matrix_v1.json"
+            plan_path="manifests/l2o_control_matrix_plan_v1.json"
+            policy_path="manifests/l2o_control_eval_policy_v1.json"
+            eval_dir="$result_root/l2o_control_eval"
+            mkdir -p "$eval_dir"
+
+            pre_resolved="$RUNNER_TEMP/l2o-control-pre-resolved.json"
+            "$runtime_python" experiments/l2o_control_request_contract.py \
+              --request "$request_path" \
+              --matrix "$matrix_path" \
+              --plan "$plan_path" \
+              --policy "$policy_path" \
+              --run-dir "$RUNNER_TEMP/unmaterialized-backbone" \
+              --out-dir "$eval_dir" > "$pre_resolved"
+
+            artifact_id="$(python3 -c 'import json,sys; print(json.load(open(sys.argv[1]))["artifact_id"])' "$pre_resolved")"
+            canonical_key="$(python3 -c 'import json,sys; print(json.load(open(sys.argv[1]))["canonical_key"])' "$pre_resolved")"
+            [[ "$artifact_id" =~ ^[0-9]+$ ]]
+            [[ "$canonical_key" =~ ^PA(1|2|3|4|8)-PA(1|2|3|4|8)$ ]]
+
+            artifact_metadata="$RUNNER_TEMP/l2o-control-artifact-metadata.json"
+            curl -fsSL \
+              -H "Accept: application/vnd.github+json" \
+              -H "Authorization: Bearer $GH_TOKEN" \
+              -H "X-GitHub-Api-Version: 2022-11-28" \
+              "https://api.github.com/repos/$REPOSITORY/actions/artifacts/$artifact_id" \
+              > "$artifact_metadata"
+
+            "$runtime_python" experiments/l2o_control_artifact_transport_contract.py \
+              --request "$request_path" \
+              --matrix "$matrix_path" \
+              --artifact-metadata "$artifact_metadata" \
+              > "$RUNNER_TEMP/l2o-control-transport-binding.json"
+
+            archive_url="$(python3 -c 'import json,sys; print(json.load(open(sys.argv[1]))["archive_download_url"])' "$artifact_metadata")"
+            artifact_zip="$RUNNER_TEMP/l2o-control-backbone-artifact.zip"
+            curl -fL \
+              -H "Accept: application/vnd.github+json" \
+              -H "Authorization: Bearer $GH_TOKEN" \
+              -H "X-GitHub-Api-Version: 2022-11-28" \
+              "$archive_url" \
+              -o "$artifact_zip"
+
+            rehydrated="$RUNNER_TEMP/l2o-control-rehydrated"
+            mkdir -p "$rehydrated"
+            "$runtime_python" experiments/l2o_artifact_rehydrate.py \
+              --matrix "$matrix_path" \
+              --canonical-key "$canonical_key" \
+              --artifact-id "$artifact_id" \
+              --artifact-zip "$artifact_zip" \
+              --destination "$rehydrated" \
+              > "$RUNNER_TEMP/l2o-control-rehydrate.json"
+
+            run_dir="$(python3 -c 'import json,sys; print(json.load(open(sys.argv[1]))["run_dir"])' "$RUNNER_TEMP/l2o-control-rehydrate.json")"
+            [[ -d "$run_dir" ]]
+
+            resolved="$RUNNER_TEMP/l2o-control-resolved.json"
+            "$runtime_python" experiments/l2o_control_request_contract.py \
+              --request "$request_path" \
+              --matrix "$matrix_path" \
+              --plan "$plan_path" \
+              --policy "$policy_path" \
+              --run-dir "$run_dir" \
+              --out-dir "$eval_dir" > "$resolved"
+
+            mapfile -t eval_args < <(
+              python3 -c 'import json,sys; a=json.load(open(sys.argv[1]))["evaluator_args"]; assert isinstance(a,list) and a; assert all(isinstance(x,str) and "\n" not in x and "\r" not in x for x in a); print(*a, sep="\n")' "$resolved"
+            )
+
+            "$runtime_python" experiments/pa_eval_l2o_controls_v1.py \
+              "${eval_args[@]}" \
+              --data-root "$TRUSTED_DATA"
+
+            [[ -f "$eval_dir/control_summary.csv" ]]
+            [[ -f "$eval_dir/control_eval_metadata.json" ]]
+
+            "$runtime_python" experiments/l2o_control_eval_result_record.py \
+              --request "$request_path" \
+              --matrix "$matrix_path" \
+              --policy "$policy_path" \
+              --summary-csv "$eval_dir/control_summary.csv" \
+              --metadata "$eval_dir/control_eval_metadata.json" \
+              --output "$eval_dir/result_record.json"
+
+            cp "$artifact_metadata" "$eval_dir/artifact-metadata.json"
+            cp "$RUNNER_TEMP/l2o-control-transport-binding.json" "$eval_dir/artifact-transport-binding.json"
+            cp "$RUNNER_TEMP/l2o-control-rehydrate.json" "$eval_dir/rehydration.json"
             cp "$resolved" "$eval_dir/resolved-request.json"
           else
             normalized="$RUNNER_TEMP/normalized-scientific-config.json"
