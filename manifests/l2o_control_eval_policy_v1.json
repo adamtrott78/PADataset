@@ -1,0 +1,53 @@
+{
+  "schema": "padataset.l2o-control-eval-policy.v1",
+  "policy_id": "l2o_repaired_controls_frozen_v1",
+  "purpose": "Frozen matched control evaluation over the exact t007 competent-backbone bank.",
+  "checkpoint": "best_model",
+  "evaluator_device": "cuda",
+  "batch_size": 128,
+  "num_workers": 0,
+  "target_labels_used_for_tuning": false,
+  "target_test_consumed_before_final_eval": false,
+  "controls": {
+    "dqn_ids_style": {
+      "method_id": "dqn_ids_style_softmax3_external_surrogate_cap625_v1",
+      "state_mode": "softmax3",
+      "known_cap": 625,
+      "open_cap": 625,
+      "gamma": 0.95,
+      "epsilon": 1,
+      "epsilon_min": 0.05,
+      "epsilon_decay": 0.99,
+      "learning_rate": 0.001,
+      "memory_size": 2000,
+      "dqn_batch_size": 32,
+      "episodes": 30,
+      "anchor_fraction": 0.05,
+      "train_subsample_size": 1250,
+      "centroid_update_threshold": 0.75,
+      "seed": 42,
+      "device": "cpu",
+      "final_decision": "hard_dqn_argmax",
+      "open_calibration_source": "external_surrogate_validation"
+    },
+    "varmax": {
+      "method_id": "varmax_surrogate_all_smoke_matched_l2o_v1",
+      "calibration_mode": "surrogate_all",
+      "sweep_grid": "smoke",
+      "temperature": 1,
+      "use_energy": true,
+      "fit_on": "predicted_class",
+      "min_samples_per_class": 5,
+      "external_surrogate_consumed": false
+    }
+  },
+  "invariants": [
+    "Both controls use the exact rehydrated best_model checkpoint bound by the canonical matrix.",
+    "Both controls are fully fitted before target test metrics are evaluated.",
+    "DQN-IDS-style open calibration is exactly 625 external-surrogate validation samples and never true-target validation/test evidence.",
+    "DQN-IDS-style final decision is the hard DQN action; no DQNGuard bands or score threshold are permitted.",
+    "VarMax remains historical surrogate_all with smoke sweep over known-class pseudo-unknown calibration.",
+    "VarMax never consumes the external surrogate.",
+    "No control outcome may change backbone/checkpoint, control semantics, selector formula, retry policy, or prior frozen results."
+  ]
+}
