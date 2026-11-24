@@ -1,0 +1,503 @@
+{
+  "schema": "padataset.l2o-control-matrix-plan.v1",
+  "status": "FROZEN_PLAN_NO_EXECUTION",
+  "purpose": "Matched repaired L2O control matrix over the exact frozen t007 competent-backbone bank. No control result may alter backbone recipe/checkpoint, DQNGuard threshold policy, selector formulas, or prior frozen OSR results.",
+  "source_binding": {
+    "padataset_pr": 54,
+    "exact_head": "f1256048b51fd863ad3fb46f9c547eff401016e7",
+    "canonical_backbone_matrix": "manifests/l2o_canonical_backbone_matrix_v1.json",
+    "canonical_backbone_count": 10,
+    "directed_cell_count": 20,
+    "dataset_profile": "ota_core_high_run01_len16384_v1",
+    "seed": 0,
+    "cache_len": 16384
+  },
+  "invariants": [
+    "Reuse each exact frozen best_model checkpoint; no retraining.",
+    "Target labels/test/OSR evidence are forbidden for control fitting, calibration, threshold/sweep selection, retry decisions, or method changes.",
+    "Target test is consumed only after the control is fully frozen for that directional cell.",
+    "DQN-IDS-style matched control and VarMax control consume the same frozen backbone outputs as DQNGuard.",
+    "Historical VarMax semantics are surrogate_all over known-class pseudo-unknown calibration; the external surrogate field is provenance only for VarMax and is never used as VarMax calibration evidence.",
+    "The DQN-IDS-style matched control is the historical softmax-confidence DQN decision mechanism over the shared PyTorch backbone, not the separate later Shreyash Keras backbone.",
+    "No new selector formula or control variant may be chosen after seeing control results."
+  ],
+  "controls": {
+    "dqn_ids_style_matched": {
+      "method_id": "dqn_ids_style_softmax3_external_surrogate_cap625_v1",
+      "label": "DQN-IDS-style confidence head (matched backbone)",
+      "lineage": "Historical DQN-IDS confidence decision mechanism used as a fixed-backbone decision head. This is not the separate RF-adapted Shreyash Keras backbone comparator.",
+      "state_features": [
+        "p_max",
+        "p1_p2_gap",
+        "entropy"
+      ],
+      "action_semantics": {
+        "0": "unknown",
+        "1": "known"
+      },
+      "final_decision": "hard DQN argmax action; no DQNGuard guard bands and no percentile score threshold",
+      "dqn": {
+        "gamma": 0.95,
+        "epsilon": 1,
+        "epsilon_min": 0.05,
+        "epsilon_decay": 0.99,
+        "learning_rate": 0.001,
+        "memory_size": 2000,
+        "batch_size": 32,
+        "episodes": 30,
+        "anchor_fraction": 0.05,
+        "train_subsample_size": 1250,
+        "centroid_update_threshold": 0.75,
+        "seed": 42,
+        "device": "cpu"
+      },
+      "calibration": {
+        "known_source": "directional cell validation-known split",
+        "open_source": "directional cell external-surrogate validation split",
+        "known_cap": 625,
+        "open_cap": 625,
+        "known_cap_sampling": "seeded stratified",
+        "open_cap_sampling": "seeded non-stratified",
+        "target_open_consumed": false,
+        "target_test_consumed": false
+      },
+      "forbidden": [
+        "true-target validation during fit",
+        "true-target test during fit",
+        "BandedGuardDQNOSR",
+        "variance/energy guard evidence",
+        "known-only percentile cutoff",
+        "Keras/Shreyash backbone substitution"
+      ]
+    },
+    "varmax_surrogate_all_matched": {
+      "method_id": "varmax_surrogate_all_smoke_matched_l2o_v1",
+      "label": "VarMax surrogate-all",
+      "lineage": "Historical paper control semantics.",
+      "method_family": "varmax",
+      "modes": [
+        "surrogate_all"
+      ],
+      "sweep_grid": "smoke",
+      "temperature": 1,
+      "use_energy": true,
+      "fit_on": "predicted_class",
+      "min_samples_per_class": 5,
+      "calibration": {
+        "source": "known validation only, partitioned internally by true known class into fit/guard/score subsets",
+        "pseudo_unknown_semantics": "each available known class is considered as pseudo-unknown; all candidate specifications compete for one selected result",
+        "external_surrogate_consumed": false,
+        "target_open_consumed": false,
+        "target_test_consumed": false
+      },
+      "final_decision": "historical VarMax accept if gap OR predicted-class variance band OR predicted-class energy band accepts; unknown only when all enabled acceptance tests fail",
+      "forbidden": [
+        "external-surrogate calibration",
+        "true-target validation calibration",
+        "DQNGuard 5% score threshold",
+        "renaming this control as a surrogate-specific VarMax method"
+      ]
+    }
+  },
+  "execution_gate": {
+    "state": "BLOCKED_UNTIL_IMPLEMENTATION_VALIDATED",
+    "requirements": [
+      "Implement a bounded evaluator/manifest path that rehydrates the exact frozen backbone artifact and emits both controls without changing their frozen semantics.",
+      "For DQN-IDS-style matched control, construct the 625-open calibration set only from the external surrogate validation partition and assert target labels are absent before fit.",
+      "For VarMax, call historical surrogate_all calibration and assert external_surrogate_consumed=false.",
+      "Emit per-cell provenance including backbone digest/model SHA, calibration counts/sources, target_labels_used_for_tuning=false, target_test_consumed_before_final_eval=false, and scientific receipt.",
+      "Validate all 20 directional requests before any admission; no duplicate admissions."
+    ]
+  },
+  "analysis_after_20_of_20": [
+    "DQNGuard-minus-DQN-IDS-style per-cell deltas",
+    "DQNGuard-minus-VarMax-surrogate-all per-cell deltas",
+    "aggregate means and uncertainty summaries",
+    "target-level effects",
+    "unordered-pair/backbone effects",
+    "relationship between DQNGuard gain and frozen selector/geometry diagnostics",
+    "no feedback from control outcomes into any frozen method definition"
+  ],
+  "cells": [
+    {
+      "cell_id": "PA1<-PA2",
+      "canonical_key": "PA1-PA2",
+      "target": "PA1",
+      "external_surrogate": "PA2",
+      "known_pas": [
+        "PA3",
+        "PA4",
+        "PA8"
+      ],
+      "backbone_artifact_id": 14765881457,
+      "backbone_artifact_digest": "sha256:7c439dc693c96777ec04ded9e76b69a7dc9b8d774cf4192bd502f880cda77f79",
+      "backbone_candidate_sha": "85bc8cb667a000d3fc544b33f8e96a6775074561",
+      "best_model_sha256": "82effeb4d9f669cfdcc16dca2539149c3d6f5ec5a79901153108d509175b48ee",
+      "checkpoint": "best_model",
+      "target_test_consumed_before_final_eval": false,
+      "dqn_ids_style_open_calibration_source": "external_surrogate_validation",
+      "varmax_external_surrogate_consumed": false
+    },
+    {
+      "cell_id": "PA2<-PA1",
+      "canonical_key": "PA1-PA2",
+      "target": "PA2",
+      "external_surrogate": "PA1",
+      "known_pas": [
+        "PA3",
+        "PA4",
+        "PA8"
+      ],
+      "backbone_artifact_id": 14765881457,
+      "backbone_artifact_digest": "sha256:7c439dc693c96777ec04ded9e76b69a7dc9b8d774cf4192bd502f880cda77f79",
+      "backbone_candidate_sha": "85bc8cb667a000d3fc544b33f8e96a6775074561",
+      "best_model_sha256": "82effeb4d9f669cfdcc16dca2539149c3d6f5ec5a79901153108d509175b48ee",
+      "checkpoint": "best_model",
+      "target_test_consumed_before_final_eval": false,
+      "dqn_ids_style_open_calibration_source": "external_surrogate_validation",
+      "varmax_external_surrogate_consumed": false
+    },
+    {
+      "cell_id": "PA1<-PA3",
+      "canonical_key": "PA1-PA3",
+      "target": "PA1",
+      "external_surrogate": "PA3",
+      "known_pas": [
+        "PA2",
+        "PA4",
+        "PA8"
+      ],
+      "backbone_artifact_id": 14783316485,
+      "backbone_artifact_digest": "sha256:75f307066bb408a10850ba9942293886e3fb07bdf0c2201f05f9b11be859973e",
+      "backbone_candidate_sha": "85bc8cb667a000d3fc544b33f8e96a6775074561",
+      "best_model_sha256": "7766bff5b5612fc9db2912c364ae2489e57c3e9fc0f6ae3be23ce34f95acd583",
+      "checkpoint": "best_model",
+      "target_test_consumed_before_final_eval": false,
+      "dqn_ids_style_open_calibration_source": "external_surrogate_validation",
+      "varmax_external_surrogate_consumed": false
+    },
+    {
+      "cell_id": "PA3<-PA1",
+      "canonical_key": "PA1-PA3",
+      "target": "PA3",
+      "external_surrogate": "PA1",
+      "known_pas": [
+        "PA2",
+        "PA4",
+        "PA8"
+      ],
+      "backbone_artifact_id": 14783316485,
+      "backbone_artifact_digest": "sha256:75f307066bb408a10850ba9942293886e3fb07bdf0c2201f05f9b11be859973e",
+      "backbone_candidate_sha": "85bc8cb667a000d3fc544b33f8e96a6775074561",
+      "best_model_sha256": "7766bff5b5612fc9db2912c364ae2489e57c3e9fc0f6ae3be23ce34f95acd583",
+      "checkpoint": "best_model",
+      "target_test_consumed_before_final_eval": false,
+      "dqn_ids_style_open_calibration_source": "external_surrogate_validation",
+      "varmax_external_surrogate_consumed": false
+    },
+    {
+      "cell_id": "PA1<-PA4",
+      "canonical_key": "PA1-PA4",
+      "target": "PA1",
+      "external_surrogate": "PA4",
+      "known_pas": [
+        "PA2",
+        "PA3",
+        "PA8"
+      ],
+      "backbone_artifact_id": 14769480157,
+      "backbone_artifact_digest": "sha256:f59f2acff9cf6a1ba865edd59de25dcadae2a6cb9885e898d106e61cf3143fac",
+      "backbone_candidate_sha": "85bc8cb667a000d3fc544b33f8e96a6775074561",
+      "best_model_sha256": "b6a45e669799940ec595954badb4ff4afda2b4262b5941a999eba6dd669e8613",
+      "checkpoint": "best_model",
+      "target_test_consumed_before_final_eval": false,
+      "dqn_ids_style_open_calibration_source": "external_surrogate_validation",
+      "varmax_external_surrogate_consumed": false
+    },
+    {
+      "cell_id": "PA4<-PA1",
+      "canonical_key": "PA1-PA4",
+      "target": "PA4",
+      "external_surrogate": "PA1",
+      "known_pas": [
+        "PA2",
+        "PA3",
+        "PA8"
+      ],
+      "backbone_artifact_id": 14769480157,
+      "backbone_artifact_digest": "sha256:f59f2acff9cf6a1ba865edd59de25dcadae2a6cb9885e898d106e61cf3143fac",
+      "backbone_candidate_sha": "85bc8cb667a000d3fc544b33f8e96a6775074561",
+      "best_model_sha256": "b6a45e669799940ec595954badb4ff4afda2b4262b5941a999eba6dd669e8613",
+      "checkpoint": "best_model",
+      "target_test_consumed_before_final_eval": false,
+      "dqn_ids_style_open_calibration_source": "external_surrogate_validation",
+      "varmax_external_surrogate_consumed": false
+    },
+    {
+      "cell_id": "PA1<-PA8",
+      "canonical_key": "PA1-PA8",
+      "target": "PA1",
+      "external_surrogate": "PA8",
+      "known_pas": [
+        "PA2",
+        "PA3",
+        "PA4"
+      ],
+      "backbone_artifact_id": 14785061977,
+      "backbone_artifact_digest": "sha256:8e1f6024937cdc19dd7ae8dad50bb88ea873f41eb8258eb2c2b43b853627edc2",
+      "backbone_candidate_sha": "85bc8cb667a000d3fc544b33f8e96a6775074561",
+      "best_model_sha256": "72c94db87bd3fecf05481b423400ba291686872aca57c90d7b2893aedb9ecb79",
+      "checkpoint": "best_model",
+      "target_test_consumed_before_final_eval": false,
+      "dqn_ids_style_open_calibration_source": "external_surrogate_validation",
+      "varmax_external_surrogate_consumed": false
+    },
+    {
+      "cell_id": "PA8<-PA1",
+      "canonical_key": "PA1-PA8",
+      "target": "PA8",
+      "external_surrogate": "PA1",
+      "known_pas": [
+        "PA2",
+        "PA3",
+        "PA4"
+      ],
+      "backbone_artifact_id": 14785061977,
+      "backbone_artifact_digest": "sha256:8e1f6024937cdc19dd7ae8dad50bb88ea873f41eb8258eb2c2b43b853627edc2",
+      "backbone_candidate_sha": "85bc8cb667a000d3fc544b33f8e96a6775074561",
+      "best_model_sha256": "72c94db87bd3fecf05481b423400ba291686872aca57c90d7b2893aedb9ecb79",
+      "checkpoint": "best_model",
+      "target_test_consumed_before_final_eval": false,
+      "dqn_ids_style_open_calibration_source": "external_surrogate_validation",
+      "varmax_external_surrogate_consumed": false
+    },
+    {
+      "cell_id": "PA2<-PA3",
+      "canonical_key": "PA2-PA3",
+      "target": "PA2",
+      "external_surrogate": "PA3",
+      "known_pas": [
+        "PA1",
+        "PA4",
+        "PA8"
+      ],
+      "backbone_artifact_id": 14736363148,
+      "backbone_artifact_digest": "sha256:3419dd982709fccdfccce0a044260542a904ce9c86e1c4ef4e8e8bcb76c96b4d",
+      "backbone_candidate_sha": "da521eaee997c56012290c9c261ee1831432ebbc",
+      "best_model_sha256": "39d919f1203c76358fded8e67cd85fc2047a7d4cc884d14eb516ff1e08995341",
+      "checkpoint": "best_model",
+      "target_test_consumed_before_final_eval": false,
+      "dqn_ids_style_open_calibration_source": "external_surrogate_validation",
+      "varmax_external_surrogate_consumed": false
+    },
+    {
+      "cell_id": "PA3<-PA2",
+      "canonical_key": "PA2-PA3",
+      "target": "PA3",
+      "external_surrogate": "PA2",
+      "known_pas": [
+        "PA1",
+        "PA4",
+        "PA8"
+      ],
+      "backbone_artifact_id": 14736363148,
+      "backbone_artifact_digest": "sha256:3419dd982709fccdfccce0a044260542a904ce9c86e1c4ef4e8e8bcb76c96b4d",
+      "backbone_candidate_sha": "da521eaee997c56012290c9c261ee1831432ebbc",
+      "best_model_sha256": "39d919f1203c76358fded8e67cd85fc2047a7d4cc884d14eb516ff1e08995341",
+      "checkpoint": "best_model",
+      "target_test_consumed_before_final_eval": false,
+      "dqn_ids_style_open_calibration_source": "external_surrogate_validation",
+      "varmax_external_surrogate_consumed": false
+    },
+    {
+      "cell_id": "PA2<-PA4",
+      "canonical_key": "PA2-PA4",
+      "target": "PA2",
+      "external_surrogate": "PA4",
+      "known_pas": [
+        "PA1",
+        "PA3",
+        "PA8"
+      ],
+      "backbone_artifact_id": 14770958092,
+      "backbone_artifact_digest": "sha256:26901793b5c7803b70151acda30ddd582572e130fa7c400467828f8c8e88137b",
+      "backbone_candidate_sha": "85bc8cb667a000d3fc544b33f8e96a6775074561",
+      "best_model_sha256": "efbf2891f1335812e351fd7eda77d2625b8f3c32e6c59c7c52c132a414888af6",
+      "checkpoint": "best_model",
+      "target_test_consumed_before_final_eval": false,
+      "dqn_ids_style_open_calibration_source": "external_surrogate_validation",
+      "varmax_external_surrogate_consumed": false
+    },
+    {
+      "cell_id": "PA4<-PA2",
+      "canonical_key": "PA2-PA4",
+      "target": "PA4",
+      "external_surrogate": "PA2",
+      "known_pas": [
+        "PA1",
+        "PA3",
+        "PA8"
+      ],
+      "backbone_artifact_id": 14770958092,
+      "backbone_artifact_digest": "sha256:26901793b5c7803b70151acda30ddd582572e130fa7c400467828f8c8e88137b",
+      "backbone_candidate_sha": "85bc8cb667a000d3fc544b33f8e96a6775074561",
+      "best_model_sha256": "efbf2891f1335812e351fd7eda77d2625b8f3c32e6c59c7c52c132a414888af6",
+      "checkpoint": "best_model",
+      "target_test_consumed_before_final_eval": false,
+      "dqn_ids_style_open_calibration_source": "external_surrogate_validation",
+      "varmax_external_surrogate_consumed": false
+    },
+    {
+      "cell_id": "PA2<-PA8",
+      "canonical_key": "PA2-PA8",
+      "target": "PA2",
+      "external_surrogate": "PA8",
+      "known_pas": [
+        "PA1",
+        "PA3",
+        "PA4"
+      ],
+      "backbone_artifact_id": 14719755202,
+      "backbone_artifact_digest": "sha256:086bf301c75197206ba3e4ae402b31081e75e8b86cf04727c4d49f73371069f8",
+      "backbone_candidate_sha": "ab87931408651b0b3516d910b13474822fb2a93d",
+      "best_model_sha256": "1ccdf80e9114d397e8eedffcaf569c5e051b2f483cf2ef17e546ce8b65143ccf",
+      "checkpoint": "best_model",
+      "target_test_consumed_before_final_eval": false,
+      "dqn_ids_style_open_calibration_source": "external_surrogate_validation",
+      "varmax_external_surrogate_consumed": false
+    },
+    {
+      "cell_id": "PA8<-PA2",
+      "canonical_key": "PA2-PA8",
+      "target": "PA8",
+      "external_surrogate": "PA2",
+      "known_pas": [
+        "PA1",
+        "PA3",
+        "PA4"
+      ],
+      "backbone_artifact_id": 14719755202,
+      "backbone_artifact_digest": "sha256:086bf301c75197206ba3e4ae402b31081e75e8b86cf04727c4d49f73371069f8",
+      "backbone_candidate_sha": "ab87931408651b0b3516d910b13474822fb2a93d",
+      "best_model_sha256": "1ccdf80e9114d397e8eedffcaf569c5e051b2f483cf2ef17e546ce8b65143ccf",
+      "checkpoint": "best_model",
+      "target_test_consumed_before_final_eval": false,
+      "dqn_ids_style_open_calibration_source": "external_surrogate_validation",
+      "varmax_external_surrogate_consumed": false
+    },
+    {
+      "cell_id": "PA3<-PA4",
+      "canonical_key": "PA3-PA4",
+      "target": "PA3",
+      "external_surrogate": "PA4",
+      "known_pas": [
+        "PA1",
+        "PA2",
+        "PA8"
+      ],
+      "backbone_artifact_id": 14784971329,
+      "backbone_artifact_digest": "sha256:423352d22c92e0267c261a774f7b1f2085e9e1877fe9aa4ea3b7775893dbdf8e",
+      "backbone_candidate_sha": "85bc8cb667a000d3fc544b33f8e96a6775074561",
+      "best_model_sha256": "aecb28aeb1f8f2f41f65804ecb90249dbf1c6d7e6a3af15d7c16819fc23a8906",
+      "checkpoint": "best_model",
+      "target_test_consumed_before_final_eval": false,
+      "dqn_ids_style_open_calibration_source": "external_surrogate_validation",
+      "varmax_external_surrogate_consumed": false
+    },
+    {
+      "cell_id": "PA4<-PA3",
+      "canonical_key": "PA3-PA4",
+      "target": "PA4",
+      "external_surrogate": "PA3",
+      "known_pas": [
+        "PA1",
+        "PA2",
+        "PA8"
+      ],
+      "backbone_artifact_id": 14784971329,
+      "backbone_artifact_digest": "sha256:423352d22c92e0267c261a774f7b1f2085e9e1877fe9aa4ea3b7775893dbdf8e",
+      "backbone_candidate_sha": "85bc8cb667a000d3fc544b33f8e96a6775074561",
+      "best_model_sha256": "aecb28aeb1f8f2f41f65804ecb90249dbf1c6d7e6a3af15d7c16819fc23a8906",
+      "checkpoint": "best_model",
+      "target_test_consumed_before_final_eval": false,
+      "dqn_ids_style_open_calibration_source": "external_surrogate_validation",
+      "varmax_external_surrogate_consumed": false
+    },
+    {
+      "cell_id": "PA3<-PA8",
+      "canonical_key": "PA3-PA8",
+      "target": "PA3",
+      "external_surrogate": "PA8",
+      "known_pas": [
+        "PA1",
+        "PA2",
+        "PA4"
+      ],
+      "backbone_artifact_id": 14880924639,
+      "backbone_artifact_digest": "sha256:8aa657cc305cc989cf1bcf988ef1466b79f1b3403c973de77dd0edd20cd1191b",
+      "backbone_candidate_sha": "da521eaee997c56012290c9c261ee1831432ebbc",
+      "best_model_sha256": "bd7fc0d2d48d55e5ac0d21aeeaf67a24de292f09f46d2866b6af8212e0c3b49c",
+      "checkpoint": "best_model",
+      "target_test_consumed_before_final_eval": false,
+      "dqn_ids_style_open_calibration_source": "external_surrogate_validation",
+      "varmax_external_surrogate_consumed": false
+    },
+    {
+      "cell_id": "PA8<-PA3",
+      "canonical_key": "PA3-PA8",
+      "target": "PA8",
+      "external_surrogate": "PA3",
+      "known_pas": [
+        "PA1",
+        "PA2",
+        "PA4"
+      ],
+      "backbone_artifact_id": 14880924639,
+      "backbone_artifact_digest": "sha256:8aa657cc305cc989cf1bcf988ef1466b79f1b3403c973de77dd0edd20cd1191b",
+      "backbone_candidate_sha": "da521eaee997c56012290c9c261ee1831432ebbc",
+      "best_model_sha256": "bd7fc0d2d48d55e5ac0d21aeeaf67a24de292f09f46d2866b6af8212e0c3b49c",
+      "checkpoint": "best_model",
+      "target_test_consumed_before_final_eval": false,
+      "dqn_ids_style_open_calibration_source": "external_surrogate_validation",
+      "varmax_external_surrogate_consumed": false
+    },
+    {
+      "cell_id": "PA4<-PA8",
+      "canonical_key": "PA4-PA8",
+      "target": "PA4",
+      "external_surrogate": "PA8",
+      "known_pas": [
+        "PA1",
+        "PA2",
+        "PA3"
+      ],
+      "backbone_artifact_id": 14773056923,
+      "backbone_artifact_digest": "sha256:a954478e8c7c644a9122dfd525e4928c02c8866fe874d9a67039d54f60e6c57e",
+      "backbone_candidate_sha": "85bc8cb667a000d3fc544b33f8e96a6775074561",
+      "best_model_sha256": "4180c932cdec45303e14f3de90e2e32d9b1d9fb6f70c78343b53775b0eae16e3",
+      "checkpoint": "best_model",
+      "target_test_consumed_before_final_eval": false,
+      "dqn_ids_style_open_calibration_source": "external_surrogate_validation",
+      "varmax_external_surrogate_consumed": false
+    },
+    {
+      "cell_id": "PA8<-PA4",
+      "canonical_key": "PA4-PA8",
+      "target": "PA8",
+      "external_surrogate": "PA4",
+      "known_pas": [
+        "PA1",
+        "PA2",
+        "PA3"
+      ],
+      "backbone_artifact_id": 14773056923,
+      "backbone_artifact_digest": "sha256:a954478e8c7c644a9122dfd525e4928c02c8866fe874d9a67039d54f60e6c57e",
+      "backbone_candidate_sha": "85bc8cb667a000d3fc544b33f8e96a6775074561",
+      "best_model_sha256": "4180c932cdec45303e14f3de90e2e32d9b1d9fb6f70c78343b53775b0eae16e3",
+      "checkpoint": "best_model",
+      "target_test_consumed_before_final_eval": false,
+      "dqn_ids_style_open_calibration_source": "external_surrogate_validation",
+      "varmax_external_surrogate_consumed": false
+    }
+  ]
+}
