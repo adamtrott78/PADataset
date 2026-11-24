@@ -1,0 +1,20 @@
+{
+  "schema": "padataset.l2o-control-eval-request.v1",
+  "policy_id": "l2o_repaired_controls_frozen_v1",
+  "canonical_matrix": "manifests/l2o_canonical_backbone_matrix_v1.json",
+  "control_plan": "manifests/l2o_control_matrix_plan_v1.json",
+  "evaluation_policy": "manifests/l2o_control_eval_policy_v1.json",
+  "canonical_key": "PA2-PA4",
+  "artifact_id": 14770958092,
+  "artifact_digest": "sha256:26901793b5c7803b70151acda30ddd582572e130fa7c400467828f8c8e88137b",
+  "evaluation_target": "PA2",
+  "evaluation_surrogate": "PA4",
+  "checkpoint": "best_model",
+  "controls": [
+    "dqn_ids_style_softmax3_external_surrogate_cap625_v1",
+    "varmax_surrogate_all_smoke_matched_l2o_v1"
+  ],
+  "target_labels_used_for_tuning": false,
+  "target_test_consumed_before_final_eval": false,
+  "status": "READY_FOR_BOUNDED_CONTROL_EVALUATOR"
+}
