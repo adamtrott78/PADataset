@@ -36,6 +36,30 @@ def gpu():
         return [tuple(x.strip() for x in line.split(",")) for line in raw.splitlines()]
     except:return []
 
+CONTROLLER_UNITS=[
+    ("G0","workspace-ci-v3-controller@padataset-scientific-single-gpu-v1.service"),
+    ("G1","workspace-ci-v3-controller@padataset-scientific-single-gpu-2-v1.service"),
+]
+
+def controller_liveness():
+    rows=[]
+    for lane,unit in CONTROLLER_UNITS:
+        try:
+            raw=subprocess.check_output(
+                ["systemctl","show",unit,"--property=ActiveState","--property=SubState","--property=MainPID","--property=NRestarts","--no-pager"],
+                text=True,stderr=subprocess.DEVNULL,timeout=3,
+            )
+            props={}
+            for line in raw.splitlines():
+                if "=" in line:
+                    k,v=line.split("=",1); props[k]=v
+            active=props.get("ActiveState","?"); sub=props.get("SubState","?")
+            state="ACTIVE" if active=="active" and sub=="running" else ("DOWN" if active in {"failed","inactive"} else active.upper())
+            rows.append({"lane":lane,"unit":unit,"state":state,"pid":props.get("MainPID","?"),"restarts":props.get("NRestarts","?")})
+        except Exception:
+            rows.append({"lane":lane,"unit":unit,"state":"UNKNOWN","pid":"?","restarts":"?"})
+    return rows
+
 def proc_rows():
     out={}
     try: raw=subprocess.check_output(["ps","-eo","pid=,etimes=,args="],text=True,stderr=subprocess.DEVNULL)
@@ -107,6 +131,9 @@ def render():
             g=gpu(); frame=[B+"MTH602 FINAL ROBUSTNESS — LOCAL PIPELINE"+RESET,DIM+"Source: HOST LOCAL ONLY | GitHub/REST/GraphQL calls per refresh: 0 | Ctrl+C exits"+RESET]
             if g:
                 frame.append("   ".join(f"GPU{x[0]} {x[1]}/{x[2]} MiB {x[3]}%" for x in g))
+            ctl=controller_liveness()
+            if ctl:
+                frame.append("   ".join(f"{x['lane']} CTRL {x['state']} pid={x['pid']} restarts={x['restarts']}" for x in ctl))
             frame.append("")
             frame.append(B+"SEED GRID  (✓ success, ▶ running, · not observed)"+RESET)
             frame.append(f"{'PAIR':<9} "+" ".join(f"p{p}t{t}" for p,t in CONDS))
