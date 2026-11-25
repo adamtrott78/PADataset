@@ -25,7 +25,7 @@ def test_local_pipeline_is_bounded_and_provider_free():
 
 def test_dashboard_is_zero_provider_and_ctrl_c_exits():
     s=(ROOT/"scripts/mth602_robustness_local_dashboard.py").read_text().lower()
-    for bad in ["gh api","gh run","api.github.com","graphql","curl "]:
+    for bad in ["gh api","gh run","api.github.com","curl ","requests.","urllib.request"]:
         assert bad not in s
     assert "keyboardinterrupt" in s
     assert "val_min_class_f1" in s
