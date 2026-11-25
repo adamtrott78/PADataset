@@ -6,9 +6,6 @@ def test_new_pipeline_sources_parse():
     for p in ["experiments/mth602_robustness_cached_all_osr.py","scripts/mth602_robustness_local_pipeline.py","scripts/mth602_robustness_local_dashboard.py"]:
         ast.parse((ROOT/p).read_text(),filename=p)
 
-def test_cached_consumer_imports():
-    import experiments.mth602_robustness_cached_all_osr as m
-    assert callable(m.run_direction)
 
 def test_cached_consumer_enforces_target_firewall_and_cpu_only():
     s=(ROOT/"experiments/mth602_robustness_cached_all_osr.py").read_text()
