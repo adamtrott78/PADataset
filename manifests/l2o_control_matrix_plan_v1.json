@@ -1,6 +1,6 @@
 {
   "schema": "padataset.l2o-control-matrix-plan.v1",
-  "status": "ROBUSTNESS_PILOT_OVERLAY_FOR_PA1_PA2_PA1_PA3",
+  "status": "FROZEN_PLAN_NO_EXECUTION",
   "purpose": "Matched repaired L2O control matrix over the exact frozen t007 competent-backbone bank. No control result may alter backbone recipe/checkpoint, DQNGuard threshold policy, selector formulas, or prior frozen OSR results.",
   "source_binding": {
     "padataset_pr": 54,
@@ -519,6 +519,8 @@
     "pairs": [
       "PA1-PA2",
       "PA1-PA3"
-    ]
+    ],
+    "status": "ROBUSTNESS_PILOT_OVERLAY_FOR_PA1_PA2_PA1_PA3",
+    "frozen_for_execution": true
   }
 }
