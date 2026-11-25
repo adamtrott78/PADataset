@@ -26,6 +26,9 @@ from dqn_osr import BandedGuardDQNOSR
 from experiments.l2o_directional_contract import resolve_directional_l2o_contract
 
 
+
+DQN_SEED = 42
+
 def cap_split(split, cap: int, seed: int, stratify: bool, suffix: str):
     n = int(len(split.y_true))
     if cap <= 0 or n <= cap:
@@ -170,7 +173,7 @@ def make_method(mode: str):
         anchor_fraction=0.05,
         train_subsample_size=1250,
         centroid_update_threshold=0.75,
-        seed=42,
+        seed=DQN_SEED,
         device="cpu",
         band_percentiles=(5.0, 95.0),
         top2_band_percentiles=(5.0, 95.0),
@@ -244,8 +247,10 @@ def main():
         config_override=contract.surrogate_config,
     )
 
-    seed = int(payload.meta.get("seed", 0) or 0)
-    known_cal = cap_split(known_cal, args.known_cap, seed + 101, True, "cap_known")
+    legacy_seed = int(payload.meta.get("seed", 0) or 0)
+    partition_seed = int(payload.meta.get("partition_seed", legacy_seed) or 0)
+    training_seed = int(payload.meta.get("training_seed", legacy_seed) or 0)
+    known_cal = cap_split(known_cal, args.known_cap, partition_seed + 101, True, "cap_known")
 
     if args.mix_true_open:
         surrogate_n = int(round(float(args.open_cap) * float(args.surrogate_frac)))
@@ -255,21 +260,21 @@ def main():
         surrogate_part = cap_split(
             surrogate_open,
             surrogate_n,
-            seed + 202,
+            partition_seed + 202,
             False,
             f"cap_surrogate_{surrogate_n}",
         )
         true_part = cap_split(
             extras["val_open"],
             true_n,
-            seed + 303,
+            partition_seed + 303,
             False,
             f"cap_trueopen_{true_n}",
         )
         open_cal = concat_splits(surrogate_part, true_part, "mixed_open")
         calibration_label = f"mixed_{args.surrogate_open_pa}_{surrogate_n}_true_{true_n}_{args.mode}_cap{args.open_cap}"
     else:
-        open_cal = cap_split(surrogate_open, args.open_cap, seed + 202, False, "cap_surrogate_open")
+        open_cal = cap_split(surrogate_open, args.open_cap, partition_seed + 202, False, "cap_surrogate_open")
         calibration_label = f"surrogate_{args.surrogate_open_pa}_{args.mode}_cap{args.open_cap}"
 
     method = make_method(args.mode)
@@ -352,6 +357,9 @@ def main():
         "backbone_known_pas": json.dumps(list(contract.known_pas)),
         "directional_reuse": bool(contract.directional_reuse),
         "target_labels_used_for_tuning": False,
+        "partition_seed": partition_seed,
+        "training_seed": training_seed,
+        "dqn_seed": DQN_SEED,
         "mix_true_open": bool(args.mix_true_open),
         "surrogate_frac": float(args.surrogate_frac),
         "band_accept_mode": args.mode,
