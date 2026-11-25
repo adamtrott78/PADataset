@@ -32,8 +32,8 @@
   "cached_osr_policy": "manifests/mth602_robustness_cached_osr_policy_v1.json",
   "final_launch_gate": [
     "canonical GPU p00/t01 pilot OSR complete",
-    "cached CPU evaluator parity against GPU pilot",
     "four-model two-wave overlap smoke PASS",
+    "cached CPU evaluator parity against canonical GPU evaluator on exact same smoke backbones",
     "zero-provider dashboard validated"
   ]
 }
