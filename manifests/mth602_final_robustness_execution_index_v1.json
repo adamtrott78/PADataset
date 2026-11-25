@@ -1,0 +1,4542 @@
+{
+  "schema": "padataset.mth602-final-robustness-execution-index.v1",
+  "accepted_seed_freeze_candidate_sha": "3fd1454bc20b89580f14c2e319d9b33766ea14b5",
+  "canonical_pairs": [
+    "PA1-PA2",
+    "PA1-PA3",
+    "PA1-PA4",
+    "PA1-PA8",
+    "PA2-PA3",
+    "PA2-PA4",
+    "PA2-PA8",
+    "PA3-PA4",
+    "PA3-PA8",
+    "PA4-PA8"
+  ],
+  "canonical_pair_count": 10,
+  "partition_seeds": [
+    0,
+    1,
+    2,
+    3,
+    4
+  ],
+  "training_seeds": [
+    0,
+    1,
+    2,
+    3,
+    4,
+    5,
+    6,
+    7,
+    8,
+    9
+  ],
+  "fixed_dqn_seed": 42,
+  "total_backbone_cells": 500,
+  "existing_seed0_compatibility_candidates": 10,
+  "new_training_cells_if_all_seed0_compatible": 490,
+  "entries": [
+    {
+      "canonical_pair": "PA1-PA2",
+      "partition_seed": 0,
+      "training_seed": 0,
+      "path": "manifests/configs/mth602_final_robustness_v1/PA1-PA2/p00_t00.json",
+      "run_name": "mth602_final_robust_PA1_PA2_p00_t00",
+      "existing_seed0_compatibility_candidate": true,
+      "status": "EXISTING_ARTIFACT_COMPATIBILITY_CANDIDATE"
+    },
+    {
+      "canonical_pair": "PA1-PA2",
+      "partition_seed": 0,
+      "training_seed": 1,
+      "path": "manifests/configs/mth602_final_robustness_v1/PA1-PA2/p00_t01.json",
+      "run_name": "mth602_final_robust_PA1_PA2_p00_t01",
+      "existing_seed0_compatibility_candidate": false,
+      "status": "READY_FOR_ADMISSION_AFTER_PACKAGE_VALIDATION"
+    },
+    {
+      "canonical_pair": "PA1-PA2",
+      "partition_seed": 0,
+      "training_seed": 2,
+      "path": "manifests/configs/mth602_final_robustness_v1/PA1-PA2/p00_t02.json",
+      "run_name": "mth602_final_robust_PA1_PA2_p00_t02",
+      "existing_seed0_compatibility_candidate": false,
+      "status": "READY_FOR_ADMISSION_AFTER_PACKAGE_VALIDATION"
+    },
+    {
+      "canonical_pair": "PA1-PA2",
+      "partition_seed": 0,
+      "training_seed": 3,
+      "path": "manifests/configs/mth602_final_robustness_v1/PA1-PA2/p00_t03.json",
+      "run_name": "mth602_final_robust_PA1_PA2_p00_t03",
+      "existing_seed0_compatibility_candidate": false,
+      "status": "READY_FOR_ADMISSION_AFTER_PACKAGE_VALIDATION"
+    },
+    {
+      "canonical_pair": "PA1-PA2",
+      "partition_seed": 0,
+      "training_seed": 4,
+      "path": "manifests/configs/mth602_final_robustness_v1/PA1-PA2/p00_t04.json",
+      "run_name": "mth602_final_robust_PA1_PA2_p00_t04",
+      "existing_seed0_compatibility_candidate": false,
+      "status": "READY_FOR_ADMISSION_AFTER_PACKAGE_VALIDATION"
+    },
+    {
+      "canonical_pair": "PA1-PA2",
+      "partition_seed": 0,
+      "training_seed": 5,
+      "path": "manifests/configs/mth602_final_robustness_v1/PA1-PA2/p00_t05.json",
+      "run_name": "mth602_final_robust_PA1_PA2_p00_t05",
+      "existing_seed0_compatibility_candidate": false,
+      "status": "READY_FOR_ADMISSION_AFTER_PACKAGE_VALIDATION"
+    },
+    {
+      "canonical_pair": "PA1-PA2",
+      "partition_seed": 0,
+      "training_seed": 6,
+      "path": "manifests/configs/mth602_final_robustness_v1/PA1-PA2/p00_t06.json",
+      "run_name": "mth602_final_robust_PA1_PA2_p00_t06",
+      "existing_seed0_compatibility_candidate": false,
+      "status": "READY_FOR_ADMISSION_AFTER_PACKAGE_VALIDATION"
+    },
+    {
+      "canonical_pair": "PA1-PA2",
+      "partition_seed": 0,
+      "training_seed": 7,
+      "path": "manifests/configs/mth602_final_robustness_v1/PA1-PA2/p00_t07.json",
+      "run_name": "mth602_final_robust_PA1_PA2_p00_t07",
+      "existing_seed0_compatibility_candidate": false,
+      "status": "READY_FOR_ADMISSION_AFTER_PACKAGE_VALIDATION"
+    },
+    {
+      "canonical_pair": "PA1-PA2",
+      "partition_seed": 0,
+      "training_seed": 8,
+      "path": "manifests/configs/mth602_final_robustness_v1/PA1-PA2/p00_t08.json",
+      "run_name": "mth602_final_robust_PA1_PA2_p00_t08",
+      "existing_seed0_compatibility_candidate": false,
+      "status": "READY_FOR_ADMISSION_AFTER_PACKAGE_VALIDATION"
+    },
+    {
+      "canonical_pair": "PA1-PA2",
+      "partition_seed": 0,
+      "training_seed": 9,
+      "path": "manifests/configs/mth602_final_robustness_v1/PA1-PA2/p00_t09.json",
+      "run_name": "mth602_final_robust_PA1_PA2_p00_t09",
+      "existing_seed0_compatibility_candidate": false,
+      "status": "READY_FOR_ADMISSION_AFTER_PACKAGE_VALIDATION"
+    },
+    {
+      "canonical_pair": "PA1-PA2",
+      "partition_seed": 1,
+      "training_seed": 0,
+      "path": "manifests/configs/mth602_final_robustness_v1/PA1-PA2/p01_t00.json",
+      "run_name": "mth602_final_robust_PA1_PA2_p01_t00",
+      "existing_seed0_compatibility_candidate": false,
+      "status": "READY_FOR_ADMISSION_AFTER_PACKAGE_VALIDATION"
+    },
+    {
+      "canonical_pair": "PA1-PA2",
+      "partition_seed": 1,
+      "training_seed": 1,
+      "path": "manifests/configs/mth602_final_robustness_v1/PA1-PA2/p01_t01.json",
+      "run_name": "mth602_final_robust_PA1_PA2_p01_t01",
+      "existing_seed0_compatibility_candidate": false,
+      "status": "READY_FOR_ADMISSION_AFTER_PACKAGE_VALIDATION"
+    },
+    {
+      "canonical_pair": "PA1-PA2",
+      "partition_seed": 1,
+      "training_seed": 2,
+      "path": "manifests/configs/mth602_final_robustness_v1/PA1-PA2/p01_t02.json",
+      "run_name": "mth602_final_robust_PA1_PA2_p01_t02",
+      "existing_seed0_compatibility_candidate": false,
+      "status": "READY_FOR_ADMISSION_AFTER_PACKAGE_VALIDATION"
+    },
+    {
+      "canonical_pair": "PA1-PA2",
+      "partition_seed": 1,
+      "training_seed": 3,
+      "path": "manifests/configs/mth602_final_robustness_v1/PA1-PA2/p01_t03.json",
+      "run_name": "mth602_final_robust_PA1_PA2_p01_t03",
+      "existing_seed0_compatibility_candidate": false,
+      "status": "READY_FOR_ADMISSION_AFTER_PACKAGE_VALIDATION"
+    },
+    {
+      "canonical_pair": "PA1-PA2",
+      "partition_seed": 1,
+      "training_seed": 4,
+      "path": "manifests/configs/mth602_final_robustness_v1/PA1-PA2/p01_t04.json",
+      "run_name": "mth602_final_robust_PA1_PA2_p01_t04",
+      "existing_seed0_compatibility_candidate": false,
+      "status": "READY_FOR_ADMISSION_AFTER_PACKAGE_VALIDATION"
+    },
+    {
+      "canonical_pair": "PA1-PA2",
+      "partition_seed": 1,
+      "training_seed": 5,
+      "path": "manifests/configs/mth602_final_robustness_v1/PA1-PA2/p01_t05.json",
+      "run_name": "mth602_final_robust_PA1_PA2_p01_t05",
+      "existing_seed0_compatibility_candidate": false,
+      "status": "READY_FOR_ADMISSION_AFTER_PACKAGE_VALIDATION"
+    },
+    {
+      "canonical_pair": "PA1-PA2",
+      "partition_seed": 1,
+      "training_seed": 6,
+      "path": "manifests/configs/mth602_final_robustness_v1/PA1-PA2/p01_t06.json",
+      "run_name": "mth602_final_robust_PA1_PA2_p01_t06",
+      "existing_seed0_compatibility_candidate": false,
+      "status": "READY_FOR_ADMISSION_AFTER_PACKAGE_VALIDATION"
+    },
+    {
+      "canonical_pair": "PA1-PA2",
+      "partition_seed": 1,
+      "training_seed": 7,
+      "path": "manifests/configs/mth602_final_robustness_v1/PA1-PA2/p01_t07.json",
+      "run_name": "mth602_final_robust_PA1_PA2_p01_t07",
+      "existing_seed0_compatibility_candidate": false,
+      "status": "READY_FOR_ADMISSION_AFTER_PACKAGE_VALIDATION"
+    },
+    {
+      "canonical_pair": "PA1-PA2",
+      "partition_seed": 1,
+      "training_seed": 8,
+      "path": "manifests/configs/mth602_final_robustness_v1/PA1-PA2/p01_t08.json",
+      "run_name": "mth602_final_robust_PA1_PA2_p01_t08",
+      "existing_seed0_compatibility_candidate": false,
+      "status": "READY_FOR_ADMISSION_AFTER_PACKAGE_VALIDATION"
+    },
+    {
+      "canonical_pair": "PA1-PA2",
+      "partition_seed": 1,
+      "training_seed": 9,
+      "path": "manifests/configs/mth602_final_robustness_v1/PA1-PA2/p01_t09.json",
+      "run_name": "mth602_final_robust_PA1_PA2_p01_t09",
+      "existing_seed0_compatibility_candidate": false,
+      "status": "READY_FOR_ADMISSION_AFTER_PACKAGE_VALIDATION"
+    },
+    {
+      "canonical_pair": "PA1-PA2",
+      "partition_seed": 2,
+      "training_seed": 0,
+      "path": "manifests/configs/mth602_final_robustness_v1/PA1-PA2/p02_t00.json",
+      "run_name": "mth602_final_robust_PA1_PA2_p02_t00",
+      "existing_seed0_compatibility_candidate": false,
+      "status": "READY_FOR_ADMISSION_AFTER_PACKAGE_VALIDATION"
+    },
+    {
+      "canonical_pair": "PA1-PA2",
+      "partition_seed": 2,
+      "training_seed": 1,
+      "path": "manifests/configs/mth602_final_robustness_v1/PA1-PA2/p02_t01.json",
+      "run_name": "mth602_final_robust_PA1_PA2_p02_t01",
+      "existing_seed0_compatibility_candidate": false,
+      "status": "READY_FOR_ADMISSION_AFTER_PACKAGE_VALIDATION"
+    },
+    {
+      "canonical_pair": "PA1-PA2",
+      "partition_seed": 2,
+      "training_seed": 2,
+      "path": "manifests/configs/mth602_final_robustness_v1/PA1-PA2/p02_t02.json",
+      "run_name": "mth602_final_robust_PA1_PA2_p02_t02",
+      "existing_seed0_compatibility_candidate": false,
+      "status": "READY_FOR_ADMISSION_AFTER_PACKAGE_VALIDATION"
+    },
+    {
+      "canonical_pair": "PA1-PA2",
+      "partition_seed": 2,
+      "training_seed": 3,
+      "path": "manifests/configs/mth602_final_robustness_v1/PA1-PA2/p02_t03.json",
+      "run_name": "mth602_final_robust_PA1_PA2_p02_t03",
+      "existing_seed0_compatibility_candidate": false,
+      "status": "READY_FOR_ADMISSION_AFTER_PACKAGE_VALIDATION"
+    },
+    {
+      "canonical_pair": "PA1-PA2",
+      "partition_seed": 2,
+      "training_seed": 4,
+      "path": "manifests/configs/mth602_final_robustness_v1/PA1-PA2/p02_t04.json",
+      "run_name": "mth602_final_robust_PA1_PA2_p02_t04",
+      "existing_seed0_compatibility_candidate": false,
+      "status": "READY_FOR_ADMISSION_AFTER_PACKAGE_VALIDATION"
+    },
+    {
+      "canonical_pair": "PA1-PA2",
+      "partition_seed": 2,
+      "training_seed": 5,
+      "path": "manifests/configs/mth602_final_robustness_v1/PA1-PA2/p02_t05.json",
+      "run_name": "mth602_final_robust_PA1_PA2_p02_t05",
+      "existing_seed0_compatibility_candidate": false,
+      "status": "READY_FOR_ADMISSION_AFTER_PACKAGE_VALIDATION"
+    },
+    {
+      "canonical_pair": "PA1-PA2",
+      "partition_seed": 2,
+      "training_seed": 6,
+      "path": "manifests/configs/mth602_final_robustness_v1/PA1-PA2/p02_t06.json",
+      "run_name": "mth602_final_robust_PA1_PA2_p02_t06",
+      "existing_seed0_compatibility_candidate": false,
+      "status": "READY_FOR_ADMISSION_AFTER_PACKAGE_VALIDATION"
+    },
+    {
+      "canonical_pair": "PA1-PA2",
+      "partition_seed": 2,
+      "training_seed": 7,
+      "path": "manifests/configs/mth602_final_robustness_v1/PA1-PA2/p02_t07.json",
+      "run_name": "mth602_final_robust_PA1_PA2_p02_t07",
+      "existing_seed0_compatibility_candidate": false,
+      "status": "READY_FOR_ADMISSION_AFTER_PACKAGE_VALIDATION"
+    },
+    {
+      "canonical_pair": "PA1-PA2",
+      "partition_seed": 2,
+      "training_seed": 8,
+      "path": "manifests/configs/mth602_final_robustness_v1/PA1-PA2/p02_t08.json",
+      "run_name": "mth602_final_robust_PA1_PA2_p02_t08",
+      "existing_seed0_compatibility_candidate": false,
+      "status": "READY_FOR_ADMISSION_AFTER_PACKAGE_VALIDATION"
+    },
+    {
+      "canonical_pair": "PA1-PA2",
+      "partition_seed": 2,
+      "training_seed": 9,
+      "path": "manifests/configs/mth602_final_robustness_v1/PA1-PA2/p02_t09.json",
+      "run_name": "mth602_final_robust_PA1_PA2_p02_t09",
+      "existing_seed0_compatibility_candidate": false,
+      "status": "READY_FOR_ADMISSION_AFTER_PACKAGE_VALIDATION"
+    },
+    {
+      "canonical_pair": "PA1-PA2",
+      "partition_seed": 3,
+      "training_seed": 0,
+      "path": "manifests/configs/mth602_final_robustness_v1/PA1-PA2/p03_t00.json",
+      "run_name": "mth602_final_robust_PA1_PA2_p03_t00",
+      "existing_seed0_compatibility_candidate": false,
+      "status": "READY_FOR_ADMISSION_AFTER_PACKAGE_VALIDATION"
+    },
+    {
+      "canonical_pair": "PA1-PA2",
+      "partition_seed": 3,
+      "training_seed": 1,
+      "path": "manifests/configs/mth602_final_robustness_v1/PA1-PA2/p03_t01.json",
+      "run_name": "mth602_final_robust_PA1_PA2_p03_t01",
+      "existing_seed0_compatibility_candidate": false,
+      "status": "READY_FOR_ADMISSION_AFTER_PACKAGE_VALIDATION"
+    },
+    {
+      "canonical_pair": "PA1-PA2",
+      "partition_seed": 3,
+      "training_seed": 2,
+      "path": "manifests/configs/mth602_final_robustness_v1/PA1-PA2/p03_t02.json",
+      "run_name": "mth602_final_robust_PA1_PA2_p03_t02",
+      "existing_seed0_compatibility_candidate": false,
+      "status": "READY_FOR_ADMISSION_AFTER_PACKAGE_VALIDATION"
+    },
+    {
+      "canonical_pair": "PA1-PA2",
+      "partition_seed": 3,
+      "training_seed": 3,
+      "path": "manifests/configs/mth602_final_robustness_v1/PA1-PA2/p03_t03.json",
+      "run_name": "mth602_final_robust_PA1_PA2_p03_t03",
+      "existing_seed0_compatibility_candidate": false,
+      "status": "READY_FOR_ADMISSION_AFTER_PACKAGE_VALIDATION"
+    },
+    {
+      "canonical_pair": "PA1-PA2",
+      "partition_seed": 3,
+      "training_seed": 4,
+      "path": "manifests/configs/mth602_final_robustness_v1/PA1-PA2/p03_t04.json",
+      "run_name": "mth602_final_robust_PA1_PA2_p03_t04",
+      "existing_seed0_compatibility_candidate": false,
+      "status": "READY_FOR_ADMISSION_AFTER_PACKAGE_VALIDATION"
+    },
+    {
+      "canonical_pair": "PA1-PA2",
+      "partition_seed": 3,
+      "training_seed": 5,
+      "path": "manifests/configs/mth602_final_robustness_v1/PA1-PA2/p03_t05.json",
+      "run_name": "mth602_final_robust_PA1_PA2_p03_t05",
+      "existing_seed0_compatibility_candidate": false,
+      "status": "READY_FOR_ADMISSION_AFTER_PACKAGE_VALIDATION"
+    },
+    {
+      "canonical_pair": "PA1-PA2",
+      "partition_seed": 3,
+      "training_seed": 6,
+      "path": "manifests/configs/mth602_final_robustness_v1/PA1-PA2/p03_t06.json",
+      "run_name": "mth602_final_robust_PA1_PA2_p03_t06",
+      "existing_seed0_compatibility_candidate": false,
+      "status": "READY_FOR_ADMISSION_AFTER_PACKAGE_VALIDATION"
+    },
+    {
+      "canonical_pair": "PA1-PA2",
+      "partition_seed": 3,
+      "training_seed": 7,
+      "path": "manifests/configs/mth602_final_robustness_v1/PA1-PA2/p03_t07.json",
+      "run_name": "mth602_final_robust_PA1_PA2_p03_t07",
+      "existing_seed0_compatibility_candidate": false,
+      "status": "READY_FOR_ADMISSION_AFTER_PACKAGE_VALIDATION"
+    },
+    {
+      "canonical_pair": "PA1-PA2",
+      "partition_seed": 3,
+      "training_seed": 8,
+      "path": "manifests/configs/mth602_final_robustness_v1/PA1-PA2/p03_t08.json",
+      "run_name": "mth602_final_robust_PA1_PA2_p03_t08",
+      "existing_seed0_compatibility_candidate": false,
+      "status": "READY_FOR_ADMISSION_AFTER_PACKAGE_VALIDATION"
+    },
+    {
+      "canonical_pair": "PA1-PA2",
+      "partition_seed": 3,
+      "training_seed": 9,
+      "path": "manifests/configs/mth602_final_robustness_v1/PA1-PA2/p03_t09.json",
+      "run_name": "mth602_final_robust_PA1_PA2_p03_t09",
+      "existing_seed0_compatibility_candidate": false,
+      "status": "READY_FOR_ADMISSION_AFTER_PACKAGE_VALIDATION"
+    },
+    {
+      "canonical_pair": "PA1-PA2",
+      "partition_seed": 4,
+      "training_seed": 0,
+      "path": "manifests/configs/mth602_final_robustness_v1/PA1-PA2/p04_t00.json",
+      "run_name": "mth602_final_robust_PA1_PA2_p04_t00",
+      "existing_seed0_compatibility_candidate": false,
+      "status": "READY_FOR_ADMISSION_AFTER_PACKAGE_VALIDATION"
+    },
+    {
+      "canonical_pair": "PA1-PA2",
+      "partition_seed": 4,
+      "training_seed": 1,
+      "path": "manifests/configs/mth602_final_robustness_v1/PA1-PA2/p04_t01.json",
+      "run_name": "mth602_final_robust_PA1_PA2_p04_t01",
+      "existing_seed0_compatibility_candidate": false,
+      "status": "READY_FOR_ADMISSION_AFTER_PACKAGE_VALIDATION"
+    },
+    {
+      "canonical_pair": "PA1-PA2",
+      "partition_seed": 4,
+      "training_seed": 2,
+      "path": "manifests/configs/mth602_final_robustness_v1/PA1-PA2/p04_t02.json",
+      "run_name": "mth602_final_robust_PA1_PA2_p04_t02",
+      "existing_seed0_compatibility_candidate": false,
+      "status": "READY_FOR_ADMISSION_AFTER_PACKAGE_VALIDATION"
+    },
+    {
+      "canonical_pair": "PA1-PA2",
+      "partition_seed": 4,
+      "training_seed": 3,
+      "path": "manifests/configs/mth602_final_robustness_v1/PA1-PA2/p04_t03.json",
+      "run_name": "mth602_final_robust_PA1_PA2_p04_t03",
+      "existing_seed0_compatibility_candidate": false,
+      "status": "READY_FOR_ADMISSION_AFTER_PACKAGE_VALIDATION"
+    },
+    {
+      "canonical_pair": "PA1-PA2",
+      "partition_seed": 4,
+      "training_seed": 4,
+      "path": "manifests/configs/mth602_final_robustness_v1/PA1-PA2/p04_t04.json",
+      "run_name": "mth602_final_robust_PA1_PA2_p04_t04",
+      "existing_seed0_compatibility_candidate": false,
+      "status": "READY_FOR_ADMISSION_AFTER_PACKAGE_VALIDATION"
+    },
+    {
+      "canonical_pair": "PA1-PA2",
+      "partition_seed": 4,
+      "training_seed": 5,
+      "path": "manifests/configs/mth602_final_robustness_v1/PA1-PA2/p04_t05.json",
+      "run_name": "mth602_final_robust_PA1_PA2_p04_t05",
+      "existing_seed0_compatibility_candidate": false,
+      "status": "READY_FOR_ADMISSION_AFTER_PACKAGE_VALIDATION"
+    },
+    {
+      "canonical_pair": "PA1-PA2",
+      "partition_seed": 4,
+      "training_seed": 6,
+      "path": "manifests/configs/mth602_final_robustness_v1/PA1-PA2/p04_t06.json",
+      "run_name": "mth602_final_robust_PA1_PA2_p04_t06",
+      "existing_seed0_compatibility_candidate": false,
+      "status": "READY_FOR_ADMISSION_AFTER_PACKAGE_VALIDATION"
+    },
+    {
+      "canonical_pair": "PA1-PA2",
+      "partition_seed": 4,
+      "training_seed": 7,
+      "path": "manifests/configs/mth602_final_robustness_v1/PA1-PA2/p04_t07.json",
+      "run_name": "mth602_final_robust_PA1_PA2_p04_t07",
+      "existing_seed0_compatibility_candidate": false,
+      "status": "READY_FOR_ADMISSION_AFTER_PACKAGE_VALIDATION"
+    },
+    {
+      "canonical_pair": "PA1-PA2",
+      "partition_seed": 4,
+      "training_seed": 8,
+      "path": "manifests/configs/mth602_final_robustness_v1/PA1-PA2/p04_t08.json",
+      "run_name": "mth602_final_robust_PA1_PA2_p04_t08",
+      "existing_seed0_compatibility_candidate": false,
+      "status": "READY_FOR_ADMISSION_AFTER_PACKAGE_VALIDATION"
+    },
+    {
+      "canonical_pair": "PA1-PA2",
+      "partition_seed": 4,
+      "training_seed": 9,
+      "path": "manifests/configs/mth602_final_robustness_v1/PA1-PA2/p04_t09.json",
+      "run_name": "mth602_final_robust_PA1_PA2_p04_t09",
+      "existing_seed0_compatibility_candidate": false,
+      "status": "READY_FOR_ADMISSION_AFTER_PACKAGE_VALIDATION"
+    },
+    {
+      "canonical_pair": "PA1-PA3",
+      "partition_seed": 0,
+      "training_seed": 0,
+      "path": "manifests/configs/mth602_final_robustness_v1/PA1-PA3/p00_t00.json",
+      "run_name": "mth602_final_robust_PA1_PA3_p00_t00",
+      "existing_seed0_compatibility_candidate": true,
+      "status": "EXISTING_ARTIFACT_COMPATIBILITY_CANDIDATE"
+    },
+    {
+      "canonical_pair": "PA1-PA3",
+      "partition_seed": 0,
+      "training_seed": 1,
+      "path": "manifests/configs/mth602_final_robustness_v1/PA1-PA3/p00_t01.json",
+      "run_name": "mth602_final_robust_PA1_PA3_p00_t01",
+      "existing_seed0_compatibility_candidate": false,
+      "status": "READY_FOR_ADMISSION_AFTER_PACKAGE_VALIDATION"
+    },
+    {
+      "canonical_pair": "PA1-PA3",
+      "partition_seed": 0,
+      "training_seed": 2,
+      "path": "manifests/configs/mth602_final_robustness_v1/PA1-PA3/p00_t02.json",
+      "run_name": "mth602_final_robust_PA1_PA3_p00_t02",
+      "existing_seed0_compatibility_candidate": false,
+      "status": "READY_FOR_ADMISSION_AFTER_PACKAGE_VALIDATION"
+    },
+    {
+      "canonical_pair": "PA1-PA3",
+      "partition_seed": 0,
+      "training_seed": 3,
+      "path": "manifests/configs/mth602_final_robustness_v1/PA1-PA3/p00_t03.json",
+      "run_name": "mth602_final_robust_PA1_PA3_p00_t03",
+      "existing_seed0_compatibility_candidate": false,
+      "status": "READY_FOR_ADMISSION_AFTER_PACKAGE_VALIDATION"
+    },
+    {
+      "canonical_pair": "PA1-PA3",
+      "partition_seed": 0,
+      "training_seed": 4,
+      "path": "manifests/configs/mth602_final_robustness_v1/PA1-PA3/p00_t04.json",
+      "run_name": "mth602_final_robust_PA1_PA3_p00_t04",
+      "existing_seed0_compatibility_candidate": false,
+      "status": "READY_FOR_ADMISSION_AFTER_PACKAGE_VALIDATION"
+    },
+    {
+      "canonical_pair": "PA1-PA3",
+      "partition_seed": 0,
+      "training_seed": 5,
+      "path": "manifests/configs/mth602_final_robustness_v1/PA1-PA3/p00_t05.json",
+      "run_name": "mth602_final_robust_PA1_PA3_p00_t05",
+      "existing_seed0_compatibility_candidate": false,
+      "status": "READY_FOR_ADMISSION_AFTER_PACKAGE_VALIDATION"
+    },
+    {
+      "canonical_pair": "PA1-PA3",
+      "partition_seed": 0,
+      "training_seed": 6,
+      "path": "manifests/configs/mth602_final_robustness_v1/PA1-PA3/p00_t06.json",
+      "run_name": "mth602_final_robust_PA1_PA3_p00_t06",
+      "existing_seed0_compatibility_candidate": false,
+      "status": "READY_FOR_ADMISSION_AFTER_PACKAGE_VALIDATION"
+    },
+    {
+      "canonical_pair": "PA1-PA3",
+      "partition_seed": 0,
+      "training_seed": 7,
+      "path": "manifests/configs/mth602_final_robustness_v1/PA1-PA3/p00_t07.json",
+      "run_name": "mth602_final_robust_PA1_PA3_p00_t07",
+      "existing_seed0_compatibility_candidate": false,
+      "status": "READY_FOR_ADMISSION_AFTER_PACKAGE_VALIDATION"
+    },
+    {
+      "canonical_pair": "PA1-PA3",
+      "partition_seed": 0,
+      "training_seed": 8,
+      "path": "manifests/configs/mth602_final_robustness_v1/PA1-PA3/p00_t08.json",
+      "run_name": "mth602_final_robust_PA1_PA3_p00_t08",
+      "existing_seed0_compatibility_candidate": false,
+      "status": "READY_FOR_ADMISSION_AFTER_PACKAGE_VALIDATION"
+    },
+    {
+      "canonical_pair": "PA1-PA3",
+      "partition_seed": 0,
+      "training_seed": 9,
+      "path": "manifests/configs/mth602_final_robustness_v1/PA1-PA3/p00_t09.json",
+      "run_name": "mth602_final_robust_PA1_PA3_p00_t09",
+      "existing_seed0_compatibility_candidate": false,
+      "status": "READY_FOR_ADMISSION_AFTER_PACKAGE_VALIDATION"
+    },
+    {
+      "canonical_pair": "PA1-PA3",
+      "partition_seed": 1,
+      "training_seed": 0,
+      "path": "manifests/configs/mth602_final_robustness_v1/PA1-PA3/p01_t00.json",
+      "run_name": "mth602_final_robust_PA1_PA3_p01_t00",
+      "existing_seed0_compatibility_candidate": false,
+      "status": "READY_FOR_ADMISSION_AFTER_PACKAGE_VALIDATION"
+    },
+    {
+      "canonical_pair": "PA1-PA3",
+      "partition_seed": 1,
+      "training_seed": 1,
+      "path": "manifests/configs/mth602_final_robustness_v1/PA1-PA3/p01_t01.json",
+      "run_name": "mth602_final_robust_PA1_PA3_p01_t01",
+      "existing_seed0_compatibility_candidate": false,
+      "status": "READY_FOR_ADMISSION_AFTER_PACKAGE_VALIDATION"
+    },
+    {
+      "canonical_pair": "PA1-PA3",
+      "partition_seed": 1,
+      "training_seed": 2,
+      "path": "manifests/configs/mth602_final_robustness_v1/PA1-PA3/p01_t02.json",
+      "run_name": "mth602_final_robust_PA1_PA3_p01_t02",
+      "existing_seed0_compatibility_candidate": false,
+      "status": "READY_FOR_ADMISSION_AFTER_PACKAGE_VALIDATION"
+    },
+    {
+      "canonical_pair": "PA1-PA3",
+      "partition_seed": 1,
+      "training_seed": 3,
+      "path": "manifests/configs/mth602_final_robustness_v1/PA1-PA3/p01_t03.json",
+      "run_name": "mth602_final_robust_PA1_PA3_p01_t03",
+      "existing_seed0_compatibility_candidate": false,
+      "status": "READY_FOR_ADMISSION_AFTER_PACKAGE_VALIDATION"
+    },
+    {
+      "canonical_pair": "PA1-PA3",
+      "partition_seed": 1,
+      "training_seed": 4,
+      "path": "manifests/configs/mth602_final_robustness_v1/PA1-PA3/p01_t04.json",
+      "run_name": "mth602_final_robust_PA1_PA3_p01_t04",
+      "existing_seed0_compatibility_candidate": false,
+      "status": "READY_FOR_ADMISSION_AFTER_PACKAGE_VALIDATION"
+    },
+    {
+      "canonical_pair": "PA1-PA3",
+      "partition_seed": 1,
+      "training_seed": 5,
+      "path": "manifests/configs/mth602_final_robustness_v1/PA1-PA3/p01_t05.json",
+      "run_name": "mth602_final_robust_PA1_PA3_p01_t05",
+      "existing_seed0_compatibility_candidate": false,
+      "status": "READY_FOR_ADMISSION_AFTER_PACKAGE_VALIDATION"
+    },
+    {
+      "canonical_pair": "PA1-PA3",
+      "partition_seed": 1,
+      "training_seed": 6,
+      "path": "manifests/configs/mth602_final_robustness_v1/PA1-PA3/p01_t06.json",
+      "run_name": "mth602_final_robust_PA1_PA3_p01_t06",
+      "existing_seed0_compatibility_candidate": false,
+      "status": "READY_FOR_ADMISSION_AFTER_PACKAGE_VALIDATION"
+    },
+    {
+      "canonical_pair": "PA1-PA3",
+      "partition_seed": 1,
+      "training_seed": 7,
+      "path": "manifests/configs/mth602_final_robustness_v1/PA1-PA3/p01_t07.json",
+      "run_name": "mth602_final_robust_PA1_PA3_p01_t07",
+      "existing_seed0_compatibility_candidate": false,
+      "status": "READY_FOR_ADMISSION_AFTER_PACKAGE_VALIDATION"
+    },
+    {
+      "canonical_pair": "PA1-PA3",
+      "partition_seed": 1,
+      "training_seed": 8,
+      "path": "manifests/configs/mth602_final_robustness_v1/PA1-PA3/p01_t08.json",
+      "run_name": "mth602_final_robust_PA1_PA3_p01_t08",
+      "existing_seed0_compatibility_candidate": false,
+      "status": "READY_FOR_ADMISSION_AFTER_PACKAGE_VALIDATION"
+    },
+    {
+      "canonical_pair": "PA1-PA3",
+      "partition_seed": 1,
+      "training_seed": 9,
+      "path": "manifests/configs/mth602_final_robustness_v1/PA1-PA3/p01_t09.json",
+      "run_name": "mth602_final_robust_PA1_PA3_p01_t09",
+      "existing_seed0_compatibility_candidate": false,
+      "status": "READY_FOR_ADMISSION_AFTER_PACKAGE_VALIDATION"
+    },
+    {
+      "canonical_pair": "PA1-PA3",
+      "partition_seed": 2,
+      "training_seed": 0,
+      "path": "manifests/configs/mth602_final_robustness_v1/PA1-PA3/p02_t00.json",
+      "run_name": "mth602_final_robust_PA1_PA3_p02_t00",
+      "existing_seed0_compatibility_candidate": false,
+      "status": "READY_FOR_ADMISSION_AFTER_PACKAGE_VALIDATION"
+    },
+    {
+      "canonical_pair": "PA1-PA3",
+      "partition_seed": 2,
+      "training_seed": 1,
+      "path": "manifests/configs/mth602_final_robustness_v1/PA1-PA3/p02_t01.json",
+      "run_name": "mth602_final_robust_PA1_PA3_p02_t01",
+      "existing_seed0_compatibility_candidate": false,
+      "status": "READY_FOR_ADMISSION_AFTER_PACKAGE_VALIDATION"
+    },
+    {
+      "canonical_pair": "PA1-PA3",
+      "partition_seed": 2,
+      "training_seed": 2,
+      "path": "manifests/configs/mth602_final_robustness_v1/PA1-PA3/p02_t02.json",
+      "run_name": "mth602_final_robust_PA1_PA3_p02_t02",
+      "existing_seed0_compatibility_candidate": false,
+      "status": "READY_FOR_ADMISSION_AFTER_PACKAGE_VALIDATION"
+    },
+    {
+      "canonical_pair": "PA1-PA3",
+      "partition_seed": 2,
+      "training_seed": 3,
+      "path": "manifests/configs/mth602_final_robustness_v1/PA1-PA3/p02_t03.json",
+      "run_name": "mth602_final_robust_PA1_PA3_p02_t03",
+      "existing_seed0_compatibility_candidate": false,
+      "status": "READY_FOR_ADMISSION_AFTER_PACKAGE_VALIDATION"
+    },
+    {
+      "canonical_pair": "PA1-PA3",
+      "partition_seed": 2,
+      "training_seed": 4,
+      "path": "manifests/configs/mth602_final_robustness_v1/PA1-PA3/p02_t04.json",
+      "run_name": "mth602_final_robust_PA1_PA3_p02_t04",
+      "existing_seed0_compatibility_candidate": false,
+      "status": "READY_FOR_ADMISSION_AFTER_PACKAGE_VALIDATION"
+    },
+    {
+      "canonical_pair": "PA1-PA3",
+      "partition_seed": 2,
+      "training_seed": 5,
+      "path": "manifests/configs/mth602_final_robustness_v1/PA1-PA3/p02_t05.json",
+      "run_name": "mth602_final_robust_PA1_PA3_p02_t05",
+      "existing_seed0_compatibility_candidate": false,
+      "status": "READY_FOR_ADMISSION_AFTER_PACKAGE_VALIDATION"
+    },
+    {
+      "canonical_pair": "PA1-PA3",
+      "partition_seed": 2,
+      "training_seed": 6,
+      "path": "manifests/configs/mth602_final_robustness_v1/PA1-PA3/p02_t06.json",
+      "run_name": "mth602_final_robust_PA1_PA3_p02_t06",
+      "existing_seed0_compatibility_candidate": false,
+      "status": "READY_FOR_ADMISSION_AFTER_PACKAGE_VALIDATION"
+    },
+    {
+      "canonical_pair": "PA1-PA3",
+      "partition_seed": 2,
+      "training_seed": 7,
+      "path": "manifests/configs/mth602_final_robustness_v1/PA1-PA3/p02_t07.json",
+      "run_name": "mth602_final_robust_PA1_PA3_p02_t07",
+      "existing_seed0_compatibility_candidate": false,
+      "status": "READY_FOR_ADMISSION_AFTER_PACKAGE_VALIDATION"
+    },
+    {
+      "canonical_pair": "PA1-PA3",
+      "partition_seed": 2,
+      "training_seed": 8,
+      "path": "manifests/configs/mth602_final_robustness_v1/PA1-PA3/p02_t08.json",
+      "run_name": "mth602_final_robust_PA1_PA3_p02_t08",
+      "existing_seed0_compatibility_candidate": false,
+      "status": "READY_FOR_ADMISSION_AFTER_PACKAGE_VALIDATION"
+    },
+    {
+      "canonical_pair": "PA1-PA3",
+      "partition_seed": 2,
+      "training_seed": 9,
+      "path": "manifests/configs/mth602_final_robustness_v1/PA1-PA3/p02_t09.json",
+      "run_name": "mth602_final_robust_PA1_PA3_p02_t09",
+      "existing_seed0_compatibility_candidate": false,
+      "status": "READY_FOR_ADMISSION_AFTER_PACKAGE_VALIDATION"
+    },
+    {
+      "canonical_pair": "PA1-PA3",
+      "partition_seed": 3,
+      "training_seed": 0,
+      "path": "manifests/configs/mth602_final_robustness_v1/PA1-PA3/p03_t00.json",
+      "run_name": "mth602_final_robust_PA1_PA3_p03_t00",
+      "existing_seed0_compatibility_candidate": false,
+      "status": "READY_FOR_ADMISSION_AFTER_PACKAGE_VALIDATION"
+    },
+    {
+      "canonical_pair": "PA1-PA3",
+      "partition_seed": 3,
+      "training_seed": 1,
+      "path": "manifests/configs/mth602_final_robustness_v1/PA1-PA3/p03_t01.json",
+      "run_name": "mth602_final_robust_PA1_PA3_p03_t01",
+      "existing_seed0_compatibility_candidate": false,
+      "status": "READY_FOR_ADMISSION_AFTER_PACKAGE_VALIDATION"
+    },
+    {
+      "canonical_pair": "PA1-PA3",
+      "partition_seed": 3,
+      "training_seed": 2,
+      "path": "manifests/configs/mth602_final_robustness_v1/PA1-PA3/p03_t02.json",
+      "run_name": "mth602_final_robust_PA1_PA3_p03_t02",
+      "existing_seed0_compatibility_candidate": false,
+      "status": "READY_FOR_ADMISSION_AFTER_PACKAGE_VALIDATION"
+    },
+    {
+      "canonical_pair": "PA1-PA3",
+      "partition_seed": 3,
+      "training_seed": 3,
+      "path": "manifests/configs/mth602_final_robustness_v1/PA1-PA3/p03_t03.json",
+      "run_name": "mth602_final_robust_PA1_PA3_p03_t03",
+      "existing_seed0_compatibility_candidate": false,
+      "status": "READY_FOR_ADMISSION_AFTER_PACKAGE_VALIDATION"
+    },
+    {
+      "canonical_pair": "PA1-PA3",
+      "partition_seed": 3,
+      "training_seed": 4,
+      "path": "manifests/configs/mth602_final_robustness_v1/PA1-PA3/p03_t04.json",
+      "run_name": "mth602_final_robust_PA1_PA3_p03_t04",
+      "existing_seed0_compatibility_candidate": false,
+      "status": "READY_FOR_ADMISSION_AFTER_PACKAGE_VALIDATION"
+    },
+    {
+      "canonical_pair": "PA1-PA3",
+      "partition_seed": 3,
+      "training_seed": 5,
+      "path": "manifests/configs/mth602_final_robustness_v1/PA1-PA3/p03_t05.json",
+      "run_name": "mth602_final_robust_PA1_PA3_p03_t05",
+      "existing_seed0_compatibility_candidate": false,
+      "status": "READY_FOR_ADMISSION_AFTER_PACKAGE_VALIDATION"
+    },
+    {
+      "canonical_pair": "PA1-PA3",
+      "partition_seed": 3,
+      "training_seed": 6,
+      "path": "manifests/configs/mth602_final_robustness_v1/PA1-PA3/p03_t06.json",
+      "run_name": "mth602_final_robust_PA1_PA3_p03_t06",
+      "existing_seed0_compatibility_candidate": false,
+      "status": "READY_FOR_ADMISSION_AFTER_PACKAGE_VALIDATION"
+    },
+    {
+      "canonical_pair": "PA1-PA3",
+      "partition_seed": 3,
+      "training_seed": 7,
+      "path": "manifests/configs/mth602_final_robustness_v1/PA1-PA3/p03_t07.json",
+      "run_name": "mth602_final_robust_PA1_PA3_p03_t07",
+      "existing_seed0_compatibility_candidate": false,
+      "status": "READY_FOR_ADMISSION_AFTER_PACKAGE_VALIDATION"
+    },
+    {
+      "canonical_pair": "PA1-PA3",
+      "partition_seed": 3,
+      "training_seed": 8,
+      "path": "manifests/configs/mth602_final_robustness_v1/PA1-PA3/p03_t08.json",
+      "run_name": "mth602_final_robust_PA1_PA3_p03_t08",
+      "existing_seed0_compatibility_candidate": false,
+      "status": "READY_FOR_ADMISSION_AFTER_PACKAGE_VALIDATION"
+    },
+    {
+      "canonical_pair": "PA1-PA3",
+      "partition_seed": 3,
+      "training_seed": 9,
+      "path": "manifests/configs/mth602_final_robustness_v1/PA1-PA3/p03_t09.json",
+      "run_name": "mth602_final_robust_PA1_PA3_p03_t09",
+      "existing_seed0_compatibility_candidate": false,
+      "status": "READY_FOR_ADMISSION_AFTER_PACKAGE_VALIDATION"
+    },
+    {
+      "canonical_pair": "PA1-PA3",
+      "partition_seed": 4,
+      "training_seed": 0,
+      "path": "manifests/configs/mth602_final_robustness_v1/PA1-PA3/p04_t00.json",
+      "run_name": "mth602_final_robust_PA1_PA3_p04_t00",
+      "existing_seed0_compatibility_candidate": false,
+      "status": "READY_FOR_ADMISSION_AFTER_PACKAGE_VALIDATION"
+    },
+    {
+      "canonical_pair": "PA1-PA3",
+      "partition_seed": 4,
+      "training_seed": 1,
+      "path": "manifests/configs/mth602_final_robustness_v1/PA1-PA3/p04_t01.json",
+      "run_name": "mth602_final_robust_PA1_PA3_p04_t01",
+      "existing_seed0_compatibility_candidate": false,
+      "status": "READY_FOR_ADMISSION_AFTER_PACKAGE_VALIDATION"
+    },
+    {
+      "canonical_pair": "PA1-PA3",
+      "partition_seed": 4,
+      "training_seed": 2,
+      "path": "manifests/configs/mth602_final_robustness_v1/PA1-PA3/p04_t02.json",
+      "run_name": "mth602_final_robust_PA1_PA3_p04_t02",
+      "existing_seed0_compatibility_candidate": false,
+      "status": "READY_FOR_ADMISSION_AFTER_PACKAGE_VALIDATION"
+    },
+    {
+      "canonical_pair": "PA1-PA3",
+      "partition_seed": 4,
+      "training_seed": 3,
+      "path": "manifests/configs/mth602_final_robustness_v1/PA1-PA3/p04_t03.json",
+      "run_name": "mth602_final_robust_PA1_PA3_p04_t03",
+      "existing_seed0_compatibility_candidate": false,
+      "status": "READY_FOR_ADMISSION_AFTER_PACKAGE_VALIDATION"
+    },
+    {
+      "canonical_pair": "PA1-PA3",
+      "partition_seed": 4,
+      "training_seed": 4,
+      "path": "manifests/configs/mth602_final_robustness_v1/PA1-PA3/p04_t04.json",
+      "run_name": "mth602_final_robust_PA1_PA3_p04_t04",
+      "existing_seed0_compatibility_candidate": false,
+      "status": "READY_FOR_ADMISSION_AFTER_PACKAGE_VALIDATION"
+    },
+    {
+      "canonical_pair": "PA1-PA3",
+      "partition_seed": 4,
+      "training_seed": 5,
+      "path": "manifests/configs/mth602_final_robustness_v1/PA1-PA3/p04_t05.json",
+      "run_name": "mth602_final_robust_PA1_PA3_p04_t05",
+      "existing_seed0_compatibility_candidate": false,
+      "status": "READY_FOR_ADMISSION_AFTER_PACKAGE_VALIDATION"
+    },
+    {
+      "canonical_pair": "PA1-PA3",
+      "partition_seed": 4,
+      "training_seed": 6,
+      "path": "manifests/configs/mth602_final_robustness_v1/PA1-PA3/p04_t06.json",
+      "run_name": "mth602_final_robust_PA1_PA3_p04_t06",
+      "existing_seed0_compatibility_candidate": false,
+      "status": "READY_FOR_ADMISSION_AFTER_PACKAGE_VALIDATION"
+    },
+    {
+      "canonical_pair": "PA1-PA3",
+      "partition_seed": 4,
+      "training_seed": 7,
+      "path": "manifests/configs/mth602_final_robustness_v1/PA1-PA3/p04_t07.json",
+      "run_name": "mth602_final_robust_PA1_PA3_p04_t07",
+      "existing_seed0_compatibility_candidate": false,
+      "status": "READY_FOR_ADMISSION_AFTER_PACKAGE_VALIDATION"
+    },
+    {
+      "canonical_pair": "PA1-PA3",
+      "partition_seed": 4,
+      "training_seed": 8,
+      "path": "manifests/configs/mth602_final_robustness_v1/PA1-PA3/p04_t08.json",
+      "run_name": "mth602_final_robust_PA1_PA3_p04_t08",
+      "existing_seed0_compatibility_candidate": false,
+      "status": "READY_FOR_ADMISSION_AFTER_PACKAGE_VALIDATION"
+    },
+    {
+      "canonical_pair": "PA1-PA3",
+      "partition_seed": 4,
+      "training_seed": 9,
+      "path": "manifests/configs/mth602_final_robustness_v1/PA1-PA3/p04_t09.json",
+      "run_name": "mth602_final_robust_PA1_PA3_p04_t09",
+      "existing_seed0_compatibility_candidate": false,
+      "status": "READY_FOR_ADMISSION_AFTER_PACKAGE_VALIDATION"
+    },
+    {
+      "canonical_pair": "PA1-PA4",
+      "partition_seed": 0,
+      "training_seed": 0,
+      "path": "manifests/configs/mth602_final_robustness_v1/PA1-PA4/p00_t00.json",
+      "run_name": "mth602_final_robust_PA1_PA4_p00_t00",
+      "existing_seed0_compatibility_candidate": true,
+      "status": "EXISTING_ARTIFACT_COMPATIBILITY_CANDIDATE"
+    },
+    {
+      "canonical_pair": "PA1-PA4",
+      "partition_seed": 0,
+      "training_seed": 1,
+      "path": "manifests/configs/mth602_final_robustness_v1/PA1-PA4/p00_t01.json",
+      "run_name": "mth602_final_robust_PA1_PA4_p00_t01",
+      "existing_seed0_compatibility_candidate": false,
+      "status": "READY_FOR_ADMISSION_AFTER_PACKAGE_VALIDATION"
+    },
+    {
+      "canonical_pair": "PA1-PA4",
+      "partition_seed": 0,
+      "training_seed": 2,
+      "path": "manifests/configs/mth602_final_robustness_v1/PA1-PA4/p00_t02.json",
+      "run_name": "mth602_final_robust_PA1_PA4_p00_t02",
+      "existing_seed0_compatibility_candidate": false,
+      "status": "READY_FOR_ADMISSION_AFTER_PACKAGE_VALIDATION"
+    },
+    {
+      "canonical_pair": "PA1-PA4",
+      "partition_seed": 0,
+      "training_seed": 3,
+      "path": "manifests/configs/mth602_final_robustness_v1/PA1-PA4/p00_t03.json",
+      "run_name": "mth602_final_robust_PA1_PA4_p00_t03",
+      "existing_seed0_compatibility_candidate": false,
+      "status": "READY_FOR_ADMISSION_AFTER_PACKAGE_VALIDATION"
+    },
+    {
+      "canonical_pair": "PA1-PA4",
+      "partition_seed": 0,
+      "training_seed": 4,
+      "path": "manifests/configs/mth602_final_robustness_v1/PA1-PA4/p00_t04.json",
+      "run_name": "mth602_final_robust_PA1_PA4_p00_t04",
+      "existing_seed0_compatibility_candidate": false,
+      "status": "READY_FOR_ADMISSION_AFTER_PACKAGE_VALIDATION"
+    },
+    {
+      "canonical_pair": "PA1-PA4",
+      "partition_seed": 0,
+      "training_seed": 5,
+      "path": "manifests/configs/mth602_final_robustness_v1/PA1-PA4/p00_t05.json",
+      "run_name": "mth602_final_robust_PA1_PA4_p00_t05",
+      "existing_seed0_compatibility_candidate": false,
+      "status": "READY_FOR_ADMISSION_AFTER_PACKAGE_VALIDATION"
+    },
+    {
+      "canonical_pair": "PA1-PA4",
+      "partition_seed": 0,
+      "training_seed": 6,
+      "path": "manifests/configs/mth602_final_robustness_v1/PA1-PA4/p00_t06.json",
+      "run_name": "mth602_final_robust_PA1_PA4_p00_t06",
+      "existing_seed0_compatibility_candidate": false,
+      "status": "READY_FOR_ADMISSION_AFTER_PACKAGE_VALIDATION"
+    },
+    {
+      "canonical_pair": "PA1-PA4",
+      "partition_seed": 0,
+      "training_seed": 7,
+      "path": "manifests/configs/mth602_final_robustness_v1/PA1-PA4/p00_t07.json",
+      "run_name": "mth602_final_robust_PA1_PA4_p00_t07",
+      "existing_seed0_compatibility_candidate": false,
+      "status": "READY_FOR_ADMISSION_AFTER_PACKAGE_VALIDATION"
+    },
+    {
+      "canonical_pair": "PA1-PA4",
+      "partition_seed": 0,
+      "training_seed": 8,
+      "path": "manifests/configs/mth602_final_robustness_v1/PA1-PA4/p00_t08.json",
+      "run_name": "mth602_final_robust_PA1_PA4_p00_t08",
+      "existing_seed0_compatibility_candidate": false,
+      "status": "READY_FOR_ADMISSION_AFTER_PACKAGE_VALIDATION"
+    },
+    {
+      "canonical_pair": "PA1-PA4",
+      "partition_seed": 0,
+      "training_seed": 9,
+      "path": "manifests/configs/mth602_final_robustness_v1/PA1-PA4/p00_t09.json",
+      "run_name": "mth602_final_robust_PA1_PA4_p00_t09",
+      "existing_seed0_compatibility_candidate": false,
+      "status": "READY_FOR_ADMISSION_AFTER_PACKAGE_VALIDATION"
+    },
+    {
+      "canonical_pair": "PA1-PA4",
+      "partition_seed": 1,
+      "training_seed": 0,
+      "path": "manifests/configs/mth602_final_robustness_v1/PA1-PA4/p01_t00.json",
+      "run_name": "mth602_final_robust_PA1_PA4_p01_t00",
+      "existing_seed0_compatibility_candidate": false,
+      "status": "READY_FOR_ADMISSION_AFTER_PACKAGE_VALIDATION"
+    },
+    {
+      "canonical_pair": "PA1-PA4",
+      "partition_seed": 1,
+      "training_seed": 1,
+      "path": "manifests/configs/mth602_final_robustness_v1/PA1-PA4/p01_t01.json",
+      "run_name": "mth602_final_robust_PA1_PA4_p01_t01",
+      "existing_seed0_compatibility_candidate": false,
+      "status": "READY_FOR_ADMISSION_AFTER_PACKAGE_VALIDATION"
+    },
+    {
+      "canonical_pair": "PA1-PA4",
+      "partition_seed": 1,
+      "training_seed": 2,
+      "path": "manifests/configs/mth602_final_robustness_v1/PA1-PA4/p01_t02.json",
+      "run_name": "mth602_final_robust_PA1_PA4_p01_t02",
+      "existing_seed0_compatibility_candidate": false,
+      "status": "READY_FOR_ADMISSION_AFTER_PACKAGE_VALIDATION"
+    },
+    {
+      "canonical_pair": "PA1-PA4",
+      "partition_seed": 1,
+      "training_seed": 3,
+      "path": "manifests/configs/mth602_final_robustness_v1/PA1-PA4/p01_t03.json",
+      "run_name": "mth602_final_robust_PA1_PA4_p01_t03",
+      "existing_seed0_compatibility_candidate": false,
+      "status": "READY_FOR_ADMISSION_AFTER_PACKAGE_VALIDATION"
+    },
+    {
+      "canonical_pair": "PA1-PA4",
+      "partition_seed": 1,
+      "training_seed": 4,
+      "path": "manifests/configs/mth602_final_robustness_v1/PA1-PA4/p01_t04.json",
+      "run_name": "mth602_final_robust_PA1_PA4_p01_t04",
+      "existing_seed0_compatibility_candidate": false,
+      "status": "READY_FOR_ADMISSION_AFTER_PACKAGE_VALIDATION"
+    },
+    {
+      "canonical_pair": "PA1-PA4",
+      "partition_seed": 1,
+      "training_seed": 5,
+      "path": "manifests/configs/mth602_final_robustness_v1/PA1-PA4/p01_t05.json",
+      "run_name": "mth602_final_robust_PA1_PA4_p01_t05",
+      "existing_seed0_compatibility_candidate": false,
+      "status": "READY_FOR_ADMISSION_AFTER_PACKAGE_VALIDATION"
+    },
+    {
+      "canonical_pair": "PA1-PA4",
+      "partition_seed": 1,
+      "training_seed": 6,
+      "path": "manifests/configs/mth602_final_robustness_v1/PA1-PA4/p01_t06.json",
+      "run_name": "mth602_final_robust_PA1_PA4_p01_t06",
+      "existing_seed0_compatibility_candidate": false,
+      "status": "READY_FOR_ADMISSION_AFTER_PACKAGE_VALIDATION"
+    },
+    {
+      "canonical_pair": "PA1-PA4",
+      "partition_seed": 1,
+      "training_seed": 7,
+      "path": "manifests/configs/mth602_final_robustness_v1/PA1-PA4/p01_t07.json",
+      "run_name": "mth602_final_robust_PA1_PA4_p01_t07",
+      "existing_seed0_compatibility_candidate": false,
+      "status": "READY_FOR_ADMISSION_AFTER_PACKAGE_VALIDATION"
+    },
+    {
+      "canonical_pair": "PA1-PA4",
+      "partition_seed": 1,
+      "training_seed": 8,
+      "path": "manifests/configs/mth602_final_robustness_v1/PA1-PA4/p01_t08.json",
+      "run_name": "mth602_final_robust_PA1_PA4_p01_t08",
+      "existing_seed0_compatibility_candidate": false,
+      "status": "READY_FOR_ADMISSION_AFTER_PACKAGE_VALIDATION"
+    },
+    {
+      "canonical_pair": "PA1-PA4",
+      "partition_seed": 1,
+      "training_seed": 9,
+      "path": "manifests/configs/mth602_final_robustness_v1/PA1-PA4/p01_t09.json",
+      "run_name": "mth602_final_robust_PA1_PA4_p01_t09",
+      "existing_seed0_compatibility_candidate": false,
+      "status": "READY_FOR_ADMISSION_AFTER_PACKAGE_VALIDATION"
+    },
+    {
+      "canonical_pair": "PA1-PA4",
+      "partition_seed": 2,
+      "training_seed": 0,
+      "path": "manifests/configs/mth602_final_robustness_v1/PA1-PA4/p02_t00.json",
+      "run_name": "mth602_final_robust_PA1_PA4_p02_t00",
+      "existing_seed0_compatibility_candidate": false,
+      "status": "READY_FOR_ADMISSION_AFTER_PACKAGE_VALIDATION"
+    },
+    {
+      "canonical_pair": "PA1-PA4",
+      "partition_seed": 2,
+      "training_seed": 1,
+      "path": "manifests/configs/mth602_final_robustness_v1/PA1-PA4/p02_t01.json",
+      "run_name": "mth602_final_robust_PA1_PA4_p02_t01",
+      "existing_seed0_compatibility_candidate": false,
+      "status": "READY_FOR_ADMISSION_AFTER_PACKAGE_VALIDATION"
+    },
+    {
+      "canonical_pair": "PA1-PA4",
+      "partition_seed": 2,
+      "training_seed": 2,
+      "path": "manifests/configs/mth602_final_robustness_v1/PA1-PA4/p02_t02.json",
+      "run_name": "mth602_final_robust_PA1_PA4_p02_t02",
+      "existing_seed0_compatibility_candidate": false,
+      "status": "READY_FOR_ADMISSION_AFTER_PACKAGE_VALIDATION"
+    },
+    {
+      "canonical_pair": "PA1-PA4",
+      "partition_seed": 2,
+      "training_seed": 3,
+      "path": "manifests/configs/mth602_final_robustness_v1/PA1-PA4/p02_t03.json",
+      "run_name": "mth602_final_robust_PA1_PA4_p02_t03",
+      "existing_seed0_compatibility_candidate": false,
+      "status": "READY_FOR_ADMISSION_AFTER_PACKAGE_VALIDATION"
+    },
+    {
+      "canonical_pair": "PA1-PA4",
+      "partition_seed": 2,
+      "training_seed": 4,
+      "path": "manifests/configs/mth602_final_robustness_v1/PA1-PA4/p02_t04.json",
+      "run_name": "mth602_final_robust_PA1_PA4_p02_t04",
+      "existing_seed0_compatibility_candidate": false,
+      "status": "READY_FOR_ADMISSION_AFTER_PACKAGE_VALIDATION"
+    },
+    {
+      "canonical_pair": "PA1-PA4",
+      "partition_seed": 2,
+      "training_seed": 5,
+      "path": "manifests/configs/mth602_final_robustness_v1/PA1-PA4/p02_t05.json",
+      "run_name": "mth602_final_robust_PA1_PA4_p02_t05",
+      "existing_seed0_compatibility_candidate": false,
+      "status": "READY_FOR_ADMISSION_AFTER_PACKAGE_VALIDATION"
+    },
+    {
+      "canonical_pair": "PA1-PA4",
+      "partition_seed": 2,
+      "training_seed": 6,
+      "path": "manifests/configs/mth602_final_robustness_v1/PA1-PA4/p02_t06.json",
+      "run_name": "mth602_final_robust_PA1_PA4_p02_t06",
+      "existing_seed0_compatibility_candidate": false,
+      "status": "READY_FOR_ADMISSION_AFTER_PACKAGE_VALIDATION"
+    },
+    {
+      "canonical_pair": "PA1-PA4",
+      "partition_seed": 2,
+      "training_seed": 7,
+      "path": "manifests/configs/mth602_final_robustness_v1/PA1-PA4/p02_t07.json",
+      "run_name": "mth602_final_robust_PA1_PA4_p02_t07",
+      "existing_seed0_compatibility_candidate": false,
+      "status": "READY_FOR_ADMISSION_AFTER_PACKAGE_VALIDATION"
+    },
+    {
+      "canonical_pair": "PA1-PA4",
+      "partition_seed": 2,
+      "training_seed": 8,
+      "path": "manifests/configs/mth602_final_robustness_v1/PA1-PA4/p02_t08.json",
+      "run_name": "mth602_final_robust_PA1_PA4_p02_t08",
+      "existing_seed0_compatibility_candidate": false,
+      "status": "READY_FOR_ADMISSION_AFTER_PACKAGE_VALIDATION"
+    },
+    {
+      "canonical_pair": "PA1-PA4",
+      "partition_seed": 2,
+      "training_seed": 9,
+      "path": "manifests/configs/mth602_final_robustness_v1/PA1-PA4/p02_t09.json",
+      "run_name": "mth602_final_robust_PA1_PA4_p02_t09",
+      "existing_seed0_compatibility_candidate": false,
+      "status": "READY_FOR_ADMISSION_AFTER_PACKAGE_VALIDATION"
+    },
+    {
+      "canonical_pair": "PA1-PA4",
+      "partition_seed": 3,
+      "training_seed": 0,
+      "path": "manifests/configs/mth602_final_robustness_v1/PA1-PA4/p03_t00.json",
+      "run_name": "mth602_final_robust_PA1_PA4_p03_t00",
+      "existing_seed0_compatibility_candidate": false,
+      "status": "READY_FOR_ADMISSION_AFTER_PACKAGE_VALIDATION"
+    },
+    {
+      "canonical_pair": "PA1-PA4",
+      "partition_seed": 3,
+      "training_seed": 1,
+      "path": "manifests/configs/mth602_final_robustness_v1/PA1-PA4/p03_t01.json",
+      "run_name": "mth602_final_robust_PA1_PA4_p03_t01",
+      "existing_seed0_compatibility_candidate": false,
+      "status": "READY_FOR_ADMISSION_AFTER_PACKAGE_VALIDATION"
+    },
+    {
+      "canonical_pair": "PA1-PA4",
+      "partition_seed": 3,
+      "training_seed": 2,
+      "path": "manifests/configs/mth602_final_robustness_v1/PA1-PA4/p03_t02.json",
+      "run_name": "mth602_final_robust_PA1_PA4_p03_t02",
+      "existing_seed0_compatibility_candidate": false,
+      "status": "READY_FOR_ADMISSION_AFTER_PACKAGE_VALIDATION"
+    },
+    {
+      "canonical_pair": "PA1-PA4",
+      "partition_seed": 3,
+      "training_seed": 3,
+      "path": "manifests/configs/mth602_final_robustness_v1/PA1-PA4/p03_t03.json",
+      "run_name": "mth602_final_robust_PA1_PA4_p03_t03",
+      "existing_seed0_compatibility_candidate": false,
+      "status": "READY_FOR_ADMISSION_AFTER_PACKAGE_VALIDATION"
+    },
+    {
+      "canonical_pair": "PA1-PA4",
+      "partition_seed": 3,
+      "training_seed": 4,
+      "path": "manifests/configs/mth602_final_robustness_v1/PA1-PA4/p03_t04.json",
+      "run_name": "mth602_final_robust_PA1_PA4_p03_t04",
+      "existing_seed0_compatibility_candidate": false,
+      "status": "READY_FOR_ADMISSION_AFTER_PACKAGE_VALIDATION"
+    },
+    {
+      "canonical_pair": "PA1-PA4",
+      "partition_seed": 3,
+      "training_seed": 5,
+      "path": "manifests/configs/mth602_final_robustness_v1/PA1-PA4/p03_t05.json",
+      "run_name": "mth602_final_robust_PA1_PA4_p03_t05",
+      "existing_seed0_compatibility_candidate": false,
+      "status": "READY_FOR_ADMISSION_AFTER_PACKAGE_VALIDATION"
+    },
+    {
+      "canonical_pair": "PA1-PA4",
+      "partition_seed": 3,
+      "training_seed": 6,
+      "path": "manifests/configs/mth602_final_robustness_v1/PA1-PA4/p03_t06.json",
+      "run_name": "mth602_final_robust_PA1_PA4_p03_t06",
+      "existing_seed0_compatibility_candidate": false,
+      "status": "READY_FOR_ADMISSION_AFTER_PACKAGE_VALIDATION"
+    },
+    {
+      "canonical_pair": "PA1-PA4",
+      "partition_seed": 3,
+      "training_seed": 7,
+      "path": "manifests/configs/mth602_final_robustness_v1/PA1-PA4/p03_t07.json",
+      "run_name": "mth602_final_robust_PA1_PA4_p03_t07",
+      "existing_seed0_compatibility_candidate": false,
+      "status": "READY_FOR_ADMISSION_AFTER_PACKAGE_VALIDATION"
+    },
+    {
+      "canonical_pair": "PA1-PA4",
+      "partition_seed": 3,
+      "training_seed": 8,
+      "path": "manifests/configs/mth602_final_robustness_v1/PA1-PA4/p03_t08.json",
+      "run_name": "mth602_final_robust_PA1_PA4_p03_t08",
+      "existing_seed0_compatibility_candidate": false,
+      "status": "READY_FOR_ADMISSION_AFTER_PACKAGE_VALIDATION"
+    },
+    {
+      "canonical_pair": "PA1-PA4",
+      "partition_seed": 3,
+      "training_seed": 9,
+      "path": "manifests/configs/mth602_final_robustness_v1/PA1-PA4/p03_t09.json",
+      "run_name": "mth602_final_robust_PA1_PA4_p03_t09",
+      "existing_seed0_compatibility_candidate": false,
+      "status": "READY_FOR_ADMISSION_AFTER_PACKAGE_VALIDATION"
+    },
+    {
+      "canonical_pair": "PA1-PA4",
+      "partition_seed": 4,
+      "training_seed": 0,
+      "path": "manifests/configs/mth602_final_robustness_v1/PA1-PA4/p04_t00.json",
+      "run_name": "mth602_final_robust_PA1_PA4_p04_t00",
+      "existing_seed0_compatibility_candidate": false,
+      "status": "READY_FOR_ADMISSION_AFTER_PACKAGE_VALIDATION"
+    },
+    {
+      "canonical_pair": "PA1-PA4",
+      "partition_seed": 4,
+      "training_seed": 1,
+      "path": "manifests/configs/mth602_final_robustness_v1/PA1-PA4/p04_t01.json",
+      "run_name": "mth602_final_robust_PA1_PA4_p04_t01",
+      "existing_seed0_compatibility_candidate": false,
+      "status": "READY_FOR_ADMISSION_AFTER_PACKAGE_VALIDATION"
+    },
+    {
+      "canonical_pair": "PA1-PA4",
+      "partition_seed": 4,
+      "training_seed": 2,
+      "path": "manifests/configs/mth602_final_robustness_v1/PA1-PA4/p04_t02.json",
+      "run_name": "mth602_final_robust_PA1_PA4_p04_t02",
+      "existing_seed0_compatibility_candidate": false,
+      "status": "READY_FOR_ADMISSION_AFTER_PACKAGE_VALIDATION"
+    },
+    {
+      "canonical_pair": "PA1-PA4",
+      "partition_seed": 4,
+      "training_seed": 3,
+      "path": "manifests/configs/mth602_final_robustness_v1/PA1-PA4/p04_t03.json",
+      "run_name": "mth602_final_robust_PA1_PA4_p04_t03",
+      "existing_seed0_compatibility_candidate": false,
+      "status": "READY_FOR_ADMISSION_AFTER_PACKAGE_VALIDATION"
+    },
+    {
+      "canonical_pair": "PA1-PA4",
+      "partition_seed": 4,
+      "training_seed": 4,
+      "path": "manifests/configs/mth602_final_robustness_v1/PA1-PA4/p04_t04.json",
+      "run_name": "mth602_final_robust_PA1_PA4_p04_t04",
+      "existing_seed0_compatibility_candidate": false,
+      "status": "READY_FOR_ADMISSION_AFTER_PACKAGE_VALIDATION"
+    },
+    {
+      "canonical_pair": "PA1-PA4",
+      "partition_seed": 4,
+      "training_seed": 5,
+      "path": "manifests/configs/mth602_final_robustness_v1/PA1-PA4/p04_t05.json",
+      "run_name": "mth602_final_robust_PA1_PA4_p04_t05",
+      "existing_seed0_compatibility_candidate": false,
+      "status": "READY_FOR_ADMISSION_AFTER_PACKAGE_VALIDATION"
+    },
+    {
+      "canonical_pair": "PA1-PA4",
+      "partition_seed": 4,
+      "training_seed": 6,
+      "path": "manifests/configs/mth602_final_robustness_v1/PA1-PA4/p04_t06.json",
+      "run_name": "mth602_final_robust_PA1_PA4_p04_t06",
+      "existing_seed0_compatibility_candidate": false,
+      "status": "READY_FOR_ADMISSION_AFTER_PACKAGE_VALIDATION"
+    },
+    {
+      "canonical_pair": "PA1-PA4",
+      "partition_seed": 4,
+      "training_seed": 7,
+      "path": "manifests/configs/mth602_final_robustness_v1/PA1-PA4/p04_t07.json",
+      "run_name": "mth602_final_robust_PA1_PA4_p04_t07",
+      "existing_seed0_compatibility_candidate": false,
+      "status": "READY_FOR_ADMISSION_AFTER_PACKAGE_VALIDATION"
+    },
+    {
+      "canonical_pair": "PA1-PA4",
+      "partition_seed": 4,
+      "training_seed": 8,
+      "path": "manifests/configs/mth602_final_robustness_v1/PA1-PA4/p04_t08.json",
+      "run_name": "mth602_final_robust_PA1_PA4_p04_t08",
+      "existing_seed0_compatibility_candidate": false,
+      "status": "READY_FOR_ADMISSION_AFTER_PACKAGE_VALIDATION"
+    },
+    {
+      "canonical_pair": "PA1-PA4",
+      "partition_seed": 4,
+      "training_seed": 9,
+      "path": "manifests/configs/mth602_final_robustness_v1/PA1-PA4/p04_t09.json",
+      "run_name": "mth602_final_robust_PA1_PA4_p04_t09",
+      "existing_seed0_compatibility_candidate": false,
+      "status": "READY_FOR_ADMISSION_AFTER_PACKAGE_VALIDATION"
+    },
+    {
+      "canonical_pair": "PA1-PA8",
+      "partition_seed": 0,
+      "training_seed": 0,
+      "path": "manifests/configs/mth602_final_robustness_v1/PA1-PA8/p00_t00.json",
+      "run_name": "mth602_final_robust_PA1_PA8_p00_t00",
+      "existing_seed0_compatibility_candidate": true,
+      "status": "EXISTING_ARTIFACT_COMPATIBILITY_CANDIDATE"
+    },
+    {
+      "canonical_pair": "PA1-PA8",
+      "partition_seed": 0,
+      "training_seed": 1,
+      "path": "manifests/configs/mth602_final_robustness_v1/PA1-PA8/p00_t01.json",
+      "run_name": "mth602_final_robust_PA1_PA8_p00_t01",
+      "existing_seed0_compatibility_candidate": false,
+      "status": "READY_FOR_ADMISSION_AFTER_PACKAGE_VALIDATION"
+    },
+    {
+      "canonical_pair": "PA1-PA8",
+      "partition_seed": 0,
+      "training_seed": 2,
+      "path": "manifests/configs/mth602_final_robustness_v1/PA1-PA8/p00_t02.json",
+      "run_name": "mth602_final_robust_PA1_PA8_p00_t02",
+      "existing_seed0_compatibility_candidate": false,
+      "status": "READY_FOR_ADMISSION_AFTER_PACKAGE_VALIDATION"
+    },
+    {
+      "canonical_pair": "PA1-PA8",
+      "partition_seed": 0,
+      "training_seed": 3,
+      "path": "manifests/configs/mth602_final_robustness_v1/PA1-PA8/p00_t03.json",
+      "run_name": "mth602_final_robust_PA1_PA8_p00_t03",
+      "existing_seed0_compatibility_candidate": false,
+      "status": "READY_FOR_ADMISSION_AFTER_PACKAGE_VALIDATION"
+    },
+    {
+      "canonical_pair": "PA1-PA8",
+      "partition_seed": 0,
+      "training_seed": 4,
+      "path": "manifests/configs/mth602_final_robustness_v1/PA1-PA8/p00_t04.json",
+      "run_name": "mth602_final_robust_PA1_PA8_p00_t04",
+      "existing_seed0_compatibility_candidate": false,
+      "status": "READY_FOR_ADMISSION_AFTER_PACKAGE_VALIDATION"
+    },
+    {
+      "canonical_pair": "PA1-PA8",
+      "partition_seed": 0,
+      "training_seed": 5,
+      "path": "manifests/configs/mth602_final_robustness_v1/PA1-PA8/p00_t05.json",
+      "run_name": "mth602_final_robust_PA1_PA8_p00_t05",
+      "existing_seed0_compatibility_candidate": false,
+      "status": "READY_FOR_ADMISSION_AFTER_PACKAGE_VALIDATION"
+    },
+    {
+      "canonical_pair": "PA1-PA8",
+      "partition_seed": 0,
+      "training_seed": 6,
+      "path": "manifests/configs/mth602_final_robustness_v1/PA1-PA8/p00_t06.json",
+      "run_name": "mth602_final_robust_PA1_PA8_p00_t06",
+      "existing_seed0_compatibility_candidate": false,
+      "status": "READY_FOR_ADMISSION_AFTER_PACKAGE_VALIDATION"
+    },
+    {
+      "canonical_pair": "PA1-PA8",
+      "partition_seed": 0,
+      "training_seed": 7,
+      "path": "manifests/configs/mth602_final_robustness_v1/PA1-PA8/p00_t07.json",
+      "run_name": "mth602_final_robust_PA1_PA8_p00_t07",
+      "existing_seed0_compatibility_candidate": false,
+      "status": "READY_FOR_ADMISSION_AFTER_PACKAGE_VALIDATION"
+    },
+    {
+      "canonical_pair": "PA1-PA8",
+      "partition_seed": 0,
+      "training_seed": 8,
+      "path": "manifests/configs/mth602_final_robustness_v1/PA1-PA8/p00_t08.json",
+      "run_name": "mth602_final_robust_PA1_PA8_p00_t08",
+      "existing_seed0_compatibility_candidate": false,
+      "status": "READY_FOR_ADMISSION_AFTER_PACKAGE_VALIDATION"
+    },
+    {
+      "canonical_pair": "PA1-PA8",
+      "partition_seed": 0,
+      "training_seed": 9,
+      "path": "manifests/configs/mth602_final_robustness_v1/PA1-PA8/p00_t09.json",
+      "run_name": "mth602_final_robust_PA1_PA8_p00_t09",
+      "existing_seed0_compatibility_candidate": false,
+      "status": "READY_FOR_ADMISSION_AFTER_PACKAGE_VALIDATION"
+    },
+    {
+      "canonical_pair": "PA1-PA8",
+      "partition_seed": 1,
+      "training_seed": 0,
+      "path": "manifests/configs/mth602_final_robustness_v1/PA1-PA8/p01_t00.json",
+      "run_name": "mth602_final_robust_PA1_PA8_p01_t00",
+      "existing_seed0_compatibility_candidate": false,
+      "status": "READY_FOR_ADMISSION_AFTER_PACKAGE_VALIDATION"
+    },
+    {
+      "canonical_pair": "PA1-PA8",
+      "partition_seed": 1,
+      "training_seed": 1,
+      "path": "manifests/configs/mth602_final_robustness_v1/PA1-PA8/p01_t01.json",
+      "run_name": "mth602_final_robust_PA1_PA8_p01_t01",
+      "existing_seed0_compatibility_candidate": false,
+      "status": "READY_FOR_ADMISSION_AFTER_PACKAGE_VALIDATION"
+    },
+    {
+      "canonical_pair": "PA1-PA8",
+      "partition_seed": 1,
+      "training_seed": 2,
+      "path": "manifests/configs/mth602_final_robustness_v1/PA1-PA8/p01_t02.json",
+      "run_name": "mth602_final_robust_PA1_PA8_p01_t02",
+      "existing_seed0_compatibility_candidate": false,
+      "status": "READY_FOR_ADMISSION_AFTER_PACKAGE_VALIDATION"
+    },
+    {
+      "canonical_pair": "PA1-PA8",
+      "partition_seed": 1,
+      "training_seed": 3,
+      "path": "manifests/configs/mth602_final_robustness_v1/PA1-PA8/p01_t03.json",
+      "run_name": "mth602_final_robust_PA1_PA8_p01_t03",
+      "existing_seed0_compatibility_candidate": false,
+      "status": "READY_FOR_ADMISSION_AFTER_PACKAGE_VALIDATION"
+    },
+    {
+      "canonical_pair": "PA1-PA8",
+      "partition_seed": 1,
+      "training_seed": 4,
+      "path": "manifests/configs/mth602_final_robustness_v1/PA1-PA8/p01_t04.json",
+      "run_name": "mth602_final_robust_PA1_PA8_p01_t04",
+      "existing_seed0_compatibility_candidate": false,
+      "status": "READY_FOR_ADMISSION_AFTER_PACKAGE_VALIDATION"
+    },
+    {
+      "canonical_pair": "PA1-PA8",
+      "partition_seed": 1,
+      "training_seed": 5,
+      "path": "manifests/configs/mth602_final_robustness_v1/PA1-PA8/p01_t05.json",
+      "run_name": "mth602_final_robust_PA1_PA8_p01_t05",
+      "existing_seed0_compatibility_candidate": false,
+      "status": "READY_FOR_ADMISSION_AFTER_PACKAGE_VALIDATION"
+    },
+    {
+      "canonical_pair": "PA1-PA8",
+      "partition_seed": 1,
+      "training_seed": 6,
+      "path": "manifests/configs/mth602_final_robustness_v1/PA1-PA8/p01_t06.json",
+      "run_name": "mth602_final_robust_PA1_PA8_p01_t06",
+      "existing_seed0_compatibility_candidate": false,
+      "status": "READY_FOR_ADMISSION_AFTER_PACKAGE_VALIDATION"
+    },
+    {
+      "canonical_pair": "PA1-PA8",
+      "partition_seed": 1,
+      "training_seed": 7,
+      "path": "manifests/configs/mth602_final_robustness_v1/PA1-PA8/p01_t07.json",
+      "run_name": "mth602_final_robust_PA1_PA8_p01_t07",
+      "existing_seed0_compatibility_candidate": false,
+      "status": "READY_FOR_ADMISSION_AFTER_PACKAGE_VALIDATION"
+    },
+    {
+      "canonical_pair": "PA1-PA8",
+      "partition_seed": 1,
+      "training_seed": 8,
+      "path": "manifests/configs/mth602_final_robustness_v1/PA1-PA8/p01_t08.json",
+      "run_name": "mth602_final_robust_PA1_PA8_p01_t08",
+      "existing_seed0_compatibility_candidate": false,
+      "status": "READY_FOR_ADMISSION_AFTER_PACKAGE_VALIDATION"
+    },
+    {
+      "canonical_pair": "PA1-PA8",
+      "partition_seed": 1,
+      "training_seed": 9,
+      "path": "manifests/configs/mth602_final_robustness_v1/PA1-PA8/p01_t09.json",
+      "run_name": "mth602_final_robust_PA1_PA8_p01_t09",
+      "existing_seed0_compatibility_candidate": false,
+      "status": "READY_FOR_ADMISSION_AFTER_PACKAGE_VALIDATION"
+    },
+    {
+      "canonical_pair": "PA1-PA8",
+      "partition_seed": 2,
+      "training_seed": 0,
+      "path": "manifests/configs/mth602_final_robustness_v1/PA1-PA8/p02_t00.json",
+      "run_name": "mth602_final_robust_PA1_PA8_p02_t00",
+      "existing_seed0_compatibility_candidate": false,
+      "status": "READY_FOR_ADMISSION_AFTER_PACKAGE_VALIDATION"
+    },
+    {
+      "canonical_pair": "PA1-PA8",
+      "partition_seed": 2,
+      "training_seed": 1,
+      "path": "manifests/configs/mth602_final_robustness_v1/PA1-PA8/p02_t01.json",
+      "run_name": "mth602_final_robust_PA1_PA8_p02_t01",
+      "existing_seed0_compatibility_candidate": false,
+      "status": "READY_FOR_ADMISSION_AFTER_PACKAGE_VALIDATION"
+    },
+    {
+      "canonical_pair": "PA1-PA8",
+      "partition_seed": 2,
+      "training_seed": 2,
+      "path": "manifests/configs/mth602_final_robustness_v1/PA1-PA8/p02_t02.json",
+      "run_name": "mth602_final_robust_PA1_PA8_p02_t02",
+      "existing_seed0_compatibility_candidate": false,
+      "status": "READY_FOR_ADMISSION_AFTER_PACKAGE_VALIDATION"
+    },
+    {
+      "canonical_pair": "PA1-PA8",
+      "partition_seed": 2,
+      "training_seed": 3,
+      "path": "manifests/configs/mth602_final_robustness_v1/PA1-PA8/p02_t03.json",
+      "run_name": "mth602_final_robust_PA1_PA8_p02_t03",
+      "existing_seed0_compatibility_candidate": false,
+      "status": "READY_FOR_ADMISSION_AFTER_PACKAGE_VALIDATION"
+    },
+    {
+      "canonical_pair": "PA1-PA8",
+      "partition_seed": 2,
+      "training_seed": 4,
+      "path": "manifests/configs/mth602_final_robustness_v1/PA1-PA8/p02_t04.json",
+      "run_name": "mth602_final_robust_PA1_PA8_p02_t04",
+      "existing_seed0_compatibility_candidate": false,
+      "status": "READY_FOR_ADMISSION_AFTER_PACKAGE_VALIDATION"
+    },
+    {
+      "canonical_pair": "PA1-PA8",
+      "partition_seed": 2,
+      "training_seed": 5,
+      "path": "manifests/configs/mth602_final_robustness_v1/PA1-PA8/p02_t05.json",
+      "run_name": "mth602_final_robust_PA1_PA8_p02_t05",
+      "existing_seed0_compatibility_candidate": false,
+      "status": "READY_FOR_ADMISSION_AFTER_PACKAGE_VALIDATION"
+    },
+    {
+      "canonical_pair": "PA1-PA8",
+      "partition_seed": 2,
+      "training_seed": 6,
+      "path": "manifests/configs/mth602_final_robustness_v1/PA1-PA8/p02_t06.json",
+      "run_name": "mth602_final_robust_PA1_PA8_p02_t06",
+      "existing_seed0_compatibility_candidate": false,
+      "status": "READY_FOR_ADMISSION_AFTER_PACKAGE_VALIDATION"
+    },
+    {
+      "canonical_pair": "PA1-PA8",
+      "partition_seed": 2,
+      "training_seed": 7,
+      "path": "manifests/configs/mth602_final_robustness_v1/PA1-PA8/p02_t07.json",
+      "run_name": "mth602_final_robust_PA1_PA8_p02_t07",
+      "existing_seed0_compatibility_candidate": false,
+      "status": "READY_FOR_ADMISSION_AFTER_PACKAGE_VALIDATION"
+    },
+    {
+      "canonical_pair": "PA1-PA8",
+      "partition_seed": 2,
+      "training_seed": 8,
+      "path": "manifests/configs/mth602_final_robustness_v1/PA1-PA8/p02_t08.json",
+      "run_name": "mth602_final_robust_PA1_PA8_p02_t08",
+      "existing_seed0_compatibility_candidate": false,
+      "status": "READY_FOR_ADMISSION_AFTER_PACKAGE_VALIDATION"
+    },
+    {
+      "canonical_pair": "PA1-PA8",
+      "partition_seed": 2,
+      "training_seed": 9,
+      "path": "manifests/configs/mth602_final_robustness_v1/PA1-PA8/p02_t09.json",
+      "run_name": "mth602_final_robust_PA1_PA8_p02_t09",
+      "existing_seed0_compatibility_candidate": false,
+      "status": "READY_FOR_ADMISSION_AFTER_PACKAGE_VALIDATION"
+    },
+    {
+      "canonical_pair": "PA1-PA8",
+      "partition_seed": 3,
+      "training_seed": 0,
+      "path": "manifests/configs/mth602_final_robustness_v1/PA1-PA8/p03_t00.json",
+      "run_name": "mth602_final_robust_PA1_PA8_p03_t00",
+      "existing_seed0_compatibility_candidate": false,
+      "status": "READY_FOR_ADMISSION_AFTER_PACKAGE_VALIDATION"
+    },
+    {
+      "canonical_pair": "PA1-PA8",
+      "partition_seed": 3,
+      "training_seed": 1,
+      "path": "manifests/configs/mth602_final_robustness_v1/PA1-PA8/p03_t01.json",
+      "run_name": "mth602_final_robust_PA1_PA8_p03_t01",
+      "existing_seed0_compatibility_candidate": false,
+      "status": "READY_FOR_ADMISSION_AFTER_PACKAGE_VALIDATION"
+    },
+    {
+      "canonical_pair": "PA1-PA8",
+      "partition_seed": 3,
+      "training_seed": 2,
+      "path": "manifests/configs/mth602_final_robustness_v1/PA1-PA8/p03_t02.json",
+      "run_name": "mth602_final_robust_PA1_PA8_p03_t02",
+      "existing_seed0_compatibility_candidate": false,
+      "status": "READY_FOR_ADMISSION_AFTER_PACKAGE_VALIDATION"
+    },
+    {
+      "canonical_pair": "PA1-PA8",
+      "partition_seed": 3,
+      "training_seed": 3,
+      "path": "manifests/configs/mth602_final_robustness_v1/PA1-PA8/p03_t03.json",
+      "run_name": "mth602_final_robust_PA1_PA8_p03_t03",
+      "existing_seed0_compatibility_candidate": false,
+      "status": "READY_FOR_ADMISSION_AFTER_PACKAGE_VALIDATION"
+    },
+    {
+      "canonical_pair": "PA1-PA8",
+      "partition_seed": 3,
+      "training_seed": 4,
+      "path": "manifests/configs/mth602_final_robustness_v1/PA1-PA8/p03_t04.json",
+      "run_name": "mth602_final_robust_PA1_PA8_p03_t04",
+      "existing_seed0_compatibility_candidate": false,
+      "status": "READY_FOR_ADMISSION_AFTER_PACKAGE_VALIDATION"
+    },
+    {
+      "canonical_pair": "PA1-PA8",
+      "partition_seed": 3,
+      "training_seed": 5,
+      "path": "manifests/configs/mth602_final_robustness_v1/PA1-PA8/p03_t05.json",
+      "run_name": "mth602_final_robust_PA1_PA8_p03_t05",
+      "existing_seed0_compatibility_candidate": false,
+      "status": "READY_FOR_ADMISSION_AFTER_PACKAGE_VALIDATION"
+    },
+    {
+      "canonical_pair": "PA1-PA8",
+      "partition_seed": 3,
+      "training_seed": 6,
+      "path": "manifests/configs/mth602_final_robustness_v1/PA1-PA8/p03_t06.json",
+      "run_name": "mth602_final_robust_PA1_PA8_p03_t06",
+      "existing_seed0_compatibility_candidate": false,
+      "status": "READY_FOR_ADMISSION_AFTER_PACKAGE_VALIDATION"
+    },
+    {
+      "canonical_pair": "PA1-PA8",
+      "partition_seed": 3,
+      "training_seed": 7,
+      "path": "manifests/configs/mth602_final_robustness_v1/PA1-PA8/p03_t07.json",
+      "run_name": "mth602_final_robust_PA1_PA8_p03_t07",
+      "existing_seed0_compatibility_candidate": false,
+      "status": "READY_FOR_ADMISSION_AFTER_PACKAGE_VALIDATION"
+    },
+    {
+      "canonical_pair": "PA1-PA8",
+      "partition_seed": 3,
+      "training_seed": 8,
+      "path": "manifests/configs/mth602_final_robustness_v1/PA1-PA8/p03_t08.json",
+      "run_name": "mth602_final_robust_PA1_PA8_p03_t08",
+      "existing_seed0_compatibility_candidate": false,
+      "status": "READY_FOR_ADMISSION_AFTER_PACKAGE_VALIDATION"
+    },
+    {
+      "canonical_pair": "PA1-PA8",
+      "partition_seed": 3,
+      "training_seed": 9,
+      "path": "manifests/configs/mth602_final_robustness_v1/PA1-PA8/p03_t09.json",
+      "run_name": "mth602_final_robust_PA1_PA8_p03_t09",
+      "existing_seed0_compatibility_candidate": false,
+      "status": "READY_FOR_ADMISSION_AFTER_PACKAGE_VALIDATION"
+    },
+    {
+      "canonical_pair": "PA1-PA8",
+      "partition_seed": 4,
+      "training_seed": 0,
+      "path": "manifests/configs/mth602_final_robustness_v1/PA1-PA8/p04_t00.json",
+      "run_name": "mth602_final_robust_PA1_PA8_p04_t00",
+      "existing_seed0_compatibility_candidate": false,
+      "status": "READY_FOR_ADMISSION_AFTER_PACKAGE_VALIDATION"
+    },
+    {
+      "canonical_pair": "PA1-PA8",
+      "partition_seed": 4,
+      "training_seed": 1,
+      "path": "manifests/configs/mth602_final_robustness_v1/PA1-PA8/p04_t01.json",
+      "run_name": "mth602_final_robust_PA1_PA8_p04_t01",
+      "existing_seed0_compatibility_candidate": false,
+      "status": "READY_FOR_ADMISSION_AFTER_PACKAGE_VALIDATION"
+    },
+    {
+      "canonical_pair": "PA1-PA8",
+      "partition_seed": 4,
+      "training_seed": 2,
+      "path": "manifests/configs/mth602_final_robustness_v1/PA1-PA8/p04_t02.json",
+      "run_name": "mth602_final_robust_PA1_PA8_p04_t02",
+      "existing_seed0_compatibility_candidate": false,
+      "status": "READY_FOR_ADMISSION_AFTER_PACKAGE_VALIDATION"
+    },
+    {
+      "canonical_pair": "PA1-PA8",
+      "partition_seed": 4,
+      "training_seed": 3,
+      "path": "manifests/configs/mth602_final_robustness_v1/PA1-PA8/p04_t03.json",
+      "run_name": "mth602_final_robust_PA1_PA8_p04_t03",
+      "existing_seed0_compatibility_candidate": false,
+      "status": "READY_FOR_ADMISSION_AFTER_PACKAGE_VALIDATION"
+    },
+    {
+      "canonical_pair": "PA1-PA8",
+      "partition_seed": 4,
+      "training_seed": 4,
+      "path": "manifests/configs/mth602_final_robustness_v1/PA1-PA8/p04_t04.json",
+      "run_name": "mth602_final_robust_PA1_PA8_p04_t04",
+      "existing_seed0_compatibility_candidate": false,
+      "status": "READY_FOR_ADMISSION_AFTER_PACKAGE_VALIDATION"
+    },
+    {
+      "canonical_pair": "PA1-PA8",
+      "partition_seed": 4,
+      "training_seed": 5,
+      "path": "manifests/configs/mth602_final_robustness_v1/PA1-PA8/p04_t05.json",
+      "run_name": "mth602_final_robust_PA1_PA8_p04_t05",
+      "existing_seed0_compatibility_candidate": false,
+      "status": "READY_FOR_ADMISSION_AFTER_PACKAGE_VALIDATION"
+    },
+    {
+      "canonical_pair": "PA1-PA8",
+      "partition_seed": 4,
+      "training_seed": 6,
+      "path": "manifests/configs/mth602_final_robustness_v1/PA1-PA8/p04_t06.json",
+      "run_name": "mth602_final_robust_PA1_PA8_p04_t06",
+      "existing_seed0_compatibility_candidate": false,
+      "status": "READY_FOR_ADMISSION_AFTER_PACKAGE_VALIDATION"
+    },
+    {
+      "canonical_pair": "PA1-PA8",
+      "partition_seed": 4,
+      "training_seed": 7,
+      "path": "manifests/configs/mth602_final_robustness_v1/PA1-PA8/p04_t07.json",
+      "run_name": "mth602_final_robust_PA1_PA8_p04_t07",
+      "existing_seed0_compatibility_candidate": false,
+      "status": "READY_FOR_ADMISSION_AFTER_PACKAGE_VALIDATION"
+    },
+    {
+      "canonical_pair": "PA1-PA8",
+      "partition_seed": 4,
+      "training_seed": 8,
+      "path": "manifests/configs/mth602_final_robustness_v1/PA1-PA8/p04_t08.json",
+      "run_name": "mth602_final_robust_PA1_PA8_p04_t08",
+      "existing_seed0_compatibility_candidate": false,
+      "status": "READY_FOR_ADMISSION_AFTER_PACKAGE_VALIDATION"
+    },
+    {
+      "canonical_pair": "PA1-PA8",
+      "partition_seed": 4,
+      "training_seed": 9,
+      "path": "manifests/configs/mth602_final_robustness_v1/PA1-PA8/p04_t09.json",
+      "run_name": "mth602_final_robust_PA1_PA8_p04_t09",
+      "existing_seed0_compatibility_candidate": false,
+      "status": "READY_FOR_ADMISSION_AFTER_PACKAGE_VALIDATION"
+    },
+    {
+      "canonical_pair": "PA2-PA3",
+      "partition_seed": 0,
+      "training_seed": 0,
+      "path": "manifests/configs/mth602_final_robustness_v1/PA2-PA3/p00_t00.json",
+      "run_name": "mth602_final_robust_PA2_PA3_p00_t00",
+      "existing_seed0_compatibility_candidate": true,
+      "status": "EXISTING_ARTIFACT_COMPATIBILITY_CANDIDATE"
+    },
+    {
+      "canonical_pair": "PA2-PA3",
+      "partition_seed": 0,
+      "training_seed": 1,
+      "path": "manifests/configs/mth602_final_robustness_v1/PA2-PA3/p00_t01.json",
+      "run_name": "mth602_final_robust_PA2_PA3_p00_t01",
+      "existing_seed0_compatibility_candidate": false,
+      "status": "READY_FOR_ADMISSION_AFTER_PACKAGE_VALIDATION"
+    },
+    {
+      "canonical_pair": "PA2-PA3",
+      "partition_seed": 0,
+      "training_seed": 2,
+      "path": "manifests/configs/mth602_final_robustness_v1/PA2-PA3/p00_t02.json",
+      "run_name": "mth602_final_robust_PA2_PA3_p00_t02",
+      "existing_seed0_compatibility_candidate": false,
+      "status": "READY_FOR_ADMISSION_AFTER_PACKAGE_VALIDATION"
+    },
+    {
+      "canonical_pair": "PA2-PA3",
+      "partition_seed": 0,
+      "training_seed": 3,
+      "path": "manifests/configs/mth602_final_robustness_v1/PA2-PA3/p00_t03.json",
+      "run_name": "mth602_final_robust_PA2_PA3_p00_t03",
+      "existing_seed0_compatibility_candidate": false,
+      "status": "READY_FOR_ADMISSION_AFTER_PACKAGE_VALIDATION"
+    },
+    {
+      "canonical_pair": "PA2-PA3",
+      "partition_seed": 0,
+      "training_seed": 4,
+      "path": "manifests/configs/mth602_final_robustness_v1/PA2-PA3/p00_t04.json",
+      "run_name": "mth602_final_robust_PA2_PA3_p00_t04",
+      "existing_seed0_compatibility_candidate": false,
+      "status": "READY_FOR_ADMISSION_AFTER_PACKAGE_VALIDATION"
+    },
+    {
+      "canonical_pair": "PA2-PA3",
+      "partition_seed": 0,
+      "training_seed": 5,
+      "path": "manifests/configs/mth602_final_robustness_v1/PA2-PA3/p00_t05.json",
+      "run_name": "mth602_final_robust_PA2_PA3_p00_t05",
+      "existing_seed0_compatibility_candidate": false,
+      "status": "READY_FOR_ADMISSION_AFTER_PACKAGE_VALIDATION"
+    },
+    {
+      "canonical_pair": "PA2-PA3",
+      "partition_seed": 0,
+      "training_seed": 6,
+      "path": "manifests/configs/mth602_final_robustness_v1/PA2-PA3/p00_t06.json",
+      "run_name": "mth602_final_robust_PA2_PA3_p00_t06",
+      "existing_seed0_compatibility_candidate": false,
+      "status": "READY_FOR_ADMISSION_AFTER_PACKAGE_VALIDATION"
+    },
+    {
+      "canonical_pair": "PA2-PA3",
+      "partition_seed": 0,
+      "training_seed": 7,
+      "path": "manifests/configs/mth602_final_robustness_v1/PA2-PA3/p00_t07.json",
+      "run_name": "mth602_final_robust_PA2_PA3_p00_t07",
+      "existing_seed0_compatibility_candidate": false,
+      "status": "READY_FOR_ADMISSION_AFTER_PACKAGE_VALIDATION"
+    },
+    {
+      "canonical_pair": "PA2-PA3",
+      "partition_seed": 0,
+      "training_seed": 8,
+      "path": "manifests/configs/mth602_final_robustness_v1/PA2-PA3/p00_t08.json",
+      "run_name": "mth602_final_robust_PA2_PA3_p00_t08",
+      "existing_seed0_compatibility_candidate": false,
+      "status": "READY_FOR_ADMISSION_AFTER_PACKAGE_VALIDATION"
+    },
+    {
+      "canonical_pair": "PA2-PA3",
+      "partition_seed": 0,
+      "training_seed": 9,
+      "path": "manifests/configs/mth602_final_robustness_v1/PA2-PA3/p00_t09.json",
+      "run_name": "mth602_final_robust_PA2_PA3_p00_t09",
+      "existing_seed0_compatibility_candidate": false,
+      "status": "READY_FOR_ADMISSION_AFTER_PACKAGE_VALIDATION"
+    },
+    {
+      "canonical_pair": "PA2-PA3",
+      "partition_seed": 1,
+      "training_seed": 0,
+      "path": "manifests/configs/mth602_final_robustness_v1/PA2-PA3/p01_t00.json",
+      "run_name": "mth602_final_robust_PA2_PA3_p01_t00",
+      "existing_seed0_compatibility_candidate": false,
+      "status": "READY_FOR_ADMISSION_AFTER_PACKAGE_VALIDATION"
+    },
+    {
+      "canonical_pair": "PA2-PA3",
+      "partition_seed": 1,
+      "training_seed": 1,
+      "path": "manifests/configs/mth602_final_robustness_v1/PA2-PA3/p01_t01.json",
+      "run_name": "mth602_final_robust_PA2_PA3_p01_t01",
+      "existing_seed0_compatibility_candidate": false,
+      "status": "READY_FOR_ADMISSION_AFTER_PACKAGE_VALIDATION"
+    },
+    {
+      "canonical_pair": "PA2-PA3",
+      "partition_seed": 1,
+      "training_seed": 2,
+      "path": "manifests/configs/mth602_final_robustness_v1/PA2-PA3/p01_t02.json",
+      "run_name": "mth602_final_robust_PA2_PA3_p01_t02",
+      "existing_seed0_compatibility_candidate": false,
+      "status": "READY_FOR_ADMISSION_AFTER_PACKAGE_VALIDATION"
+    },
+    {
+      "canonical_pair": "PA2-PA3",
+      "partition_seed": 1,
+      "training_seed": 3,
+      "path": "manifests/configs/mth602_final_robustness_v1/PA2-PA3/p01_t03.json",
+      "run_name": "mth602_final_robust_PA2_PA3_p01_t03",
+      "existing_seed0_compatibility_candidate": false,
+      "status": "READY_FOR_ADMISSION_AFTER_PACKAGE_VALIDATION"
+    },
+    {
+      "canonical_pair": "PA2-PA3",
+      "partition_seed": 1,
+      "training_seed": 4,
+      "path": "manifests/configs/mth602_final_robustness_v1/PA2-PA3/p01_t04.json",
+      "run_name": "mth602_final_robust_PA2_PA3_p01_t04",
+      "existing_seed0_compatibility_candidate": false,
+      "status": "READY_FOR_ADMISSION_AFTER_PACKAGE_VALIDATION"
+    },
+    {
+      "canonical_pair": "PA2-PA3",
+      "partition_seed": 1,
+      "training_seed": 5,
+      "path": "manifests/configs/mth602_final_robustness_v1/PA2-PA3/p01_t05.json",
+      "run_name": "mth602_final_robust_PA2_PA3_p01_t05",
+      "existing_seed0_compatibility_candidate": false,
+      "status": "READY_FOR_ADMISSION_AFTER_PACKAGE_VALIDATION"
+    },
+    {
+      "canonical_pair": "PA2-PA3",
+      "partition_seed": 1,
+      "training_seed": 6,
+      "path": "manifests/configs/mth602_final_robustness_v1/PA2-PA3/p01_t06.json",
+      "run_name": "mth602_final_robust_PA2_PA3_p01_t06",
+      "existing_seed0_compatibility_candidate": false,
+      "status": "READY_FOR_ADMISSION_AFTER_PACKAGE_VALIDATION"
+    },
+    {
+      "canonical_pair": "PA2-PA3",
+      "partition_seed": 1,
+      "training_seed": 7,
+      "path": "manifests/configs/mth602_final_robustness_v1/PA2-PA3/p01_t07.json",
+      "run_name": "mth602_final_robust_PA2_PA3_p01_t07",
+      "existing_seed0_compatibility_candidate": false,
+      "status": "READY_FOR_ADMISSION_AFTER_PACKAGE_VALIDATION"
+    },
+    {
+      "canonical_pair": "PA2-PA3",
+      "partition_seed": 1,
+      "training_seed": 8,
+      "path": "manifests/configs/mth602_final_robustness_v1/PA2-PA3/p01_t08.json",
+      "run_name": "mth602_final_robust_PA2_PA3_p01_t08",
+      "existing_seed0_compatibility_candidate": false,
+      "status": "READY_FOR_ADMISSION_AFTER_PACKAGE_VALIDATION"
+    },
+    {
+      "canonical_pair": "PA2-PA3",
+      "partition_seed": 1,
+      "training_seed": 9,
+      "path": "manifests/configs/mth602_final_robustness_v1/PA2-PA3/p01_t09.json",
+      "run_name": "mth602_final_robust_PA2_PA3_p01_t09",
+      "existing_seed0_compatibility_candidate": false,
+      "status": "READY_FOR_ADMISSION_AFTER_PACKAGE_VALIDATION"
+    },
+    {
+      "canonical_pair": "PA2-PA3",
+      "partition_seed": 2,
+      "training_seed": 0,
+      "path": "manifests/configs/mth602_final_robustness_v1/PA2-PA3/p02_t00.json",
+      "run_name": "mth602_final_robust_PA2_PA3_p02_t00",
+      "existing_seed0_compatibility_candidate": false,
+      "status": "READY_FOR_ADMISSION_AFTER_PACKAGE_VALIDATION"
+    },
+    {
+      "canonical_pair": "PA2-PA3",
+      "partition_seed": 2,
+      "training_seed": 1,
+      "path": "manifests/configs/mth602_final_robustness_v1/PA2-PA3/p02_t01.json",
+      "run_name": "mth602_final_robust_PA2_PA3_p02_t01",
+      "existing_seed0_compatibility_candidate": false,
+      "status": "READY_FOR_ADMISSION_AFTER_PACKAGE_VALIDATION"
+    },
+    {
+      "canonical_pair": "PA2-PA3",
+      "partition_seed": 2,
+      "training_seed": 2,
+      "path": "manifests/configs/mth602_final_robustness_v1/PA2-PA3/p02_t02.json",
+      "run_name": "mth602_final_robust_PA2_PA3_p02_t02",
+      "existing_seed0_compatibility_candidate": false,
+      "status": "READY_FOR_ADMISSION_AFTER_PACKAGE_VALIDATION"
+    },
+    {
+      "canonical_pair": "PA2-PA3",
+      "partition_seed": 2,
+      "training_seed": 3,
+      "path": "manifests/configs/mth602_final_robustness_v1/PA2-PA3/p02_t03.json",
+      "run_name": "mth602_final_robust_PA2_PA3_p02_t03",
+      "existing_seed0_compatibility_candidate": false,
+      "status": "READY_FOR_ADMISSION_AFTER_PACKAGE_VALIDATION"
+    },
+    {
+      "canonical_pair": "PA2-PA3",
+      "partition_seed": 2,
+      "training_seed": 4,
+      "path": "manifests/configs/mth602_final_robustness_v1/PA2-PA3/p02_t04.json",
+      "run_name": "mth602_final_robust_PA2_PA3_p02_t04",
+      "existing_seed0_compatibility_candidate": false,
+      "status": "READY_FOR_ADMISSION_AFTER_PACKAGE_VALIDATION"
+    },
+    {
+      "canonical_pair": "PA2-PA3",
+      "partition_seed": 2,
+      "training_seed": 5,
+      "path": "manifests/configs/mth602_final_robustness_v1/PA2-PA3/p02_t05.json",
+      "run_name": "mth602_final_robust_PA2_PA3_p02_t05",
+      "existing_seed0_compatibility_candidate": false,
+      "status": "READY_FOR_ADMISSION_AFTER_PACKAGE_VALIDATION"
+    },
+    {
+      "canonical_pair": "PA2-PA3",
+      "partition_seed": 2,
+      "training_seed": 6,
+      "path": "manifests/configs/mth602_final_robustness_v1/PA2-PA3/p02_t06.json",
+      "run_name": "mth602_final_robust_PA2_PA3_p02_t06",
+      "existing_seed0_compatibility_candidate": false,
+      "status": "READY_FOR_ADMISSION_AFTER_PACKAGE_VALIDATION"
+    },
+    {
+      "canonical_pair": "PA2-PA3",
+      "partition_seed": 2,
+      "training_seed": 7,
+      "path": "manifests/configs/mth602_final_robustness_v1/PA2-PA3/p02_t07.json",
+      "run_name": "mth602_final_robust_PA2_PA3_p02_t07",
+      "existing_seed0_compatibility_candidate": false,
+      "status": "READY_FOR_ADMISSION_AFTER_PACKAGE_VALIDATION"
+    },
+    {
+      "canonical_pair": "PA2-PA3",
+      "partition_seed": 2,
+      "training_seed": 8,
+      "path": "manifests/configs/mth602_final_robustness_v1/PA2-PA3/p02_t08.json",
+      "run_name": "mth602_final_robust_PA2_PA3_p02_t08",
+      "existing_seed0_compatibility_candidate": false,
+      "status": "READY_FOR_ADMISSION_AFTER_PACKAGE_VALIDATION"
+    },
+    {
+      "canonical_pair": "PA2-PA3",
+      "partition_seed": 2,
+      "training_seed": 9,
+      "path": "manifests/configs/mth602_final_robustness_v1/PA2-PA3/p02_t09.json",
+      "run_name": "mth602_final_robust_PA2_PA3_p02_t09",
+      "existing_seed0_compatibility_candidate": false,
+      "status": "READY_FOR_ADMISSION_AFTER_PACKAGE_VALIDATION"
+    },
+    {
+      "canonical_pair": "PA2-PA3",
+      "partition_seed": 3,
+      "training_seed": 0,
+      "path": "manifests/configs/mth602_final_robustness_v1/PA2-PA3/p03_t00.json",
+      "run_name": "mth602_final_robust_PA2_PA3_p03_t00",
+      "existing_seed0_compatibility_candidate": false,
+      "status": "READY_FOR_ADMISSION_AFTER_PACKAGE_VALIDATION"
+    },
+    {
+      "canonical_pair": "PA2-PA3",
+      "partition_seed": 3,
+      "training_seed": 1,
+      "path": "manifests/configs/mth602_final_robustness_v1/PA2-PA3/p03_t01.json",
+      "run_name": "mth602_final_robust_PA2_PA3_p03_t01",
+      "existing_seed0_compatibility_candidate": false,
+      "status": "READY_FOR_ADMISSION_AFTER_PACKAGE_VALIDATION"
+    },
+    {
+      "canonical_pair": "PA2-PA3",
+      "partition_seed": 3,
+      "training_seed": 2,
+      "path": "manifests/configs/mth602_final_robustness_v1/PA2-PA3/p03_t02.json",
+      "run_name": "mth602_final_robust_PA2_PA3_p03_t02",
+      "existing_seed0_compatibility_candidate": false,
+      "status": "READY_FOR_ADMISSION_AFTER_PACKAGE_VALIDATION"
+    },
+    {
+      "canonical_pair": "PA2-PA3",
+      "partition_seed": 3,
+      "training_seed": 3,
+      "path": "manifests/configs/mth602_final_robustness_v1/PA2-PA3/p03_t03.json",
+      "run_name": "mth602_final_robust_PA2_PA3_p03_t03",
+      "existing_seed0_compatibility_candidate": false,
+      "status": "READY_FOR_ADMISSION_AFTER_PACKAGE_VALIDATION"
+    },
+    {
+      "canonical_pair": "PA2-PA3",
+      "partition_seed": 3,
+      "training_seed": 4,
+      "path": "manifests/configs/mth602_final_robustness_v1/PA2-PA3/p03_t04.json",
+      "run_name": "mth602_final_robust_PA2_PA3_p03_t04",
+      "existing_seed0_compatibility_candidate": false,
+      "status": "READY_FOR_ADMISSION_AFTER_PACKAGE_VALIDATION"
+    },
+    {
+      "canonical_pair": "PA2-PA3",
+      "partition_seed": 3,
+      "training_seed": 5,
+      "path": "manifests/configs/mth602_final_robustness_v1/PA2-PA3/p03_t05.json",
+      "run_name": "mth602_final_robust_PA2_PA3_p03_t05",
+      "existing_seed0_compatibility_candidate": false,
+      "status": "READY_FOR_ADMISSION_AFTER_PACKAGE_VALIDATION"
+    },
+    {
+      "canonical_pair": "PA2-PA3",
+      "partition_seed": 3,
+      "training_seed": 6,
+      "path": "manifests/configs/mth602_final_robustness_v1/PA2-PA3/p03_t06.json",
+      "run_name": "mth602_final_robust_PA2_PA3_p03_t06",
+      "existing_seed0_compatibility_candidate": false,
+      "status": "READY_FOR_ADMISSION_AFTER_PACKAGE_VALIDATION"
+    },
+    {
+      "canonical_pair": "PA2-PA3",
+      "partition_seed": 3,
+      "training_seed": 7,
+      "path": "manifests/configs/mth602_final_robustness_v1/PA2-PA3/p03_t07.json",
+      "run_name": "mth602_final_robust_PA2_PA3_p03_t07",
+      "existing_seed0_compatibility_candidate": false,
+      "status": "READY_FOR_ADMISSION_AFTER_PACKAGE_VALIDATION"
+    },
+    {
+      "canonical_pair": "PA2-PA3",
+      "partition_seed": 3,
+      "training_seed": 8,
+      "path": "manifests/configs/mth602_final_robustness_v1/PA2-PA3/p03_t08.json",
+      "run_name": "mth602_final_robust_PA2_PA3_p03_t08",
+      "existing_seed0_compatibility_candidate": false,
+      "status": "READY_FOR_ADMISSION_AFTER_PACKAGE_VALIDATION"
+    },
+    {
+      "canonical_pair": "PA2-PA3",
+      "partition_seed": 3,
+      "training_seed": 9,
+      "path": "manifests/configs/mth602_final_robustness_v1/PA2-PA3/p03_t09.json",
+      "run_name": "mth602_final_robust_PA2_PA3_p03_t09",
+      "existing_seed0_compatibility_candidate": false,
+      "status": "READY_FOR_ADMISSION_AFTER_PACKAGE_VALIDATION"
+    },
+    {
+      "canonical_pair": "PA2-PA3",
+      "partition_seed": 4,
+      "training_seed": 0,
+      "path": "manifests/configs/mth602_final_robustness_v1/PA2-PA3/p04_t00.json",
+      "run_name": "mth602_final_robust_PA2_PA3_p04_t00",
+      "existing_seed0_compatibility_candidate": false,
+      "status": "READY_FOR_ADMISSION_AFTER_PACKAGE_VALIDATION"
+    },
+    {
+      "canonical_pair": "PA2-PA3",
+      "partition_seed": 4,
+      "training_seed": 1,
+      "path": "manifests/configs/mth602_final_robustness_v1/PA2-PA3/p04_t01.json",
+      "run_name": "mth602_final_robust_PA2_PA3_p04_t01",
+      "existing_seed0_compatibility_candidate": false,
+      "status": "READY_FOR_ADMISSION_AFTER_PACKAGE_VALIDATION"
+    },
+    {
+      "canonical_pair": "PA2-PA3",
+      "partition_seed": 4,
+      "training_seed": 2,
+      "path": "manifests/configs/mth602_final_robustness_v1/PA2-PA3/p04_t02.json",
+      "run_name": "mth602_final_robust_PA2_PA3_p04_t02",
+      "existing_seed0_compatibility_candidate": false,
+      "status": "READY_FOR_ADMISSION_AFTER_PACKAGE_VALIDATION"
+    },
+    {
+      "canonical_pair": "PA2-PA3",
+      "partition_seed": 4,
+      "training_seed": 3,
+      "path": "manifests/configs/mth602_final_robustness_v1/PA2-PA3/p04_t03.json",
+      "run_name": "mth602_final_robust_PA2_PA3_p04_t03",
+      "existing_seed0_compatibility_candidate": false,
+      "status": "READY_FOR_ADMISSION_AFTER_PACKAGE_VALIDATION"
+    },
+    {
+      "canonical_pair": "PA2-PA3",
+      "partition_seed": 4,
+      "training_seed": 4,
+      "path": "manifests/configs/mth602_final_robustness_v1/PA2-PA3/p04_t04.json",
+      "run_name": "mth602_final_robust_PA2_PA3_p04_t04",
+      "existing_seed0_compatibility_candidate": false,
+      "status": "READY_FOR_ADMISSION_AFTER_PACKAGE_VALIDATION"
+    },
+    {
+      "canonical_pair": "PA2-PA3",
+      "partition_seed": 4,
+      "training_seed": 5,
+      "path": "manifests/configs/mth602_final_robustness_v1/PA2-PA3/p04_t05.json",
+      "run_name": "mth602_final_robust_PA2_PA3_p04_t05",
+      "existing_seed0_compatibility_candidate": false,
+      "status": "READY_FOR_ADMISSION_AFTER_PACKAGE_VALIDATION"
+    },
+    {
+      "canonical_pair": "PA2-PA3",
+      "partition_seed": 4,
+      "training_seed": 6,
+      "path": "manifests/configs/mth602_final_robustness_v1/PA2-PA3/p04_t06.json",
+      "run_name": "mth602_final_robust_PA2_PA3_p04_t06",
+      "existing_seed0_compatibility_candidate": false,
+      "status": "READY_FOR_ADMISSION_AFTER_PACKAGE_VALIDATION"
+    },
+    {
+      "canonical_pair": "PA2-PA3",
+      "partition_seed": 4,
+      "training_seed": 7,
+      "path": "manifests/configs/mth602_final_robustness_v1/PA2-PA3/p04_t07.json",
+      "run_name": "mth602_final_robust_PA2_PA3_p04_t07",
+      "existing_seed0_compatibility_candidate": false,
+      "status": "READY_FOR_ADMISSION_AFTER_PACKAGE_VALIDATION"
+    },
+    {
+      "canonical_pair": "PA2-PA3",
+      "partition_seed": 4,
+      "training_seed": 8,
+      "path": "manifests/configs/mth602_final_robustness_v1/PA2-PA3/p04_t08.json",
+      "run_name": "mth602_final_robust_PA2_PA3_p04_t08",
+      "existing_seed0_compatibility_candidate": false,
+      "status": "READY_FOR_ADMISSION_AFTER_PACKAGE_VALIDATION"
+    },
+    {
+      "canonical_pair": "PA2-PA3",
+      "partition_seed": 4,
+      "training_seed": 9,
+      "path": "manifests/configs/mth602_final_robustness_v1/PA2-PA3/p04_t09.json",
+      "run_name": "mth602_final_robust_PA2_PA3_p04_t09",
+      "existing_seed0_compatibility_candidate": false,
+      "status": "READY_FOR_ADMISSION_AFTER_PACKAGE_VALIDATION"
+    },
+    {
+      "canonical_pair": "PA2-PA4",
+      "partition_seed": 0,
+      "training_seed": 0,
+      "path": "manifests/configs/mth602_final_robustness_v1/PA2-PA4/p00_t00.json",
+      "run_name": "mth602_final_robust_PA2_PA4_p00_t00",
+      "existing_seed0_compatibility_candidate": true,
+      "status": "EXISTING_ARTIFACT_COMPATIBILITY_CANDIDATE"
+    },
+    {
+      "canonical_pair": "PA2-PA4",
+      "partition_seed": 0,
+      "training_seed": 1,
+      "path": "manifests/configs/mth602_final_robustness_v1/PA2-PA4/p00_t01.json",
+      "run_name": "mth602_final_robust_PA2_PA4_p00_t01",
+      "existing_seed0_compatibility_candidate": false,
+      "status": "READY_FOR_ADMISSION_AFTER_PACKAGE_VALIDATION"
+    },
+    {
+      "canonical_pair": "PA2-PA4",
+      "partition_seed": 0,
+      "training_seed": 2,
+      "path": "manifests/configs/mth602_final_robustness_v1/PA2-PA4/p00_t02.json",
+      "run_name": "mth602_final_robust_PA2_PA4_p00_t02",
+      "existing_seed0_compatibility_candidate": false,
+      "status": "READY_FOR_ADMISSION_AFTER_PACKAGE_VALIDATION"
+    },
+    {
+      "canonical_pair": "PA2-PA4",
+      "partition_seed": 0,
+      "training_seed": 3,
+      "path": "manifests/configs/mth602_final_robustness_v1/PA2-PA4/p00_t03.json",
+      "run_name": "mth602_final_robust_PA2_PA4_p00_t03",
+      "existing_seed0_compatibility_candidate": false,
+      "status": "READY_FOR_ADMISSION_AFTER_PACKAGE_VALIDATION"
+    },
+    {
+      "canonical_pair": "PA2-PA4",
+      "partition_seed": 0,
+      "training_seed": 4,
+      "path": "manifests/configs/mth602_final_robustness_v1/PA2-PA4/p00_t04.json",
+      "run_name": "mth602_final_robust_PA2_PA4_p00_t04",
+      "existing_seed0_compatibility_candidate": false,
+      "status": "READY_FOR_ADMISSION_AFTER_PACKAGE_VALIDATION"
+    },
+    {
+      "canonical_pair": "PA2-PA4",
+      "partition_seed": 0,
+      "training_seed": 5,
+      "path": "manifests/configs/mth602_final_robustness_v1/PA2-PA4/p00_t05.json",
+      "run_name": "mth602_final_robust_PA2_PA4_p00_t05",
+      "existing_seed0_compatibility_candidate": false,
+      "status": "READY_FOR_ADMISSION_AFTER_PACKAGE_VALIDATION"
+    },
+    {
+      "canonical_pair": "PA2-PA4",
+      "partition_seed": 0,
+      "training_seed": 6,
+      "path": "manifests/configs/mth602_final_robustness_v1/PA2-PA4/p00_t06.json",
+      "run_name": "mth602_final_robust_PA2_PA4_p00_t06",
+      "existing_seed0_compatibility_candidate": false,
+      "status": "READY_FOR_ADMISSION_AFTER_PACKAGE_VALIDATION"
+    },
+    {
+      "canonical_pair": "PA2-PA4",
+      "partition_seed": 0,
+      "training_seed": 7,
+      "path": "manifests/configs/mth602_final_robustness_v1/PA2-PA4/p00_t07.json",
+      "run_name": "mth602_final_robust_PA2_PA4_p00_t07",
+      "existing_seed0_compatibility_candidate": false,
+      "status": "READY_FOR_ADMISSION_AFTER_PACKAGE_VALIDATION"
+    },
+    {
+      "canonical_pair": "PA2-PA4",
+      "partition_seed": 0,
+      "training_seed": 8,
+      "path": "manifests/configs/mth602_final_robustness_v1/PA2-PA4/p00_t08.json",
+      "run_name": "mth602_final_robust_PA2_PA4_p00_t08",
+      "existing_seed0_compatibility_candidate": false,
+      "status": "READY_FOR_ADMISSION_AFTER_PACKAGE_VALIDATION"
+    },
+    {
+      "canonical_pair": "PA2-PA4",
+      "partition_seed": 0,
+      "training_seed": 9,
+      "path": "manifests/configs/mth602_final_robustness_v1/PA2-PA4/p00_t09.json",
+      "run_name": "mth602_final_robust_PA2_PA4_p00_t09",
+      "existing_seed0_compatibility_candidate": false,
+      "status": "READY_FOR_ADMISSION_AFTER_PACKAGE_VALIDATION"
+    },
+    {
+      "canonical_pair": "PA2-PA4",
+      "partition_seed": 1,
+      "training_seed": 0,
+      "path": "manifests/configs/mth602_final_robustness_v1/PA2-PA4/p01_t00.json",
+      "run_name": "mth602_final_robust_PA2_PA4_p01_t00",
+      "existing_seed0_compatibility_candidate": false,
+      "status": "READY_FOR_ADMISSION_AFTER_PACKAGE_VALIDATION"
+    },
+    {
+      "canonical_pair": "PA2-PA4",
+      "partition_seed": 1,
+      "training_seed": 1,
+      "path": "manifests/configs/mth602_final_robustness_v1/PA2-PA4/p01_t01.json",
+      "run_name": "mth602_final_robust_PA2_PA4_p01_t01",
+      "existing_seed0_compatibility_candidate": false,
+      "status": "READY_FOR_ADMISSION_AFTER_PACKAGE_VALIDATION"
+    },
+    {
+      "canonical_pair": "PA2-PA4",
+      "partition_seed": 1,
+      "training_seed": 2,
+      "path": "manifests/configs/mth602_final_robustness_v1/PA2-PA4/p01_t02.json",
+      "run_name": "mth602_final_robust_PA2_PA4_p01_t02",
+      "existing_seed0_compatibility_candidate": false,
+      "status": "READY_FOR_ADMISSION_AFTER_PACKAGE_VALIDATION"
+    },
+    {
+      "canonical_pair": "PA2-PA4",
+      "partition_seed": 1,
+      "training_seed": 3,
+      "path": "manifests/configs/mth602_final_robustness_v1/PA2-PA4/p01_t03.json",
+      "run_name": "mth602_final_robust_PA2_PA4_p01_t03",
+      "existing_seed0_compatibility_candidate": false,
+      "status": "READY_FOR_ADMISSION_AFTER_PACKAGE_VALIDATION"
+    },
+    {
+      "canonical_pair": "PA2-PA4",
+      "partition_seed": 1,
+      "training_seed": 4,
+      "path": "manifests/configs/mth602_final_robustness_v1/PA2-PA4/p01_t04.json",
+      "run_name": "mth602_final_robust_PA2_PA4_p01_t04",
+      "existing_seed0_compatibility_candidate": false,
+      "status": "READY_FOR_ADMISSION_AFTER_PACKAGE_VALIDATION"
+    },
+    {
+      "canonical_pair": "PA2-PA4",
+      "partition_seed": 1,
+      "training_seed": 5,
+      "path": "manifests/configs/mth602_final_robustness_v1/PA2-PA4/p01_t05.json",
+      "run_name": "mth602_final_robust_PA2_PA4_p01_t05",
+      "existing_seed0_compatibility_candidate": false,
+      "status": "READY_FOR_ADMISSION_AFTER_PACKAGE_VALIDATION"
+    },
+    {
+      "canonical_pair": "PA2-PA4",
+      "partition_seed": 1,
+      "training_seed": 6,
+      "path": "manifests/configs/mth602_final_robustness_v1/PA2-PA4/p01_t06.json",
+      "run_name": "mth602_final_robust_PA2_PA4_p01_t06",
+      "existing_seed0_compatibility_candidate": false,
+      "status": "READY_FOR_ADMISSION_AFTER_PACKAGE_VALIDATION"
+    },
+    {
+      "canonical_pair": "PA2-PA4",
+      "partition_seed": 1,
+      "training_seed": 7,
+      "path": "manifests/configs/mth602_final_robustness_v1/PA2-PA4/p01_t07.json",
+      "run_name": "mth602_final_robust_PA2_PA4_p01_t07",
+      "existing_seed0_compatibility_candidate": false,
+      "status": "READY_FOR_ADMISSION_AFTER_PACKAGE_VALIDATION"
+    },
+    {
+      "canonical_pair": "PA2-PA4",
+      "partition_seed": 1,
+      "training_seed": 8,
+      "path": "manifests/configs/mth602_final_robustness_v1/PA2-PA4/p01_t08.json",
+      "run_name": "mth602_final_robust_PA2_PA4_p01_t08",
+      "existing_seed0_compatibility_candidate": false,
+      "status": "READY_FOR_ADMISSION_AFTER_PACKAGE_VALIDATION"
+    },
+    {
+      "canonical_pair": "PA2-PA4",
+      "partition_seed": 1,
+      "training_seed": 9,
+      "path": "manifests/configs/mth602_final_robustness_v1/PA2-PA4/p01_t09.json",
+      "run_name": "mth602_final_robust_PA2_PA4_p01_t09",
+      "existing_seed0_compatibility_candidate": false,
+      "status": "READY_FOR_ADMISSION_AFTER_PACKAGE_VALIDATION"
+    },
+    {
+      "canonical_pair": "PA2-PA4",
+      "partition_seed": 2,
+      "training_seed": 0,
+      "path": "manifests/configs/mth602_final_robustness_v1/PA2-PA4/p02_t00.json",
+      "run_name": "mth602_final_robust_PA2_PA4_p02_t00",
+      "existing_seed0_compatibility_candidate": false,
+      "status": "READY_FOR_ADMISSION_AFTER_PACKAGE_VALIDATION"
+    },
+    {
+      "canonical_pair": "PA2-PA4",
+      "partition_seed": 2,
+      "training_seed": 1,
+      "path": "manifests/configs/mth602_final_robustness_v1/PA2-PA4/p02_t01.json",
+      "run_name": "mth602_final_robust_PA2_PA4_p02_t01",
+      "existing_seed0_compatibility_candidate": false,
+      "status": "READY_FOR_ADMISSION_AFTER_PACKAGE_VALIDATION"
+    },
+    {
+      "canonical_pair": "PA2-PA4",
+      "partition_seed": 2,
+      "training_seed": 2,
+      "path": "manifests/configs/mth602_final_robustness_v1/PA2-PA4/p02_t02.json",
+      "run_name": "mth602_final_robust_PA2_PA4_p02_t02",
+      "existing_seed0_compatibility_candidate": false,
+      "status": "READY_FOR_ADMISSION_AFTER_PACKAGE_VALIDATION"
+    },
+    {
+      "canonical_pair": "PA2-PA4",
+      "partition_seed": 2,
+      "training_seed": 3,
+      "path": "manifests/configs/mth602_final_robustness_v1/PA2-PA4/p02_t03.json",
+      "run_name": "mth602_final_robust_PA2_PA4_p02_t03",
+      "existing_seed0_compatibility_candidate": false,
+      "status": "READY_FOR_ADMISSION_AFTER_PACKAGE_VALIDATION"
+    },
+    {
+      "canonical_pair": "PA2-PA4",
+      "partition_seed": 2,
+      "training_seed": 4,
+      "path": "manifests/configs/mth602_final_robustness_v1/PA2-PA4/p02_t04.json",
+      "run_name": "mth602_final_robust_PA2_PA4_p02_t04",
+      "existing_seed0_compatibility_candidate": false,
+      "status": "READY_FOR_ADMISSION_AFTER_PACKAGE_VALIDATION"
+    },
+    {
+      "canonical_pair": "PA2-PA4",
+      "partition_seed": 2,
+      "training_seed": 5,
+      "path": "manifests/configs/mth602_final_robustness_v1/PA2-PA4/p02_t05.json",
+      "run_name": "mth602_final_robust_PA2_PA4_p02_t05",
+      "existing_seed0_compatibility_candidate": false,
+      "status": "READY_FOR_ADMISSION_AFTER_PACKAGE_VALIDATION"
+    },
+    {
+      "canonical_pair": "PA2-PA4",
+      "partition_seed": 2,
+      "training_seed": 6,
+      "path": "manifests/configs/mth602_final_robustness_v1/PA2-PA4/p02_t06.json",
+      "run_name": "mth602_final_robust_PA2_PA4_p02_t06",
+      "existing_seed0_compatibility_candidate": false,
+      "status": "READY_FOR_ADMISSION_AFTER_PACKAGE_VALIDATION"
+    },
+    {
+      "canonical_pair": "PA2-PA4",
+      "partition_seed": 2,
+      "training_seed": 7,
+      "path": "manifests/configs/mth602_final_robustness_v1/PA2-PA4/p02_t07.json",
+      "run_name": "mth602_final_robust_PA2_PA4_p02_t07",
+      "existing_seed0_compatibility_candidate": false,
+      "status": "READY_FOR_ADMISSION_AFTER_PACKAGE_VALIDATION"
+    },
+    {
+      "canonical_pair": "PA2-PA4",
+      "partition_seed": 2,
+      "training_seed": 8,
+      "path": "manifests/configs/mth602_final_robustness_v1/PA2-PA4/p02_t08.json",
+      "run_name": "mth602_final_robust_PA2_PA4_p02_t08",
+      "existing_seed0_compatibility_candidate": false,
+      "status": "READY_FOR_ADMISSION_AFTER_PACKAGE_VALIDATION"
+    },
+    {
+      "canonical_pair": "PA2-PA4",
+      "partition_seed": 2,
+      "training_seed": 9,
+      "path": "manifests/configs/mth602_final_robustness_v1/PA2-PA4/p02_t09.json",
+      "run_name": "mth602_final_robust_PA2_PA4_p02_t09",
+      "existing_seed0_compatibility_candidate": false,
+      "status": "READY_FOR_ADMISSION_AFTER_PACKAGE_VALIDATION"
+    },
+    {
+      "canonical_pair": "PA2-PA4",
+      "partition_seed": 3,
+      "training_seed": 0,
+      "path": "manifests/configs/mth602_final_robustness_v1/PA2-PA4/p03_t00.json",
+      "run_name": "mth602_final_robust_PA2_PA4_p03_t00",
+      "existing_seed0_compatibility_candidate": false,
+      "status": "READY_FOR_ADMISSION_AFTER_PACKAGE_VALIDATION"
+    },
+    {
+      "canonical_pair": "PA2-PA4",
+      "partition_seed": 3,
+      "training_seed": 1,
+      "path": "manifests/configs/mth602_final_robustness_v1/PA2-PA4/p03_t01.json",
+      "run_name": "mth602_final_robust_PA2_PA4_p03_t01",
+      "existing_seed0_compatibility_candidate": false,
+      "status": "READY_FOR_ADMISSION_AFTER_PACKAGE_VALIDATION"
+    },
+    {
+      "canonical_pair": "PA2-PA4",
+      "partition_seed": 3,
+      "training_seed": 2,
+      "path": "manifests/configs/mth602_final_robustness_v1/PA2-PA4/p03_t02.json",
+      "run_name": "mth602_final_robust_PA2_PA4_p03_t02",
+      "existing_seed0_compatibility_candidate": false,
+      "status": "READY_FOR_ADMISSION_AFTER_PACKAGE_VALIDATION"
+    },
+    {
+      "canonical_pair": "PA2-PA4",
+      "partition_seed": 3,
+      "training_seed": 3,
+      "path": "manifests/configs/mth602_final_robustness_v1/PA2-PA4/p03_t03.json",
+      "run_name": "mth602_final_robust_PA2_PA4_p03_t03",
+      "existing_seed0_compatibility_candidate": false,
+      "status": "READY_FOR_ADMISSION_AFTER_PACKAGE_VALIDATION"
+    },
+    {
+      "canonical_pair": "PA2-PA4",
+      "partition_seed": 3,
+      "training_seed": 4,
+      "path": "manifests/configs/mth602_final_robustness_v1/PA2-PA4/p03_t04.json",
+      "run_name": "mth602_final_robust_PA2_PA4_p03_t04",
+      "existing_seed0_compatibility_candidate": false,
+      "status": "READY_FOR_ADMISSION_AFTER_PACKAGE_VALIDATION"
+    },
+    {
+      "canonical_pair": "PA2-PA4",
+      "partition_seed": 3,
+      "training_seed": 5,
+      "path": "manifests/configs/mth602_final_robustness_v1/PA2-PA4/p03_t05.json",
+      "run_name": "mth602_final_robust_PA2_PA4_p03_t05",
+      "existing_seed0_compatibility_candidate": false,
+      "status": "READY_FOR_ADMISSION_AFTER_PACKAGE_VALIDATION"
+    },
+    {
+      "canonical_pair": "PA2-PA4",
+      "partition_seed": 3,
+      "training_seed": 6,
+      "path": "manifests/configs/mth602_final_robustness_v1/PA2-PA4/p03_t06.json",
+      "run_name": "mth602_final_robust_PA2_PA4_p03_t06",
+      "existing_seed0_compatibility_candidate": false,
+      "status": "READY_FOR_ADMISSION_AFTER_PACKAGE_VALIDATION"
+    },
+    {
+      "canonical_pair": "PA2-PA4",
+      "partition_seed": 3,
+      "training_seed": 7,
+      "path": "manifests/configs/mth602_final_robustness_v1/PA2-PA4/p03_t07.json",
+      "run_name": "mth602_final_robust_PA2_PA4_p03_t07",
+      "existing_seed0_compatibility_candidate": false,
+      "status": "READY_FOR_ADMISSION_AFTER_PACKAGE_VALIDATION"
+    },
+    {
+      "canonical_pair": "PA2-PA4",
+      "partition_seed": 3,
+      "training_seed": 8,
+      "path": "manifests/configs/mth602_final_robustness_v1/PA2-PA4/p03_t08.json",
+      "run_name": "mth602_final_robust_PA2_PA4_p03_t08",
+      "existing_seed0_compatibility_candidate": false,
+      "status": "READY_FOR_ADMISSION_AFTER_PACKAGE_VALIDATION"
+    },
+    {
+      "canonical_pair": "PA2-PA4",
+      "partition_seed": 3,
+      "training_seed": 9,
+      "path": "manifests/configs/mth602_final_robustness_v1/PA2-PA4/p03_t09.json",
+      "run_name": "mth602_final_robust_PA2_PA4_p03_t09",
+      "existing_seed0_compatibility_candidate": false,
+      "status": "READY_FOR_ADMISSION_AFTER_PACKAGE_VALIDATION"
+    },
+    {
+      "canonical_pair": "PA2-PA4",
+      "partition_seed": 4,
+      "training_seed": 0,
+      "path": "manifests/configs/mth602_final_robustness_v1/PA2-PA4/p04_t00.json",
+      "run_name": "mth602_final_robust_PA2_PA4_p04_t00",
+      "existing_seed0_compatibility_candidate": false,
+      "status": "READY_FOR_ADMISSION_AFTER_PACKAGE_VALIDATION"
+    },
+    {
+      "canonical_pair": "PA2-PA4",
+      "partition_seed": 4,
+      "training_seed": 1,
+      "path": "manifests/configs/mth602_final_robustness_v1/PA2-PA4/p04_t01.json",
+      "run_name": "mth602_final_robust_PA2_PA4_p04_t01",
+      "existing_seed0_compatibility_candidate": false,
+      "status": "READY_FOR_ADMISSION_AFTER_PACKAGE_VALIDATION"
+    },
+    {
+      "canonical_pair": "PA2-PA4",
+      "partition_seed": 4,
+      "training_seed": 2,
+      "path": "manifests/configs/mth602_final_robustness_v1/PA2-PA4/p04_t02.json",
+      "run_name": "mth602_final_robust_PA2_PA4_p04_t02",
+      "existing_seed0_compatibility_candidate": false,
+      "status": "READY_FOR_ADMISSION_AFTER_PACKAGE_VALIDATION"
+    },
+    {
+      "canonical_pair": "PA2-PA4",
+      "partition_seed": 4,
+      "training_seed": 3,
+      "path": "manifests/configs/mth602_final_robustness_v1/PA2-PA4/p04_t03.json",
+      "run_name": "mth602_final_robust_PA2_PA4_p04_t03",
+      "existing_seed0_compatibility_candidate": false,
+      "status": "READY_FOR_ADMISSION_AFTER_PACKAGE_VALIDATION"
+    },
+    {
+      "canonical_pair": "PA2-PA4",
+      "partition_seed": 4,
+      "training_seed": 4,
+      "path": "manifests/configs/mth602_final_robustness_v1/PA2-PA4/p04_t04.json",
+      "run_name": "mth602_final_robust_PA2_PA4_p04_t04",
+      "existing_seed0_compatibility_candidate": false,
+      "status": "READY_FOR_ADMISSION_AFTER_PACKAGE_VALIDATION"
+    },
+    {
+      "canonical_pair": "PA2-PA4",
+      "partition_seed": 4,
+      "training_seed": 5,
+      "path": "manifests/configs/mth602_final_robustness_v1/PA2-PA4/p04_t05.json",
+      "run_name": "mth602_final_robust_PA2_PA4_p04_t05",
+      "existing_seed0_compatibility_candidate": false,
+      "status": "READY_FOR_ADMISSION_AFTER_PACKAGE_VALIDATION"
+    },
+    {
+      "canonical_pair": "PA2-PA4",
+      "partition_seed": 4,
+      "training_seed": 6,
+      "path": "manifests/configs/mth602_final_robustness_v1/PA2-PA4/p04_t06.json",
+      "run_name": "mth602_final_robust_PA2_PA4_p04_t06",
+      "existing_seed0_compatibility_candidate": false,
+      "status": "READY_FOR_ADMISSION_AFTER_PACKAGE_VALIDATION"
+    },
+    {
+      "canonical_pair": "PA2-PA4",
+      "partition_seed": 4,
+      "training_seed": 7,
+      "path": "manifests/configs/mth602_final_robustness_v1/PA2-PA4/p04_t07.json",
+      "run_name": "mth602_final_robust_PA2_PA4_p04_t07",
+      "existing_seed0_compatibility_candidate": false,
+      "status": "READY_FOR_ADMISSION_AFTER_PACKAGE_VALIDATION"
+    },
+    {
+      "canonical_pair": "PA2-PA4",
+      "partition_seed": 4,
+      "training_seed": 8,
+      "path": "manifests/configs/mth602_final_robustness_v1/PA2-PA4/p04_t08.json",
+      "run_name": "mth602_final_robust_PA2_PA4_p04_t08",
+      "existing_seed0_compatibility_candidate": false,
+      "status": "READY_FOR_ADMISSION_AFTER_PACKAGE_VALIDATION"
+    },
+    {
+      "canonical_pair": "PA2-PA4",
+      "partition_seed": 4,
+      "training_seed": 9,
+      "path": "manifests/configs/mth602_final_robustness_v1/PA2-PA4/p04_t09.json",
+      "run_name": "mth602_final_robust_PA2_PA4_p04_t09",
+      "existing_seed0_compatibility_candidate": false,
+      "status": "READY_FOR_ADMISSION_AFTER_PACKAGE_VALIDATION"
+    },
+    {
+      "canonical_pair": "PA2-PA8",
+      "partition_seed": 0,
+      "training_seed": 0,
+      "path": "manifests/configs/mth602_final_robustness_v1/PA2-PA8/p00_t00.json",
+      "run_name": "mth602_final_robust_PA2_PA8_p00_t00",
+      "existing_seed0_compatibility_candidate": true,
+      "status": "EXISTING_ARTIFACT_COMPATIBILITY_CANDIDATE"
+    },
+    {
+      "canonical_pair": "PA2-PA8",
+      "partition_seed": 0,
+      "training_seed": 1,
+      "path": "manifests/configs/mth602_final_robustness_v1/PA2-PA8/p00_t01.json",
+      "run_name": "mth602_final_robust_PA2_PA8_p00_t01",
+      "existing_seed0_compatibility_candidate": false,
+      "status": "READY_FOR_ADMISSION_AFTER_PACKAGE_VALIDATION"
+    },
+    {
+      "canonical_pair": "PA2-PA8",
+      "partition_seed": 0,
+      "training_seed": 2,
+      "path": "manifests/configs/mth602_final_robustness_v1/PA2-PA8/p00_t02.json",
+      "run_name": "mth602_final_robust_PA2_PA8_p00_t02",
+      "existing_seed0_compatibility_candidate": false,
+      "status": "READY_FOR_ADMISSION_AFTER_PACKAGE_VALIDATION"
+    },
+    {
+      "canonical_pair": "PA2-PA8",
+      "partition_seed": 0,
+      "training_seed": 3,
+      "path": "manifests/configs/mth602_final_robustness_v1/PA2-PA8/p00_t03.json",
+      "run_name": "mth602_final_robust_PA2_PA8_p00_t03",
+      "existing_seed0_compatibility_candidate": false,
+      "status": "READY_FOR_ADMISSION_AFTER_PACKAGE_VALIDATION"
+    },
+    {
+      "canonical_pair": "PA2-PA8",
+      "partition_seed": 0,
+      "training_seed": 4,
+      "path": "manifests/configs/mth602_final_robustness_v1/PA2-PA8/p00_t04.json",
+      "run_name": "mth602_final_robust_PA2_PA8_p00_t04",
+      "existing_seed0_compatibility_candidate": false,
+      "status": "READY_FOR_ADMISSION_AFTER_PACKAGE_VALIDATION"
+    },
+    {
+      "canonical_pair": "PA2-PA8",
+      "partition_seed": 0,
+      "training_seed": 5,
+      "path": "manifests/configs/mth602_final_robustness_v1/PA2-PA8/p00_t05.json",
+      "run_name": "mth602_final_robust_PA2_PA8_p00_t05",
+      "existing_seed0_compatibility_candidate": false,
+      "status": "READY_FOR_ADMISSION_AFTER_PACKAGE_VALIDATION"
+    },
+    {
+      "canonical_pair": "PA2-PA8",
+      "partition_seed": 0,
+      "training_seed": 6,
+      "path": "manifests/configs/mth602_final_robustness_v1/PA2-PA8/p00_t06.json",
+      "run_name": "mth602_final_robust_PA2_PA8_p00_t06",
+      "existing_seed0_compatibility_candidate": false,
+      "status": "READY_FOR_ADMISSION_AFTER_PACKAGE_VALIDATION"
+    },
+    {
+      "canonical_pair": "PA2-PA8",
+      "partition_seed": 0,
+      "training_seed": 7,
+      "path": "manifests/configs/mth602_final_robustness_v1/PA2-PA8/p00_t07.json",
+      "run_name": "mth602_final_robust_PA2_PA8_p00_t07",
+      "existing_seed0_compatibility_candidate": false,
+      "status": "READY_FOR_ADMISSION_AFTER_PACKAGE_VALIDATION"
+    },
+    {
+      "canonical_pair": "PA2-PA8",
+      "partition_seed": 0,
+      "training_seed": 8,
+      "path": "manifests/configs/mth602_final_robustness_v1/PA2-PA8/p00_t08.json",
+      "run_name": "mth602_final_robust_PA2_PA8_p00_t08",
+      "existing_seed0_compatibility_candidate": false,
+      "status": "READY_FOR_ADMISSION_AFTER_PACKAGE_VALIDATION"
+    },
+    {
+      "canonical_pair": "PA2-PA8",
+      "partition_seed": 0,
+      "training_seed": 9,
+      "path": "manifests/configs/mth602_final_robustness_v1/PA2-PA8/p00_t09.json",
+      "run_name": "mth602_final_robust_PA2_PA8_p00_t09",
+      "existing_seed0_compatibility_candidate": false,
+      "status": "READY_FOR_ADMISSION_AFTER_PACKAGE_VALIDATION"
+    },
+    {
+      "canonical_pair": "PA2-PA8",
+      "partition_seed": 1,
+      "training_seed": 0,
+      "path": "manifests/configs/mth602_final_robustness_v1/PA2-PA8/p01_t00.json",
+      "run_name": "mth602_final_robust_PA2_PA8_p01_t00",
+      "existing_seed0_compatibility_candidate": false,
+      "status": "READY_FOR_ADMISSION_AFTER_PACKAGE_VALIDATION"
+    },
+    {
+      "canonical_pair": "PA2-PA8",
+      "partition_seed": 1,
+      "training_seed": 1,
+      "path": "manifests/configs/mth602_final_robustness_v1/PA2-PA8/p01_t01.json",
+      "run_name": "mth602_final_robust_PA2_PA8_p01_t01",
+      "existing_seed0_compatibility_candidate": false,
+      "status": "READY_FOR_ADMISSION_AFTER_PACKAGE_VALIDATION"
+    },
+    {
+      "canonical_pair": "PA2-PA8",
+      "partition_seed": 1,
+      "training_seed": 2,
+      "path": "manifests/configs/mth602_final_robustness_v1/PA2-PA8/p01_t02.json",
+      "run_name": "mth602_final_robust_PA2_PA8_p01_t02",
+      "existing_seed0_compatibility_candidate": false,
+      "status": "READY_FOR_ADMISSION_AFTER_PACKAGE_VALIDATION"
+    },
+    {
+      "canonical_pair": "PA2-PA8",
+      "partition_seed": 1,
+      "training_seed": 3,
+      "path": "manifests/configs/mth602_final_robustness_v1/PA2-PA8/p01_t03.json",
+      "run_name": "mth602_final_robust_PA2_PA8_p01_t03",
+      "existing_seed0_compatibility_candidate": false,
+      "status": "READY_FOR_ADMISSION_AFTER_PACKAGE_VALIDATION"
+    },
+    {
+      "canonical_pair": "PA2-PA8",
+      "partition_seed": 1,
+      "training_seed": 4,
+      "path": "manifests/configs/mth602_final_robustness_v1/PA2-PA8/p01_t04.json",
+      "run_name": "mth602_final_robust_PA2_PA8_p01_t04",
+      "existing_seed0_compatibility_candidate": false,
+      "status": "READY_FOR_ADMISSION_AFTER_PACKAGE_VALIDATION"
+    },
+    {
+      "canonical_pair": "PA2-PA8",
+      "partition_seed": 1,
+      "training_seed": 5,
+      "path": "manifests/configs/mth602_final_robustness_v1/PA2-PA8/p01_t05.json",
+      "run_name": "mth602_final_robust_PA2_PA8_p01_t05",
+      "existing_seed0_compatibility_candidate": false,
+      "status": "READY_FOR_ADMISSION_AFTER_PACKAGE_VALIDATION"
+    },
+    {
+      "canonical_pair": "PA2-PA8",
+      "partition_seed": 1,
+      "training_seed": 6,
+      "path": "manifests/configs/mth602_final_robustness_v1/PA2-PA8/p01_t06.json",
+      "run_name": "mth602_final_robust_PA2_PA8_p01_t06",
+      "existing_seed0_compatibility_candidate": false,
+      "status": "READY_FOR_ADMISSION_AFTER_PACKAGE_VALIDATION"
+    },
+    {
+      "canonical_pair": "PA2-PA8",
+      "partition_seed": 1,
+      "training_seed": 7,
+      "path": "manifests/configs/mth602_final_robustness_v1/PA2-PA8/p01_t07.json",
+      "run_name": "mth602_final_robust_PA2_PA8_p01_t07",
+      "existing_seed0_compatibility_candidate": false,
+      "status": "READY_FOR_ADMISSION_AFTER_PACKAGE_VALIDATION"
+    },
+    {
+      "canonical_pair": "PA2-PA8",
+      "partition_seed": 1,
+      "training_seed": 8,
+      "path": "manifests/configs/mth602_final_robustness_v1/PA2-PA8/p01_t08.json",
+      "run_name": "mth602_final_robust_PA2_PA8_p01_t08",
+      "existing_seed0_compatibility_candidate": false,
+      "status": "READY_FOR_ADMISSION_AFTER_PACKAGE_VALIDATION"
+    },
+    {
+      "canonical_pair": "PA2-PA8",
+      "partition_seed": 1,
+      "training_seed": 9,
+      "path": "manifests/configs/mth602_final_robustness_v1/PA2-PA8/p01_t09.json",
+      "run_name": "mth602_final_robust_PA2_PA8_p01_t09",
+      "existing_seed0_compatibility_candidate": false,
+      "status": "READY_FOR_ADMISSION_AFTER_PACKAGE_VALIDATION"
+    },
+    {
+      "canonical_pair": "PA2-PA8",
+      "partition_seed": 2,
+      "training_seed": 0,
+      "path": "manifests/configs/mth602_final_robustness_v1/PA2-PA8/p02_t00.json",
+      "run_name": "mth602_final_robust_PA2_PA8_p02_t00",
+      "existing_seed0_compatibility_candidate": false,
+      "status": "READY_FOR_ADMISSION_AFTER_PACKAGE_VALIDATION"
+    },
+    {
+      "canonical_pair": "PA2-PA8",
+      "partition_seed": 2,
+      "training_seed": 1,
+      "path": "manifests/configs/mth602_final_robustness_v1/PA2-PA8/p02_t01.json",
+      "run_name": "mth602_final_robust_PA2_PA8_p02_t01",
+      "existing_seed0_compatibility_candidate": false,
+      "status": "READY_FOR_ADMISSION_AFTER_PACKAGE_VALIDATION"
+    },
+    {
+      "canonical_pair": "PA2-PA8",
+      "partition_seed": 2,
+      "training_seed": 2,
+      "path": "manifests/configs/mth602_final_robustness_v1/PA2-PA8/p02_t02.json",
+      "run_name": "mth602_final_robust_PA2_PA8_p02_t02",
+      "existing_seed0_compatibility_candidate": false,
+      "status": "READY_FOR_ADMISSION_AFTER_PACKAGE_VALIDATION"
+    },
+    {
+      "canonical_pair": "PA2-PA8",
+      "partition_seed": 2,
+      "training_seed": 3,
+      "path": "manifests/configs/mth602_final_robustness_v1/PA2-PA8/p02_t03.json",
+      "run_name": "mth602_final_robust_PA2_PA8_p02_t03",
+      "existing_seed0_compatibility_candidate": false,
+      "status": "READY_FOR_ADMISSION_AFTER_PACKAGE_VALIDATION"
+    },
+    {
+      "canonical_pair": "PA2-PA8",
+      "partition_seed": 2,
+      "training_seed": 4,
+      "path": "manifests/configs/mth602_final_robustness_v1/PA2-PA8/p02_t04.json",
+      "run_name": "mth602_final_robust_PA2_PA8_p02_t04",
+      "existing_seed0_compatibility_candidate": false,
+      "status": "READY_FOR_ADMISSION_AFTER_PACKAGE_VALIDATION"
+    },
+    {
+      "canonical_pair": "PA2-PA8",
+      "partition_seed": 2,
+      "training_seed": 5,
+      "path": "manifests/configs/mth602_final_robustness_v1/PA2-PA8/p02_t05.json",
+      "run_name": "mth602_final_robust_PA2_PA8_p02_t05",
+      "existing_seed0_compatibility_candidate": false,
+      "status": "READY_FOR_ADMISSION_AFTER_PACKAGE_VALIDATION"
+    },
+    {
+      "canonical_pair": "PA2-PA8",
+      "partition_seed": 2,
+      "training_seed": 6,
+      "path": "manifests/configs/mth602_final_robustness_v1/PA2-PA8/p02_t06.json",
+      "run_name": "mth602_final_robust_PA2_PA8_p02_t06",
+      "existing_seed0_compatibility_candidate": false,
+      "status": "READY_FOR_ADMISSION_AFTER_PACKAGE_VALIDATION"
+    },
+    {
+      "canonical_pair": "PA2-PA8",
+      "partition_seed": 2,
+      "training_seed": 7,
+      "path": "manifests/configs/mth602_final_robustness_v1/PA2-PA8/p02_t07.json",
+      "run_name": "mth602_final_robust_PA2_PA8_p02_t07",
+      "existing_seed0_compatibility_candidate": false,
+      "status": "READY_FOR_ADMISSION_AFTER_PACKAGE_VALIDATION"
+    },
+    {
+      "canonical_pair": "PA2-PA8",
+      "partition_seed": 2,
+      "training_seed": 8,
+      "path": "manifests/configs/mth602_final_robustness_v1/PA2-PA8/p02_t08.json",
+      "run_name": "mth602_final_robust_PA2_PA8_p02_t08",
+      "existing_seed0_compatibility_candidate": false,
+      "status": "READY_FOR_ADMISSION_AFTER_PACKAGE_VALIDATION"
+    },
+    {
+      "canonical_pair": "PA2-PA8",
+      "partition_seed": 2,
+      "training_seed": 9,
+      "path": "manifests/configs/mth602_final_robustness_v1/PA2-PA8/p02_t09.json",
+      "run_name": "mth602_final_robust_PA2_PA8_p02_t09",
+      "existing_seed0_compatibility_candidate": false,
+      "status": "READY_FOR_ADMISSION_AFTER_PACKAGE_VALIDATION"
+    },
+    {
+      "canonical_pair": "PA2-PA8",
+      "partition_seed": 3,
+      "training_seed": 0,
+      "path": "manifests/configs/mth602_final_robustness_v1/PA2-PA8/p03_t00.json",
+      "run_name": "mth602_final_robust_PA2_PA8_p03_t00",
+      "existing_seed0_compatibility_candidate": false,
+      "status": "READY_FOR_ADMISSION_AFTER_PACKAGE_VALIDATION"
+    },
+    {
+      "canonical_pair": "PA2-PA8",
+      "partition_seed": 3,
+      "training_seed": 1,
+      "path": "manifests/configs/mth602_final_robustness_v1/PA2-PA8/p03_t01.json",
+      "run_name": "mth602_final_robust_PA2_PA8_p03_t01",
+      "existing_seed0_compatibility_candidate": false,
+      "status": "READY_FOR_ADMISSION_AFTER_PACKAGE_VALIDATION"
+    },
+    {
+      "canonical_pair": "PA2-PA8",
+      "partition_seed": 3,
+      "training_seed": 2,
+      "path": "manifests/configs/mth602_final_robustness_v1/PA2-PA8/p03_t02.json",
+      "run_name": "mth602_final_robust_PA2_PA8_p03_t02",
+      "existing_seed0_compatibility_candidate": false,
+      "status": "READY_FOR_ADMISSION_AFTER_PACKAGE_VALIDATION"
+    },
+    {
+      "canonical_pair": "PA2-PA8",
+      "partition_seed": 3,
+      "training_seed": 3,
+      "path": "manifests/configs/mth602_final_robustness_v1/PA2-PA8/p03_t03.json",
+      "run_name": "mth602_final_robust_PA2_PA8_p03_t03",
+      "existing_seed0_compatibility_candidate": false,
+      "status": "READY_FOR_ADMISSION_AFTER_PACKAGE_VALIDATION"
+    },
+    {
+      "canonical_pair": "PA2-PA8",
+      "partition_seed": 3,
+      "training_seed": 4,
+      "path": "manifests/configs/mth602_final_robustness_v1/PA2-PA8/p03_t04.json",
+      "run_name": "mth602_final_robust_PA2_PA8_p03_t04",
+      "existing_seed0_compatibility_candidate": false,
+      "status": "READY_FOR_ADMISSION_AFTER_PACKAGE_VALIDATION"
+    },
+    {
+      "canonical_pair": "PA2-PA8",
+      "partition_seed": 3,
+      "training_seed": 5,
+      "path": "manifests/configs/mth602_final_robustness_v1/PA2-PA8/p03_t05.json",
+      "run_name": "mth602_final_robust_PA2_PA8_p03_t05",
+      "existing_seed0_compatibility_candidate": false,
+      "status": "READY_FOR_ADMISSION_AFTER_PACKAGE_VALIDATION"
+    },
+    {
+      "canonical_pair": "PA2-PA8",
+      "partition_seed": 3,
+      "training_seed": 6,
+      "path": "manifests/configs/mth602_final_robustness_v1/PA2-PA8/p03_t06.json",
+      "run_name": "mth602_final_robust_PA2_PA8_p03_t06",
+      "existing_seed0_compatibility_candidate": false,
+      "status": "READY_FOR_ADMISSION_AFTER_PACKAGE_VALIDATION"
+    },
+    {
+      "canonical_pair": "PA2-PA8",
+      "partition_seed": 3,
+      "training_seed": 7,
+      "path": "manifests/configs/mth602_final_robustness_v1/PA2-PA8/p03_t07.json",
+      "run_name": "mth602_final_robust_PA2_PA8_p03_t07",
+      "existing_seed0_compatibility_candidate": false,
+      "status": "READY_FOR_ADMISSION_AFTER_PACKAGE_VALIDATION"
+    },
+    {
+      "canonical_pair": "PA2-PA8",
+      "partition_seed": 3,
+      "training_seed": 8,
+      "path": "manifests/configs/mth602_final_robustness_v1/PA2-PA8/p03_t08.json",
+      "run_name": "mth602_final_robust_PA2_PA8_p03_t08",
+      "existing_seed0_compatibility_candidate": false,
+      "status": "READY_FOR_ADMISSION_AFTER_PACKAGE_VALIDATION"
+    },
+    {
+      "canonical_pair": "PA2-PA8",
+      "partition_seed": 3,
+      "training_seed": 9,
+      "path": "manifests/configs/mth602_final_robustness_v1/PA2-PA8/p03_t09.json",
+      "run_name": "mth602_final_robust_PA2_PA8_p03_t09",
+      "existing_seed0_compatibility_candidate": false,
+      "status": "READY_FOR_ADMISSION_AFTER_PACKAGE_VALIDATION"
+    },
+    {
+      "canonical_pair": "PA2-PA8",
+      "partition_seed": 4,
+      "training_seed": 0,
+      "path": "manifests/configs/mth602_final_robustness_v1/PA2-PA8/p04_t00.json",
+      "run_name": "mth602_final_robust_PA2_PA8_p04_t00",
+      "existing_seed0_compatibility_candidate": false,
+      "status": "READY_FOR_ADMISSION_AFTER_PACKAGE_VALIDATION"
+    },
+    {
+      "canonical_pair": "PA2-PA8",
+      "partition_seed": 4,
+      "training_seed": 1,
+      "path": "manifests/configs/mth602_final_robustness_v1/PA2-PA8/p04_t01.json",
+      "run_name": "mth602_final_robust_PA2_PA8_p04_t01",
+      "existing_seed0_compatibility_candidate": false,
+      "status": "READY_FOR_ADMISSION_AFTER_PACKAGE_VALIDATION"
+    },
+    {
+      "canonical_pair": "PA2-PA8",
+      "partition_seed": 4,
+      "training_seed": 2,
+      "path": "manifests/configs/mth602_final_robustness_v1/PA2-PA8/p04_t02.json",
+      "run_name": "mth602_final_robust_PA2_PA8_p04_t02",
+      "existing_seed0_compatibility_candidate": false,
+      "status": "READY_FOR_ADMISSION_AFTER_PACKAGE_VALIDATION"
+    },
+    {
+      "canonical_pair": "PA2-PA8",
+      "partition_seed": 4,
+      "training_seed": 3,
+      "path": "manifests/configs/mth602_final_robustness_v1/PA2-PA8/p04_t03.json",
+      "run_name": "mth602_final_robust_PA2_PA8_p04_t03",
+      "existing_seed0_compatibility_candidate": false,
+      "status": "READY_FOR_ADMISSION_AFTER_PACKAGE_VALIDATION"
+    },
+    {
+      "canonical_pair": "PA2-PA8",
+      "partition_seed": 4,
+      "training_seed": 4,
+      "path": "manifests/configs/mth602_final_robustness_v1/PA2-PA8/p04_t04.json",
+      "run_name": "mth602_final_robust_PA2_PA8_p04_t04",
+      "existing_seed0_compatibility_candidate": false,
+      "status": "READY_FOR_ADMISSION_AFTER_PACKAGE_VALIDATION"
+    },
+    {
+      "canonical_pair": "PA2-PA8",
+      "partition_seed": 4,
+      "training_seed": 5,
+      "path": "manifests/configs/mth602_final_robustness_v1/PA2-PA8/p04_t05.json",
+      "run_name": "mth602_final_robust_PA2_PA8_p04_t05",
+      "existing_seed0_compatibility_candidate": false,
+      "status": "READY_FOR_ADMISSION_AFTER_PACKAGE_VALIDATION"
+    },
+    {
+      "canonical_pair": "PA2-PA8",
+      "partition_seed": 4,
+      "training_seed": 6,
+      "path": "manifests/configs/mth602_final_robustness_v1/PA2-PA8/p04_t06.json",
+      "run_name": "mth602_final_robust_PA2_PA8_p04_t06",
+      "existing_seed0_compatibility_candidate": false,
+      "status": "READY_FOR_ADMISSION_AFTER_PACKAGE_VALIDATION"
+    },
+    {
+      "canonical_pair": "PA2-PA8",
+      "partition_seed": 4,
+      "training_seed": 7,
+      "path": "manifests/configs/mth602_final_robustness_v1/PA2-PA8/p04_t07.json",
+      "run_name": "mth602_final_robust_PA2_PA8_p04_t07",
+      "existing_seed0_compatibility_candidate": false,
+      "status": "READY_FOR_ADMISSION_AFTER_PACKAGE_VALIDATION"
+    },
+    {
+      "canonical_pair": "PA2-PA8",
+      "partition_seed": 4,
+      "training_seed": 8,
+      "path": "manifests/configs/mth602_final_robustness_v1/PA2-PA8/p04_t08.json",
+      "run_name": "mth602_final_robust_PA2_PA8_p04_t08",
+      "existing_seed0_compatibility_candidate": false,
+      "status": "READY_FOR_ADMISSION_AFTER_PACKAGE_VALIDATION"
+    },
+    {
+      "canonical_pair": "PA2-PA8",
+      "partition_seed": 4,
+      "training_seed": 9,
+      "path": "manifests/configs/mth602_final_robustness_v1/PA2-PA8/p04_t09.json",
+      "run_name": "mth602_final_robust_PA2_PA8_p04_t09",
+      "existing_seed0_compatibility_candidate": false,
+      "status": "READY_FOR_ADMISSION_AFTER_PACKAGE_VALIDATION"
+    },
+    {
+      "canonical_pair": "PA3-PA4",
+      "partition_seed": 0,
+      "training_seed": 0,
+      "path": "manifests/configs/mth602_final_robustness_v1/PA3-PA4/p00_t00.json",
+      "run_name": "mth602_final_robust_PA3_PA4_p00_t00",
+      "existing_seed0_compatibility_candidate": true,
+      "status": "EXISTING_ARTIFACT_COMPATIBILITY_CANDIDATE"
+    },
+    {
+      "canonical_pair": "PA3-PA4",
+      "partition_seed": 0,
+      "training_seed": 1,
+      "path": "manifests/configs/mth602_final_robustness_v1/PA3-PA4/p00_t01.json",
+      "run_name": "mth602_final_robust_PA3_PA4_p00_t01",
+      "existing_seed0_compatibility_candidate": false,
+      "status": "READY_FOR_ADMISSION_AFTER_PACKAGE_VALIDATION"
+    },
+    {
+      "canonical_pair": "PA3-PA4",
+      "partition_seed": 0,
+      "training_seed": 2,
+      "path": "manifests/configs/mth602_final_robustness_v1/PA3-PA4/p00_t02.json",
+      "run_name": "mth602_final_robust_PA3_PA4_p00_t02",
+      "existing_seed0_compatibility_candidate": false,
+      "status": "READY_FOR_ADMISSION_AFTER_PACKAGE_VALIDATION"
+    },
+    {
+      "canonical_pair": "PA3-PA4",
+      "partition_seed": 0,
+      "training_seed": 3,
+      "path": "manifests/configs/mth602_final_robustness_v1/PA3-PA4/p00_t03.json",
+      "run_name": "mth602_final_robust_PA3_PA4_p00_t03",
+      "existing_seed0_compatibility_candidate": false,
+      "status": "READY_FOR_ADMISSION_AFTER_PACKAGE_VALIDATION"
+    },
+    {
+      "canonical_pair": "PA3-PA4",
+      "partition_seed": 0,
+      "training_seed": 4,
+      "path": "manifests/configs/mth602_final_robustness_v1/PA3-PA4/p00_t04.json",
+      "run_name": "mth602_final_robust_PA3_PA4_p00_t04",
+      "existing_seed0_compatibility_candidate": false,
+      "status": "READY_FOR_ADMISSION_AFTER_PACKAGE_VALIDATION"
+    },
+    {
+      "canonical_pair": "PA3-PA4",
+      "partition_seed": 0,
+      "training_seed": 5,
+      "path": "manifests/configs/mth602_final_robustness_v1/PA3-PA4/p00_t05.json",
+      "run_name": "mth602_final_robust_PA3_PA4_p00_t05",
+      "existing_seed0_compatibility_candidate": false,
+      "status": "READY_FOR_ADMISSION_AFTER_PACKAGE_VALIDATION"
+    },
+    {
+      "canonical_pair": "PA3-PA4",
+      "partition_seed": 0,
+      "training_seed": 6,
+      "path": "manifests/configs/mth602_final_robustness_v1/PA3-PA4/p00_t06.json",
+      "run_name": "mth602_final_robust_PA3_PA4_p00_t06",
+      "existing_seed0_compatibility_candidate": false,
+      "status": "READY_FOR_ADMISSION_AFTER_PACKAGE_VALIDATION"
+    },
+    {
+      "canonical_pair": "PA3-PA4",
+      "partition_seed": 0,
+      "training_seed": 7,
+      "path": "manifests/configs/mth602_final_robustness_v1/PA3-PA4/p00_t07.json",
+      "run_name": "mth602_final_robust_PA3_PA4_p00_t07",
+      "existing_seed0_compatibility_candidate": false,
+      "status": "READY_FOR_ADMISSION_AFTER_PACKAGE_VALIDATION"
+    },
+    {
+      "canonical_pair": "PA3-PA4",
+      "partition_seed": 0,
+      "training_seed": 8,
+      "path": "manifests/configs/mth602_final_robustness_v1/PA3-PA4/p00_t08.json",
+      "run_name": "mth602_final_robust_PA3_PA4_p00_t08",
+      "existing_seed0_compatibility_candidate": false,
+      "status": "READY_FOR_ADMISSION_AFTER_PACKAGE_VALIDATION"
+    },
+    {
+      "canonical_pair": "PA3-PA4",
+      "partition_seed": 0,
+      "training_seed": 9,
+      "path": "manifests/configs/mth602_final_robustness_v1/PA3-PA4/p00_t09.json",
+      "run_name": "mth602_final_robust_PA3_PA4_p00_t09",
+      "existing_seed0_compatibility_candidate": false,
+      "status": "READY_FOR_ADMISSION_AFTER_PACKAGE_VALIDATION"
+    },
+    {
+      "canonical_pair": "PA3-PA4",
+      "partition_seed": 1,
+      "training_seed": 0,
+      "path": "manifests/configs/mth602_final_robustness_v1/PA3-PA4/p01_t00.json",
+      "run_name": "mth602_final_robust_PA3_PA4_p01_t00",
+      "existing_seed0_compatibility_candidate": false,
+      "status": "READY_FOR_ADMISSION_AFTER_PACKAGE_VALIDATION"
+    },
+    {
+      "canonical_pair": "PA3-PA4",
+      "partition_seed": 1,
+      "training_seed": 1,
+      "path": "manifests/configs/mth602_final_robustness_v1/PA3-PA4/p01_t01.json",
+      "run_name": "mth602_final_robust_PA3_PA4_p01_t01",
+      "existing_seed0_compatibility_candidate": false,
+      "status": "READY_FOR_ADMISSION_AFTER_PACKAGE_VALIDATION"
+    },
+    {
+      "canonical_pair": "PA3-PA4",
+      "partition_seed": 1,
+      "training_seed": 2,
+      "path": "manifests/configs/mth602_final_robustness_v1/PA3-PA4/p01_t02.json",
+      "run_name": "mth602_final_robust_PA3_PA4_p01_t02",
+      "existing_seed0_compatibility_candidate": false,
+      "status": "READY_FOR_ADMISSION_AFTER_PACKAGE_VALIDATION"
+    },
+    {
+      "canonical_pair": "PA3-PA4",
+      "partition_seed": 1,
+      "training_seed": 3,
+      "path": "manifests/configs/mth602_final_robustness_v1/PA3-PA4/p01_t03.json",
+      "run_name": "mth602_final_robust_PA3_PA4_p01_t03",
+      "existing_seed0_compatibility_candidate": false,
+      "status": "READY_FOR_ADMISSION_AFTER_PACKAGE_VALIDATION"
+    },
+    {
+      "canonical_pair": "PA3-PA4",
+      "partition_seed": 1,
+      "training_seed": 4,
+      "path": "manifests/configs/mth602_final_robustness_v1/PA3-PA4/p01_t04.json",
+      "run_name": "mth602_final_robust_PA3_PA4_p01_t04",
+      "existing_seed0_compatibility_candidate": false,
+      "status": "READY_FOR_ADMISSION_AFTER_PACKAGE_VALIDATION"
+    },
+    {
+      "canonical_pair": "PA3-PA4",
+      "partition_seed": 1,
+      "training_seed": 5,
+      "path": "manifests/configs/mth602_final_robustness_v1/PA3-PA4/p01_t05.json",
+      "run_name": "mth602_final_robust_PA3_PA4_p01_t05",
+      "existing_seed0_compatibility_candidate": false,
+      "status": "READY_FOR_ADMISSION_AFTER_PACKAGE_VALIDATION"
+    },
+    {
+      "canonical_pair": "PA3-PA4",
+      "partition_seed": 1,
+      "training_seed": 6,
+      "path": "manifests/configs/mth602_final_robustness_v1/PA3-PA4/p01_t06.json",
+      "run_name": "mth602_final_robust_PA3_PA4_p01_t06",
+      "existing_seed0_compatibility_candidate": false,
+      "status": "READY_FOR_ADMISSION_AFTER_PACKAGE_VALIDATION"
+    },
+    {
+      "canonical_pair": "PA3-PA4",
+      "partition_seed": 1,
+      "training_seed": 7,
+      "path": "manifests/configs/mth602_final_robustness_v1/PA3-PA4/p01_t07.json",
+      "run_name": "mth602_final_robust_PA3_PA4_p01_t07",
+      "existing_seed0_compatibility_candidate": false,
+      "status": "READY_FOR_ADMISSION_AFTER_PACKAGE_VALIDATION"
+    },
+    {
+      "canonical_pair": "PA3-PA4",
+      "partition_seed": 1,
+      "training_seed": 8,
+      "path": "manifests/configs/mth602_final_robustness_v1/PA3-PA4/p01_t08.json",
+      "run_name": "mth602_final_robust_PA3_PA4_p01_t08",
+      "existing_seed0_compatibility_candidate": false,
+      "status": "READY_FOR_ADMISSION_AFTER_PACKAGE_VALIDATION"
+    },
+    {
+      "canonical_pair": "PA3-PA4",
+      "partition_seed": 1,
+      "training_seed": 9,
+      "path": "manifests/configs/mth602_final_robustness_v1/PA3-PA4/p01_t09.json",
+      "run_name": "mth602_final_robust_PA3_PA4_p01_t09",
+      "existing_seed0_compatibility_candidate": false,
+      "status": "READY_FOR_ADMISSION_AFTER_PACKAGE_VALIDATION"
+    },
+    {
+      "canonical_pair": "PA3-PA4",
+      "partition_seed": 2,
+      "training_seed": 0,
+      "path": "manifests/configs/mth602_final_robustness_v1/PA3-PA4/p02_t00.json",
+      "run_name": "mth602_final_robust_PA3_PA4_p02_t00",
+      "existing_seed0_compatibility_candidate": false,
+      "status": "READY_FOR_ADMISSION_AFTER_PACKAGE_VALIDATION"
+    },
+    {
+      "canonical_pair": "PA3-PA4",
+      "partition_seed": 2,
+      "training_seed": 1,
+      "path": "manifests/configs/mth602_final_robustness_v1/PA3-PA4/p02_t01.json",
+      "run_name": "mth602_final_robust_PA3_PA4_p02_t01",
+      "existing_seed0_compatibility_candidate": false,
+      "status": "READY_FOR_ADMISSION_AFTER_PACKAGE_VALIDATION"
+    },
+    {
+      "canonical_pair": "PA3-PA4",
+      "partition_seed": 2,
+      "training_seed": 2,
+      "path": "manifests/configs/mth602_final_robustness_v1/PA3-PA4/p02_t02.json",
+      "run_name": "mth602_final_robust_PA3_PA4_p02_t02",
+      "existing_seed0_compatibility_candidate": false,
+      "status": "READY_FOR_ADMISSION_AFTER_PACKAGE_VALIDATION"
+    },
+    {
+      "canonical_pair": "PA3-PA4",
+      "partition_seed": 2,
+      "training_seed": 3,
+      "path": "manifests/configs/mth602_final_robustness_v1/PA3-PA4/p02_t03.json",
+      "run_name": "mth602_final_robust_PA3_PA4_p02_t03",
+      "existing_seed0_compatibility_candidate": false,
+      "status": "READY_FOR_ADMISSION_AFTER_PACKAGE_VALIDATION"
+    },
+    {
+      "canonical_pair": "PA3-PA4",
+      "partition_seed": 2,
+      "training_seed": 4,
+      "path": "manifests/configs/mth602_final_robustness_v1/PA3-PA4/p02_t04.json",
+      "run_name": "mth602_final_robust_PA3_PA4_p02_t04",
+      "existing_seed0_compatibility_candidate": false,
+      "status": "READY_FOR_ADMISSION_AFTER_PACKAGE_VALIDATION"
+    },
+    {
+      "canonical_pair": "PA3-PA4",
+      "partition_seed": 2,
+      "training_seed": 5,
+      "path": "manifests/configs/mth602_final_robustness_v1/PA3-PA4/p02_t05.json",
+      "run_name": "mth602_final_robust_PA3_PA4_p02_t05",
+      "existing_seed0_compatibility_candidate": false,
+      "status": "READY_FOR_ADMISSION_AFTER_PACKAGE_VALIDATION"
+    },
+    {
+      "canonical_pair": "PA3-PA4",
+      "partition_seed": 2,
+      "training_seed": 6,
+      "path": "manifests/configs/mth602_final_robustness_v1/PA3-PA4/p02_t06.json",
+      "run_name": "mth602_final_robust_PA3_PA4_p02_t06",
+      "existing_seed0_compatibility_candidate": false,
+      "status": "READY_FOR_ADMISSION_AFTER_PACKAGE_VALIDATION"
+    },
+    {
+      "canonical_pair": "PA3-PA4",
+      "partition_seed": 2,
+      "training_seed": 7,
+      "path": "manifests/configs/mth602_final_robustness_v1/PA3-PA4/p02_t07.json",
+      "run_name": "mth602_final_robust_PA3_PA4_p02_t07",
+      "existing_seed0_compatibility_candidate": false,
+      "status": "READY_FOR_ADMISSION_AFTER_PACKAGE_VALIDATION"
+    },
+    {
+      "canonical_pair": "PA3-PA4",
+      "partition_seed": 2,
+      "training_seed": 8,
+      "path": "manifests/configs/mth602_final_robustness_v1/PA3-PA4/p02_t08.json",
+      "run_name": "mth602_final_robust_PA3_PA4_p02_t08",
+      "existing_seed0_compatibility_candidate": false,
+      "status": "READY_FOR_ADMISSION_AFTER_PACKAGE_VALIDATION"
+    },
+    {
+      "canonical_pair": "PA3-PA4",
+      "partition_seed": 2,
+      "training_seed": 9,
+      "path": "manifests/configs/mth602_final_robustness_v1/PA3-PA4/p02_t09.json",
+      "run_name": "mth602_final_robust_PA3_PA4_p02_t09",
+      "existing_seed0_compatibility_candidate": false,
+      "status": "READY_FOR_ADMISSION_AFTER_PACKAGE_VALIDATION"
+    },
+    {
+      "canonical_pair": "PA3-PA4",
+      "partition_seed": 3,
+      "training_seed": 0,
+      "path": "manifests/configs/mth602_final_robustness_v1/PA3-PA4/p03_t00.json",
+      "run_name": "mth602_final_robust_PA3_PA4_p03_t00",
+      "existing_seed0_compatibility_candidate": false,
+      "status": "READY_FOR_ADMISSION_AFTER_PACKAGE_VALIDATION"
+    },
+    {
+      "canonical_pair": "PA3-PA4",
+      "partition_seed": 3,
+      "training_seed": 1,
+      "path": "manifests/configs/mth602_final_robustness_v1/PA3-PA4/p03_t01.json",
+      "run_name": "mth602_final_robust_PA3_PA4_p03_t01",
+      "existing_seed0_compatibility_candidate": false,
+      "status": "READY_FOR_ADMISSION_AFTER_PACKAGE_VALIDATION"
+    },
+    {
+      "canonical_pair": "PA3-PA4",
+      "partition_seed": 3,
+      "training_seed": 2,
+      "path": "manifests/configs/mth602_final_robustness_v1/PA3-PA4/p03_t02.json",
+      "run_name": "mth602_final_robust_PA3_PA4_p03_t02",
+      "existing_seed0_compatibility_candidate": false,
+      "status": "READY_FOR_ADMISSION_AFTER_PACKAGE_VALIDATION"
+    },
+    {
+      "canonical_pair": "PA3-PA4",
+      "partition_seed": 3,
+      "training_seed": 3,
+      "path": "manifests/configs/mth602_final_robustness_v1/PA3-PA4/p03_t03.json",
+      "run_name": "mth602_final_robust_PA3_PA4_p03_t03",
+      "existing_seed0_compatibility_candidate": false,
+      "status": "READY_FOR_ADMISSION_AFTER_PACKAGE_VALIDATION"
+    },
+    {
+      "canonical_pair": "PA3-PA4",
+      "partition_seed": 3,
+      "training_seed": 4,
+      "path": "manifests/configs/mth602_final_robustness_v1/PA3-PA4/p03_t04.json",
+      "run_name": "mth602_final_robust_PA3_PA4_p03_t04",
+      "existing_seed0_compatibility_candidate": false,
+      "status": "READY_FOR_ADMISSION_AFTER_PACKAGE_VALIDATION"
+    },
+    {
+      "canonical_pair": "PA3-PA4",
+      "partition_seed": 3,
+      "training_seed": 5,
+      "path": "manifests/configs/mth602_final_robustness_v1/PA3-PA4/p03_t05.json",
+      "run_name": "mth602_final_robust_PA3_PA4_p03_t05",
+      "existing_seed0_compatibility_candidate": false,
+      "status": "READY_FOR_ADMISSION_AFTER_PACKAGE_VALIDATION"
+    },
+    {
+      "canonical_pair": "PA3-PA4",
+      "partition_seed": 3,
+      "training_seed": 6,
+      "path": "manifests/configs/mth602_final_robustness_v1/PA3-PA4/p03_t06.json",
+      "run_name": "mth602_final_robust_PA3_PA4_p03_t06",
+      "existing_seed0_compatibility_candidate": false,
+      "status": "READY_FOR_ADMISSION_AFTER_PACKAGE_VALIDATION"
+    },
+    {
+      "canonical_pair": "PA3-PA4",
+      "partition_seed": 3,
+      "training_seed": 7,
+      "path": "manifests/configs/mth602_final_robustness_v1/PA3-PA4/p03_t07.json",
+      "run_name": "mth602_final_robust_PA3_PA4_p03_t07",
+      "existing_seed0_compatibility_candidate": false,
+      "status": "READY_FOR_ADMISSION_AFTER_PACKAGE_VALIDATION"
+    },
+    {
+      "canonical_pair": "PA3-PA4",
+      "partition_seed": 3,
+      "training_seed": 8,
+      "path": "manifests/configs/mth602_final_robustness_v1/PA3-PA4/p03_t08.json",
+      "run_name": "mth602_final_robust_PA3_PA4_p03_t08",
+      "existing_seed0_compatibility_candidate": false,
+      "status": "READY_FOR_ADMISSION_AFTER_PACKAGE_VALIDATION"
+    },
+    {
+      "canonical_pair": "PA3-PA4",
+      "partition_seed": 3,
+      "training_seed": 9,
+      "path": "manifests/configs/mth602_final_robustness_v1/PA3-PA4/p03_t09.json",
+      "run_name": "mth602_final_robust_PA3_PA4_p03_t09",
+      "existing_seed0_compatibility_candidate": false,
+      "status": "READY_FOR_ADMISSION_AFTER_PACKAGE_VALIDATION"
+    },
+    {
+      "canonical_pair": "PA3-PA4",
+      "partition_seed": 4,
+      "training_seed": 0,
+      "path": "manifests/configs/mth602_final_robustness_v1/PA3-PA4/p04_t00.json",
+      "run_name": "mth602_final_robust_PA3_PA4_p04_t00",
+      "existing_seed0_compatibility_candidate": false,
+      "status": "READY_FOR_ADMISSION_AFTER_PACKAGE_VALIDATION"
+    },
+    {
+      "canonical_pair": "PA3-PA4",
+      "partition_seed": 4,
+      "training_seed": 1,
+      "path": "manifests/configs/mth602_final_robustness_v1/PA3-PA4/p04_t01.json",
+      "run_name": "mth602_final_robust_PA3_PA4_p04_t01",
+      "existing_seed0_compatibility_candidate": false,
+      "status": "READY_FOR_ADMISSION_AFTER_PACKAGE_VALIDATION"
+    },
+    {
+      "canonical_pair": "PA3-PA4",
+      "partition_seed": 4,
+      "training_seed": 2,
+      "path": "manifests/configs/mth602_final_robustness_v1/PA3-PA4/p04_t02.json",
+      "run_name": "mth602_final_robust_PA3_PA4_p04_t02",
+      "existing_seed0_compatibility_candidate": false,
+      "status": "READY_FOR_ADMISSION_AFTER_PACKAGE_VALIDATION"
+    },
+    {
+      "canonical_pair": "PA3-PA4",
+      "partition_seed": 4,
+      "training_seed": 3,
+      "path": "manifests/configs/mth602_final_robustness_v1/PA3-PA4/p04_t03.json",
+      "run_name": "mth602_final_robust_PA3_PA4_p04_t03",
+      "existing_seed0_compatibility_candidate": false,
+      "status": "READY_FOR_ADMISSION_AFTER_PACKAGE_VALIDATION"
+    },
+    {
+      "canonical_pair": "PA3-PA4",
+      "partition_seed": 4,
+      "training_seed": 4,
+      "path": "manifests/configs/mth602_final_robustness_v1/PA3-PA4/p04_t04.json",
+      "run_name": "mth602_final_robust_PA3_PA4_p04_t04",
+      "existing_seed0_compatibility_candidate": false,
+      "status": "READY_FOR_ADMISSION_AFTER_PACKAGE_VALIDATION"
+    },
+    {
+      "canonical_pair": "PA3-PA4",
+      "partition_seed": 4,
+      "training_seed": 5,
+      "path": "manifests/configs/mth602_final_robustness_v1/PA3-PA4/p04_t05.json",
+      "run_name": "mth602_final_robust_PA3_PA4_p04_t05",
+      "existing_seed0_compatibility_candidate": false,
+      "status": "READY_FOR_ADMISSION_AFTER_PACKAGE_VALIDATION"
+    },
+    {
+      "canonical_pair": "PA3-PA4",
+      "partition_seed": 4,
+      "training_seed": 6,
+      "path": "manifests/configs/mth602_final_robustness_v1/PA3-PA4/p04_t06.json",
+      "run_name": "mth602_final_robust_PA3_PA4_p04_t06",
+      "existing_seed0_compatibility_candidate": false,
+      "status": "READY_FOR_ADMISSION_AFTER_PACKAGE_VALIDATION"
+    },
+    {
+      "canonical_pair": "PA3-PA4",
+      "partition_seed": 4,
+      "training_seed": 7,
+      "path": "manifests/configs/mth602_final_robustness_v1/PA3-PA4/p04_t07.json",
+      "run_name": "mth602_final_robust_PA3_PA4_p04_t07",
+      "existing_seed0_compatibility_candidate": false,
+      "status": "READY_FOR_ADMISSION_AFTER_PACKAGE_VALIDATION"
+    },
+    {
+      "canonical_pair": "PA3-PA4",
+      "partition_seed": 4,
+      "training_seed": 8,
+      "path": "manifests/configs/mth602_final_robustness_v1/PA3-PA4/p04_t08.json",
+      "run_name": "mth602_final_robust_PA3_PA4_p04_t08",
+      "existing_seed0_compatibility_candidate": false,
+      "status": "READY_FOR_ADMISSION_AFTER_PACKAGE_VALIDATION"
+    },
+    {
+      "canonical_pair": "PA3-PA4",
+      "partition_seed": 4,
+      "training_seed": 9,
+      "path": "manifests/configs/mth602_final_robustness_v1/PA3-PA4/p04_t09.json",
+      "run_name": "mth602_final_robust_PA3_PA4_p04_t09",
+      "existing_seed0_compatibility_candidate": false,
+      "status": "READY_FOR_ADMISSION_AFTER_PACKAGE_VALIDATION"
+    },
+    {
+      "canonical_pair": "PA3-PA8",
+      "partition_seed": 0,
+      "training_seed": 0,
+      "path": "manifests/configs/mth602_final_robustness_v1/PA3-PA8/p00_t00.json",
+      "run_name": "mth602_final_robust_PA3_PA8_p00_t00",
+      "existing_seed0_compatibility_candidate": true,
+      "status": "EXISTING_ARTIFACT_COMPATIBILITY_CANDIDATE"
+    },
+    {
+      "canonical_pair": "PA3-PA8",
+      "partition_seed": 0,
+      "training_seed": 1,
+      "path": "manifests/configs/mth602_final_robustness_v1/PA3-PA8/p00_t01.json",
+      "run_name": "mth602_final_robust_PA3_PA8_p00_t01",
+      "existing_seed0_compatibility_candidate": false,
+      "status": "READY_FOR_ADMISSION_AFTER_PACKAGE_VALIDATION"
+    },
+    {
+      "canonical_pair": "PA3-PA8",
+      "partition_seed": 0,
+      "training_seed": 2,
+      "path": "manifests/configs/mth602_final_robustness_v1/PA3-PA8/p00_t02.json",
+      "run_name": "mth602_final_robust_PA3_PA8_p00_t02",
+      "existing_seed0_compatibility_candidate": false,
+      "status": "READY_FOR_ADMISSION_AFTER_PACKAGE_VALIDATION"
+    },
+    {
+      "canonical_pair": "PA3-PA8",
+      "partition_seed": 0,
+      "training_seed": 3,
+      "path": "manifests/configs/mth602_final_robustness_v1/PA3-PA8/p00_t03.json",
+      "run_name": "mth602_final_robust_PA3_PA8_p00_t03",
+      "existing_seed0_compatibility_candidate": false,
+      "status": "READY_FOR_ADMISSION_AFTER_PACKAGE_VALIDATION"
+    },
+    {
+      "canonical_pair": "PA3-PA8",
+      "partition_seed": 0,
+      "training_seed": 4,
+      "path": "manifests/configs/mth602_final_robustness_v1/PA3-PA8/p00_t04.json",
+      "run_name": "mth602_final_robust_PA3_PA8_p00_t04",
+      "existing_seed0_compatibility_candidate": false,
+      "status": "READY_FOR_ADMISSION_AFTER_PACKAGE_VALIDATION"
+    },
+    {
+      "canonical_pair": "PA3-PA8",
+      "partition_seed": 0,
+      "training_seed": 5,
+      "path": "manifests/configs/mth602_final_robustness_v1/PA3-PA8/p00_t05.json",
+      "run_name": "mth602_final_robust_PA3_PA8_p00_t05",
+      "existing_seed0_compatibility_candidate": false,
+      "status": "READY_FOR_ADMISSION_AFTER_PACKAGE_VALIDATION"
+    },
+    {
+      "canonical_pair": "PA3-PA8",
+      "partition_seed": 0,
+      "training_seed": 6,
+      "path": "manifests/configs/mth602_final_robustness_v1/PA3-PA8/p00_t06.json",
+      "run_name": "mth602_final_robust_PA3_PA8_p00_t06",
+      "existing_seed0_compatibility_candidate": false,
+      "status": "READY_FOR_ADMISSION_AFTER_PACKAGE_VALIDATION"
+    },
+    {
+      "canonical_pair": "PA3-PA8",
+      "partition_seed": 0,
+      "training_seed": 7,
+      "path": "manifests/configs/mth602_final_robustness_v1/PA3-PA8/p00_t07.json",
+      "run_name": "mth602_final_robust_PA3_PA8_p00_t07",
+      "existing_seed0_compatibility_candidate": false,
+      "status": "READY_FOR_ADMISSION_AFTER_PACKAGE_VALIDATION"
+    },
+    {
+      "canonical_pair": "PA3-PA8",
+      "partition_seed": 0,
+      "training_seed": 8,
+      "path": "manifests/configs/mth602_final_robustness_v1/PA3-PA8/p00_t08.json",
+      "run_name": "mth602_final_robust_PA3_PA8_p00_t08",
+      "existing_seed0_compatibility_candidate": false,
+      "status": "READY_FOR_ADMISSION_AFTER_PACKAGE_VALIDATION"
+    },
+    {
+      "canonical_pair": "PA3-PA8",
+      "partition_seed": 0,
+      "training_seed": 9,
+      "path": "manifests/configs/mth602_final_robustness_v1/PA3-PA8/p00_t09.json",
+      "run_name": "mth602_final_robust_PA3_PA8_p00_t09",
+      "existing_seed0_compatibility_candidate": false,
+      "status": "READY_FOR_ADMISSION_AFTER_PACKAGE_VALIDATION"
+    },
+    {
+      "canonical_pair": "PA3-PA8",
+      "partition_seed": 1,
+      "training_seed": 0,
+      "path": "manifests/configs/mth602_final_robustness_v1/PA3-PA8/p01_t00.json",
+      "run_name": "mth602_final_robust_PA3_PA8_p01_t00",
+      "existing_seed0_compatibility_candidate": false,
+      "status": "READY_FOR_ADMISSION_AFTER_PACKAGE_VALIDATION"
+    },
+    {
+      "canonical_pair": "PA3-PA8",
+      "partition_seed": 1,
+      "training_seed": 1,
+      "path": "manifests/configs/mth602_final_robustness_v1/PA3-PA8/p01_t01.json",
+      "run_name": "mth602_final_robust_PA3_PA8_p01_t01",
+      "existing_seed0_compatibility_candidate": false,
+      "status": "READY_FOR_ADMISSION_AFTER_PACKAGE_VALIDATION"
+    },
+    {
+      "canonical_pair": "PA3-PA8",
+      "partition_seed": 1,
+      "training_seed": 2,
+      "path": "manifests/configs/mth602_final_robustness_v1/PA3-PA8/p01_t02.json",
+      "run_name": "mth602_final_robust_PA3_PA8_p01_t02",
+      "existing_seed0_compatibility_candidate": false,
+      "status": "READY_FOR_ADMISSION_AFTER_PACKAGE_VALIDATION"
+    },
+    {
+      "canonical_pair": "PA3-PA8",
+      "partition_seed": 1,
+      "training_seed": 3,
+      "path": "manifests/configs/mth602_final_robustness_v1/PA3-PA8/p01_t03.json",
+      "run_name": "mth602_final_robust_PA3_PA8_p01_t03",
+      "existing_seed0_compatibility_candidate": false,
+      "status": "READY_FOR_ADMISSION_AFTER_PACKAGE_VALIDATION"
+    },
+    {
+      "canonical_pair": "PA3-PA8",
+      "partition_seed": 1,
+      "training_seed": 4,
+      "path": "manifests/configs/mth602_final_robustness_v1/PA3-PA8/p01_t04.json",
+      "run_name": "mth602_final_robust_PA3_PA8_p01_t04",
+      "existing_seed0_compatibility_candidate": false,
+      "status": "READY_FOR_ADMISSION_AFTER_PACKAGE_VALIDATION"
+    },
+    {
+      "canonical_pair": "PA3-PA8",
+      "partition_seed": 1,
+      "training_seed": 5,
+      "path": "manifests/configs/mth602_final_robustness_v1/PA3-PA8/p01_t05.json",
+      "run_name": "mth602_final_robust_PA3_PA8_p01_t05",
+      "existing_seed0_compatibility_candidate": false,
+      "status": "READY_FOR_ADMISSION_AFTER_PACKAGE_VALIDATION"
+    },
+    {
+      "canonical_pair": "PA3-PA8",
+      "partition_seed": 1,
+      "training_seed": 6,
+      "path": "manifests/configs/mth602_final_robustness_v1/PA3-PA8/p01_t06.json",
+      "run_name": "mth602_final_robust_PA3_PA8_p01_t06",
+      "existing_seed0_compatibility_candidate": false,
+      "status": "READY_FOR_ADMISSION_AFTER_PACKAGE_VALIDATION"
+    },
+    {
+      "canonical_pair": "PA3-PA8",
+      "partition_seed": 1,
+      "training_seed": 7,
+      "path": "manifests/configs/mth602_final_robustness_v1/PA3-PA8/p01_t07.json",
+      "run_name": "mth602_final_robust_PA3_PA8_p01_t07",
+      "existing_seed0_compatibility_candidate": false,
+      "status": "READY_FOR_ADMISSION_AFTER_PACKAGE_VALIDATION"
+    },
+    {
+      "canonical_pair": "PA3-PA8",
+      "partition_seed": 1,
+      "training_seed": 8,
+      "path": "manifests/configs/mth602_final_robustness_v1/PA3-PA8/p01_t08.json",
+      "run_name": "mth602_final_robust_PA3_PA8_p01_t08",
+      "existing_seed0_compatibility_candidate": false,
+      "status": "READY_FOR_ADMISSION_AFTER_PACKAGE_VALIDATION"
+    },
+    {
+      "canonical_pair": "PA3-PA8",
+      "partition_seed": 1,
+      "training_seed": 9,
+      "path": "manifests/configs/mth602_final_robustness_v1/PA3-PA8/p01_t09.json",
+      "run_name": "mth602_final_robust_PA3_PA8_p01_t09",
+      "existing_seed0_compatibility_candidate": false,
+      "status": "READY_FOR_ADMISSION_AFTER_PACKAGE_VALIDATION"
+    },
+    {
+      "canonical_pair": "PA3-PA8",
+      "partition_seed": 2,
+      "training_seed": 0,
+      "path": "manifests/configs/mth602_final_robustness_v1/PA3-PA8/p02_t00.json",
+      "run_name": "mth602_final_robust_PA3_PA8_p02_t00",
+      "existing_seed0_compatibility_candidate": false,
+      "status": "READY_FOR_ADMISSION_AFTER_PACKAGE_VALIDATION"
+    },
+    {
+      "canonical_pair": "PA3-PA8",
+      "partition_seed": 2,
+      "training_seed": 1,
+      "path": "manifests/configs/mth602_final_robustness_v1/PA3-PA8/p02_t01.json",
+      "run_name": "mth602_final_robust_PA3_PA8_p02_t01",
+      "existing_seed0_compatibility_candidate": false,
+      "status": "READY_FOR_ADMISSION_AFTER_PACKAGE_VALIDATION"
+    },
+    {
+      "canonical_pair": "PA3-PA8",
+      "partition_seed": 2,
+      "training_seed": 2,
+      "path": "manifests/configs/mth602_final_robustness_v1/PA3-PA8/p02_t02.json",
+      "run_name": "mth602_final_robust_PA3_PA8_p02_t02",
+      "existing_seed0_compatibility_candidate": false,
+      "status": "READY_FOR_ADMISSION_AFTER_PACKAGE_VALIDATION"
+    },
+    {
+      "canonical_pair": "PA3-PA8",
+      "partition_seed": 2,
+      "training_seed": 3,
+      "path": "manifests/configs/mth602_final_robustness_v1/PA3-PA8/p02_t03.json",
+      "run_name": "mth602_final_robust_PA3_PA8_p02_t03",
+      "existing_seed0_compatibility_candidate": false,
+      "status": "READY_FOR_ADMISSION_AFTER_PACKAGE_VALIDATION"
+    },
+    {
+      "canonical_pair": "PA3-PA8",
+      "partition_seed": 2,
+      "training_seed": 4,
+      "path": "manifests/configs/mth602_final_robustness_v1/PA3-PA8/p02_t04.json",
+      "run_name": "mth602_final_robust_PA3_PA8_p02_t04",
+      "existing_seed0_compatibility_candidate": false,
+      "status": "READY_FOR_ADMISSION_AFTER_PACKAGE_VALIDATION"
+    },
+    {
+      "canonical_pair": "PA3-PA8",
+      "partition_seed": 2,
+      "training_seed": 5,
+      "path": "manifests/configs/mth602_final_robustness_v1/PA3-PA8/p02_t05.json",
+      "run_name": "mth602_final_robust_PA3_PA8_p02_t05",
+      "existing_seed0_compatibility_candidate": false,
+      "status": "READY_FOR_ADMISSION_AFTER_PACKAGE_VALIDATION"
+    },
+    {
+      "canonical_pair": "PA3-PA8",
+      "partition_seed": 2,
+      "training_seed": 6,
+      "path": "manifests/configs/mth602_final_robustness_v1/PA3-PA8/p02_t06.json",
+      "run_name": "mth602_final_robust_PA3_PA8_p02_t06",
+      "existing_seed0_compatibility_candidate": false,
+      "status": "READY_FOR_ADMISSION_AFTER_PACKAGE_VALIDATION"
+    },
+    {
+      "canonical_pair": "PA3-PA8",
+      "partition_seed": 2,
+      "training_seed": 7,
+      "path": "manifests/configs/mth602_final_robustness_v1/PA3-PA8/p02_t07.json",
+      "run_name": "mth602_final_robust_PA3_PA8_p02_t07",
+      "existing_seed0_compatibility_candidate": false,
+      "status": "READY_FOR_ADMISSION_AFTER_PACKAGE_VALIDATION"
+    },
+    {
+      "canonical_pair": "PA3-PA8",
+      "partition_seed": 2,
+      "training_seed": 8,
+      "path": "manifests/configs/mth602_final_robustness_v1/PA3-PA8/p02_t08.json",
+      "run_name": "mth602_final_robust_PA3_PA8_p02_t08",
+      "existing_seed0_compatibility_candidate": false,
+      "status": "READY_FOR_ADMISSION_AFTER_PACKAGE_VALIDATION"
+    },
+    {
+      "canonical_pair": "PA3-PA8",
+      "partition_seed": 2,
+      "training_seed": 9,
+      "path": "manifests/configs/mth602_final_robustness_v1/PA3-PA8/p02_t09.json",
+      "run_name": "mth602_final_robust_PA3_PA8_p02_t09",
+      "existing_seed0_compatibility_candidate": false,
+      "status": "READY_FOR_ADMISSION_AFTER_PACKAGE_VALIDATION"
+    },
+    {
+      "canonical_pair": "PA3-PA8",
+      "partition_seed": 3,
+      "training_seed": 0,
+      "path": "manifests/configs/mth602_final_robustness_v1/PA3-PA8/p03_t00.json",
+      "run_name": "mth602_final_robust_PA3_PA8_p03_t00",
+      "existing_seed0_compatibility_candidate": false,
+      "status": "READY_FOR_ADMISSION_AFTER_PACKAGE_VALIDATION"
+    },
+    {
+      "canonical_pair": "PA3-PA8",
+      "partition_seed": 3,
+      "training_seed": 1,
+      "path": "manifests/configs/mth602_final_robustness_v1/PA3-PA8/p03_t01.json",
+      "run_name": "mth602_final_robust_PA3_PA8_p03_t01",
+      "existing_seed0_compatibility_candidate": false,
+      "status": "READY_FOR_ADMISSION_AFTER_PACKAGE_VALIDATION"
+    },
+    {
+      "canonical_pair": "PA3-PA8",
+      "partition_seed": 3,
+      "training_seed": 2,
+      "path": "manifests/configs/mth602_final_robustness_v1/PA3-PA8/p03_t02.json",
+      "run_name": "mth602_final_robust_PA3_PA8_p03_t02",
+      "existing_seed0_compatibility_candidate": false,
+      "status": "READY_FOR_ADMISSION_AFTER_PACKAGE_VALIDATION"
+    },
+    {
+      "canonical_pair": "PA3-PA8",
+      "partition_seed": 3,
+      "training_seed": 3,
+      "path": "manifests/configs/mth602_final_robustness_v1/PA3-PA8/p03_t03.json",
+      "run_name": "mth602_final_robust_PA3_PA8_p03_t03",
+      "existing_seed0_compatibility_candidate": false,
+      "status": "READY_FOR_ADMISSION_AFTER_PACKAGE_VALIDATION"
+    },
+    {
+      "canonical_pair": "PA3-PA8",
+      "partition_seed": 3,
+      "training_seed": 4,
+      "path": "manifests/configs/mth602_final_robustness_v1/PA3-PA8/p03_t04.json",
+      "run_name": "mth602_final_robust_PA3_PA8_p03_t04",
+      "existing_seed0_compatibility_candidate": false,
+      "status": "READY_FOR_ADMISSION_AFTER_PACKAGE_VALIDATION"
+    },
+    {
+      "canonical_pair": "PA3-PA8",
+      "partition_seed": 3,
+      "training_seed": 5,
+      "path": "manifests/configs/mth602_final_robustness_v1/PA3-PA8/p03_t05.json",
+      "run_name": "mth602_final_robust_PA3_PA8_p03_t05",
+      "existing_seed0_compatibility_candidate": false,
+      "status": "READY_FOR_ADMISSION_AFTER_PACKAGE_VALIDATION"
+    },
+    {
+      "canonical_pair": "PA3-PA8",
+      "partition_seed": 3,
+      "training_seed": 6,
+      "path": "manifests/configs/mth602_final_robustness_v1/PA3-PA8/p03_t06.json",
+      "run_name": "mth602_final_robust_PA3_PA8_p03_t06",
+      "existing_seed0_compatibility_candidate": false,
+      "status": "READY_FOR_ADMISSION_AFTER_PACKAGE_VALIDATION"
+    },
+    {
+      "canonical_pair": "PA3-PA8",
+      "partition_seed": 3,
+      "training_seed": 7,
+      "path": "manifests/configs/mth602_final_robustness_v1/PA3-PA8/p03_t07.json",
+      "run_name": "mth602_final_robust_PA3_PA8_p03_t07",
+      "existing_seed0_compatibility_candidate": false,
+      "status": "READY_FOR_ADMISSION_AFTER_PACKAGE_VALIDATION"
+    },
+    {
+      "canonical_pair": "PA3-PA8",
+      "partition_seed": 3,
+      "training_seed": 8,
+      "path": "manifests/configs/mth602_final_robustness_v1/PA3-PA8/p03_t08.json",
+      "run_name": "mth602_final_robust_PA3_PA8_p03_t08",
+      "existing_seed0_compatibility_candidate": false,
+      "status": "READY_FOR_ADMISSION_AFTER_PACKAGE_VALIDATION"
+    },
+    {
+      "canonical_pair": "PA3-PA8",
+      "partition_seed": 3,
+      "training_seed": 9,
+      "path": "manifests/configs/mth602_final_robustness_v1/PA3-PA8/p03_t09.json",
+      "run_name": "mth602_final_robust_PA3_PA8_p03_t09",
+      "existing_seed0_compatibility_candidate": false,
+      "status": "READY_FOR_ADMISSION_AFTER_PACKAGE_VALIDATION"
+    },
+    {
+      "canonical_pair": "PA3-PA8",
+      "partition_seed": 4,
+      "training_seed": 0,
+      "path": "manifests/configs/mth602_final_robustness_v1/PA3-PA8/p04_t00.json",
+      "run_name": "mth602_final_robust_PA3_PA8_p04_t00",
+      "existing_seed0_compatibility_candidate": false,
+      "status": "READY_FOR_ADMISSION_AFTER_PACKAGE_VALIDATION"
+    },
+    {
+      "canonical_pair": "PA3-PA8",
+      "partition_seed": 4,
+      "training_seed": 1,
+      "path": "manifests/configs/mth602_final_robustness_v1/PA3-PA8/p04_t01.json",
+      "run_name": "mth602_final_robust_PA3_PA8_p04_t01",
+      "existing_seed0_compatibility_candidate": false,
+      "status": "READY_FOR_ADMISSION_AFTER_PACKAGE_VALIDATION"
+    },
+    {
+      "canonical_pair": "PA3-PA8",
+      "partition_seed": 4,
+      "training_seed": 2,
+      "path": "manifests/configs/mth602_final_robustness_v1/PA3-PA8/p04_t02.json",
+      "run_name": "mth602_final_robust_PA3_PA8_p04_t02",
+      "existing_seed0_compatibility_candidate": false,
+      "status": "READY_FOR_ADMISSION_AFTER_PACKAGE_VALIDATION"
+    },
+    {
+      "canonical_pair": "PA3-PA8",
+      "partition_seed": 4,
+      "training_seed": 3,
+      "path": "manifests/configs/mth602_final_robustness_v1/PA3-PA8/p04_t03.json",
+      "run_name": "mth602_final_robust_PA3_PA8_p04_t03",
+      "existing_seed0_compatibility_candidate": false,
+      "status": "READY_FOR_ADMISSION_AFTER_PACKAGE_VALIDATION"
+    },
+    {
+      "canonical_pair": "PA3-PA8",
+      "partition_seed": 4,
+      "training_seed": 4,
+      "path": "manifests/configs/mth602_final_robustness_v1/PA3-PA8/p04_t04.json",
+      "run_name": "mth602_final_robust_PA3_PA8_p04_t04",
+      "existing_seed0_compatibility_candidate": false,
+      "status": "READY_FOR_ADMISSION_AFTER_PACKAGE_VALIDATION"
+    },
+    {
+      "canonical_pair": "PA3-PA8",
+      "partition_seed": 4,
+      "training_seed": 5,
+      "path": "manifests/configs/mth602_final_robustness_v1/PA3-PA8/p04_t05.json",
+      "run_name": "mth602_final_robust_PA3_PA8_p04_t05",
+      "existing_seed0_compatibility_candidate": false,
+      "status": "READY_FOR_ADMISSION_AFTER_PACKAGE_VALIDATION"
+    },
+    {
+      "canonical_pair": "PA3-PA8",
+      "partition_seed": 4,
+      "training_seed": 6,
+      "path": "manifests/configs/mth602_final_robustness_v1/PA3-PA8/p04_t06.json",
+      "run_name": "mth602_final_robust_PA3_PA8_p04_t06",
+      "existing_seed0_compatibility_candidate": false,
+      "status": "READY_FOR_ADMISSION_AFTER_PACKAGE_VALIDATION"
+    },
+    {
+      "canonical_pair": "PA3-PA8",
+      "partition_seed": 4,
+      "training_seed": 7,
+      "path": "manifests/configs/mth602_final_robustness_v1/PA3-PA8/p04_t07.json",
+      "run_name": "mth602_final_robust_PA3_PA8_p04_t07",
+      "existing_seed0_compatibility_candidate": false,
+      "status": "READY_FOR_ADMISSION_AFTER_PACKAGE_VALIDATION"
+    },
+    {
+      "canonical_pair": "PA3-PA8",
+      "partition_seed": 4,
+      "training_seed": 8,
+      "path": "manifests/configs/mth602_final_robustness_v1/PA3-PA8/p04_t08.json",
+      "run_name": "mth602_final_robust_PA3_PA8_p04_t08",
+      "existing_seed0_compatibility_candidate": false,
+      "status": "READY_FOR_ADMISSION_AFTER_PACKAGE_VALIDATION"
+    },
+    {
+      "canonical_pair": "PA3-PA8",
+      "partition_seed": 4,
+      "training_seed": 9,
+      "path": "manifests/configs/mth602_final_robustness_v1/PA3-PA8/p04_t09.json",
+      "run_name": "mth602_final_robust_PA3_PA8_p04_t09",
+      "existing_seed0_compatibility_candidate": false,
+      "status": "READY_FOR_ADMISSION_AFTER_PACKAGE_VALIDATION"
+    },
+    {
+      "canonical_pair": "PA4-PA8",
+      "partition_seed": 0,
+      "training_seed": 0,
+      "path": "manifests/configs/mth602_final_robustness_v1/PA4-PA8/p00_t00.json",
+      "run_name": "mth602_final_robust_PA4_PA8_p00_t00",
+      "existing_seed0_compatibility_candidate": true,
+      "status": "EXISTING_ARTIFACT_COMPATIBILITY_CANDIDATE"
+    },
+    {
+      "canonical_pair": "PA4-PA8",
+      "partition_seed": 0,
+      "training_seed": 1,
+      "path": "manifests/configs/mth602_final_robustness_v1/PA4-PA8/p00_t01.json",
+      "run_name": "mth602_final_robust_PA4_PA8_p00_t01",
+      "existing_seed0_compatibility_candidate": false,
+      "status": "READY_FOR_ADMISSION_AFTER_PACKAGE_VALIDATION"
+    },
+    {
+      "canonical_pair": "PA4-PA8",
+      "partition_seed": 0,
+      "training_seed": 2,
+      "path": "manifests/configs/mth602_final_robustness_v1/PA4-PA8/p00_t02.json",
+      "run_name": "mth602_final_robust_PA4_PA8_p00_t02",
+      "existing_seed0_compatibility_candidate": false,
+      "status": "READY_FOR_ADMISSION_AFTER_PACKAGE_VALIDATION"
+    },
+    {
+      "canonical_pair": "PA4-PA8",
+      "partition_seed": 0,
+      "training_seed": 3,
+      "path": "manifests/configs/mth602_final_robustness_v1/PA4-PA8/p00_t03.json",
+      "run_name": "mth602_final_robust_PA4_PA8_p00_t03",
+      "existing_seed0_compatibility_candidate": false,
+      "status": "READY_FOR_ADMISSION_AFTER_PACKAGE_VALIDATION"
+    },
+    {
+      "canonical_pair": "PA4-PA8",
+      "partition_seed": 0,
+      "training_seed": 4,
+      "path": "manifests/configs/mth602_final_robustness_v1/PA4-PA8/p00_t04.json",
+      "run_name": "mth602_final_robust_PA4_PA8_p00_t04",
+      "existing_seed0_compatibility_candidate": false,
+      "status": "READY_FOR_ADMISSION_AFTER_PACKAGE_VALIDATION"
+    },
+    {
+      "canonical_pair": "PA4-PA8",
+      "partition_seed": 0,
+      "training_seed": 5,
+      "path": "manifests/configs/mth602_final_robustness_v1/PA4-PA8/p00_t05.json",
+      "run_name": "mth602_final_robust_PA4_PA8_p00_t05",
+      "existing_seed0_compatibility_candidate": false,
+      "status": "READY_FOR_ADMISSION_AFTER_PACKAGE_VALIDATION"
+    },
+    {
+      "canonical_pair": "PA4-PA8",
+      "partition_seed": 0,
+      "training_seed": 6,
+      "path": "manifests/configs/mth602_final_robustness_v1/PA4-PA8/p00_t06.json",
+      "run_name": "mth602_final_robust_PA4_PA8_p00_t06",
+      "existing_seed0_compatibility_candidate": false,
+      "status": "READY_FOR_ADMISSION_AFTER_PACKAGE_VALIDATION"
+    },
+    {
+      "canonical_pair": "PA4-PA8",
+      "partition_seed": 0,
+      "training_seed": 7,
+      "path": "manifests/configs/mth602_final_robustness_v1/PA4-PA8/p00_t07.json",
+      "run_name": "mth602_final_robust_PA4_PA8_p00_t07",
+      "existing_seed0_compatibility_candidate": false,
+      "status": "READY_FOR_ADMISSION_AFTER_PACKAGE_VALIDATION"
+    },
+    {
+      "canonical_pair": "PA4-PA8",
+      "partition_seed": 0,
+      "training_seed": 8,
+      "path": "manifests/configs/mth602_final_robustness_v1/PA4-PA8/p00_t08.json",
+      "run_name": "mth602_final_robust_PA4_PA8_p00_t08",
+      "existing_seed0_compatibility_candidate": false,
+      "status": "READY_FOR_ADMISSION_AFTER_PACKAGE_VALIDATION"
+    },
+    {
+      "canonical_pair": "PA4-PA8",
+      "partition_seed": 0,
+      "training_seed": 9,
+      "path": "manifests/configs/mth602_final_robustness_v1/PA4-PA8/p00_t09.json",
+      "run_name": "mth602_final_robust_PA4_PA8_p00_t09",
+      "existing_seed0_compatibility_candidate": false,
+      "status": "READY_FOR_ADMISSION_AFTER_PACKAGE_VALIDATION"
+    },
+    {
+      "canonical_pair": "PA4-PA8",
+      "partition_seed": 1,
+      "training_seed": 0,
+      "path": "manifests/configs/mth602_final_robustness_v1/PA4-PA8/p01_t00.json",
+      "run_name": "mth602_final_robust_PA4_PA8_p01_t00",
+      "existing_seed0_compatibility_candidate": false,
+      "status": "READY_FOR_ADMISSION_AFTER_PACKAGE_VALIDATION"
+    },
+    {
+      "canonical_pair": "PA4-PA8",
+      "partition_seed": 1,
+      "training_seed": 1,
+      "path": "manifests/configs/mth602_final_robustness_v1/PA4-PA8/p01_t01.json",
+      "run_name": "mth602_final_robust_PA4_PA8_p01_t01",
+      "existing_seed0_compatibility_candidate": false,
+      "status": "READY_FOR_ADMISSION_AFTER_PACKAGE_VALIDATION"
+    },
+    {
+      "canonical_pair": "PA4-PA8",
+      "partition_seed": 1,
+      "training_seed": 2,
+      "path": "manifests/configs/mth602_final_robustness_v1/PA4-PA8/p01_t02.json",
+      "run_name": "mth602_final_robust_PA4_PA8_p01_t02",
+      "existing_seed0_compatibility_candidate": false,
+      "status": "READY_FOR_ADMISSION_AFTER_PACKAGE_VALIDATION"
+    },
+    {
+      "canonical_pair": "PA4-PA8",
+      "partition_seed": 1,
+      "training_seed": 3,
+      "path": "manifests/configs/mth602_final_robustness_v1/PA4-PA8/p01_t03.json",
+      "run_name": "mth602_final_robust_PA4_PA8_p01_t03",
+      "existing_seed0_compatibility_candidate": false,
+      "status": "READY_FOR_ADMISSION_AFTER_PACKAGE_VALIDATION"
+    },
+    {
+      "canonical_pair": "PA4-PA8",
+      "partition_seed": 1,
+      "training_seed": 4,
+      "path": "manifests/configs/mth602_final_robustness_v1/PA4-PA8/p01_t04.json",
+      "run_name": "mth602_final_robust_PA4_PA8_p01_t04",
+      "existing_seed0_compatibility_candidate": false,
+      "status": "READY_FOR_ADMISSION_AFTER_PACKAGE_VALIDATION"
+    },
+    {
+      "canonical_pair": "PA4-PA8",
+      "partition_seed": 1,
+      "training_seed": 5,
+      "path": "manifests/configs/mth602_final_robustness_v1/PA4-PA8/p01_t05.json",
+      "run_name": "mth602_final_robust_PA4_PA8_p01_t05",
+      "existing_seed0_compatibility_candidate": false,
+      "status": "READY_FOR_ADMISSION_AFTER_PACKAGE_VALIDATION"
+    },
+    {
+      "canonical_pair": "PA4-PA8",
+      "partition_seed": 1,
+      "training_seed": 6,
+      "path": "manifests/configs/mth602_final_robustness_v1/PA4-PA8/p01_t06.json",
+      "run_name": "mth602_final_robust_PA4_PA8_p01_t06",
+      "existing_seed0_compatibility_candidate": false,
+      "status": "READY_FOR_ADMISSION_AFTER_PACKAGE_VALIDATION"
+    },
+    {
+      "canonical_pair": "PA4-PA8",
+      "partition_seed": 1,
+      "training_seed": 7,
+      "path": "manifests/configs/mth602_final_robustness_v1/PA4-PA8/p01_t07.json",
+      "run_name": "mth602_final_robust_PA4_PA8_p01_t07",
+      "existing_seed0_compatibility_candidate": false,
+      "status": "READY_FOR_ADMISSION_AFTER_PACKAGE_VALIDATION"
+    },
+    {
+      "canonical_pair": "PA4-PA8",
+      "partition_seed": 1,
+      "training_seed": 8,
+      "path": "manifests/configs/mth602_final_robustness_v1/PA4-PA8/p01_t08.json",
+      "run_name": "mth602_final_robust_PA4_PA8_p01_t08",
+      "existing_seed0_compatibility_candidate": false,
+      "status": "READY_FOR_ADMISSION_AFTER_PACKAGE_VALIDATION"
+    },
+    {
+      "canonical_pair": "PA4-PA8",
+      "partition_seed": 1,
+      "training_seed": 9,
+      "path": "manifests/configs/mth602_final_robustness_v1/PA4-PA8/p01_t09.json",
+      "run_name": "mth602_final_robust_PA4_PA8_p01_t09",
+      "existing_seed0_compatibility_candidate": false,
+      "status": "READY_FOR_ADMISSION_AFTER_PACKAGE_VALIDATION"
+    },
+    {
+      "canonical_pair": "PA4-PA8",
+      "partition_seed": 2,
+      "training_seed": 0,
+      "path": "manifests/configs/mth602_final_robustness_v1/PA4-PA8/p02_t00.json",
+      "run_name": "mth602_final_robust_PA4_PA8_p02_t00",
+      "existing_seed0_compatibility_candidate": false,
+      "status": "READY_FOR_ADMISSION_AFTER_PACKAGE_VALIDATION"
+    },
+    {
+      "canonical_pair": "PA4-PA8",
+      "partition_seed": 2,
+      "training_seed": 1,
+      "path": "manifests/configs/mth602_final_robustness_v1/PA4-PA8/p02_t01.json",
+      "run_name": "mth602_final_robust_PA4_PA8_p02_t01",
+      "existing_seed0_compatibility_candidate": false,
+      "status": "READY_FOR_ADMISSION_AFTER_PACKAGE_VALIDATION"
+    },
+    {
+      "canonical_pair": "PA4-PA8",
+      "partition_seed": 2,
+      "training_seed": 2,
+      "path": "manifests/configs/mth602_final_robustness_v1/PA4-PA8/p02_t02.json",
+      "run_name": "mth602_final_robust_PA4_PA8_p02_t02",
+      "existing_seed0_compatibility_candidate": false,
+      "status": "READY_FOR_ADMISSION_AFTER_PACKAGE_VALIDATION"
+    },
+    {
+      "canonical_pair": "PA4-PA8",
+      "partition_seed": 2,
+      "training_seed": 3,
+      "path": "manifests/configs/mth602_final_robustness_v1/PA4-PA8/p02_t03.json",
+      "run_name": "mth602_final_robust_PA4_PA8_p02_t03",
+      "existing_seed0_compatibility_candidate": false,
+      "status": "READY_FOR_ADMISSION_AFTER_PACKAGE_VALIDATION"
+    },
+    {
+      "canonical_pair": "PA4-PA8",
+      "partition_seed": 2,
+      "training_seed": 4,
+      "path": "manifests/configs/mth602_final_robustness_v1/PA4-PA8/p02_t04.json",
+      "run_name": "mth602_final_robust_PA4_PA8_p02_t04",
+      "existing_seed0_compatibility_candidate": false,
+      "status": "READY_FOR_ADMISSION_AFTER_PACKAGE_VALIDATION"
+    },
+    {
+      "canonical_pair": "PA4-PA8",
+      "partition_seed": 2,
+      "training_seed": 5,
+      "path": "manifests/configs/mth602_final_robustness_v1/PA4-PA8/p02_t05.json",
+      "run_name": "mth602_final_robust_PA4_PA8_p02_t05",
+      "existing_seed0_compatibility_candidate": false,
+      "status": "READY_FOR_ADMISSION_AFTER_PACKAGE_VALIDATION"
+    },
+    {
+      "canonical_pair": "PA4-PA8",
+      "partition_seed": 2,
+      "training_seed": 6,
+      "path": "manifests/configs/mth602_final_robustness_v1/PA4-PA8/p02_t06.json",
+      "run_name": "mth602_final_robust_PA4_PA8_p02_t06",
+      "existing_seed0_compatibility_candidate": false,
+      "status": "READY_FOR_ADMISSION_AFTER_PACKAGE_VALIDATION"
+    },
+    {
+      "canonical_pair": "PA4-PA8",
+      "partition_seed": 2,
+      "training_seed": 7,
+      "path": "manifests/configs/mth602_final_robustness_v1/PA4-PA8/p02_t07.json",
+      "run_name": "mth602_final_robust_PA4_PA8_p02_t07",
+      "existing_seed0_compatibility_candidate": false,
+      "status": "READY_FOR_ADMISSION_AFTER_PACKAGE_VALIDATION"
+    },
+    {
+      "canonical_pair": "PA4-PA8",
+      "partition_seed": 2,
+      "training_seed": 8,
+      "path": "manifests/configs/mth602_final_robustness_v1/PA4-PA8/p02_t08.json",
+      "run_name": "mth602_final_robust_PA4_PA8_p02_t08",
+      "existing_seed0_compatibility_candidate": false,
+      "status": "READY_FOR_ADMISSION_AFTER_PACKAGE_VALIDATION"
+    },
+    {
+      "canonical_pair": "PA4-PA8",
+      "partition_seed": 2,
+      "training_seed": 9,
+      "path": "manifests/configs/mth602_final_robustness_v1/PA4-PA8/p02_t09.json",
+      "run_name": "mth602_final_robust_PA4_PA8_p02_t09",
+      "existing_seed0_compatibility_candidate": false,
+      "status": "READY_FOR_ADMISSION_AFTER_PACKAGE_VALIDATION"
+    },
+    {
+      "canonical_pair": "PA4-PA8",
+      "partition_seed": 3,
+      "training_seed": 0,
+      "path": "manifests/configs/mth602_final_robustness_v1/PA4-PA8/p03_t00.json",
+      "run_name": "mth602_final_robust_PA4_PA8_p03_t00",
+      "existing_seed0_compatibility_candidate": false,
+      "status": "READY_FOR_ADMISSION_AFTER_PACKAGE_VALIDATION"
+    },
+    {
+      "canonical_pair": "PA4-PA8",
+      "partition_seed": 3,
+      "training_seed": 1,
+      "path": "manifests/configs/mth602_final_robustness_v1/PA4-PA8/p03_t01.json",
+      "run_name": "mth602_final_robust_PA4_PA8_p03_t01",
+      "existing_seed0_compatibility_candidate": false,
+      "status": "READY_FOR_ADMISSION_AFTER_PACKAGE_VALIDATION"
+    },
+    {
+      "canonical_pair": "PA4-PA8",
+      "partition_seed": 3,
+      "training_seed": 2,
+      "path": "manifests/configs/mth602_final_robustness_v1/PA4-PA8/p03_t02.json",
+      "run_name": "mth602_final_robust_PA4_PA8_p03_t02",
+      "existing_seed0_compatibility_candidate": false,
+      "status": "READY_FOR_ADMISSION_AFTER_PACKAGE_VALIDATION"
+    },
+    {
+      "canonical_pair": "PA4-PA8",
+      "partition_seed": 3,
+      "training_seed": 3,
+      "path": "manifests/configs/mth602_final_robustness_v1/PA4-PA8/p03_t03.json",
+      "run_name": "mth602_final_robust_PA4_PA8_p03_t03",
+      "existing_seed0_compatibility_candidate": false,
+      "status": "READY_FOR_ADMISSION_AFTER_PACKAGE_VALIDATION"
+    },
+    {
+      "canonical_pair": "PA4-PA8",
+      "partition_seed": 3,
+      "training_seed": 4,
+      "path": "manifests/configs/mth602_final_robustness_v1/PA4-PA8/p03_t04.json",
+      "run_name": "mth602_final_robust_PA4_PA8_p03_t04",
+      "existing_seed0_compatibility_candidate": false,
+      "status": "READY_FOR_ADMISSION_AFTER_PACKAGE_VALIDATION"
+    },
+    {
+      "canonical_pair": "PA4-PA8",
+      "partition_seed": 3,
+      "training_seed": 5,
+      "path": "manifests/configs/mth602_final_robustness_v1/PA4-PA8/p03_t05.json",
+      "run_name": "mth602_final_robust_PA4_PA8_p03_t05",
+      "existing_seed0_compatibility_candidate": false,
+      "status": "READY_FOR_ADMISSION_AFTER_PACKAGE_VALIDATION"
+    },
+    {
+      "canonical_pair": "PA4-PA8",
+      "partition_seed": 3,
+      "training_seed": 6,
+      "path": "manifests/configs/mth602_final_robustness_v1/PA4-PA8/p03_t06.json",
+      "run_name": "mth602_final_robust_PA4_PA8_p03_t06",
+      "existing_seed0_compatibility_candidate": false,
+      "status": "READY_FOR_ADMISSION_AFTER_PACKAGE_VALIDATION"
+    },
+    {
+      "canonical_pair": "PA4-PA8",
+      "partition_seed": 3,
+      "training_seed": 7,
+      "path": "manifests/configs/mth602_final_robustness_v1/PA4-PA8/p03_t07.json",
+      "run_name": "mth602_final_robust_PA4_PA8_p03_t07",
+      "existing_seed0_compatibility_candidate": false,
+      "status": "READY_FOR_ADMISSION_AFTER_PACKAGE_VALIDATION"
+    },
+    {
+      "canonical_pair": "PA4-PA8",
+      "partition_seed": 3,
+      "training_seed": 8,
+      "path": "manifests/configs/mth602_final_robustness_v1/PA4-PA8/p03_t08.json",
+      "run_name": "mth602_final_robust_PA4_PA8_p03_t08",
+      "existing_seed0_compatibility_candidate": false,
+      "status": "READY_FOR_ADMISSION_AFTER_PACKAGE_VALIDATION"
+    },
+    {
+      "canonical_pair": "PA4-PA8",
+      "partition_seed": 3,
+      "training_seed": 9,
+      "path": "manifests/configs/mth602_final_robustness_v1/PA4-PA8/p03_t09.json",
+      "run_name": "mth602_final_robust_PA4_PA8_p03_t09",
+      "existing_seed0_compatibility_candidate": false,
+      "status": "READY_FOR_ADMISSION_AFTER_PACKAGE_VALIDATION"
+    },
+    {
+      "canonical_pair": "PA4-PA8",
+      "partition_seed": 4,
+      "training_seed": 0,
+      "path": "manifests/configs/mth602_final_robustness_v1/PA4-PA8/p04_t00.json",
+      "run_name": "mth602_final_robust_PA4_PA8_p04_t00",
+      "existing_seed0_compatibility_candidate": false,
+      "status": "READY_FOR_ADMISSION_AFTER_PACKAGE_VALIDATION"
+    },
+    {
+      "canonical_pair": "PA4-PA8",
+      "partition_seed": 4,
+      "training_seed": 1,
+      "path": "manifests/configs/mth602_final_robustness_v1/PA4-PA8/p04_t01.json",
+      "run_name": "mth602_final_robust_PA4_PA8_p04_t01",
+      "existing_seed0_compatibility_candidate": false,
+      "status": "READY_FOR_ADMISSION_AFTER_PACKAGE_VALIDATION"
+    },
+    {
+      "canonical_pair": "PA4-PA8",
+      "partition_seed": 4,
+      "training_seed": 2,
+      "path": "manifests/configs/mth602_final_robustness_v1/PA4-PA8/p04_t02.json",
+      "run_name": "mth602_final_robust_PA4_PA8_p04_t02",
+      "existing_seed0_compatibility_candidate": false,
+      "status": "READY_FOR_ADMISSION_AFTER_PACKAGE_VALIDATION"
+    },
+    {
+      "canonical_pair": "PA4-PA8",
+      "partition_seed": 4,
+      "training_seed": 3,
+      "path": "manifests/configs/mth602_final_robustness_v1/PA4-PA8/p04_t03.json",
+      "run_name": "mth602_final_robust_PA4_PA8_p04_t03",
+      "existing_seed0_compatibility_candidate": false,
+      "status": "READY_FOR_ADMISSION_AFTER_PACKAGE_VALIDATION"
+    },
+    {
+      "canonical_pair": "PA4-PA8",
+      "partition_seed": 4,
+      "training_seed": 4,
+      "path": "manifests/configs/mth602_final_robustness_v1/PA4-PA8/p04_t04.json",
+      "run_name": "mth602_final_robust_PA4_PA8_p04_t04",
+      "existing_seed0_compatibility_candidate": false,
+      "status": "READY_FOR_ADMISSION_AFTER_PACKAGE_VALIDATION"
+    },
+    {
+      "canonical_pair": "PA4-PA8",
+      "partition_seed": 4,
+      "training_seed": 5,
+      "path": "manifests/configs/mth602_final_robustness_v1/PA4-PA8/p04_t05.json",
+      "run_name": "mth602_final_robust_PA4_PA8_p04_t05",
+      "existing_seed0_compatibility_candidate": false,
+      "status": "READY_FOR_ADMISSION_AFTER_PACKAGE_VALIDATION"
+    },
+    {
+      "canonical_pair": "PA4-PA8",
+      "partition_seed": 4,
+      "training_seed": 6,
+      "path": "manifests/configs/mth602_final_robustness_v1/PA4-PA8/p04_t06.json",
+      "run_name": "mth602_final_robust_PA4_PA8_p04_t06",
+      "existing_seed0_compatibility_candidate": false,
+      "status": "READY_FOR_ADMISSION_AFTER_PACKAGE_VALIDATION"
+    },
+    {
+      "canonical_pair": "PA4-PA8",
+      "partition_seed": 4,
+      "training_seed": 7,
+      "path": "manifests/configs/mth602_final_robustness_v1/PA4-PA8/p04_t07.json",
+      "run_name": "mth602_final_robust_PA4_PA8_p04_t07",
+      "existing_seed0_compatibility_candidate": false,
+      "status": "READY_FOR_ADMISSION_AFTER_PACKAGE_VALIDATION"
+    },
+    {
+      "canonical_pair": "PA4-PA8",
+      "partition_seed": 4,
+      "training_seed": 8,
+      "path": "manifests/configs/mth602_final_robustness_v1/PA4-PA8/p04_t08.json",
+      "run_name": "mth602_final_robust_PA4_PA8_p04_t08",
+      "existing_seed0_compatibility_candidate": false,
+      "status": "READY_FOR_ADMISSION_AFTER_PACKAGE_VALIDATION"
+    },
+    {
+      "canonical_pair": "PA4-PA8",
+      "partition_seed": 4,
+      "training_seed": 9,
+      "path": "manifests/configs/mth602_final_robustness_v1/PA4-PA8/p04_t09.json",
+      "run_name": "mth602_final_robust_PA4_PA8_p04_t09",
+      "existing_seed0_compatibility_candidate": false,
+      "status": "READY_FOR_ADMISSION_AFTER_PACKAGE_VALIDATION"
+    }
+  ]
+}

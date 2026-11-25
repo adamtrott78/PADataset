@@ -1,6 +1,6 @@
 {
   "schema": "padataset.mth602-final-robustness-plan.v1",
-  "status": "PROPOSED_NOT_AUTHORIZED_FOR_SCIENCE",
+  "status": "ACCEPTED_SEED_FREEZE_EXECUTION_PACKAGE",
   "task_id": "mth602-final-multisurrogate-dqnguard-v1",
   "source_control_head": "17c991dd41c16099a679cc4ad81230c7616a0db1",
   "frozen_recipe": {
@@ -102,13 +102,16 @@
     ]
   },
   "admission_gate": {
-    "current": "BLOCKED_PENDING_EXPLICIT_REVIEW_ACCEPTANCE",
+    "current": "PACKAGE_GENERATED_PENDING_EXACT_HEAD_VALIDATION",
+    "science_authority": true,
+    "merge_authority": false,
     "required_before_science": [
-      "review and accept exact numeric seed lists",
-      "validate independent seed-axis implementation",
-      "bind candidate exact SHA",
-      "generate immutable per-cell manifests from this plan",
-      "use existing bounded train_backbone and directional-evaluator paths only"
+      "validate exact execution-package head",
+      "bind exact execution-package SHA in durable task state",
+      "admit only through existing bounded train_backbone and directional-evaluator paths"
     ]
-  }
+  },
+  "accepted_candidate_sha": "3fd1454bc20b89580f14c2e319d9b33766ea14b5",
+  "execution_package_parent_sha": "f3b66f0136477c67e365945647b4ce8a29faae3d",
+  "user_acceptance": "2026-11-25 explicit acceptance in durable task conversation"
 }
