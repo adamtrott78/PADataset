@@ -31,6 +31,10 @@ def test_dashboard_is_zero_provider_and_ctrl_c_exits():
     assert "val_min_class_f1" in s
     assert "campaign eta" in s
     assert "projected finish" in s
+    assert "controller_liveness" in s
+    assert "systemctl" in s
+    assert "nrestarts" in s
+    assert "provider calls/refresh 0" in s
 
 def test_reduced_plan_is_5_partitions_plus_one_t1_rep_not_cartesian():
     p=json.loads((ROOT/"manifests/mth602_final_robustness_reduced_v1.json").read_text())
