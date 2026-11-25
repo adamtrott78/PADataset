@@ -1,0 +1,51 @@
+{
+  "schema": "padataset.mth602-robustness-cached-osr-policy.v1",
+  "policy_id": "mth602_robustness_cached_all_methods_cpu_v1",
+  "status": "CANDIDATE_REQUIRES_PILOT_PARITY_BEFORE_FINAL_SCIENCE",
+  "checkpoint": "best_model",
+  "backbone_target_inference_device": "cpu",
+  "calibration_cache_builder_device": "cuda",
+  "target_test_materialized_in_calibration_cache": false,
+  "partition_seed_source": "partition_seed",
+  "training_seed_source": "training_seed",
+  "dqn_seed": 42,
+  "methods": {
+    "dqnguard": {
+      "id": "l2o_dqnguard_track_a_frozen_v1",
+      "band_accept_mode": "var_energy",
+      "decision_mode": "score_threshold",
+      "max_known_reject_cal": 0.05,
+      "known_cap": 625,
+      "open_cap": 625,
+      "state_mode": "softmax3"
+    },
+    "dqn_ids_style": {
+      "id": "dqn_ids_style_softmax3_external_surrogate_cap625_v1",
+      "known_cap": 625,
+      "open_cap": 625,
+      "final_decision": "hard_dqn_argmax",
+      "seed": 42
+    },
+    "varmax": {
+      "id": "varmax_surrogate_all_smoke_matched_l2o_v1",
+      "calibration_mode": "surrogate_all",
+      "sweep_grid": "smoke",
+      "external_surrogate_consumed": false
+    }
+  },
+  "concurrency": {
+    "max_cpu_consumers": 2,
+    "cuda_visible_to_cpu_consumers": false
+  },
+  "firewall": {
+    "target_labels_used_for_tuning": false,
+    "target_test_consumed_before_method_fit": false,
+    "target_test_passes_per_direction": 1,
+    "no_result_dependent_recipe_or_seed_changes": true
+  },
+  "parity_gate": {
+    "required": true,
+    "reference": "canonical GPU pilot results on p00/t01 PA1-PA2 and PA1-PA3",
+    "pass_rule": "all reported scalar OSR metrics must agree within reviewed numeric tolerance before final seed launch"
+  }
+}

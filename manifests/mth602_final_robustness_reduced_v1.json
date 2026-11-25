@@ -1,0 +1,39 @@
+{
+  "schema": "padataset.mth602-final-robustness-reduced-plan.v1",
+  "status": "FROZEN_PENDING_PILOT_OSR_AND_FOUR_MODEL_SMOKE_PASS",
+  "partition_seeds": [
+    0,
+    1,
+    2,
+    3,
+    4
+  ],
+  "training_seeds": [
+    0,
+    1
+  ],
+  "crossing_policy": "p0..p4 at t0 plus p0/t1 only",
+  "canonical_pairs": [
+    "PA1-PA2",
+    "PA1-PA3",
+    "PA1-PA4",
+    "PA1-PA8",
+    "PA2-PA3",
+    "PA2-PA4",
+    "PA2-PA8",
+    "PA3-PA4",
+    "PA3-PA8",
+    "PA4-PA8"
+  ],
+  "unique_cells_per_pair": 6,
+  "total_unique_cells": 60,
+  "reuse_p00t00_backbones": 10,
+  "new_trainings": 50,
+  "cached_osr_policy": "manifests/mth602_robustness_cached_osr_policy_v1.json",
+  "final_launch_gate": [
+    "canonical GPU p00/t01 pilot OSR complete",
+    "cached CPU evaluator parity against GPU pilot",
+    "four-model two-wave overlap smoke PASS",
+    "zero-provider dashboard validated"
+  ]
+}
