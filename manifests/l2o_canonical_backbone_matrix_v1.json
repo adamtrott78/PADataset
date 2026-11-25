@@ -95,25 +95,30 @@
         "target": "PA1",
         "surrogate": "PA3"
       },
-      "workflow_run_id": 45084249815,
-      "workflow_job_id": 137399088294,
-      "artifact_id": 14783316485,
-      "artifact_digest": "sha256:75f307066bb408a10850ba9942293886e3fb07bdf0c2201f05f9b11be859973e",
-      "candidate_sha": "85bc8cb667a000d3fc544b33f8e96a6775074561",
-      "best_model_sha256": "7766bff5b5612fc9db2912c364ae2489e57c3e9fc0f6ae3be23ce34f95acd583",
-      "config_sha256": "77117ce227917e20d90eed477ede7287d124ed8bcd4fcfa9d42c2993048cd066",
-      "best_epoch": 19,
+      "workflow_run_id": 45692782898,
+      "workflow_job_id": 139482318252,
+      "artifact_id": 15066143819,
+      "artifact_digest": "sha256:9abcf1210a16e65e6495ba502648416b90d62dd931efe8800e7d8f143b61f314",
+      "candidate_sha": "af4e2835b4e066a501b42e4b1558bee42cab9f8f",
+      "best_model_sha256": "6d0db4236319e741ca3b88fbbd42b67750a021fadbc04862b4d3924adefa9887",
+      "config_sha256": "f19001310e961b42e655e0d06cd963ecea222ea8f20bd4daeaf7f24324b55ed3",
+      "best_epoch": 18,
       "best_val_macro_f1": 0.999925851719,
       "best_val_acc": 0.9999258765102661,
-      "test_known_macro_f1": 0.9998517364899926,
-      "test_known_acc": 0.9998517749944416,
+      "test_known_macro_f1": 1,
+      "test_known_acc": 1,
       "test_known_n_samples": 13493,
-      "elapsed_sec": 7121.9,
+      "elapsed_sec": 6858,
       "early_stop_epoch": 36,
       "target_test_consumed": false,
       "target_quarantine_status": "PRESERVED_FOR_FINAL_FROZEN_EVALUATOR",
       "hpo_selection_evidence": "known_validation_only",
-      "diagnostic_role": "T007_POST_FREEZE_STANDARD_DQNGUARD_OSR_NO_SELECTION_FEEDBACK"
+      "diagnostic_role": "MTH602_ROBUSTNESS_PILOT_P00_T01_OSR_NO_SELECTION_FEEDBACK",
+      "partition_seed": 0,
+      "training_seed": 1,
+      "dqn_seed": 42,
+      "robustness_pilot": true,
+      "run_name": "mth602_final_robust_PA1_PA3_p00_t01"
     },
     {
       "canonical_pair": [
@@ -471,11 +476,14 @@
     }
   ],
   "robustness_pilot": {
-    "status": "PA1-PA2_P00_T01_BOUND",
-    "source_frozen_matrix_role": "seed0 canonical remains frozen elsewhere; this PR58 branch matrix is pilot-only",
+    "status": "PA1-PA2_AND_PA1-PA3_P00_T01_BOUND",
     "partition_seed": 0,
     "training_seed": 1,
     "dqn_seed": 42,
-    "no_selection_feedback": true
+    "no_selection_feedback": true,
+    "bound_pairs": [
+      "PA1-PA2",
+      "PA1-PA3"
+    ]
   }
 }
