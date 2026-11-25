@@ -6,10 +6,15 @@ def test_new_pipeline_sources_parse():
     for p in ["experiments/mth602_robustness_cached_all_osr.py","scripts/mth602_robustness_local_pipeline.py","scripts/mth602_robustness_local_dashboard.py"]:
         ast.parse((ROOT/p).read_text(),filename=p)
 
+def test_cached_consumer_imports():
+    import experiments.mth602_robustness_cached_all_osr as m
+    assert callable(m.run_direction)
+
 def test_cached_consumer_enforces_target_firewall_and_cpu_only():
     s=(ROOT/"experiments/mth602_robustness_cached_all_osr.py").read_text()
     assert 'methods_frozen_before_target_test' in s
-    assert s.index('methods_frozen_before_target_test') < s.index('collect_target_test_once')
+    run=s[s.index("def run_direction"):]
+    assert run.index('methods_frozen_before_target_test') < run.index('target_test=collect_target_test_once')
     assert 'CUDA_VISIBLE_DEVICES' in s
     assert 'target_test_consumed_before_method_fit' in s
 
