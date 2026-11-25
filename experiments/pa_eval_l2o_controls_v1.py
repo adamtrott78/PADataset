@@ -114,7 +114,9 @@ def _payload_meta(handle):
         "class_names": handle.class_names,
         "num_classes": handle.num_classes,
         "cache_len": handle.config.get("cache_len"),
-        "seed": handle.config.get("seed"),
+        "seed": handle.config.get("training_seed", handle.config.get("seed")),
+        "partition_seed": handle.config.get("partition_seed", handle.config.get("seed")),
+        "training_seed": handle.config.get("training_seed", handle.config.get("seed")),
         "epochs": handle.config.get("epochs"),
         "source_type": handle.config.get("source_type", "digital"),
         "source_name": handle.config.get("source_name", "pilot_noisy_torch"),
@@ -262,7 +264,7 @@ def run_controls(
     if len(surrogate_open.y_true) < open_cap:
         raise ValueError("insufficient surrogate validation samples for exact DQN cap")
 
-    seed = int(calibration_payload.meta.get("seed", 0) or 0)
+    seed = int(calibration_payload.meta.get("partition_seed", calibration_payload.meta.get("seed", 0)) or 0)
     known_cal = cap_split(calibration_payload.val_known, known_cap, seed + 101, True, "control_cap_known")
     open_cal = cap_split(surrogate_open, open_cap, seed + 202, False, "control_cap_surrogate")
     if len(known_cal.y_true) != known_cap or len(open_cal.y_true) != open_cap:
