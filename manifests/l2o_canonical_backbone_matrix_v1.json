@@ -1,6 +1,6 @@
 {
   "schema": "padataset.l2o-canonical-backbone-matrix.v1",
-  "purpose": "T007 post-freeze canonical matrix for standard-DQNGuard directional OSR; nine completed t007 backbones are frozen while PA3-PA8 finishes.",
+  "purpose": "MTH602 robustness pilot evaluation matrix: PA1-PA2 entry temporarily binds the p00/t01 trained robustness backbone; all other entries preserve the frozen seed-0 canonical matrix.",
   "invariants": [
     "Backbone training never consumes either excluded PA as a known class.",
     "Exactly three known PAs remain for every canonical pair.",
@@ -33,12 +33,12 @@
         "target": "PA1",
         "surrogate": "PA2"
       },
-      "workflow_run_id": 45047242656,
-      "workflow_job_id": 137284402449,
-      "artifact_id": 14765881457,
-      "candidate_sha": "85bc8cb667a000d3fc544b33f8e96a6775074561",
-      "best_model_sha256": "82effeb4d9f669cfdcc16dca2539149c3d6f5ec5a79901153108d509175b48ee",
-      "config_sha256": "f61293f6877e8d95663003faea3230b736700b1574d63c9f94f7cbbbef39ebb6",
+      "workflow_run_id": 45692779142,
+      "workflow_job_id": 139482306314,
+      "artifact_id": 15063830452,
+      "candidate_sha": "af4e2835b4e066a501b42e4b1558bee42cab9f8f",
+      "best_model_sha256": "18422631d8369bfdb184cf34b738caba8c252caea04c040788575440fb59d0e5",
+      "config_sha256": "0e3106a634b6c730e370e1ea9e629f875bbd765b9321c9b1d3c1878721d153da",
       "directed_cells": [
         {
           "evaluation_target": "PA1",
@@ -49,13 +49,23 @@
           "evaluation_surrogate": "PA1"
         }
       ],
-      "artifact_digest": "sha256:7c439dc693c96777ec04ded9e76b69a7dc9b8d774cf4192bd502f880cda77f79",
+      "artifact_digest": "sha256:b3b53325080dd9da92425bfeb5e26c08b025ce3f2ab416ec4fa11bc5bae5bdc3",
       "best_epoch": 2,
-      "elapsed_sec": 2918,
+      "elapsed_sec": 2914.16553235054,
       "target_test_consumed": false,
       "target_quarantine_status": "PRESERVED_FOR_FINAL_FROZEN_EVALUATOR",
       "hpo_selection_evidence": "known_validation_only",
-      "diagnostic_role": "T007_POST_FREEZE_STANDARD_DQNGUARD_OSR_NO_SELECTION_FEEDBACK"
+      "diagnostic_role": "MTH602_ROBUSTNESS_PILOT_P00_T01_OSR_NO_SELECTION_FEEDBACK",
+      "best_val_macro_f1": 1,
+      "best_val_acc": 1,
+      "test_known_macro_f1": 1,
+      "test_known_acc": 1,
+      "test_known_n_samples": 13500,
+      "partition_seed": 0,
+      "training_seed": 1,
+      "dqn_seed": 42,
+      "robustness_pilot": true,
+      "source_frozen_seed0_artifact_id": 14765881457
     },
     {
       "canonical_pair": [
@@ -458,5 +468,13 @@
       "hpo_selection_evidence": "known_validation_only",
       "diagnostic_role": "T007_POST_FREEZE_STANDARD_DQNGUARD_OSR_NO_SELECTION_FEEDBACK"
     }
-  ]
+  ],
+  "robustness_pilot": {
+    "status": "PA1-PA2_P00_T01_BOUND",
+    "source_frozen_matrix_role": "seed0 canonical remains frozen elsewhere; this PR58 branch matrix is pilot-only",
+    "partition_seed": 0,
+    "training_seed": 1,
+    "dqn_seed": 42,
+    "no_selection_feedback": true
+  }
 }
