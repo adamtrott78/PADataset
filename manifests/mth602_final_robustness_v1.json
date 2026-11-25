@@ -102,14 +102,16 @@
     ]
   },
   "admission_gate": {
-    "current": "PACKAGE_GENERATED_PENDING_EXACT_HEAD_VALIDATION",
+    "current": "VALIDATED_READY_FOR_BOUNDED_ADMISSION",
     "science_authority": true,
     "merge_authority": false,
     "required_before_science": [
       "validate exact execution-package head",
       "bind exact execution-package SHA in durable task state",
       "admit only through existing bounded train_backbone and directional-evaluator paths"
-    ]
+    ],
+    "validation_receipt": "job-2cabc43f-374f-4440-b757-bfbfb08b642b",
+    "validation_result": "14 passed"
   },
   "accepted_candidate_sha": "3fd1454bc20b89580f14c2e319d9b33766ea14b5",
   "execution_package_parent_sha": "f3b66f0136477c67e365945647b4ce8a29faae3d",
