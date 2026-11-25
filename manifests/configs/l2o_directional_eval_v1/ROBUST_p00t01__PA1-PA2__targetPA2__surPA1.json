@@ -1,0 +1,18 @@
+{
+  "schema": "padataset.l2o-directional-eval-request.v1",
+  "policy_id": "l2o_dqnguard_track_a_frozen_v1",
+  "canonical_matrix": "manifests/l2o_canonical_backbone_matrix_v1.json",
+  "evaluation_policy": "manifests/l2o_directional_eval_policy_v1.json",
+  "canonical_key": "PA1-PA2",
+  "artifact_id": 15063830452,
+  "artifact_digest": "sha256:b3b53325080dd9da92425bfeb5e26c08b025ce3f2ab416ec4fa11bc5bae5bdc3",
+  "evaluation_target": "PA2",
+  "evaluation_surrogate": "PA1",
+  "checkpoint": "best_model",
+  "target_labels_used_for_tuning": false,
+  "status": "READY_FOR_BOUNDED_EVALUATOR",
+  "diagnostic_role": "MTH602_ROBUSTNESS_PILOT_P00_T01_NO_SELECTION_FEEDBACK",
+  "partition_seed": 0,
+  "training_seed": 1,
+  "dqn_seed": 42
+}

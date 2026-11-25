@@ -452,7 +452,7 @@ def _make_setup_from_run_config(config: Dict[str, Any], data_root: Optional[str]
 
         train_frac=config.get("train_frac", 0.70),
         val_frac=config.get("val_frac", 0.15),
-        seed=config.get("seed", 0),
+        seed=config.get("partition_seed", config.get("seed", 0)),
 
         protocols=tuple(config["protocols"]) if config.get("protocols") is not None else None,
         pas=tuple(config["pas"]) if config.get("pas") is not None else None,
@@ -566,7 +566,9 @@ def build_osr_eval_bundle(
             "class_names": handle.class_names,
             "num_classes": handle.num_classes,
             "cache_len": handle.config.get("cache_len"),
-            "seed": handle.config.get("seed"),
+            "seed": handle.config.get("training_seed", handle.config.get("seed")),
+            "partition_seed": handle.config.get("partition_seed", handle.config.get("seed")),
+            "training_seed": handle.config.get("training_seed", handle.config.get("seed")),
             "epochs": handle.config.get("epochs"),
             "source_type": handle.config.get("source_type", "digital"),
             "source_name": handle.config.get("source_name", "pilot_noisy_torch"),

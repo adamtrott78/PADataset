@@ -1,0 +1,119 @@
+{
+  "schema": "padataset.mth602-final-robustness-plan.v1",
+  "status": "ACCEPTED_SEED_FREEZE_EXECUTION_PACKAGE",
+  "task_id": "mth602-final-multisurrogate-dqnguard-v1",
+  "source_control_head": "17c991dd41c16099a679cc4ad81230c7616a0db1",
+  "frozen_recipe": {
+    "family": "t007",
+    "checkpoint_selection": "known_validation_only_best_model",
+    "deterministic_training": true,
+    "deterministic_profile": "strict_tf32",
+    "target_test_selection_feedback": false
+  },
+  "seed_axes": {
+    "partition_seed_field": "partition_seed",
+    "partition_seeds": [
+      0,
+      1,
+      2,
+      3,
+      4
+    ],
+    "training_seed_field": "training_seed",
+    "training_seeds": [
+      0,
+      1,
+      2,
+      3,
+      4,
+      5,
+      6,
+      7,
+      8,
+      9
+    ],
+    "legacy_seed_field": "seed",
+    "legacy_seed_semantics": "training_seed alias for backward-compatible provenance; partition_seed is explicit",
+    "factorial_backbones_per_pair": 50,
+    "canonical_pairs": 10,
+    "total_backbone_cells": 500,
+    "initial_seed0_matrix_counts_as": {
+      "partition_seed": 0,
+      "training_seed": 0,
+      "when_exact_recipe_and_artifact_compatible": true
+    }
+  },
+  "dqn_policy": {
+    "factorial_dqn_seed": 42,
+    "rationale": "Preserve the frozen standard-DQNGuard evaluator's existing fixed seed. Do not add a third full seed axis.",
+    "calibration_subsampling_seed_source": "partition_seed",
+    "separate_dqn_seed_sensitivity": "DEFERRED_NOT_PART_OF_5x10_FACTORIAL"
+  },
+  "controls_and_selectors": {
+    "standard_dqnguard": "frozen",
+    "dqn_ids_style": "dqn_ids_style_softmax3_external_surrogate_cap625_v1",
+    "varmax": "varmax_surrogate_all_smoke_matched_l2o_v1",
+    "rule_a": "frozen",
+    "rule_b": "frozen",
+    "rule_c": "frozen",
+    "target_aware_confusion_exclusion": "diagnostic_only_not_deployable"
+  },
+  "firewall": {
+    "target_labels_used_for_tuning": false,
+    "target_test_used_for_recipe_selection": false,
+    "target_test_used_for_checkpoint_selection": false,
+    "target_test_used_for_retry_selection": false,
+    "target_test_used_for_seed_selection": false,
+    "seed_values_selected_before_any_multi_seed_results": true
+  },
+  "result_identity": {
+    "backbone_key": [
+      "canonical_pair",
+      "partition_seed",
+      "training_seed"
+    ],
+    "directional_key": [
+      "target",
+      "surrogate",
+      "partition_seed",
+      "training_seed"
+    ],
+    "duplicate_policy": "exact identity may have at most one canonical successful science result; recovery duplicates are noncanonical unless durable recovery mapping supersedes prior attempt",
+    "required_backbone_provenance": [
+      "candidate_sha",
+      "config_sha256",
+      "best_model_sha256",
+      "partition_seed",
+      "training_seed",
+      "best_epoch",
+      "known_val_macro_f1",
+      "target_test_consumed"
+    ],
+    "required_osr_provenance": [
+      "candidate_sha",
+      "backbone_artifact_id",
+      "backbone_digest",
+      "partition_seed",
+      "training_seed",
+      "dqn_seed",
+      "threshold_source",
+      "target_labels_used_for_tuning",
+      "unknown_f1"
+    ]
+  },
+  "admission_gate": {
+    "current": "VALIDATED_READY_FOR_BOUNDED_ADMISSION",
+    "science_authority": true,
+    "merge_authority": false,
+    "required_before_science": [
+      "validate exact execution-package head",
+      "bind exact execution-package SHA in durable task state",
+      "admit only through existing bounded train_backbone and directional-evaluator paths"
+    ],
+    "validation_receipt": "job-2cabc43f-374f-4440-b757-bfbfb08b642b",
+    "validation_result": "14 passed"
+  },
+  "accepted_candidate_sha": "3fd1454bc20b89580f14c2e319d9b33766ea14b5",
+  "execution_package_parent_sha": "f3b66f0136477c67e365945647b4ce8a29faae3d",
+  "user_acceptance": "2026-11-25 explicit acceptance in durable task conversation"
+}

@@ -33,7 +33,7 @@ DETERMINISTIC_PROFILES = {
 
 
 def configure_training_reproducibility(cfg: Dict[str, Any]) -> dict[str, Any]:
-    seed = int(cfg.get("seed", 0))
+    seed = int(cfg.get("training_seed", cfg.get("seed", 0)))
     deterministic = bool(cfg.get("deterministic_training", False))
     profile = str(cfg.get("deterministic_profile", "strict" if deterministic else "off"))
 
@@ -848,10 +848,18 @@ def run_experiment(cfg: Dict[str, Any], data_root: str) -> Dict[str, Any]:
     cfg = copy.deepcopy(cfg)
     cfg["root"] = data_root
 
+    legacy_seed = int(cfg.get("seed", 0))
+    partition_seed = int(cfg.get("partition_seed", legacy_seed))
+    training_seed = int(cfg.get("training_seed", legacy_seed))
+    cfg["partition_seed"] = partition_seed
+    cfg["training_seed"] = training_seed
+
     reproducibility = configure_training_reproducibility(cfg)
     print(
         "REPRODUCIBILITY | "
         f"seed={reproducibility['seed']} | "
+        f"partition_seed={partition_seed} | "
+        f"training_seed={training_seed} | "
         f"deterministic_training={str(reproducibility['deterministic_training']).lower()} | "
         f"deterministic_profile={reproducibility['deterministic_profile']} | "
         f"use_deterministic_algorithms={str(reproducibility['use_deterministic_algorithms']).lower()} | "
@@ -875,7 +883,7 @@ def run_experiment(cfg: Dict[str, Any], data_root: str) -> Dict[str, Any]:
 
         train_frac=cfg.get("train_frac", 0.70),
         val_frac=cfg.get("val_frac", 0.15),
-        seed=cfg.get("seed", 0),
+        seed=partition_seed,
 
         protocols=tuple(cfg["protocols"]) if cfg.get("protocols") is not None else None,
         pas=tuple(cfg["pas"]) if cfg.get("pas") is not None else None,
@@ -904,6 +912,7 @@ def run_experiment(cfg: Dict[str, Any], data_root: str) -> Dict[str, Any]:
         batch_size=batch_size,
         num_workers=num_workers,
         pin_memory=pin_memory,
+        loader_seed=training_seed,
     )
 
     print(f"RUN_STAGE | run_name={run_name} | stage=build_data_done", flush=True)
@@ -926,7 +935,7 @@ def run_experiment(cfg: Dict[str, Any], data_root: str) -> Dict[str, Any]:
             shuffle=True,
             num_workers=num_workers,
             pin_memory=pin_memory,
-            seed=int(cfg.get("seed", 0)),
+            seed=training_seed,
             stream_id=101,
         )
         data["val_loader"] = make_seeded_dataloader(
@@ -935,7 +944,7 @@ def run_experiment(cfg: Dict[str, Any], data_root: str) -> Dict[str, Any]:
             shuffle=False,
             num_workers=num_workers,
             pin_memory=pin_memory,
-            seed=int(cfg.get("seed", 0)),
+            seed=training_seed,
             stream_id=102,
         )
         print(
@@ -970,7 +979,7 @@ def run_experiment(cfg: Dict[str, Any], data_root: str) -> Dict[str, Any]:
             batch_size=batch_size,
             num_workers=num_workers,
             pin_memory=pin_memory,
-            seed=cfg.get("seed", 0),
+            seed=partition_seed,
             require_true_val_open=cfg.get("require_true_val_open", False),
             allow_val_open_fallback=cfg.get("allow_val_open_fallback", True),
         )
@@ -1046,7 +1055,9 @@ def run_experiment(cfg: Dict[str, Any], data_root: str) -> Dict[str, Any]:
             "throughput_probe_val_samples": int(cfg.get("throughput_probe_val_samples", 1024)),
             "batch_size": batch_size,
             "num_workers": num_workers,
-            "seed": int(cfg.get("seed", 0)),
+            "seed": training_seed,
+            "partition_seed": partition_seed,
+            "training_seed": training_seed,
             "deterministic_training": bool(cfg.get("deterministic_training", False)),
             "deterministic_profile": reproducibility["deterministic_profile"],
             "deterministic_profile": reproducibility["deterministic_profile"],
@@ -1139,7 +1150,9 @@ def run_experiment(cfg: Dict[str, Any], data_root: str) -> Dict[str, Any]:
             "grad_clip_norm": cfg.get("grad_clip_norm", None),
             "scheduler_name": cfg.get("scheduler_name", "cosine"),
             "epochs": cfg.get("epochs", 20),
-            "seed": cfg.get("seed", 0),
+            "seed": training_seed,
+            "partition_seed": partition_seed,
+            "training_seed": training_seed,
             "deterministic_training": bool(cfg.get("deterministic_training", False)),
             "deterministic_profile": reproducibility["deterministic_profile"],
 
@@ -1270,7 +1283,9 @@ def run_experiment(cfg: Dict[str, Any], data_root: str) -> Dict[str, Any]:
             "early_stopping_mode": cfg.get("early_stopping_mode", "known_only"),
             "open_conf_selection_metric": cfg.get("open_conf_selection_metric", "dqn_proxy_expanded5"),
             "epochs": cfg.get("epochs", 20),
-            "seed": cfg.get("seed", 0),
+            "seed": training_seed,
+            "partition_seed": partition_seed,
+            "training_seed": training_seed,
             "deterministic_training": bool(cfg.get("deterministic_training", False)),
             "deterministic_profile": reproducibility["deterministic_profile"],
 
