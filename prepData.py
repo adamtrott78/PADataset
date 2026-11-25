@@ -993,7 +993,9 @@ def build_data_from_setup(
     batch_size: int = 2,
     num_workers: int = 0,
     pin_memory: bool = True,
+    loader_seed: Optional[int] = None,
 ) -> Dict[str, Any]:
+    effective_loader_seed = setup.seed if loader_seed is None else int(loader_seed)
     if getattr(setup, "skip_cache_build", False):
         print(
             f"DATA_STAGE | cache_only=true | cache_root={setup.cache_root}",
@@ -1036,9 +1038,9 @@ def build_data_from_setup(
             "train_ds": train_ds,
             "val_ds": val_ds,
             "test_ds": test_ds,
-            "train_loader": make_seeded_dataloader(train_ds, batch_size=batch_size, shuffle=True, num_workers=num_workers, pin_memory=pin_memory, seed=setup.seed, stream_id=1),
-            "val_loader": make_seeded_dataloader(val_ds, batch_size=batch_size, shuffle=False, num_workers=num_workers, pin_memory=pin_memory, seed=setup.seed, stream_id=2),
-            "test_loader": make_seeded_dataloader(test_ds, batch_size=batch_size, shuffle=False, num_workers=num_workers, pin_memory=pin_memory, seed=setup.seed, stream_id=3),
+            "train_loader": make_seeded_dataloader(train_ds, batch_size=batch_size, shuffle=True, num_workers=num_workers, pin_memory=pin_memory, seed=effective_loader_seed, stream_id=1),
+            "val_loader": make_seeded_dataloader(val_ds, batch_size=batch_size, shuffle=False, num_workers=num_workers, pin_memory=pin_memory, seed=effective_loader_seed, stream_id=2),
+            "test_loader": make_seeded_dataloader(test_ds, batch_size=batch_size, shuffle=False, num_workers=num_workers, pin_memory=pin_memory, seed=effective_loader_seed, stream_id=3),
             "meta": meta,
         })
         return out
@@ -1068,17 +1070,17 @@ def build_data_from_setup(
             "val_known_balanced_ds": split["val_known_balanced"],
             "val_open_balanced_ds": split["val_open_balanced"],
 
-            "train_loader": make_seeded_dataloader(split["train"], batch_size=batch_size, shuffle=True, num_workers=num_workers, pin_memory=pin_memory, seed=setup.seed, stream_id=11),
-            "val_loader": make_seeded_dataloader(split["val"], batch_size=batch_size, shuffle=False, num_workers=num_workers, pin_memory=pin_memory, seed=setup.seed, stream_id=12),
-            "test_known_loader": make_seeded_dataloader(split["test_known"], batch_size=batch_size, shuffle=False, num_workers=num_workers, pin_memory=pin_memory, seed=setup.seed, stream_id=13),
-            "val_open_loader": make_seeded_dataloader(split["val_open"], batch_size=batch_size, shuffle=False, num_workers=num_workers, pin_memory=pin_memory, seed=setup.seed, stream_id=14),
-            "test_open_loader": make_seeded_dataloader(split["test_open"], batch_size=batch_size, shuffle=False, num_workers=num_workers, pin_memory=pin_memory, seed=setup.seed, stream_id=15),
+            "train_loader": make_seeded_dataloader(split["train"], batch_size=batch_size, shuffle=True, num_workers=num_workers, pin_memory=pin_memory, seed=effective_loader_seed, stream_id=11),
+            "val_loader": make_seeded_dataloader(split["val"], batch_size=batch_size, shuffle=False, num_workers=num_workers, pin_memory=pin_memory, seed=effective_loader_seed, stream_id=12),
+            "test_known_loader": make_seeded_dataloader(split["test_known"], batch_size=batch_size, shuffle=False, num_workers=num_workers, pin_memory=pin_memory, seed=effective_loader_seed, stream_id=13),
+            "val_open_loader": make_seeded_dataloader(split["val_open"], batch_size=batch_size, shuffle=False, num_workers=num_workers, pin_memory=pin_memory, seed=effective_loader_seed, stream_id=14),
+            "test_open_loader": make_seeded_dataloader(split["test_open"], batch_size=batch_size, shuffle=False, num_workers=num_workers, pin_memory=pin_memory, seed=effective_loader_seed, stream_id=15),
 
             "val_known_balanced_loader": None if split["val_known_balanced"] is None else make_seeded_dataloader(
-                split["val_known_balanced"], batch_size=batch_size, shuffle=False, num_workers=num_workers, pin_memory=pin_memory, seed=setup.seed, stream_id=16
+                split["val_known_balanced"], batch_size=batch_size, shuffle=False, num_workers=num_workers, pin_memory=pin_memory, seed=effective_loader_seed, stream_id=16
             ),
             "val_open_balanced_loader": None if split["val_open_balanced"] is None else make_seeded_dataloader(
-                split["val_open_balanced"], batch_size=batch_size, shuffle=False, num_workers=num_workers, pin_memory=pin_memory, seed=setup.seed, stream_id=17
+                split["val_open_balanced"], batch_size=batch_size, shuffle=False, num_workers=num_workers, pin_memory=pin_memory, seed=effective_loader_seed, stream_id=17
             ),
 
             "meta": split["meta"],
