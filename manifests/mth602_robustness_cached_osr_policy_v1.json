@@ -45,7 +45,15 @@
   },
   "parity_gate": {
     "required": true,
-    "reference": "canonical GPU pilot results on p00/t01 PA1-PA2 and PA1-PA3",
-    "pass_rule": "all reported scalar OSR metrics must agree within reviewed numeric tolerance before final seed launch"
+    "reference": "canonical GPU evaluator on the exact same four-model smoke backbones",
+    "minimum_backbones": 2,
+    "required_methods": [
+      "DQNGuard",
+      "DQN-IDS-style",
+      "VarMax"
+    ],
+    "required_directions_per_backbone": 2,
+    "pass_rule": "cached CPU and canonical GPU evaluations must agree within a reviewed numeric tolerance on the same backbone/splits before final seed launch",
+    "reason": "current p00/t01 pilots predate the post-training calibration-cache hook and must not be retrained solely to manufacture a cache"
   }
 }
