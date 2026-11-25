@@ -61,4 +61,4 @@ def test_target_test_firewall_is_frozen_before_seed_results():
         "target_test_used_for_seed_selection": False,
         "seed_values_selected_before_any_multi_seed_results": True,
     }
-    assert plan["admission_gate"]["current"] == "PACKAGE_GENERATED_PENDING_EXACT_HEAD_VALIDATION"
+    assert plan["admission_gate"]["current"] == "VALIDATED_READY_FOR_BOUNDED_ADMISSION"
