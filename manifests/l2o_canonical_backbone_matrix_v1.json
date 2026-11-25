@@ -65,7 +65,8 @@
       "training_seed": 1,
       "dqn_seed": 42,
       "robustness_pilot": true,
-      "source_frozen_seed0_artifact_id": 14765881457
+      "source_frozen_seed0_artifact_id": 14765881457,
+      "run_name": "mth602_final_robust_PA1_PA2_p00_t01"
     },
     {
       "canonical_pair": [

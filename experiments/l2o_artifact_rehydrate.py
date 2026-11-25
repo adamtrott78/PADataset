@@ -96,7 +96,7 @@ def rehydrate_canonical_backbone(
     if receipt.get("candidate_sha") != row.get("candidate_sha"):
         raise ValueError("candidate SHA mismatch")
 
-    run_name = Path(row["canonical_w4_config"]).stem
+    run_name = str(row.get("run_name") or Path(row["canonical_w4_config"]).stem)
     run_dir = result_root / "backbone" / run_name
     config_path = run_dir / "config.json"
     best_model_path = run_dir / "best_model.pt"
@@ -155,8 +155,14 @@ def rehydrate_canonical_backbone(
         raise ValueError("target quarantine was not enabled")
     if float(cfg.get("open_val_frac", -1)) != 0.0:
         raise ValueError("target-open validation was not disabled")
-    if int(cfg.get("seed", -1)) != int(matrix.get("seed", -2)):
-        raise ValueError("seed provenance mismatch")
+    expected_training_seed = int(row.get("training_seed", matrix.get("seed", -2)))
+    expected_partition_seed = int(row.get("partition_seed", matrix.get("seed", -2)))
+    actual_training_seed = int(cfg.get("training_seed", cfg.get("seed", -1)))
+    actual_partition_seed = int(cfg.get("partition_seed", cfg.get("seed", -1)))
+    if actual_training_seed != expected_training_seed:
+        raise ValueError("training seed provenance mismatch")
+    if actual_partition_seed != expected_partition_seed:
+        raise ValueError("partition seed provenance mismatch")
     if int(cfg.get("cache_len", -1)) != int(matrix.get("cache_len", -2)):
         raise ValueError("cache length provenance mismatch")
 
