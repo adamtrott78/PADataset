@@ -8,7 +8,7 @@ ROOT = Path(__file__).resolve().parents[1]
 
 def test_final_robustness_seed_grid_is_exact_and_predeclared():
     plan = json.loads((ROOT / "manifests/mth602_final_robustness_v1.json").read_text())
-    assert plan["status"] == "PROPOSED_NOT_AUTHORIZED_FOR_SCIENCE"
+    assert plan["status"] == "ACCEPTED_SEED_FREEZE_EXECUTION_PACKAGE"
     assert plan["seed_axes"]["partition_seeds"] == [0, 1, 2, 3, 4]
     assert plan["seed_axes"]["training_seeds"] == list(range(10))
     assert plan["seed_axes"]["factorial_backbones_per_pair"] == 50
@@ -61,4 +61,4 @@ def test_target_test_firewall_is_frozen_before_seed_results():
         "target_test_used_for_seed_selection": False,
         "seed_values_selected_before_any_multi_seed_results": True,
     }
-    assert plan["admission_gate"]["current"] == "BLOCKED_PENDING_EXPLICIT_REVIEW_ACCEPTANCE"
+    assert plan["admission_gate"]["current"] == "PACKAGE_GENERATED_PENDING_EXACT_HEAD_VALIDATION"
