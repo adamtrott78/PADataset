@@ -17,6 +17,11 @@ def test_same_evidence_gate_uses_exact_cached_tensors_and_frozen_constructors():
     assert "CUDA_VISIBLE_DEVICES" in s
     assert "target_labels_used_for_tuning" in s
 
+def test_same_evidence_gate_uses_process_isolation_for_dqn_rng():
+    s=SCRIPT.read_text()
+    assert "ProcessPoolExecutor" in s
+    assert "ThreadPoolExecutor" not in s
+
 def test_same_evidence_gate_requires_prediction_identity_and_tiny_metric_tolerance():
     s=SCRIPT.read_text()
     assert "kp_mismatch==0" in s
