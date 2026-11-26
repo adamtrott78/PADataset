@@ -16,7 +16,7 @@ sudo -v
 
 # Kill only stale/missing-heartbeat pipeline sessions. Never bounce a healthy watcher.
 pipeline_healthy=0
-if [[ -f "$STATE_FILE" ]]; then
+if tmux has-session -t "$PIPE_SESSION" 2>/dev/null && [[ -f "$STATE_FILE" ]]; then
   if python3 - "$STATE_FILE" <<'PY'
 import json,sys,time
 try:
