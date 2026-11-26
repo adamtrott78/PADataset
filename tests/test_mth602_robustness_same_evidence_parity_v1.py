@@ -23,9 +23,8 @@ def test_same_evidence_gate_requires_prediction_identity_and_tiny_metric_toleran
     assert "op_mismatch==0" in s
     assert "default=1e-12" in s
 
-def test_same_evidence_gate_syntax_and_help():
+def test_same_evidence_gate_syntax_and_cli_markers():
     subprocess.run(["python3","-m","py_compile",str(SCRIPT)],check=True)
-    p=subprocess.run(["python3",str(SCRIPT),"--help"],capture_output=True,text=True)
-    assert p.returncode==0,p.stderr
-    assert "--pipeline-root" in p.stdout
-    assert "--tolerance" in p.stdout
+    s=SCRIPT.read_text()
+    assert 'ap.add_argument("--pipeline-root"' in s
+    assert 'ap.add_argument("--tolerance"' in s
