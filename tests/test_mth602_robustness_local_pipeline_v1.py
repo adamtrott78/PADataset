@@ -28,7 +28,7 @@ def test_dashboard_is_zero_provider_and_ctrl_c_exits():
     s=(ROOT/"scripts/mth602_robustness_local_dashboard.py").read_text().lower()
     for bad in ["gh api","gh run","api.github.com","curl ","requests.","urllib.request"]:
         assert bad not in s
-    assert "keyboardinterrupt" in s
+    assert "signal.signal(signal.sigint,detach_current_client)" in s
     assert "val_min_class_f1" in s
     assert "campaign eta" in s
     assert "projected finish" in s
