@@ -51,23 +51,27 @@ def main():
     a=ap.parse_args()
     root=Path(a.state_root).expanduser() if a.state_root else operator_home()/".cache/workspace-control/mth602-robustness-pipeline"; backbones=root/"backbones"; results=root/"osr"; logs=root/"logs"; root.mkdir(parents=True,exist_ok=True)
     workers={}
+    failed_workers={}
     stop=False
     def sig(*_):
         nonlocal stop; stop=True
     signal.signal(signal.SIGINT,sig); signal.signal(signal.SIGTERM,sig)
-    atomic_json(root/"pipeline_state.json",{"schema":"padataset.mth602-robustness-local-pipeline-state.v3","time":time.strftime("%Y-%m-%dT%H:%M:%S%z"),"epoch":time.time(),"pid":os.getpid(),"phase":"STARTING","max_workers":a.max_workers,"active_workers":{},"backbones_spooled":len(list(backbones.glob("mth602_robust_*"))),"osr_complete":len(list(results.glob("*/osr_complete.json"))),"provider_calls_per_refresh":0})
+    atomic_json(root/"pipeline_state.json",{"schema":"padataset.mth602-robustness-local-pipeline-state.v3","time":time.strftime("%Y-%m-%dT%H:%M:%S%z"),"epoch":time.time(),"pid":os.getpid(),"phase":"STARTING","max_workers":a.max_workers,"active_workers":{},"failed_workers":{},"backbones_spooled":len(list(backbones.glob("mth602_robust_*"))),"osr_complete":len(list(results.glob("*/osr_complete.json"))),"provider_calls_per_refresh":0})
     while not stop:
         for rn,src in discover().items():
             dst=backbones/rn; copy_ready(src,dst)
         for rn,p in list(workers.items()):
             rc=p.poll()
-            if rc is not None: workers.pop(rn,None)
+            if rc is not None:
+                workers.pop(rn,None)
+                if rc != 0:
+                    failed_workers[rn]={"returncode":int(rc),"time":time.strftime("%Y-%m-%dT%H:%M:%S%z")}
         candidates=[]
         for d in sorted(backbones.glob("mth602_robust_*")):
             cfg=read_json(d/"config.json") or {}; pair=str((cfg.get("robustness_replication") or {}).get("canonical_pair") or "")
             if len(pair.split("-"))!=2: continue
             od=results/d.name
-            if (od/"osr_complete.json").is_file() or d.name in workers: continue
+            if (od/"osr_complete.json").is_file() or d.name in workers or d.name in failed_workers: continue
             candidates.append((d,pair,od))
         while candidates and len(workers)<a.max_workers:
             d,pair,od=candidates.pop(0); pa,pb=pair.split("-"); od.mkdir(parents=True,exist_ok=True); logs.mkdir(parents=True,exist_ok=True)
@@ -77,7 +81,7 @@ def main():
             cmd=[a.runtime_python,str(Path(a.repo)/"experiments/mth602_robustness_cached_all_osr.py"),"--cache-dir",str(d/"osr_calibration_cache"),"--bundle-dir",str(d/"osr_posttrain_bundle"),"--pair-a",pa,"--pair-b",pb,"--out-dir",str(od),"--policy",str(Path(a.repo)/"manifests/mth602_robustness_cached_osr_policy_v1.json"),"--device","cpu"]
             p=subprocess.Popen(cmd,cwd=a.repo,env=env,stdout=log,stderr=subprocess.STDOUT,start_new_session=True)
             workers[d.name]=p
-        state={"schema":"padataset.mth602-robustness-local-pipeline-state.v3","time":time.strftime("%Y-%m-%dT%H:%M:%S%z"),"epoch":time.time(),"pid":os.getpid(),"phase":"RUNNING","max_workers":a.max_workers,"active_workers":{k:v.pid for k,v in workers.items()},"backbones_spooled":len(list(backbones.glob("mth602_robust_*"))),"osr_complete":len(list(results.glob("*/osr_complete.json"))),"provider_calls_per_refresh":0}
+        state={"schema":"padataset.mth602-robustness-local-pipeline-state.v3","time":time.strftime("%Y-%m-%dT%H:%M:%S%z"),"epoch":time.time(),"pid":os.getpid(),"phase":"RUNNING","max_workers":a.max_workers,"active_workers":{k:v.pid for k,v in workers.items()},"failed_workers":failed_workers,"backbones_spooled":len(list(backbones.glob("mth602_robust_*"))),"osr_complete":len(list(results.glob("*/osr_complete.json"))),"provider_calls_per_refresh":0}
         atomic_json(root/"pipeline_state.json",state)
         if a.once: break
         time.sleep(a.refresh)
