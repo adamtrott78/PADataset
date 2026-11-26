@@ -9,10 +9,15 @@ STATE_FILE="$STATE_ROOT/pipeline_state.json"
 LOG_DIR="$STATE_ROOT/logs"
 WATCHER_LOG="$LOG_DIR/pipeline-watcher.log"
 
-mkdir -p "$LOG_DIR"
-
 echo "Authenticating sudo for background watcher..."
 sudo -v
+
+# Earlier versions may have left this task-scoped state directory root-owned.
+OPERATOR_USER="${SUDO_USER:-$USER}"
+OPERATOR_GROUP="$(id -gn "$OPERATOR_USER")"
+sudo mkdir -p "$STATE_ROOT" "$LOG_DIR"
+sudo chown "$OPERATOR_USER:$OPERATOR_GROUP" "$STATE_ROOT" "$LOG_DIR"
+touch "$WATCHER_LOG"
 
 # Kill only stale/missing-heartbeat pipeline sessions. Never bounce a healthy watcher.
 pipeline_healthy=0
