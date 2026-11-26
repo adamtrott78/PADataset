@@ -1,10 +1,22 @@
 #!/usr/bin/env python3
 from __future__ import annotations
-import argparse, glob, json, os, pwd, re, shlex, statistics, subprocess, sys, time
+import argparse, glob, json, os, pwd, re, shlex, shutil, statistics, subprocess, sys, time
 from datetime import datetime, timedelta
 from pathlib import Path
 
 RESET="\033[0m"; B="\033[1m"; DIM="\033[2m"; GREEN="\033[32m"; YELLOW="\033[33m"; CYAN="\033[36m"; RED="\033[31m"; MAG="\033[35m"
+ANSI_RE=re.compile(r"\x1b\[[0-9;]*m")
+
+def clip_ansi(line: str, width: int) -> str:
+    width=max(20,int(width))
+    out=[]; visible=0; i=0
+    while i < len(line) and visible < width:
+        if line[i]=="\x1b":
+            m=ANSI_RE.match(line,i)
+            if m:
+                out.append(m.group(0)); i=m.end(); continue
+        out.append(line[i]); visible+=1; i+=1
+    return "".join(out)+RESET
 PAIRS=["PA1-PA2","PA1-PA3","PA1-PA4","PA1-PA8","PA2-PA3","PA2-PA4","PA2-PA8","PA3-PA4","PA3-PA8","PA4-PA8"]
 CONDS=[(0,0),(1,0),(2,0),(3,0),(4,0),(0,1)]
 
@@ -158,7 +170,11 @@ def render():
             frame.append(f"TRAINING {done}/{total} + active={active_frac:.2f}  completion≈{progress*100:5.1f}%  median completed={fmt(med)}  campaign ETA={fmt(overall_eta)}  projected finish={finish_text(overall_eta)}")
             ps=readj(ROOT/"pipeline_state.json") or {}
             frame.append(f"CPU OSR workers {len(ps.get('active_workers',{}))}/{ps.get('max_workers','-')} | spooled {ps.get('backbones_spooled','-')} | OSR complete {ps.get('osr_complete','-')} | provider calls/refresh 0")
-            sys.stdout.write("\033[H"+"\n".join(frame)+"\033[J");sys.stdout.flush();time.sleep(1)
+            width=max(40,shutil.get_terminal_size((100,40)).columns-1)
+            rendered="\n".join(clip_ansi(line,width) for line in frame)
+            sys.stdout.write("\033[2J\033[H"+rendered)
+            sys.stdout.flush()
+            time.sleep(2)
     finally:
         sys.stdout.write("\033[?25h\033[?1049l");sys.stdout.flush()
 
