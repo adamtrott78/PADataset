@@ -1,7 +1,7 @@
 #!/usr/bin/env bash
 set -euo pipefail
 UI_SESSION=mth602-robustness-ui
-ROOT="$(cd "$(dirname "\${BASH_SOURCE[0]}")/.." && pwd)"
+ROOT="$(cd "$(dirname "${BASH_SOURCE[0]}")/.." && pwd)"
 PYTHON_BIN="$(command -v python3)"
 STATE_ROOT="$HOME/.cache/workspace-control/mth602-robustness-pipeline"
 STATE_FILE="$STATE_ROOT/pipeline_state.json"
@@ -12,7 +12,7 @@ WATCHER_PID_FILE="$STATE_ROOT/pipeline-watcher.pid"
 echo "Authenticating sudo for background watcher..."
 sudo -v
 
-OPERATOR_USER="\${SUDO_USER:-$USER}"
+OPERATOR_USER="${SUDO_USER:-$USER}"
 OPERATOR_GROUP="$(id -gn "$OPERATOR_USER")"
 sudo mkdir -p "$STATE_ROOT" "$LOG_DIR"
 sudo chown "$OPERATOR_USER:$OPERATOR_GROUP" "$STATE_ROOT" "$LOG_DIR"
