@@ -1,6 +1,6 @@
 #!/usr/bin/env python3
 from __future__ import annotations
-import argparse, glob, json, os, pwd, re, shlex, shutil, statistics, subprocess, sys, time
+import argparse, glob, json, os, pwd, re, shlex, shutil, signal, statistics, subprocess, sys, time
 from datetime import datetime, timedelta
 from pathlib import Path
 
@@ -115,6 +115,11 @@ def identity_from_cfg(cfg):
 def glyph(status):
     return {"SUCCESS":GREEN+"✓"+RESET,"RUNNING":YELLOW+"▶"+RESET,"ERROR":RED+"×"+RESET,"OSR":CYAN+"O"+RESET}.get(status,DIM+"·"+RESET)
 
+def detach_current_client(_signum=None, _frame=None):
+    if not os.environ.get("TMUX"):
+        return
+    subprocess.run(["tmux","detach-client"],stdout=subprocess.DEVNULL,stderr=subprocess.DEVNULL,check=False)
+
 def render():
     sys.stdout.write("\033[?1049h\033[?25l\033[H");sys.stdout.flush()
     try:
@@ -140,7 +145,7 @@ def render():
                 osrstate="SUCCESS" if osrdone else ("RUNNING" if any((od/f).exists() for f in ["progress_PA1_from_PA2.json"]) else "-")
                 rows.append({"rn":rn,"pair":pair,"p":ps,"t":ts,"status":st,"epoch":epoch,"epochs":epochs,"macro":macro if macro is not None else best_macro,"minf":minf if minf is not None else best_min,"elapsed":elapsed,"eta":eta,"osr":osrstate})
                 bycell[(pair,ps,ts)]=st
-            g=gpu(); frame=[B+"MTH602 FINAL ROBUSTNESS — LOCAL PIPELINE"+RESET,DIM+"Source: HOST LOCAL ONLY | GitHub/REST/GraphQL calls per refresh: 0 | Ctrl+C exits"+RESET]
+            g=gpu(); frame=[B+"MTH602 FINAL ROBUSTNESS — LOCAL PIPELINE"+RESET,DIM+"Source: HOST LOCAL ONLY | GitHub/REST/GraphQL calls per refresh: 0 | Ctrl+C detaches"+RESET]
             if g:
                 frame.append("   ".join(f"GPU{x[0]} {x[1]}/{x[2]} MiB {x[3]}%" for x in g))
             ctl=controller_liveness()
@@ -183,5 +188,5 @@ def render():
         sys.stdout.write("\033[?25h\033[?1049l");sys.stdout.flush()
 
 if __name__=="__main__":
-    try:render()
-    except KeyboardInterrupt:pass
+    signal.signal(signal.SIGINT,detach_current_client)
+    render()
