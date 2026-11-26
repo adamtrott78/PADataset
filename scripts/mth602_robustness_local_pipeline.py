@@ -47,13 +47,15 @@ def main():
     ap=argparse.ArgumentParser(); ap.add_argument("--repo",default=str(Path(__file__).resolve().parents[1])); ap.add_argument("--runtime-python",default=sys.executable)
     ap.add_argument("--data-root",default="/srv/workspace-ci/padataset/trusted-cache/scientific-data/ota_core_high_run01_len16384_v1")
     ap.add_argument("--max-workers",type=int,default=2); ap.add_argument("--refresh",type=float,default=2.0); ap.add_argument("--once",action="store_true")
+    ap.add_argument("--state-root",default=None)
     a=ap.parse_args()
-    root=operator_home()/".cache/workspace-control/mth602-robustness-pipeline"; backbones=root/"backbones"; results=root/"osr"; logs=root/"logs"; root.mkdir(parents=True,exist_ok=True)
+    root=Path(a.state_root).expanduser() if a.state_root else operator_home()/".cache/workspace-control/mth602-robustness-pipeline"; backbones=root/"backbones"; results=root/"osr"; logs=root/"logs"; root.mkdir(parents=True,exist_ok=True)
     workers={}
     stop=False
     def sig(*_):
         nonlocal stop; stop=True
     signal.signal(signal.SIGINT,sig); signal.signal(signal.SIGTERM,sig)
+    atomic_json(root/"pipeline_state.json",{"schema":"padataset.mth602-robustness-local-pipeline-state.v3","time":time.strftime("%Y-%m-%dT%H:%M:%S%z"),"epoch":time.time(),"pid":os.getpid(),"phase":"STARTING","max_workers":a.max_workers,"active_workers":{},"backbones_spooled":len(list(backbones.glob("mth602_robust_*"))),"osr_complete":len(list(results.glob("*/osr_complete.json"))),"provider_calls_per_refresh":0})
     while not stop:
         for rn,src in discover().items():
             dst=backbones/rn; copy_ready(src,dst)
@@ -75,7 +77,7 @@ def main():
             cmd=[a.runtime_python,str(Path(a.repo)/"experiments/mth602_robustness_cached_all_osr.py"),"--cache-dir",str(d/"osr_calibration_cache"),"--bundle-dir",str(d/"osr_posttrain_bundle"),"--pair-a",pa,"--pair-b",pb,"--out-dir",str(od),"--policy",str(Path(a.repo)/"manifests/mth602_robustness_cached_osr_policy_v1.json"),"--device","cpu"]
             p=subprocess.Popen(cmd,cwd=a.repo,env=env,stdout=log,stderr=subprocess.STDOUT,start_new_session=True)
             workers[d.name]=p
-        state={"schema":"padataset.mth602-robustness-local-pipeline-state.v2","time":time.strftime("%Y-%m-%dT%H:%M:%S%z"),"epoch":time.time(),"pid":os.getpid(),"max_workers":a.max_workers,"active_workers":{k:v.pid for k,v in workers.items()},"backbones_spooled":len(list(backbones.glob("mth602_robust_*"))),"osr_complete":len(list(results.glob("*/osr_complete.json"))),"provider_calls_per_refresh":0}
+        state={"schema":"padataset.mth602-robustness-local-pipeline-state.v3","time":time.strftime("%Y-%m-%dT%H:%M:%S%z"),"epoch":time.time(),"pid":os.getpid(),"phase":"RUNNING","max_workers":a.max_workers,"active_workers":{k:v.pid for k,v in workers.items()},"backbones_spooled":len(list(backbones.glob("mth602_robust_*"))),"osr_complete":len(list(results.glob("*/osr_complete.json"))),"provider_calls_per_refresh":0}
         atomic_json(root/"pipeline_state.json",state)
         if a.once: break
         time.sleep(a.refresh)
