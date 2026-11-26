@@ -9,13 +9,13 @@ def test_cached_osr_adds_repo_root_before_osr_core_import():
     assert s.index("sys.path.insert(0,str(REPO_ROOT))") < s.index("from osr_core import")
 
 def test_cached_osr_cli_imports_cleanly():
-    subprocess.run(
+    p=subprocess.run(
         ["python3",str(ROOT/"experiments/mth602_robustness_cached_all_osr.py"),"--help"],
         cwd=ROOT,
-        check=True,
-        stdout=subprocess.DEVNULL,
-        stderr=subprocess.DEVNULL,
+        text=True,
+        capture_output=True,
     )
+    assert p.returncode == 0, p.stderr
 
 def test_pipeline_quarantines_nonzero_worker_exit():
     s=(ROOT/"scripts/mth602_robustness_local_pipeline.py").read_text()
