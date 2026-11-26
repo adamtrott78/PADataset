@@ -115,6 +115,47 @@ def identity_from_cfg(cfg):
 def glyph(status):
     return {"SUCCESS":GREEN+"✓"+RESET,"RUNNING":YELLOW+"▶"+RESET,"ERROR":RED+"×"+RESET,"OSR":CYAN+"O"+RESET}.get(status,DIM+"·"+RESET)
 
+def osr_results():
+    directions=[]
+    method_values={"DQNGuard":[],"DQN-IDS-style":[],"VarMax":[]}
+    osr_root=ROOT/"osr"
+    if not osr_root.is_dir():
+        return directions,method_values
+    for od in osr_root.glob("mth602_robust_*"):
+        done=readj(od/"osr_complete.json")
+        rows=readj(od/"result.json")
+        if not done or done.get("status")!="SUCCESS" or not isinstance(rows,list):
+            continue
+        try:
+            mt=(od/"osr_complete.json").stat().st_mtime
+        except Exception:
+            mt=0
+        bydir={}
+        for row in rows:
+            method=str(row.get("method",""))
+            if method in method_values:
+                try: method_values[method].append(float(row.get("unknown_f1")))
+                except Exception: pass
+            target=str(row.get("target",""))
+            surrogate=str(row.get("surrogate",""))
+            if target and surrogate and method:
+                bydir.setdefault((target,surrogate),{})[method]=row
+        for (target,surrogate),methods in bydir.items():
+            directions.append({
+                "mtime":mt,
+                "run_name":done.get("run_name",od.name),
+                "partition_seed":done.get("partition_seed"),
+                "training_seed":done.get("training_seed"),
+                "target":target,
+                "surrogate":surrogate,
+                "methods":methods,
+            })
+    directions.sort(key=lambda x:(x["mtime"],x["run_name"],x["target"],x["surrogate"]),reverse=True)
+    return directions,method_values
+
+def mean_metric(vals):
+    return metric(statistics.mean(vals)) if vals else "-"
+
 def detach_current_client(_signum=None, _frame=None):
     if not os.environ.get("TMUX"):
         return
@@ -173,6 +214,24 @@ def render():
             if med is not None: overall_eta=max(0.0,(total-done-active_frac)*med/2.0)
             frame.append("-"*98)
             frame.append(f"TRAINING {done}/{total} + active={active_frac:.2f}  completion≈{progress*100:5.1f}%  median completed={fmt(med)}  campaign ETA={fmt(overall_eta)}  projected finish={finish_text(overall_eta)}")
+
+            osrdirs,osrvals=osr_results()
+            completed_dirs=len(osrdirs)
+            if completed_dirs:
+                frame.append("")
+                frame.append(B+f"OSR RESULTS  completed directions={completed_dirs}  mean U-F1: DQNGuard={mean_metric(osrvals['DQNGuard'])}  DQN-IDS={mean_metric(osrvals['DQN-IDS-style'])}  VarMax={mean_metric(osrvals['VarMax'])}"+RESET)
+                frame.append(f"{'CELL':<18} {'DIRECTION':<13} {'DQNG-UF1':>9} {'IDS-UF1':>9} {'VMAX-UF1':>10}")
+                frame.append("-"*64)
+                for x in osrdirs[:12]:
+                    methods=x["methods"]
+                    dg=(methods.get("DQNGuard") or {}).get("unknown_f1")
+                    ids=(methods.get("DQN-IDS-style") or {}).get("unknown_f1")
+                    vm=(methods.get("VarMax") or {}).get("unknown_f1")
+                    pair="-".join(sorted([x["target"],x["surrogate"]],key=lambda z:int(z[2:])))
+                    cell=f"{pair} p{x['partition_seed']}t{x['training_seed']}"
+                    direction=f"{x['target']}<-{x['surrogate']}"
+                    frame.append(f"{cell:<18} {direction:<13} {metric(dg):>9} {metric(ids):>9} {metric(vm):>10}")
+
             ps=readj(ROOT/"pipeline_state.json") or {}
             p_age=None
             try: p_age=max(0.0,time.time()-float(ps.get("epoch")))
