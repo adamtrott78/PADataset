@@ -4,7 +4,7 @@ ROOT=Path(__file__).resolve().parents[1]
 def test_launcher_authenticates_before_background_start_and_fails_closed():
     s=(ROOT/"scripts/mth602_robustness_tmux.sh").read_text()
     assert "sudo -v" in s
-    assert "sudo -n -E python3" in s
+    assert "sudo -E bash -c" in s\n    assert "nohup python3" in s\n    assert "sudo -n" not in s
     assert "PIPELINE_WATCHER_START=FAIL" in s
     assert "PIPELINE_WATCHER_START=PASS" in s
     assert "pipeline-watcher.log" in s
