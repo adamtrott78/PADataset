@@ -2,6 +2,11 @@
 from __future__ import annotations
 import argparse, hashlib, json, os, time
 from pathlib import Path
+import sys
+
+REPO_ROOT=Path(__file__).resolve().parents[1]
+if str(REPO_ROOT) not in sys.path:
+    sys.path.insert(0,str(REPO_ROOT))
 
 os.environ.setdefault("OMP_NUM_THREADS","4")
 os.environ.setdefault("MKL_NUM_THREADS","4")
