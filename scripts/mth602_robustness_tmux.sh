@@ -1,6 +1,5 @@
 #!/usr/bin/env bash
 set -euo pipefail
-PIPE_SESSION=mth602-robustness-pipeline
 UI_SESSION=mth602-robustness-ui
 ROOT="$(cd "$(dirname "${BASH_SOURCE[0]}")/.." && pwd)"
 PYTHON_BIN="$(command -v python3)"
@@ -8,25 +7,26 @@ STATE_ROOT="$HOME/.cache/workspace-control/mth602-robustness-pipeline"
 STATE_FILE="$STATE_ROOT/pipeline_state.json"
 LOG_DIR="$STATE_ROOT/logs"
 WATCHER_LOG="$LOG_DIR/pipeline-watcher.log"
+WATCHER_PID_FILE="$STATE_ROOT/pipeline-watcher.pid"
 
 echo "Authenticating sudo for background watcher..."
 sudo -v
 
-# Earlier versions may have left this task-scoped state directory root-owned.
 OPERATOR_USER="${SUDO_USER:-$USER}"
 OPERATOR_GROUP="$(id -gn "$OPERATOR_USER")"
 sudo mkdir -p "$STATE_ROOT" "$LOG_DIR"
 sudo chown "$OPERATOR_USER:$OPERATOR_GROUP" "$STATE_ROOT" "$LOG_DIR"
 touch "$WATCHER_LOG"
 
-# Kill only stale/missing-heartbeat pipeline sessions. Never bounce a healthy watcher.
 pipeline_healthy=0
-if tmux has-session -t "$PIPE_SESSION" 2>/dev/null && [[ -f "$STATE_FILE" ]]; then
+if [[ -f "$STATE_FILE" ]]; then
   if python3 - "$STATE_FILE" <<'PY'
-import json,sys,time
+import json,os,sys,time
 try:
     s=json.load(open(sys.argv[1]))
     age=time.time()-float(s["epoch"])
+    pid=int(s.get("pid",0))
+    os.kill(pid,0)
     raise SystemExit(0 if age <= 5.0 else 1)
 except Exception:
     raise SystemExit(1)
@@ -37,20 +37,35 @@ PY
 fi
 
 if [[ "$pipeline_healthy" -ne 1 ]]; then
-  tmux kill-session -t "$PIPE_SESSION" 2>/dev/null || true
   : > "$WATCHER_LOG"
-  tmux new-session -d -s "$PIPE_SESSION" -n pipeline     "exec sudo -n -E python3 '$ROOT/scripts/mth602_robustness_local_pipeline.py' --repo '$ROOT' --runtime-python '$PYTHON_BIN' --max-workers 2 --refresh 1 >>'$WATCHER_LOG' 2>&1"
+  sudo -E bash -c "
+    export SUDO_USER='$OPERATOR_USER'
+    export CUDA_VISIBLE_DEVICES=''
+    export OMP_NUM_THREADS=4
+    export MKL_NUM_THREADS=4
+    export OPENBLAS_NUM_THREADS=4
+    export NUMEXPR_NUM_THREADS=4
+    nohup python3 '$ROOT/scripts/mth602_robustness_local_pipeline.py' \
+      --repo '$ROOT' \
+      --runtime-python '$PYTHON_BIN' \
+      --max-workers 2 \
+      --refresh 1 \
+      >>'$WATCHER_LOG' 2>&1 </dev/null &
+    echo \$! > '$WATCHER_PID_FILE'
+  "
+  sudo chown "$OPERATOR_USER:$OPERATOR_GROUP" "$WATCHER_PID_FILE" "$WATCHER_LOG" 2>/dev/null || true
 fi
 
-# Fail closed unless the watcher proves liveness.
 watcher_ok=0
-for _ in $(seq 1 20); do
+for _ in $(seq 1 30); do
   if [[ -f "$STATE_FILE" ]] && python3 - "$STATE_FILE" <<'PY'
-import json,sys,time
+import json,os,sys,time
 try:
     s=json.load(open(sys.argv[1]))
     age=time.time()-float(s["epoch"])
-    raise SystemExit(0 if age <= 5.0 and int(s.get("pid",0)) > 0 else 1)
+    pid=int(s.get("pid",0))
+    os.kill(pid,0)
+    raise SystemExit(0 if age <= 5.0 else 1)
 except Exception:
     raise SystemExit(1)
 PY
@@ -78,8 +93,7 @@ print(f"SPOOLED={s.get('backbones_spooled')}")
 print(f"OSR_COMPLETE={s.get('osr_complete')}")
 PY
 
-# UI is disposable; restarting it must never touch the pipeline session.
 tmux kill-session -t "$UI_SESSION" 2>/dev/null || true
-tmux new-session -d -s "$UI_SESSION" -n dashboard   "exec sudo -n -E python3 '$ROOT/scripts/mth602_robustness_local_dashboard.py'"
+tmux new-session -d -s "$UI_SESSION" -n dashboard   "exec python3 '$ROOT/scripts/mth602_robustness_local_dashboard.py'"
 
 exec tmux attach -t "$UI_SESSION"
