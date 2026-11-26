@@ -31,6 +31,19 @@ def discover():
             out[p.name]=p
     return out
 
+def make_tree_user_readable(path):
+    path=Path(path)
+    if not path.exists(): return
+    for p in [path,*path.rglob("*")]:
+        try:
+            mode=p.stat().st_mode
+            if p.is_dir():
+                p.chmod(mode | 0o055)
+            else:
+                p.chmod(mode | 0o044)
+        except (FileNotFoundError, PermissionError):
+            pass
+
 def copy_ready(src,dst):
     dst.mkdir(parents=True,exist_ok=True)
     for name in ("config.json","summary.json","train_complete.json","best_model.pt"):
@@ -42,6 +55,7 @@ def copy_ready(src,dst):
             tmp=dst/(sub+".tmp")
             if tmp.exists(): shutil.rmtree(tmp)
             shutil.copytree(sc,tmp); tmp.replace(dc)
+    make_tree_user_readable(dst)
 
 def main():
     ap=argparse.ArgumentParser(); ap.add_argument("--repo",default=str(Path(__file__).resolve().parents[1])); ap.add_argument("--runtime-python",default=sys.executable)
