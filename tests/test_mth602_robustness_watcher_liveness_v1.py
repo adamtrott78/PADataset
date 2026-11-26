@@ -1,12 +1,12 @@
 from pathlib import Path
 ROOT=Path(__file__).resolve().parents[1]
 
-def test_watcher_is_not_owned_by_tmux_lifecycle():
+def test_dashboard_restart_cannot_own_or_kill_watcher():
     s=(ROOT/"scripts/mth602_robustness_tmux.sh").read_text()
+    assert "WATCHER_UNIT=mth602-robustness-pipeline.service" in s
     assert "UI_SESSION=mth602-robustness-ui" in s
+    assert 'kill-session -t "$UI_SESSION"' in s
     assert "PIPE_SESSION=" not in s
-    assert "nohup '$PYTHON_BIN'" in s
-    assert "pipeline-watcher.pid" in s
 
 def test_pipeline_state_has_liveness_heartbeat():
     s=(ROOT/"scripts/mth602_robustness_local_pipeline.py").read_text()
