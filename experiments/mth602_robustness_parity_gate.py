@@ -79,10 +79,19 @@ def validate_cell(cell: dict[str, Any], pipeline_root: Path) -> tuple[Path, list
     cfg = read_json(run_dir / "config.json")
     rr = cfg.get("robustness_replication") or {}
     expected_pair = list(cell["canonical_pair"])
+    raw_pair = rr.get("canonical_pair")
+    if isinstance(raw_pair, str):
+        observed_pair = raw_pair.split("-")
+    elif isinstance(raw_pair, (list, tuple)):
+        observed_pair = list(raw_pair)
+    else:
+        observed_pair = []
     if str(cfg.get("run_name")) != run_name:
         raise RuntimeError(f"{run_name}: config run_name drift")
-    if list(rr.get("canonical_pair") or []) != expected_pair:
-        raise RuntimeError(f"{run_name}: canonical pair drift")
+    if observed_pair != expected_pair:
+        raise RuntimeError(
+            f"{run_name}: canonical pair drift expected={expected_pair} observed={observed_pair}"
+        )
     if int(rr.get("partition_seed", -1)) != int(cell["partition_seed"]):
         raise RuntimeError(f"{run_name}: partition seed drift")
     if int(rr.get("training_seed", -1)) != int(cell["training_seed"]):
