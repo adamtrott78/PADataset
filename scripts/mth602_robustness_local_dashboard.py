@@ -169,7 +169,11 @@ def render():
             frame.append("-"*98)
             frame.append(f"TRAINING {done}/{total} + active={active_frac:.2f}  completion≈{progress*100:5.1f}%  median completed={fmt(med)}  campaign ETA={fmt(overall_eta)}  projected finish={finish_text(overall_eta)}")
             ps=readj(ROOT/"pipeline_state.json") or {}
-            frame.append(f"CPU OSR workers {len(ps.get('active_workers',{}))}/{ps.get('max_workers','-')} | spooled {ps.get('backbones_spooled','-')} | OSR complete {ps.get('osr_complete','-')} | provider calls/refresh 0")
+            p_age=None
+            try: p_age=max(0.0,time.time()-float(ps.get("epoch")))
+            except Exception: pass
+            p_state="ALIVE" if p_age is not None and p_age <= 5.0 else "STALE"
+            frame.append(f"PIPELINE {p_state} age={fmt(p_age)} pid={ps.get('pid','-')} | CPU OSR workers {len(ps.get('active_workers',{}))}/{ps.get('max_workers','-')} | spooled {ps.get('backbones_spooled','-')} | OSR complete {ps.get('osr_complete','-')} | provider calls/refresh 0")
             width=max(40,shutil.get_terminal_size((100,40)).columns-1)
             rendered="\n".join(clip_ansi(line,width) for line in frame)
             sys.stdout.write("\033[2J\033[H"+rendered)
