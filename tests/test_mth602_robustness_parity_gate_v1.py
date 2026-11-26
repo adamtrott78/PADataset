@@ -29,6 +29,12 @@ def test_parity_manifest_pins_exact_four_smokes_and_two_gpus():
     assert d["invariants"]["canonical_state_mutation"] is False
     assert d["invariants"]["retraining"] is False
 
+def test_parity_driver_normalizes_string_canonical_pair():
+    s=SCRIPT.read_text()
+    assert 'if isinstance(raw_pair, str):' in s
+    assert 'observed_pair = raw_pair.split("-")' in s
+    assert "expected={expected_pair} observed={observed_pair}" in s
+
 def test_parity_driver_uses_frozen_canonical_semantics_and_all_metrics():
     s=SCRIPT.read_text()
     required=[
