@@ -35,6 +35,8 @@ from experiments.pa_eval_dqn_guard_surrogate_open import cap_split, make_method
 from experiments.pa_eval_l2o_controls_v1 import (
     build_varmax_calibration, make_dqn_control, make_varmax_control
 )
+from experiments.mth602_robustness_posttrain_bundle import _fit_one
+from osr_core import load_backbone_run
 
 METHODS=("DQNGuard","DQN-IDS-style","VarMax")
 METRICS=("known_reject_rate","unknown_precision","unknown_recall","unknown_f1","osr_acc","osr_macro_f1","unknown_auroc")
@@ -91,43 +93,19 @@ def compare(name,ref_tuple,frozen_tuple,tol):
     }
 
 
-def fit_reference(cache_dir:Path,target:str,surrogate:str,policy):
-    cal=readj(cache_dir/"manifest.json")
+def fit_reference(handle,cache_dir:Path,target:str,surrogate:str,policy):
     known_val=load_split(cache_dir/"known_val.npz")
     known_test=load_split(cache_dir/"known_test.npz")
     kb=cache_dir/"known_val_balanced.npz"
     known_bal=load_split(kb) if kb.is_file() else None
     surrogate_val=load_split(cache_dir/f"val_open_{surrogate}.npz")
-    meta=payload_meta_from_manifests(cal,target)
-    pseed=int(meta["partition_seed"])
-    fit_payload=BackbonePayload(meta=meta,val_known=known_val,test_known=known_test,test_open=None)
-
-    dgcfg=policy["methods"]["dqnguard"]
-    kc=cap_split(known_val,int(dgcfg["known_cap"]),pseed+101,True,"parity_dqnguard_known")
-    oc=cap_split(surrogate_val,int(dgcfg["open_cap"]),pseed+202,False,"parity_dqnguard_surrogate")
-    dg=make_method(str(dgcfg["band_accept_mode"]))
-    dg.fit(fit_payload,calibration={
-        "calibration_mode":f"surrogate_{surrogate}_var_energy_cap{dgcfg['open_cap']}",
-        "calibration_known":kc,"calibration_open":oc,
-    })
-    u=int(meta["num_classes"])
-    ckp=dg.predict(kc,unknown_label=u)
-    thr=float(np.percentile(ckp["unknown_score"],100.0*(1.0-float(dgcfg["max_known_reject_cal"]))))
-
-    cp=readj(REPO_ROOT/"manifests/l2o_control_eval_policy_v1.json")
-    di=make_dqn_control(cp)
-    dik=cap_split(known_val,625,pseed+101,True,"parity_dqnids_known")
-    dio=cap_split(surrogate_val,625,pseed+202,False,"parity_dqnids_surrogate")
-    di.fit(fit_payload,calibration={
-        "calibration_mode":"external_surrogate_cap625",
-        "calibration_known":dik,"calibration_open":dio,
-    })
-
-    vm=make_varmax_control(cp)
-    extras={"val_known_balanced":known_bal,"val_open":None,"val_open_balanced":None}
-    vm.fit(fit_payload,calibration=build_varmax_calibration(fit_payload,extras,cp))
-    return dg,thr,di,vm
-
+    # Replay the exact production freeze implementation.  Do not duplicate its
+    # metadata construction, control policy, capping, fitting, or threshold logic.
+    fr=_fit_one(
+        handle,known_val,known_bal,known_test,surrogate_val,
+        target,surrogate,policy,
+    )
+    return fr["dqnguard"],fr["dqnguard_threshold"],fr["dqnids"],fr["varmax"]
 
 def run_cell(cell,pipeline_root:Path,policy,tol):
     rn=cell["run_name"]; pair=list(cell["canonical_pair"])
@@ -135,11 +113,12 @@ def run_cell(cell,pipeline_root:Path,policy,tol):
     cache_dir=run_dir/"osr_calibration_cache"
     bundle=run_dir/"osr_posttrain_bundle"
     frozen=torch.load(bundle/"frozen/frozen_methods.pt",map_location="cpu",weights_only=False)
+    handle=load_backbone_run(str(run_dir),"best_model",device="cpu")
     cal=readj(cache_dir/"manifest.json")
     known_test=load_split(cache_dir/"known_test.npz")
     rows=[]
     for target,surrogate in ((pair[0],pair[1]),(pair[1],pair[0])):
-        ref_dg,ref_thr,ref_di,ref_vm=fit_reference(cache_dir,target,surrogate,policy)
+        ref_dg,ref_thr,ref_di,ref_vm=fit_reference(handle,cache_dir,target,surrogate,policy)
         fr=frozen["directions"][f"{target}_from_{surrogate}"]
         target_test=load_split(bundle/f"target_cache/test_open_{target}.npz")
         meta=payload_meta_from_manifests(cal,target)
