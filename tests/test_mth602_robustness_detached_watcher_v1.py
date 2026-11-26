@@ -1,17 +1,16 @@
 from pathlib import Path
 ROOT=Path(__file__).resolve().parents[1]
 
-def test_watcher_uses_foreground_authenticated_detached_sudo_launch():
+def test_watcher_is_systemd_managed_not_tmux_or_nohup():
     s=(ROOT/"scripts/mth602_robustness_tmux.sh").read_text()
-    assert "sudo -v" in s
-    assert "sudo -E bash -c" in s
-    assert "nohup '$PYTHON_BIN'" in s
-    assert "pipeline-watcher.pid" in s
-    assert "sudo -n" not in s
+    assert "systemd-run" in s
+    assert "systemctl is-active" in s
+    assert "nohup" not in s
+    assert "PIPE_SESSION=" not in s
 
-def test_dashboard_runs_unprivileged_and_health_uses_pid_plus_heartbeat():
+def test_systemd_watcher_uses_exact_dnn_python_and_operator_home():
     s=(ROOT/"scripts/mth602_robustness_tmux.sh").read_text()
-    assert "os.kill(pid,0)" in s
-    assert "age <= 5.0" in s
-    assert "exec '$PYTHON_BIN'" in s
-    assert "exec sudo" not in s
+    assert 'PYTHON_BIN="$(command -v python3)"' in s
+    assert '--setenv=SUDO_USER="$OPERATOR_USER"' in s
+    assert '"$PYTHON_BIN" "$ROOT/scripts/mth602_robustness_local_pipeline.py"' in s
+    assert '--runtime-python "$PYTHON_BIN"' in s
