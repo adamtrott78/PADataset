@@ -20,13 +20,13 @@ sudo chown "$OPERATOR_USER:$OPERATOR_GROUP" "$STATE_ROOT" "$LOG_DIR"
 watcher_healthy=0
 if systemctl is-active --quiet "$WATCHER_UNIT" 2>/dev/null && [[ -f "$STATE_FILE" ]]; then
   if "$PYTHON_BIN" - "$STATE_FILE" <<'PY'
-import json,os,sys,time
+import json,pathlib,sys,time
 try:
     s=json.load(open(sys.argv[1]))
     age=time.time()-float(s["epoch"])
     pid=int(s.get("pid",0))
-    os.kill(pid,0)
-    raise SystemExit(0 if age <= 5.0 else 1)
+    alive=pathlib.Path(f"/proc/{pid}").exists()
+    raise SystemExit(0 if age <= 5.0 and alive else 1)
 except Exception:
     raise SystemExit(1)
 PY
@@ -43,13 +43,13 @@ fi
 watcher_ok=0
 for _ in $(seq 1 30); do
   if systemctl is-active --quiet "$WATCHER_UNIT" 2>/dev/null && [[ -f "$STATE_FILE" ]] && "$PYTHON_BIN" - "$STATE_FILE" <<'PY'
-import json,os,sys,time
+import json,pathlib,sys,time
 try:
     s=json.load(open(sys.argv[1]))
     age=time.time()-float(s["epoch"])
     pid=int(s.get("pid",0))
-    os.kill(pid,0)
-    raise SystemExit(0 if age <= 5.0 else 1)
+    alive=pathlib.Path(f"/proc/{pid}").exists()
+    raise SystemExit(0 if age <= 5.0 and alive else 1)
 except Exception:
     raise SystemExit(1)
 PY
