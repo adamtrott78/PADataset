@@ -99,6 +99,7 @@ def main() -> None:
             parts = pair.split("-")
             if len(parts) != 2:
                 raise RuntimeError(f"post_train_osr_calibration_cache requires canonical pair, got {pair!r}")
+            cache_workers = int(cfg.get("post_train_osr_cache_num_workers", cfg.get("num_workers", 4)) or 4)
             cache_record = build_calibration_cache(
                 run_dir=save_dir,
                 checkpoint="best_model",
@@ -108,8 +109,21 @@ def main() -> None:
                 data_root=args.data_root,
                 device="cuda",
                 batch_size=128,
-                num_workers=0,
+                num_workers=cache_workers,
             )
+            from experiments.mth602_robustness_posttrain_bundle import build_posttrain_osr_bundle
+            bundle_record = build_posttrain_osr_bundle(
+                run_dir=save_dir,
+                calibration_cache_dir=save_dir / "osr_calibration_cache",
+                pair_a=parts[0],
+                pair_b=parts[1],
+                policy_path=REPO_ROOT / "manifests/mth602_robustness_cached_osr_policy_v1.json",
+                data_root=args.data_root,
+                batch_size=128,
+                num_workers=cache_workers,
+            )
+        else:
+            bundle_record = None
 
         complete_record = {
             "run_name": run_name,
@@ -118,6 +132,7 @@ def main() -> None:
             "elapsed_sec": time.time() - t0,
             "summary_path": str(save_dir / "summary.json"),
             "osr_calibration_cache": cache_record,
+            "osr_posttrain_bundle": bundle_record,
         }
         (save_dir / "train_complete.json").write_text(json.dumps(complete_record, indent=2))
 

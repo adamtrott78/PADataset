@@ -27,7 +27,7 @@ def discover():
         for s in glob.glob(pat):
             p=Path(s); c=read_json(p/"config.json")
             if not c or not c.get("post_train_osr_calibration_cache"): continue
-            if not (p/"train_complete.json").is_file() or not (p/"osr_calibration_cache/cache_complete.json").is_file(): continue
+            if not (p/"train_complete.json").is_file() or not (p/"osr_calibration_cache/cache_complete.json").is_file() or not (p/"osr_posttrain_bundle/bundle_complete.json").is_file(): continue
             out[p.name]=p
     return out
 
@@ -36,11 +36,12 @@ def copy_ready(src,dst):
     for name in ("config.json","summary.json","train_complete.json","best_model.pt"):
         sp=src/name; dp=dst/name
         if sp.is_file() and not dp.is_file(): shutil.copy2(sp,dp)
-    sc=src/"osr_calibration_cache"; dc=dst/"osr_calibration_cache"
-    if sc.is_dir() and not (dc/"cache_complete.json").is_file():
-        tmp=dst/"osr_calibration_cache.tmp"
-        if tmp.exists(): shutil.rmtree(tmp)
-        shutil.copytree(sc,tmp); tmp.replace(dc)
+    for sub, marker in (("osr_calibration_cache","cache_complete.json"),("osr_posttrain_bundle","bundle_complete.json")):
+        sc=src/sub; dc=dst/sub
+        if sc.is_dir() and not (dc/marker).is_file():
+            tmp=dst/(sub+".tmp")
+            if tmp.exists(): shutil.rmtree(tmp)
+            shutil.copytree(sc,tmp); tmp.replace(dc)
 
 def main():
     ap=argparse.ArgumentParser(); ap.add_argument("--repo",default=str(Path(__file__).resolve().parents[1])); ap.add_argument("--runtime-python",default=sys.executable)
@@ -70,7 +71,8 @@ def main():
             d,pair,od=candidates.pop(0); pa,pb=pair.split("-"); od.mkdir(parents=True,exist_ok=True); logs.mkdir(parents=True,exist_ok=True)
             log=(logs/f"{d.name}.log").open("ab",buffering=0)
             env=os.environ.copy(); env["CUDA_VISIBLE_DEVICES"]=""; env["PYTHONUNBUFFERED"]="1"
-            cmd=[a.runtime_python,str(Path(a.repo)/"experiments/mth602_robustness_cached_all_osr.py"),"--run-dir",str(d),"--cache-dir",str(d/"osr_calibration_cache"),"--pair-a",pa,"--pair-b",pb,"--out-dir",str(od),"--data-root",a.data_root,"--policy",str(Path(a.repo)/"manifests/mth602_robustness_cached_osr_policy_v1.json"),"--device","cpu"]
+            env["OMP_NUM_THREADS"]="4"; env["MKL_NUM_THREADS"]="4"; env["OPENBLAS_NUM_THREADS"]="4"; env["NUMEXPR_NUM_THREADS"]="4"
+            cmd=[a.runtime_python,str(Path(a.repo)/"experiments/mth602_robustness_cached_all_osr.py"),"--cache-dir",str(d/"osr_calibration_cache"),"--bundle-dir",str(d/"osr_posttrain_bundle"),"--pair-a",pa,"--pair-b",pb,"--out-dir",str(od),"--policy",str(Path(a.repo)/"manifests/mth602_robustness_cached_osr_policy_v1.json"),"--device","cpu"]
             p=subprocess.Popen(cmd,cwd=a.repo,env=env,stdout=log,stderr=subprocess.STDOUT,start_new_session=True)
             workers[d.name]=p
         state={"schema":"padataset.mth602-robustness-local-pipeline-state.v1","time":time.strftime("%Y-%m-%dT%H:%M:%S%z"),"max_workers":a.max_workers,"active_workers":{k:v.pid for k,v in workers.items()},"backbones_spooled":len(list(backbones.glob("mth602_robust_*"))),"osr_complete":len(list(results.glob("*/osr_complete.json"))),"provider_calls_per_refresh":0}

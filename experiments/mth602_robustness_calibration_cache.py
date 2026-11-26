@@ -4,11 +4,22 @@ from __future__ import annotations
 import argparse
 import hashlib
 import json
+import os
 from pathlib import Path
 from typing import Any
 
+os.environ.setdefault("OMP_NUM_THREADS","4")
+os.environ.setdefault("MKL_NUM_THREADS","4")
+os.environ.setdefault("OPENBLAS_NUM_THREADS","4")
+os.environ.setdefault("NUMEXPR_NUM_THREADS","4")
+
 import numpy as np
 import torch
+torch.set_num_threads(min(4, max(1, os.cpu_count() or 1)))
+try:
+    torch.set_num_interop_threads(1)
+except RuntimeError:
+    pass
 
 from evaluate import _make_setup_from_run_config
 from osr_core import load_backbone_run
@@ -127,7 +138,7 @@ def main():
     ap.add_argument("--run-dir",required=True); ap.add_argument("--checkpoint",default="best_model")
     ap.add_argument("--pair-a",required=True); ap.add_argument("--pair-b",required=True)
     ap.add_argument("--out-dir",required=True); ap.add_argument("--data-root",required=True)
-    ap.add_argument("--device",default="cuda"); ap.add_argument("--batch-size",type=int,default=128); ap.add_argument("--num-workers",type=int,default=0)
+    ap.add_argument("--device",default="cuda"); ap.add_argument("--batch-size",type=int,default=128); ap.add_argument("--num-workers",type=int,default=4)
     a=ap.parse_args()
     build_calibration_cache(run_dir=Path(a.run_dir),checkpoint=a.checkpoint,pair_a=a.pair_a,pair_b=a.pair_b,out_dir=Path(a.out_dir),data_root=a.data_root,device=a.device,batch_size=a.batch_size,num_workers=a.num_workers)
 

@@ -33,3 +33,16 @@ def test_four_smoke_manifests_are_two_epochs_and_nonfinal():
         assert c["robustness_replication"]["final_science_eligible"] is False
         seen.append((c["robustness_replication"]["smoke_wave"],c["robustness_replication"]["lane"]))
     assert sorted(seen)==[("A","G0"),("A","G1"),("B","G0"),("B","G1")]
+
+def test_posttrain_bundle_freezes_before_target_materialization():
+    s=(ROOT/"experiments/mth602_robustness_posttrain_bundle.py").read_text()
+    assert s.index("freeze_methods(") < s.index("build_target_cache(")
+    assert '"methods_frozen_before_target_test":True' in s
+    assert '"target_test_consumed_before_method_fit":False' in s
+
+def test_cached_consumer_never_touches_raw_dataset_or_backbone():
+    s=(ROOT/"experiments/mth602_robustness_cached_all_osr.py").read_text()
+    for forbidden in ["build_data_from_setup","_make_setup_from_run_config","load_backbone_run","test_open_loader","data_root"]:
+        assert forbidden not in s
+    assert '"raw_hdf5_reads":0' in s
+    assert '"backbone_forward_passes":0' in s

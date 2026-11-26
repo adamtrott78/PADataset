@@ -10,10 +10,11 @@ def test_new_pipeline_sources_parse():
 def test_cached_consumer_enforces_target_firewall_and_cpu_only():
     s=(ROOT/"experiments/mth602_robustness_cached_all_osr.py").read_text()
     assert 'methods_frozen_before_target_test' in s
-    run=s[s.index("def run_direction"):]
-    assert run.index('methods_frozen_before_target_test') < run.index('target_test=collect_target_test_once')
     assert 'CUDA_VISIBLE_DEVICES' in s
     assert 'target_test_consumed_before_method_fit' in s
+    assert 'raw_hdf5_reads' in s
+    assert 'backbone_forward_passes' in s
+    assert 'build_data_from_setup' not in s
 
 def test_local_pipeline_is_bounded_and_provider_free():
     s=(ROOT/"scripts/mth602_robustness_local_pipeline.py").read_text()
