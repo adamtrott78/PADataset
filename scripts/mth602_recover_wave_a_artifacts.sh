@@ -10,7 +10,10 @@ trap 'rm -rf "$TMP"' EXIT
 command -v gh >/dev/null || { echo "RECOVERY=FAIL reason=gh-missing"; exit 1; }
 gh auth status >/dev/null 2>&1 || { echo "RECOVERY=FAIL reason=gh-auth"; exit 1; }
 
-mkdir -p "$BACKBONES"
+echo "RECOVERY_PREPARE_SPOOL path=$BACKBONES"
+sudo -v
+sudo mkdir -p "$BACKBONES"
+sudo chown -R "$USER:$(id -gn)" "$BACKBONES"
 
 recover_one() {
   local run_id="$1"
