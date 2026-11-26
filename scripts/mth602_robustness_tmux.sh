@@ -37,7 +37,7 @@ fi
 
 if [[ "$watcher_healthy" -ne 1 ]]; then
   sudo systemctl stop "$WATCHER_UNIT" 2>/dev/null || true
-  sudo systemd-run     --unit="$WATCHER_UNIT"     --property=Restart=on-failure     --property=RestartSec=2     --setenv=SUDO_USER="$OPERATOR_USER"     --setenv=CUDA_VISIBLE_DEVICES=     --setenv=OMP_NUM_THREADS=4     --setenv=MKL_NUM_THREADS=4     --setenv=OPENBLAS_NUM_THREADS=4     --setenv=NUMEXPR_NUM_THREADS=4     "$PYTHON_BIN" "$ROOT/scripts/mth602_robustness_local_pipeline.py"       --repo "$ROOT"       --runtime-python "$PYTHON_BIN"       --max-workers 2       --refresh 1
+  sudo systemd-run     --unit="$WATCHER_UNIT"     --property=Restart=on-failure     --property=RestartSec=2     --setenv=SUDO_USER="$OPERATOR_USER"     --setenv=CUDA_VISIBLE_DEVICES=     --setenv=OMP_NUM_THREADS=4     --setenv=MKL_NUM_THREADS=4     --setenv=OPENBLAS_NUM_THREADS=4     --setenv=NUMEXPR_NUM_THREADS=4     "$PYTHON_BIN" "$ROOT/scripts/mth602_robustness_local_pipeline.py"       --repo "$ROOT"       --runtime-python "$PYTHON_BIN"       --state-root "$STATE_ROOT"       --max-workers 2       --refresh 1
 fi
 
 watcher_ok=0
