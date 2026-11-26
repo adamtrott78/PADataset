@@ -178,7 +178,7 @@ def render():
             try: p_age=max(0.0,time.time()-float(ps.get("epoch")))
             except Exception: pass
             p_state="ALIVE" if p_age is not None and p_age <= 5.0 else "STALE"
-            frame.append(f"PIPELINE {p_state} age={fmt(p_age)} pid={ps.get('pid','-')} | CPU OSR workers {len(ps.get('active_workers',{}))}/{ps.get('max_workers','-')} | spooled {ps.get('backbones_spooled','-')} | OSR complete {ps.get('osr_complete','-')} | provider calls/refresh 0")
+            frame.append(f"PIPELINE {p_state} age={fmt(p_age)} pid={ps.get('pid','-')} | CPU OSR workers {len(ps.get('active_workers',{}))}/{ps.get('max_workers','-')} | failed {len(ps.get('failed_workers',{}))} | spooled {ps.get('backbones_spooled','-')} | OSR complete {ps.get('osr_complete','-')} | provider calls/refresh 0")
             width=max(40,shutil.get_terminal_size((100,40)).columns-1)
             rendered="\n".join(clip_ansi(line,width) for line in frame)
             sys.stdout.write("\033[2J\033[H"+rendered)
