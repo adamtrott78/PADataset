@@ -1,25 +1,24 @@
 #!/usr/bin/env bash
 set -euo pipefail
+
 UI_SESSION=mth602-robustness-ui
+WATCHER_UNIT=mth602-robustness-pipeline.service
 ROOT="$(cd "$(dirname "${BASH_SOURCE[0]}")/.." && pwd)"
 PYTHON_BIN="$(command -v python3)"
 STATE_ROOT="$HOME/.cache/workspace-control/mth602-robustness-pipeline"
 STATE_FILE="$STATE_ROOT/pipeline_state.json"
 LOG_DIR="$STATE_ROOT/logs"
-WATCHER_LOG="$LOG_DIR/pipeline-watcher.log"
-WATCHER_PID_FILE="$STATE_ROOT/pipeline-watcher.pid"
 
-echo "Authenticating sudo for background watcher..."
+echo "Authenticating sudo for robustness watcher..."
 sudo -v
 
 OPERATOR_USER="${SUDO_USER:-$USER}"
 OPERATOR_GROUP="$(id -gn "$OPERATOR_USER")"
 sudo mkdir -p "$STATE_ROOT" "$LOG_DIR"
 sudo chown "$OPERATOR_USER:$OPERATOR_GROUP" "$STATE_ROOT" "$LOG_DIR"
-touch "$WATCHER_LOG"
 
-pipeline_healthy=0
-if [[ -f "$STATE_FILE" ]]; then
+watcher_healthy=0
+if systemctl is-active --quiet "$WATCHER_UNIT" 2>/dev/null && [[ -f "$STATE_FILE" ]]; then
   if "$PYTHON_BIN" - "$STATE_FILE" <<'PY'
 import json,os,sys,time
 try:
@@ -32,33 +31,18 @@ except Exception:
     raise SystemExit(1)
 PY
   then
-    pipeline_healthy=1
+    watcher_healthy=1
   fi
 fi
 
-if [[ "$pipeline_healthy" -ne 1 ]]; then
-  : > "$WATCHER_LOG"
-  sudo -E bash -c "
-    export SUDO_USER='$OPERATOR_USER'
-    export CUDA_VISIBLE_DEVICES=''
-    export OMP_NUM_THREADS=4
-    export MKL_NUM_THREADS=4
-    export OPENBLAS_NUM_THREADS=4
-    export NUMEXPR_NUM_THREADS=4
-    nohup '$PYTHON_BIN' '$ROOT/scripts/mth602_robustness_local_pipeline.py' \
-      --repo '$ROOT' \
-      --runtime-python '$PYTHON_BIN' \
-      --max-workers 2 \
-      --refresh 1 \
-      >>'$WATCHER_LOG' 2>&1 </dev/null &
-    echo \$! > '$WATCHER_PID_FILE'
-  "
-  sudo chown "$OPERATOR_USER:$OPERATOR_GROUP" "$WATCHER_PID_FILE" "$WATCHER_LOG" 2>/dev/null || true
+if [[ "$watcher_healthy" -ne 1 ]]; then
+  sudo systemctl stop "$WATCHER_UNIT" 2>/dev/null || true
+  sudo systemd-run     --unit="$WATCHER_UNIT"     --property=Restart=on-failure     --property=RestartSec=2     --setenv=SUDO_USER="$OPERATOR_USER"     --setenv=CUDA_VISIBLE_DEVICES=     --setenv=OMP_NUM_THREADS=4     --setenv=MKL_NUM_THREADS=4     --setenv=OPENBLAS_NUM_THREADS=4     --setenv=NUMEXPR_NUM_THREADS=4     "$PYTHON_BIN" "$ROOT/scripts/mth602_robustness_local_pipeline.py"       --repo "$ROOT"       --runtime-python "$PYTHON_BIN"       --max-workers 2       --refresh 1
 fi
 
 watcher_ok=0
 for _ in $(seq 1 30); do
-  if [[ -f "$STATE_FILE" ]] && "$PYTHON_BIN" - "$STATE_FILE" <<'PY'
+  if systemctl is-active --quiet "$WATCHER_UNIT" 2>/dev/null && [[ -f "$STATE_FILE" ]] && "$PYTHON_BIN" - "$STATE_FILE" <<'PY'
 import json,os,sys,time
 try:
     s=json.load(open(sys.argv[1]))
@@ -78,8 +62,9 @@ done
 
 if [[ "$watcher_ok" -ne 1 ]]; then
   echo "PIPELINE_WATCHER_START=FAIL"
-  echo "Watcher log:"
-  tail -n 80 "$WATCHER_LOG" 2>/dev/null || true
+  sudo systemctl status "$WATCHER_UNIT" --no-pager -l || true
+  echo "Recent watcher journal:"
+  sudo journalctl -u "$WATCHER_UNIT" -n 80 --no-pager || true
   exit 1
 fi
 
