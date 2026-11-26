@@ -6,7 +6,7 @@ import json
 import os
 import sys
 import time
-from concurrent.futures import ThreadPoolExecutor, as_completed
+from concurrent.futures import ProcessPoolExecutor, as_completed
 from pathlib import Path
 
 REPO_ROOT=Path(__file__).resolve().parents[1]
@@ -169,7 +169,7 @@ def main():
     root=Path(a.pipeline_root).expanduser().resolve()
     started=time.time()
     all_rows=[]; errors=[]
-    with ThreadPoolExecutor(max_workers=2) as pool:
+    with ProcessPoolExecutor(max_workers=2) as pool:
         futs={pool.submit(run_cell,c,root,policy,a.tolerance):c["run_name"] for c in cells}
         for fut in as_completed(futs):
             rn=futs[fut]
