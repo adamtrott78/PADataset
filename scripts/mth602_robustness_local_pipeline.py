@@ -6,6 +6,8 @@ from pathlib import Path
 PATTERNS=[
 "/srv/workspace-ci/padataset/jobs/*/runner/_work/_temp/scientific-results/backbone/mth602_robust_*",
 "/srv/workspace-ci/padataset/jobs/*/runner*/_work/_temp/scientific-results/backbone/mth602_robust_*",
+"/srv/workspace-ci/padataset/jobs/*/runner/_work/_temp/scientific-results/backbone/mth602_final_robust_*",
+"/srv/workspace-ci/padataset/jobs/*/runner*/_work/_temp/scientific-results/backbone/mth602_final_robust_*",
 ]
 
 def operator_home():
