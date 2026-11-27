@@ -84,17 +84,24 @@ def proc_rows():
             argv=shlex.split(p[2]); cfgp=Path(argv[argv.index("--cfg")+1]); cfg=readj(cfgp)
             if not cfg:continue
             rn=str(cfg.get("run_name",""))
-            if not rn.startswith("mth602_robust_"):continue
+            if not rn.startswith(("mth602_robust_","mth602_final_robust_")):continue
             out[rn]={"pid":int(p[0]),"elapsed":int(p[1]),"cfg":cfg,"run_dir":Path(str(cfg.get("save_root","")))/rn}
         except:continue
     return out
 
 def scan_dirs():
     d={}
-    pats=["/srv/workspace-ci/padataset/jobs/*/runner/_work/_temp/scientific-results/backbone/mth602_robust_*","/srv/workspace-ci/padataset/jobs/*/runner*/_work/_temp/scientific-results/backbone/mth602_robust_*"]
+    pats=[
+        "/srv/workspace-ci/padataset/jobs/*/runner/_work/_temp/scientific-results/backbone/mth602_robust_*",
+        "/srv/workspace-ci/padataset/jobs/*/runner*/_work/_temp/scientific-results/backbone/mth602_robust_*",
+        "/srv/workspace-ci/padataset/jobs/*/runner/_work/_temp/scientific-results/backbone/mth602_final_robust_*",
+        "/srv/workspace-ci/padataset/jobs/*/runner*/_work/_temp/scientific-results/backbone/mth602_final_robust_*",
+    ]
     for pat in pats:
         for s in glob.glob(pat): d.setdefault(Path(s).name,[]).append(Path(s))
-    for p in (ROOT/"backbones").glob("mth602_robust_*") if (ROOT/"backbones").is_dir() else []: d.setdefault(p.name,[]).append(p)
+    if (ROOT/"backbones").is_dir():
+        for pat in ("mth602_robust_*","mth602_final_robust_*"):
+            for p in (ROOT/"backbones").glob(pat): d.setdefault(p.name,[]).append(p)
     return d
 
 def record(rn,dirs,proc):
@@ -121,7 +128,10 @@ def osr_results():
     osr_root=ROOT/"osr"
     if not osr_root.is_dir():
         return directions,method_values
-    for od in osr_root.glob("mth602_robust_*"):
+    ods=[]
+    for pat in ("mth602_robust_*","mth602_final_robust_*"):
+        ods.extend(osr_root.glob(pat))
+    for od in ods:
         done=readj(od/"osr_complete.json")
         rows=readj(od/"result.json")
         if not done or done.get("status")!="SUCCESS" or not isinstance(rows,list):
