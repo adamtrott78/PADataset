@@ -55,6 +55,20 @@ def main() -> None:
     cfg_path = Path(args.cfg).expanduser()
     cfg = json.loads(cfg_path.read_text())
 
+    # Final robustness continuation contract: backbone science semantics remain
+    # frozen, while every final-family run emits the same provenance-bound
+    # post-train calibration cache + deterministic frozen-method bundle proven
+    # by the four-cell smoke pipeline.
+    if cfg.get("family_tag") == "mth602_final_robustness_v1":
+        cfg.setdefault("post_train_osr_calibration_cache", True)
+        cfg.setdefault("post_train_osr_cache_num_workers", int(cfg.get("num_workers", 4) or 4))
+        cfg["robustness_posttrain_contract"] = {
+            "schema": "padataset.mth602-final-robustness-posttrain-contract.v1",
+            "calibration_cache": True,
+            "deterministic_frozen_method_bundle": True,
+            "target_labels_used_for_tuning": False,
+        }
+
     run_name = cfg["run_name"]
     seed = cfg.get("seed")
     gpu = os.environ.get("CUDA_VISIBLE_DEVICES", "unset")
@@ -92,12 +106,47 @@ def main() -> None:
         save_dir = Path(summary["save_dir"])
         verify_complete(save_dir)
 
+        cache_record = None
+        if bool(cfg.get("post_train_osr_calibration_cache", False)):
+            from experiments.mth602_robustness_calibration_cache import build_calibration_cache
+            pair = str((cfg.get("robustness_replication") or {}).get("canonical_pair") or cfg.get("robustness_pair") or "")
+            parts = pair.split("-")
+            if len(parts) != 2:
+                raise RuntimeError(f"post_train_osr_calibration_cache requires canonical pair, got {pair!r}")
+            cache_workers = int(cfg.get("post_train_osr_cache_num_workers", cfg.get("num_workers", 4)) or 4)
+            cache_record = build_calibration_cache(
+                run_dir=save_dir,
+                checkpoint="best_model",
+                pair_a=parts[0],
+                pair_b=parts[1],
+                out_dir=save_dir / "osr_calibration_cache",
+                data_root=args.data_root,
+                device="cuda",
+                batch_size=128,
+                num_workers=cache_workers,
+            )
+            from experiments.mth602_robustness_posttrain_bundle import build_posttrain_osr_bundle
+            bundle_record = build_posttrain_osr_bundle(
+                run_dir=save_dir,
+                calibration_cache_dir=save_dir / "osr_calibration_cache",
+                pair_a=parts[0],
+                pair_b=parts[1],
+                policy_path=REPO_ROOT / "manifests/mth602_robustness_cached_osr_policy_v1.json",
+                data_root=args.data_root,
+                batch_size=128,
+                num_workers=cache_workers,
+            )
+        else:
+            bundle_record = None
+
         complete_record = {
             "run_name": run_name,
             "save_dir": str(save_dir),
             "cfg_path": str(cfg_path),
             "elapsed_sec": time.time() - t0,
             "summary_path": str(save_dir / "summary.json"),
+            "osr_calibration_cache": cache_record,
+            "osr_posttrain_bundle": bundle_record,
         }
         (save_dir / "train_complete.json").write_text(json.dumps(complete_record, indent=2))
 

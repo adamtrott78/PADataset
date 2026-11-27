@@ -80,6 +80,7 @@ def _compute_safe_classification_metrics(
             "acc": np.nan,
             "macro_f1": np.nan,
             "weighted_f1": np.nan,
+            "min_class_f1": np.nan,
             "confusion_matrix": cm,
             "class_names": [] if class_names is None else class_names,
             "n_valid_samples": 0,
@@ -88,6 +89,8 @@ def _compute_safe_classification_metrics(
     acc = float(np.mean(valid_preds == valid_labels))
     macro_f1 = float(f1_score(valid_labels, valid_preds, average="macro"))
     weighted_f1 = float(f1_score(valid_labels, valid_preds, average="weighted"))
+    per_class_f1 = np.asarray(f1_score(valid_labels, valid_preds, average=None, zero_division=0), dtype=np.float64)
+    min_class_f1 = float(np.min(per_class_f1)) if per_class_f1.size else np.nan
     cm = confusion_matrix(valid_labels, valid_preds)
 
     if class_names is None:
@@ -110,6 +113,7 @@ def _compute_safe_classification_metrics(
         "acc": acc,
         "macro_f1": macro_f1,
         "weighted_f1": weighted_f1,
+        "min_class_f1": min_class_f1,
         "confusion_matrix": cm,
         "class_names": out_class_names,
         "n_valid_samples": int(valid_labels.size),
@@ -188,6 +192,7 @@ def collect_classifier_outputs(
         "acc": metric_block["acc"],
         "macro_f1": metric_block["macro_f1"],
         "weighted_f1": metric_block["weighted_f1"],
+        "min_class_f1": metric_block["min_class_f1"],
         "n_samples": int(total_samples),
         "n_valid_samples": metric_block["n_valid_samples"],
         "confusion_matrix": metric_block["confusion_matrix"],
@@ -236,6 +241,7 @@ def evaluate_classifier(
             "acc": out["acc"],
             "macro_f1": out["macro_f1"],
             "weighted_f1": out["weighted_f1"],
+            "min_class_f1": out["min_class_f1"],
             "n_samples": out["n_samples"],
             "n_valid_samples": out["n_valid_samples"],
             "confusion_matrix": out["confusion_matrix"],

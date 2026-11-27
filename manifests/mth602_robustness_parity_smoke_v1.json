@@ -1,0 +1,79 @@
+{
+  "schema": "padataset.mth602-robustness-parity-smoke.v1",
+  "status": "READY_FOR_LOCAL_PARITY_GATE",
+  "purpose": "Same-backbone cached-vs-canonical evaluator parity gate before final MTH602 robustness campaign.",
+  "scientific_role": "INFRASTRUCTURE_VALIDATION_ONLY_NOT_FINAL_SCIENCE",
+  "abs_tolerance": 0.000001,
+  "metrics": [
+    "known_reject_rate",
+    "unknown_precision",
+    "unknown_recall",
+    "unknown_f1",
+    "osr_acc",
+    "osr_macro_f1",
+    "unknown_auroc"
+  ],
+  "methods": [
+    "DQNGuard",
+    "DQN-IDS-style",
+    "VarMax"
+  ],
+  "invariants": {
+    "checkpoint": "best_model",
+    "dqn_seed": 42,
+    "target_labels_used_for_tuning": false,
+    "canonical_dqnguard_policy": "manifests/l2o_directional_eval_policy_v1.json",
+    "canonical_control_policy": "manifests/l2o_control_eval_policy_v1.json",
+    "cached_policy": "manifests/mth602_robustness_cached_osr_policy_v1.json",
+    "canonical_state_mutation": false,
+    "retraining": false
+  },
+  "lanes": [
+    {
+      "gpu": 0,
+      "cells": [
+        {
+          "run_name": "mth602_robust_smoke_A_PA1_PA2_p01_t00",
+          "canonical_pair": [
+            "PA1",
+            "PA2"
+          ],
+          "partition_seed": 1,
+          "training_seed": 0
+        },
+        {
+          "run_name": "mth602_robust_smoke_B_PA2_PA4_p02_t00",
+          "canonical_pair": [
+            "PA2",
+            "PA4"
+          ],
+          "partition_seed": 2,
+          "training_seed": 0
+        }
+      ]
+    },
+    {
+      "gpu": 1,
+      "cells": [
+        {
+          "run_name": "mth602_robust_smoke_A_PA3_PA8_p01_t00",
+          "canonical_pair": [
+            "PA3",
+            "PA8"
+          ],
+          "partition_seed": 1,
+          "training_seed": 0
+        },
+        {
+          "run_name": "mth602_robust_smoke_B_PA4_PA8_p02_t00",
+          "canonical_pair": [
+            "PA4",
+            "PA8"
+          ],
+          "partition_seed": 2,
+          "training_seed": 0
+        }
+      ]
+    }
+  ]
+}

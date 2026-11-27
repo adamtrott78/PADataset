@@ -541,6 +541,7 @@ def train_classifier(
         "val_loss": [],
         "val_acc": [],
         "val_macro_f1": [],
+        "val_min_class_f1": [],
         "val_weighted_f1": [],
         "val_dqn_proxy_softmax3": [],
         "val_dqn_proxy_expanded5": [],
@@ -735,6 +736,7 @@ def train_classifier(
         history["val_loss"].append(val_stats["loss"])
         history["val_acc"].append(val_stats["acc"])
         history["val_macro_f1"].append(val_stats["macro_f1"])
+        history["val_min_class_f1"].append(val_stats["min_class_f1"])
         history["val_weighted_f1"].append(val_stats["weighted_f1"])
         history["lr"].append(float(optimizer.param_groups[0]["lr"]))
         history["train_epoch_elapsed_sec"].append(float(train_epoch_elapsed_sec))
@@ -759,7 +761,8 @@ def train_classifier(
             f"ce={train_ce:.4f} | ent={train_ent:.4f} | center={train_center:.4f} | "
             f"val_loss={val_stats['loss']:.4f} | "
             f"val_acc={val_stats['acc']:.4f} | "
-            f"val_macro_f1={val_stats['macro_f1']:.4f}"
+            f"val_macro_f1={val_stats['macro_f1']:.4f} | "
+            f"val_min_class_f1={val_stats['min_class_f1']:.4f}"
         )
         if open_conf_stats is not None:
             log_msg += (
@@ -774,7 +777,8 @@ def train_classifier(
         print(
             f"TRAIN_EPOCH_DONE | run_name={run_name} | epoch={epoch} | epochs={epochs} "
             f"| train_loss={train_loss:.5f} | val_loss={val_stats['loss']:.5f} "
-            f"| val_acc={val_stats['acc']:.5f} | val_macro_f1={val_stats['macro_f1']:.5f}",
+            f"| val_acc={val_stats['acc']:.5f} | val_macro_f1={val_stats['macro_f1']:.5f} "
+            f"| val_min_class_f1={val_stats['min_class_f1']:.5f}",
             flush=True,
         )
         write_progress(
@@ -788,6 +792,7 @@ def train_classifier(
             val_loss=float(val_stats["loss"]),
             val_acc=float(val_stats["acc"]),
             val_macro_f1=float(val_stats["macro_f1"]),
+            val_min_class_f1=float(val_stats["min_class_f1"]),
             train_epoch_elapsed_sec=float(train_epoch_elapsed_sec),
             train_steps_per_sec=float(train_steps_per_sec),
         )
@@ -1127,10 +1132,12 @@ def run_experiment(cfg: Dict[str, Any], data_root: str) -> Dict[str, Any]:
             "best_val_metric": best_val_metric,
             "best_val_acc": best_val_acc,
             "best_val_macro_f1": best_val_macro_f1,
+            "best_val_min_class_f1": val_stats.get("min_class_f1"),
 
             "test_loss": test_stats["loss"],
             "test_acc": test_stats["acc"],
             "test_macro_f1": test_stats["macro_f1"],
+            "test_min_class_f1": test_stats["min_class_f1"],
             "test_weighted_f1": test_stats["weighted_f1"],
             "test_n_samples": test_stats["n_samples"],
 
@@ -1221,6 +1228,7 @@ def run_experiment(cfg: Dict[str, Any], data_root: str) -> Dict[str, Any]:
             "best_val_metric": best_val_metric,
             "best_val_acc": best_val_acc,
             "best_val_macro_f1": best_val_macro_f1,
+            "best_val_min_class_f1": val_stats.get("min_class_f1"),
             "best_val_dqn_proxy_softmax3": best_open_conf_stats.get("dqn_proxy_softmax3"),
             "best_val_dqn_proxy_expanded5": best_open_conf_stats.get("dqn_proxy_expanded5"),
 
@@ -1232,6 +1240,7 @@ def run_experiment(cfg: Dict[str, Any], data_root: str) -> Dict[str, Any]:
             "test_known_loss": known_stats["loss"],
             "test_known_acc": known_stats["acc"],
             "test_known_macro_f1": known_stats["macro_f1"],
+            "test_known_min_class_f1": known_stats["min_class_f1"],
             "test_known_weighted_f1": known_stats["weighted_f1"],
             "test_known_n_samples": known_stats["n_samples"],
 
