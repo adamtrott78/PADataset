@@ -122,14 +122,15 @@ def identity_from_cfg(cfg):
 def glyph(status):
     return {"SUCCESS":GREEN+"✓"+RESET,"RUNNING":YELLOW+"▶"+RESET,"ERROR":RED+"×"+RESET,"OSR":CYAN+"O"+RESET}.get(status,DIM+"·"+RESET)
 
-def osr_results():
+def osr_results(final_only=False):
     directions=[]
     method_values={"DQNGuard":[],"DQN-IDS-style":[],"VarMax":[]}
     osr_root=ROOT/"osr"
     if not osr_root.is_dir():
         return directions,method_values
     ods=[]
-    for pat in ("mth602_robust_*","mth602_final_robust_*"):
+    pats=("mth602_final_robust_*",) if final_only else ("mth602_robust_*","mth602_final_robust_*")
+    for pat in pats:
         ods.extend(osr_root.glob(pat))
     for od in ods:
         done=readj(od/"osr_complete.json")
@@ -184,7 +185,7 @@ def render():
                 st="WAITING"; epoch=epochs=None; macro=minf=None; elapsed=(p or {}).get("elapsed"); eta=None; best_macro=None; best_min=None
                 if rec:
                     if rec["complete"]:
-                        st="SUCCESS"; elapsed=rec["complete"].get("elapsed_sec"); sm=rec["summary"] or {}; best_macro=sm.get("best_val_macro_f1"); best_min=sm.get("best_val_min_class_f1"); completed_durations.append(float(elapsed or 0))
+                        st="SUCCESS"; elapsed=rec["complete"].get("elapsed_sec"); sm=rec["summary"] or {}; best_macro=sm.get("best_val_macro_f1"); best_min=sm.get("best_val_min_class_f1") 
                     elif rec["error"]:st="ERROR"
                     elif p:st="RUNNING"
                     pr=rec["progress"] or {}
@@ -195,7 +196,10 @@ def render():
                 od=ROOT/"osr"/rn; osrdone=readj(od/"osr_complete.json")
                 osrstate="SUCCESS" if osrdone else ("RUNNING" if any((od/f).exists() for f in ["progress_PA1_from_PA2.json"]) else "-")
                 rows.append({"rn":rn,"pair":pair,"p":ps,"t":ts,"status":st,"epoch":epoch,"epochs":epochs,"macro":macro if macro is not None else best_macro,"minf":minf if minf is not None else best_min,"elapsed":elapsed,"eta":eta,"osr":osrstate})
-                bycell[(pair,ps,ts)]=st
+            final_rows=[r for r in rows if r["rn"].startswith("mth602_final_robust_")]
+            display_rows=final_rows if final_rows else rows
+            bycell={(r["pair"],r["p"],r["t"]):r["status"] for r in display_rows}
+            completed_durations=[float(r["elapsed"] or 0) for r in display_rows if r["status"]=="SUCCESS" and float(r["elapsed"] or 0)>0]
             g=gpu(); frame=[B+"MTH602 FINAL ROBUSTNESS — LOCAL PIPELINE"+RESET,DIM+"Source: HOST LOCAL ONLY | GitHub/REST/GraphQL calls per refresh: 0 | Ctrl+C detaches"+RESET]
             if g:
                 frame.append("   ".join(f"GPU{x[0]} {x[1]}/{x[2]} MiB {x[3]}%" for x in g))
@@ -209,12 +213,12 @@ def render():
             frame.append("")
             frame.append(B+f"{'CELL':<22} {'STATE':<8} {'EPOCH':>7} {'MAC-F1':>8} {'MIN-F1':>8} {'ELAPSED':>9} {'ETA':>9} {'FINISH':>7} {'OSR':>8}"+RESET)
             frame.append("-"*98)
-            active=[r for r in rows if r["status"]=="RUNNING"]; terminal=sorted([r for r in rows if r["status"]!="RUNNING"],key=lambda x:x["rn"])[-12:]
+            active=[r for r in display_rows if r["status"]=="RUNNING"]; terminal=sorted([r for r in display_rows if r["status"]!="RUNNING"],key=lambda x:x["rn"])[-12:]
             for r in active+terminal:
                 ep="-" if not r["epoch"] else f"{int(r['epoch'])}/{int(r['epochs'] or 0)}"
                 frame.append(f"{r['pair']} p{r['p']}t{r['t']:<11} {r['status']:<8} {ep:>7} {metric(r['macro']):>8} {metric(r['minf']):>8} {fmt(r['elapsed']):>9} {fmt(r['eta']):>9} {finish_text(r['eta']):>7} {r['osr']:>8}")
             total=50
-            done=sum(1 for r in rows if r["status"]=="SUCCESS" and r["t"] in (0,1))
+            done=sum(1 for r in display_rows if r["status"]=="SUCCESS" and r["t"] in (0,1))
             med=statistics.median([x for x in completed_durations if x>0]) if any(x>0 for x in completed_durations) else None
             active_frac=0.0
             for r in active:
@@ -225,11 +229,11 @@ def render():
             frame.append("-"*98)
             frame.append(f"TRAINING {done}/{total} + active={active_frac:.2f}  completion≈{progress*100:5.1f}%  median completed={fmt(med)}  campaign ETA={fmt(overall_eta)}  projected finish={finish_text(overall_eta)}")
 
-            osrdirs,osrvals=osr_results()
+            osrdirs,osrvals=osr_results(final_only=bool(final_rows))
             completed_dirs=len(osrdirs)
             if completed_dirs:
                 frame.append("")
-                frame.append(B+f"OSR RESULTS  completed directions={completed_dirs}  mean U-F1: DQNGuard={mean_metric(osrvals['DQNGuard'])}  DQN-IDS={mean_metric(osrvals['DQN-IDS-style'])}  VarMax={mean_metric(osrvals['VarMax'])}"+RESET)
+                frame.append(B+f"{'FINAL ' if final_rows else ''}OSR RESULTS  completed directions={completed_dirs}  mean U-F1: DQNGuard={mean_metric(osrvals['DQNGuard'])}  DQN-IDS={mean_metric(osrvals['DQN-IDS-style'])}  VarMax={mean_metric(osrvals['VarMax'])}"+RESET)
                 frame.append(f"{'CELL':<18} {'DIRECTION':<13} {'DQNG-UF1':>9} {'IDS-UF1':>9} {'VMAX-UF1':>10}")
                 frame.append("-"*64)
                 for x in osrdirs[:12]:
