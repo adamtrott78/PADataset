@@ -16,6 +16,7 @@ try:
     torch.set_num_interop_threads(1)
 except RuntimeError:
     pass
+torch.use_deterministic_algorithms(True)
 
 from osr_core import BackbonePayload, load_backbone_run
 from evaluate import _make_setup_from_run_config
