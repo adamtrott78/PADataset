@@ -55,6 +55,20 @@ def main() -> None:
     cfg_path = Path(args.cfg).expanduser()
     cfg = json.loads(cfg_path.read_text())
 
+    # Final robustness continuation contract: backbone science semantics remain
+    # frozen, while every final-family run emits the same provenance-bound
+    # post-train calibration cache + deterministic frozen-method bundle proven
+    # by the four-cell smoke pipeline.
+    if cfg.get("family_tag") == "mth602_final_robustness_v1":
+        cfg.setdefault("post_train_osr_calibration_cache", True)
+        cfg.setdefault("post_train_osr_cache_num_workers", int(cfg.get("num_workers", 4) or 4))
+        cfg["robustness_posttrain_contract"] = {
+            "schema": "padataset.mth602-final-robustness-posttrain-contract.v1",
+            "calibration_cache": True,
+            "deterministic_frozen_method_bundle": True,
+            "target_labels_used_for_tuning": False,
+        }
+
     run_name = cfg["run_name"]
     seed = cfg.get("seed")
     gpu = os.environ.get("CUDA_VISIBLE_DEVICES", "unset")
