@@ -1,0 +1,418 @@
+{
+  "schema": "padataset.mth602-final-robustness-continuation.v1",
+  "status": "PREPARED_NOT_ADMITTED",
+  "prepared_from_head": "d07bbbaa4f62d9125ba2a12dbddd4bcef8f189eb",
+  "original_launch_head": "bdb512c04b70f1e2be673fb94254960d50997ba4",
+  "reason": "Reuse two valid PA1-PA2 final backbones; re-admit only the 46 cells that never trained after exact-head rejection. Final-family runner now emits the proven cached-OSR calibration/frozen-method bundle automatically.",
+  "completed_reuse": [
+    {
+      "canonical_pair": "PA1-PA2",
+      "partition_seed": 1,
+      "training_seed": 0,
+      "run_name": "mth602_final_robust_PA1_PA2_p01_t00",
+      "workflow_run_id": 45941183333,
+      "artifact_id": 15175081549,
+      "retrain": false
+    },
+    {
+      "canonical_pair": "PA1-PA2",
+      "partition_seed": 2,
+      "training_seed": 0,
+      "run_name": "mth602_final_robust_PA1_PA2_p02_t00",
+      "workflow_run_id": 45941184981,
+      "retrain": false
+    }
+  ],
+  "remaining_trainings": 46,
+  "lane_counts": {
+    "lambda-scientific": 23,
+    "lambda-scientific-2": 23
+  },
+  "training_policy": {
+    "epochs_max": 60,
+    "early_stopping_mode": "known_only",
+    "early_stopping_patience": 10,
+    "horizon_change": false
+  },
+  "posttrain_policy": {
+    "automatic_for_family_tag": "mth602_final_robustness_v1",
+    "calibration_cache": true,
+    "deterministic_frozen_method_bundle": true,
+    "target_labels_used_for_tuning": false
+  },
+  "head_freeze_policy": {
+    "exact_head_pin_required": true,
+    "no_pr_head_mutation_after_admission": true,
+    "explicit_execution_authority_required": true
+  },
+  "cells": [
+    {
+      "canonical_pair": "PA1-PA2",
+      "partition_seed": 3,
+      "training_seed": 0,
+      "lane": "lambda-scientific",
+      "config_path": "manifests/configs/mth602_final_robustness_v1/PA1-PA2/p03_t00.json",
+      "run_name": "mth602_final_robust_PA1_PA2_p03_t00"
+    },
+    {
+      "canonical_pair": "PA1-PA2",
+      "partition_seed": 4,
+      "training_seed": 0,
+      "lane": "lambda-scientific-2",
+      "config_path": "manifests/configs/mth602_final_robustness_v1/PA1-PA2/p04_t00.json",
+      "run_name": "mth602_final_robust_PA1_PA2_p04_t00"
+    },
+    {
+      "canonical_pair": "PA1-PA3",
+      "partition_seed": 1,
+      "training_seed": 0,
+      "lane": "lambda-scientific",
+      "config_path": "manifests/configs/mth602_final_robustness_v1/PA1-PA3/p01_t00.json",
+      "run_name": "mth602_final_robust_PA1_PA3_p01_t00"
+    },
+    {
+      "canonical_pair": "PA1-PA3",
+      "partition_seed": 2,
+      "training_seed": 0,
+      "lane": "lambda-scientific-2",
+      "config_path": "manifests/configs/mth602_final_robustness_v1/PA1-PA3/p02_t00.json",
+      "run_name": "mth602_final_robust_PA1_PA3_p02_t00"
+    },
+    {
+      "canonical_pair": "PA1-PA3",
+      "partition_seed": 3,
+      "training_seed": 0,
+      "lane": "lambda-scientific",
+      "config_path": "manifests/configs/mth602_final_robustness_v1/PA1-PA3/p03_t00.json",
+      "run_name": "mth602_final_robust_PA1_PA3_p03_t00"
+    },
+    {
+      "canonical_pair": "PA1-PA3",
+      "partition_seed": 4,
+      "training_seed": 0,
+      "lane": "lambda-scientific-2",
+      "config_path": "manifests/configs/mth602_final_robustness_v1/PA1-PA3/p04_t00.json",
+      "run_name": "mth602_final_robust_PA1_PA3_p04_t00"
+    },
+    {
+      "canonical_pair": "PA1-PA4",
+      "partition_seed": 1,
+      "training_seed": 0,
+      "lane": "lambda-scientific",
+      "config_path": "manifests/configs/mth602_final_robustness_v1/PA1-PA4/p01_t00.json",
+      "run_name": "mth602_final_robust_PA1_PA4_p01_t00"
+    },
+    {
+      "canonical_pair": "PA1-PA4",
+      "partition_seed": 2,
+      "training_seed": 0,
+      "lane": "lambda-scientific-2",
+      "config_path": "manifests/configs/mth602_final_robustness_v1/PA1-PA4/p02_t00.json",
+      "run_name": "mth602_final_robust_PA1_PA4_p02_t00"
+    },
+    {
+      "canonical_pair": "PA1-PA4",
+      "partition_seed": 3,
+      "training_seed": 0,
+      "lane": "lambda-scientific",
+      "config_path": "manifests/configs/mth602_final_robustness_v1/PA1-PA4/p03_t00.json",
+      "run_name": "mth602_final_robust_PA1_PA4_p03_t00"
+    },
+    {
+      "canonical_pair": "PA1-PA4",
+      "partition_seed": 4,
+      "training_seed": 0,
+      "lane": "lambda-scientific-2",
+      "config_path": "manifests/configs/mth602_final_robustness_v1/PA1-PA4/p04_t00.json",
+      "run_name": "mth602_final_robust_PA1_PA4_p04_t00"
+    },
+    {
+      "canonical_pair": "PA1-PA8",
+      "partition_seed": 1,
+      "training_seed": 0,
+      "lane": "lambda-scientific",
+      "config_path": "manifests/configs/mth602_final_robustness_v1/PA1-PA8/p01_t00.json",
+      "run_name": "mth602_final_robust_PA1_PA8_p01_t00"
+    },
+    {
+      "canonical_pair": "PA1-PA8",
+      "partition_seed": 2,
+      "training_seed": 0,
+      "lane": "lambda-scientific-2",
+      "config_path": "manifests/configs/mth602_final_robustness_v1/PA1-PA8/p02_t00.json",
+      "run_name": "mth602_final_robust_PA1_PA8_p02_t00"
+    },
+    {
+      "canonical_pair": "PA1-PA8",
+      "partition_seed": 3,
+      "training_seed": 0,
+      "lane": "lambda-scientific",
+      "config_path": "manifests/configs/mth602_final_robustness_v1/PA1-PA8/p03_t00.json",
+      "run_name": "mth602_final_robust_PA1_PA8_p03_t00"
+    },
+    {
+      "canonical_pair": "PA1-PA8",
+      "partition_seed": 4,
+      "training_seed": 0,
+      "lane": "lambda-scientific-2",
+      "config_path": "manifests/configs/mth602_final_robustness_v1/PA1-PA8/p04_t00.json",
+      "run_name": "mth602_final_robust_PA1_PA8_p04_t00"
+    },
+    {
+      "canonical_pair": "PA2-PA3",
+      "partition_seed": 1,
+      "training_seed": 0,
+      "lane": "lambda-scientific",
+      "config_path": "manifests/configs/mth602_final_robustness_v1/PA2-PA3/p01_t00.json",
+      "run_name": "mth602_final_robust_PA2_PA3_p01_t00"
+    },
+    {
+      "canonical_pair": "PA2-PA3",
+      "partition_seed": 2,
+      "training_seed": 0,
+      "lane": "lambda-scientific-2",
+      "config_path": "manifests/configs/mth602_final_robustness_v1/PA2-PA3/p02_t00.json",
+      "run_name": "mth602_final_robust_PA2_PA3_p02_t00"
+    },
+    {
+      "canonical_pair": "PA2-PA3",
+      "partition_seed": 3,
+      "training_seed": 0,
+      "lane": "lambda-scientific",
+      "config_path": "manifests/configs/mth602_final_robustness_v1/PA2-PA3/p03_t00.json",
+      "run_name": "mth602_final_robust_PA2_PA3_p03_t00"
+    },
+    {
+      "canonical_pair": "PA2-PA3",
+      "partition_seed": 4,
+      "training_seed": 0,
+      "lane": "lambda-scientific-2",
+      "config_path": "manifests/configs/mth602_final_robustness_v1/PA2-PA3/p04_t00.json",
+      "run_name": "mth602_final_robust_PA2_PA3_p04_t00"
+    },
+    {
+      "canonical_pair": "PA2-PA4",
+      "partition_seed": 1,
+      "training_seed": 0,
+      "lane": "lambda-scientific",
+      "config_path": "manifests/configs/mth602_final_robustness_v1/PA2-PA4/p01_t00.json",
+      "run_name": "mth602_final_robust_PA2_PA4_p01_t00"
+    },
+    {
+      "canonical_pair": "PA2-PA4",
+      "partition_seed": 2,
+      "training_seed": 0,
+      "lane": "lambda-scientific-2",
+      "config_path": "manifests/configs/mth602_final_robustness_v1/PA2-PA4/p02_t00.json",
+      "run_name": "mth602_final_robust_PA2_PA4_p02_t00"
+    },
+    {
+      "canonical_pair": "PA2-PA4",
+      "partition_seed": 3,
+      "training_seed": 0,
+      "lane": "lambda-scientific",
+      "config_path": "manifests/configs/mth602_final_robustness_v1/PA2-PA4/p03_t00.json",
+      "run_name": "mth602_final_robust_PA2_PA4_p03_t00"
+    },
+    {
+      "canonical_pair": "PA2-PA4",
+      "partition_seed": 4,
+      "training_seed": 0,
+      "lane": "lambda-scientific-2",
+      "config_path": "manifests/configs/mth602_final_robustness_v1/PA2-PA4/p04_t00.json",
+      "run_name": "mth602_final_robust_PA2_PA4_p04_t00"
+    },
+    {
+      "canonical_pair": "PA2-PA8",
+      "partition_seed": 1,
+      "training_seed": 0,
+      "lane": "lambda-scientific",
+      "config_path": "manifests/configs/mth602_final_robustness_v1/PA2-PA8/p01_t00.json",
+      "run_name": "mth602_final_robust_PA2_PA8_p01_t00"
+    },
+    {
+      "canonical_pair": "PA2-PA8",
+      "partition_seed": 2,
+      "training_seed": 0,
+      "lane": "lambda-scientific-2",
+      "config_path": "manifests/configs/mth602_final_robustness_v1/PA2-PA8/p02_t00.json",
+      "run_name": "mth602_final_robust_PA2_PA8_p02_t00"
+    },
+    {
+      "canonical_pair": "PA2-PA8",
+      "partition_seed": 3,
+      "training_seed": 0,
+      "lane": "lambda-scientific",
+      "config_path": "manifests/configs/mth602_final_robustness_v1/PA2-PA8/p03_t00.json",
+      "run_name": "mth602_final_robust_PA2_PA8_p03_t00"
+    },
+    {
+      "canonical_pair": "PA2-PA8",
+      "partition_seed": 4,
+      "training_seed": 0,
+      "lane": "lambda-scientific-2",
+      "config_path": "manifests/configs/mth602_final_robustness_v1/PA2-PA8/p04_t00.json",
+      "run_name": "mth602_final_robust_PA2_PA8_p04_t00"
+    },
+    {
+      "canonical_pair": "PA3-PA4",
+      "partition_seed": 1,
+      "training_seed": 0,
+      "lane": "lambda-scientific",
+      "config_path": "manifests/configs/mth602_final_robustness_v1/PA3-PA4/p01_t00.json",
+      "run_name": "mth602_final_robust_PA3_PA4_p01_t00"
+    },
+    {
+      "canonical_pair": "PA3-PA4",
+      "partition_seed": 2,
+      "training_seed": 0,
+      "lane": "lambda-scientific-2",
+      "config_path": "manifests/configs/mth602_final_robustness_v1/PA3-PA4/p02_t00.json",
+      "run_name": "mth602_final_robust_PA3_PA4_p02_t00"
+    },
+    {
+      "canonical_pair": "PA3-PA4",
+      "partition_seed": 3,
+      "training_seed": 0,
+      "lane": "lambda-scientific",
+      "config_path": "manifests/configs/mth602_final_robustness_v1/PA3-PA4/p03_t00.json",
+      "run_name": "mth602_final_robust_PA3_PA4_p03_t00"
+    },
+    {
+      "canonical_pair": "PA3-PA4",
+      "partition_seed": 4,
+      "training_seed": 0,
+      "lane": "lambda-scientific-2",
+      "config_path": "manifests/configs/mth602_final_robustness_v1/PA3-PA4/p04_t00.json",
+      "run_name": "mth602_final_robust_PA3_PA4_p04_t00"
+    },
+    {
+      "canonical_pair": "PA3-PA8",
+      "partition_seed": 1,
+      "training_seed": 0,
+      "lane": "lambda-scientific",
+      "config_path": "manifests/configs/mth602_final_robustness_v1/PA3-PA8/p01_t00.json",
+      "run_name": "mth602_final_robust_PA3_PA8_p01_t00"
+    },
+    {
+      "canonical_pair": "PA3-PA8",
+      "partition_seed": 2,
+      "training_seed": 0,
+      "lane": "lambda-scientific-2",
+      "config_path": "manifests/configs/mth602_final_robustness_v1/PA3-PA8/p02_t00.json",
+      "run_name": "mth602_final_robust_PA3_PA8_p02_t00"
+    },
+    {
+      "canonical_pair": "PA3-PA8",
+      "partition_seed": 3,
+      "training_seed": 0,
+      "lane": "lambda-scientific",
+      "config_path": "manifests/configs/mth602_final_robustness_v1/PA3-PA8/p03_t00.json",
+      "run_name": "mth602_final_robust_PA3_PA8_p03_t00"
+    },
+    {
+      "canonical_pair": "PA3-PA8",
+      "partition_seed": 4,
+      "training_seed": 0,
+      "lane": "lambda-scientific-2",
+      "config_path": "manifests/configs/mth602_final_robustness_v1/PA3-PA8/p04_t00.json",
+      "run_name": "mth602_final_robust_PA3_PA8_p04_t00"
+    },
+    {
+      "canonical_pair": "PA4-PA8",
+      "partition_seed": 1,
+      "training_seed": 0,
+      "lane": "lambda-scientific",
+      "config_path": "manifests/configs/mth602_final_robustness_v1/PA4-PA8/p01_t00.json",
+      "run_name": "mth602_final_robust_PA4_PA8_p01_t00"
+    },
+    {
+      "canonical_pair": "PA4-PA8",
+      "partition_seed": 2,
+      "training_seed": 0,
+      "lane": "lambda-scientific-2",
+      "config_path": "manifests/configs/mth602_final_robustness_v1/PA4-PA8/p02_t00.json",
+      "run_name": "mth602_final_robust_PA4_PA8_p02_t00"
+    },
+    {
+      "canonical_pair": "PA4-PA8",
+      "partition_seed": 3,
+      "training_seed": 0,
+      "lane": "lambda-scientific",
+      "config_path": "manifests/configs/mth602_final_robustness_v1/PA4-PA8/p03_t00.json",
+      "run_name": "mth602_final_robust_PA4_PA8_p03_t00"
+    },
+    {
+      "canonical_pair": "PA4-PA8",
+      "partition_seed": 4,
+      "training_seed": 0,
+      "lane": "lambda-scientific-2",
+      "config_path": "manifests/configs/mth602_final_robustness_v1/PA4-PA8/p04_t00.json",
+      "run_name": "mth602_final_robust_PA4_PA8_p04_t00"
+    },
+    {
+      "canonical_pair": "PA1-PA4",
+      "partition_seed": 0,
+      "training_seed": 1,
+      "lane": "lambda-scientific",
+      "config_path": "manifests/configs/mth602_final_robustness_v1/PA1-PA4/p00_t01.json",
+      "run_name": "mth602_final_robust_PA1_PA4_p00_t01"
+    },
+    {
+      "canonical_pair": "PA1-PA8",
+      "partition_seed": 0,
+      "training_seed": 1,
+      "lane": "lambda-scientific-2",
+      "config_path": "manifests/configs/mth602_final_robustness_v1/PA1-PA8/p00_t01.json",
+      "run_name": "mth602_final_robust_PA1_PA8_p00_t01"
+    },
+    {
+      "canonical_pair": "PA2-PA3",
+      "partition_seed": 0,
+      "training_seed": 1,
+      "lane": "lambda-scientific",
+      "config_path": "manifests/configs/mth602_final_robustness_v1/PA2-PA3/p00_t01.json",
+      "run_name": "mth602_final_robust_PA2_PA3_p00_t01"
+    },
+    {
+      "canonical_pair": "PA2-PA4",
+      "partition_seed": 0,
+      "training_seed": 1,
+      "lane": "lambda-scientific-2",
+      "config_path": "manifests/configs/mth602_final_robustness_v1/PA2-PA4/p00_t01.json",
+      "run_name": "mth602_final_robust_PA2_PA4_p00_t01"
+    },
+    {
+      "canonical_pair": "PA2-PA8",
+      "partition_seed": 0,
+      "training_seed": 1,
+      "lane": "lambda-scientific",
+      "config_path": "manifests/configs/mth602_final_robustness_v1/PA2-PA8/p00_t01.json",
+      "run_name": "mth602_final_robust_PA2_PA8_p00_t01"
+    },
+    {
+      "canonical_pair": "PA3-PA4",
+      "partition_seed": 0,
+      "training_seed": 1,
+      "lane": "lambda-scientific-2",
+      "config_path": "manifests/configs/mth602_final_robustness_v1/PA3-PA4/p00_t01.json",
+      "run_name": "mth602_final_robust_PA3_PA4_p00_t01"
+    },
+    {
+      "canonical_pair": "PA3-PA8",
+      "partition_seed": 0,
+      "training_seed": 1,
+      "lane": "lambda-scientific",
+      "config_path": "manifests/configs/mth602_final_robustness_v1/PA3-PA8/p00_t01.json",
+      "run_name": "mth602_final_robust_PA3_PA8_p00_t01"
+    },
+    {
+      "canonical_pair": "PA4-PA8",
+      "partition_seed": 0,
+      "training_seed": 1,
+      "lane": "lambda-scientific-2",
+      "config_path": "manifests/configs/mth602_final_robustness_v1/PA4-PA8/p00_t01.json",
+      "run_name": "mth602_final_robust_PA4_PA8_p00_t01"
+    }
+  ]
+}
