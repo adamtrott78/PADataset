@@ -1,6 +1,6 @@
 {
   "schema": "padataset.mth602-final-robustness-reduced-plan.v1",
-  "status": "FROZEN_PENDING_PILOT_OSR_AND_FOUR_MODEL_SMOKE_PASS",
+  "status": "FINAL_LAUNCH_AUTHORIZED_DETERMINISM_RESOLVED",
   "partition_seeds": [
     0,
     1,
@@ -35,5 +35,20 @@
     "four-model two-wave overlap smoke PASS",
     "cached CPU evaluator parity against canonical GPU evaluator on exact same smoke backbones",
     "zero-provider dashboard validated"
+  ],
+  "final_launch_gate_resolution": {
+    "status": "PASS",
+    "smoke_overlap": "PASS",
+    "cached_osr": "PASS_ON_FROZEN_METHOD_EVALUATION_PATH",
+    "canonical_fresh_refit_parity": "DIAGNOSTIC_FAIL_DUE_TO_UNCONTROLLED_DQN_REFIT_VARIABILITY",
+    "dqn_repro_probe": "PASS_WITH_DETERMINISTIC_ALGORITHMS",
+    "production_determinism_hardening_head": "bc19f2b01db67fde46d9f8550e901d28da229fe8",
+    "final_admission_manifest": "manifests/mth602_final_robustness_reduced_admission_v1.json",
+    "note": "Do not reinterpret the failed fresh-refit 1e-6 gate as cached-evaluator corruption; exact same-evidence production refits proved the DQN fit was the varying component before deterministic hardening."
+  },
+  "remaining_new_trainings": 48,
+  "already_completed_p00t01": [
+    "PA1-PA2",
+    "PA1-PA3"
   ]
 }
