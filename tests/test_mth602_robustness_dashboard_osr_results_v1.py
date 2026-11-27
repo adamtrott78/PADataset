@@ -4,7 +4,7 @@ ROOT=Path(__file__).resolve().parents[1]
 
 def test_dashboard_reads_completed_osr_results_and_displays_unknown_f1():
     s=(ROOT/"scripts/mth602_robustness_local_dashboard.py").read_text()
-    assert "def osr_results()" in s
+    assert "def osr_results(final_only=False)" in s
     assert 'readj(od/"osr_complete.json")' in s
     assert 'readj(od/"result.json")' in s
     assert "OSR RESULTS" in s
